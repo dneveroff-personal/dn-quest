@@ -11,19 +11,18 @@ import dn.quizengine.model.Quiz;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * <a href="http://localhost:8080/swagger-ui/index.html">Swagger ui for testing</a>
- */
 @RestController
 @RequestMapping("/api/quiz")
 public class QuizController {
 
+    private static final Logger log = LoggerFactory.getLogger(QuizController.class);
     private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
     private final Cache<UUID, Quiz> quizCache =
             Caffeine.newBuilder().maximumSize(10_000).build(); // Кеш последних тестов
-
 
     @PostConstruct
     public void init() {
@@ -39,7 +38,7 @@ public class QuizController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its UUID")
+    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its UUID") // это для Swagger-а
     public Quiz getQuiz(
             @Parameter(description = "ID of the quiz", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id
@@ -60,7 +59,7 @@ public class QuizController {
          * В вашем случае он не обязателен, но полезен для отладки.
          */
         if (traceId == null) {
-            traceId = UUID.randomUUID().toString(); // Генерируем, если не передали
+            traceId = "gen-" + UUID.randomUUID();
         }
 
         Quiz quiz = quizCache.getIfPresent(id);
@@ -69,6 +68,7 @@ public class QuizController {
         }
 
         boolean isCorrect = quiz != null && answer == quiz.getCorrectOptionIndex();
+        log.info("TraceId: {}, QuizId: {}, Answer: {}", traceId, id, answer);
 
         return new AnswerResult(
                 isCorrect,
