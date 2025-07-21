@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/quizzes")
 public class QuizController {
 
-    private static final Logger log = LoggerFactory.getLogger(QuizController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(QuizController.class);
     private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
     private final Cache<UUID, Quiz> quizCache = Caffeine.newBuilder().maximumSize(10_000).build();
 
@@ -94,12 +94,8 @@ public class QuizController {
             quiz = quizzes.get(id);
         }
 
-        if (quiz == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
-        }
-
-        boolean isCorrect = answer == quiz.getCorrectOptionIndex();
-        log.info("TraceId: {}, QuizId: {}, Answer: {}", traceId, id, answer);
+        boolean isCorrect = quiz != null && answer == quiz.getCorrectOptionIndex();
+        LOGGER.info("TraceId: {}, QuizId: {}, Answer: {}", traceId, id, answer);
 
         return new AnswerResult(
                 isCorrect,
@@ -108,4 +104,5 @@ public class QuizController {
                 traceId
         );
     }
+
 }
