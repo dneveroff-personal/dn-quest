@@ -8,21 +8,23 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import dn.quizengine.model.AnswerResult;
 import dn.quizengine.model.Quiz;
+import dn.quizengine.model.QuizCreationDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/quiz")
+@RequestMapping("/api/quizzes")
 public class QuizController {
 
     private static final Logger log = LoggerFactory.getLogger(QuizController.class);
     private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
-    private final Cache<UUID, Quiz> quizCache =
-            Caffeine.newBuilder().maximumSize(10_000).build(); // Кеш последних тестов
+    private final Cache<UUID, Quiz> quizCache = Caffeine.newBuilder().maximumSize(10_000).build();
 
     @PostConstruct
     public void init() {
@@ -33,17 +35,46 @@ public class QuizController {
                 Set.of("Robot", "Tea leaf", "Cup of coffee", "Bug"),
                 2
         );
-
         quizzes.put(javaQuiz.getId(), javaQuiz);
     }
 
+    @PostMapping
+    @Operation(
+            summary = "Create new quiz",
+            description = "Create a new quiz with title, text, options and correct answer index"
+    )
+    public Quiz createQuiz(@RequestBody QuizCreationDTO quizDTO) {
+        Quiz quiz = new Quiz(
+                UUID.randomUUID(),
+                quizDTO.getTitle(),
+                quizDTO.getText(),
+                quizDTO.getOptions(),
+                quizDTO.getAnswer() != null ? quizDTO.getAnswer() : -1
+        );
+        quizzes.put(quiz.getId(), quiz);
+        return quiz;
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "Get all quizzes",
+            description = "Returns list of all available quizzes"
+    )
+    public Set<Quiz> getAllQuizzes() {
+        return Set.copyOf(quizzes.values());
+    }
+
     @GetMapping("/{id}")
-    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its UUID") // это для Swagger-а
+    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its UUID")
     public Quiz getQuiz(
             @Parameter(description = "ID of the quiz", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id
     ) {
-        return quizCache.get(id, quizzes::get); // Кешируем!
+        Quiz quiz = quizCache.get(id, quizzes::get);
+        if (quiz == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
+        }
+        return quiz;
     }
 
     @PostMapping("/{id}/solve")
@@ -54,10 +85,6 @@ public class QuizController {
             @RequestParam int answer,
             @RequestHeader(name = "X-Trace-Id", required = false) String traceId
     ) {
-        /**
-         * traceId — это идентификатор для сквозного логирования запросов в распределённых системах.
-         * В вашем случае он не обязателен, но полезен для отладки.
-         */
         if (traceId == null) {
             traceId = "gen-" + UUID.randomUUID();
         }
@@ -67,12 +94,16 @@ public class QuizController {
             quiz = quizzes.get(id);
         }
 
-        boolean isCorrect = quiz != null && answer == quiz.getCorrectOptionIndex();
+        if (quiz == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
+        }
+
+        boolean isCorrect = answer == quiz.getCorrectOptionIndex();
         log.info("TraceId: {}, QuizId: {}, Answer: {}", traceId, id, answer);
 
         return new AnswerResult(
                 isCorrect,
-                isCorrect ? "Correct!" : "Wrong!",
+                isCorrect ? "Congratulations, you're right!" : "Wrong answer! Please, try again.",
                 id,
                 traceId
         );
