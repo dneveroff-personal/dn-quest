@@ -6,12 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import dn.quizengine.model.AnswerRequest;
 import dn.quizengine.model.AnswerResult;
 import dn.quizengine.model.Quiz;
-import dn.quizengine.model.QuizCreationDTO;
+import dn.quizengine.model.QuizCreation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -33,7 +35,7 @@ public class QuizController {
                 "The Java Logo",
                 "What is depicted on the Java logo?",
                 Set.of("Robot", "Tea leaf", "Cup of coffee", "Bug"),
-                2
+                Set.of(2)
         );
         quizzes.put(javaQuiz.getId(), javaQuiz);
     }
@@ -43,13 +45,13 @@ public class QuizController {
             summary = "Create new quiz",
             description = "Create a new quiz with title, text, options and correct answer index"
     )
-    public Quiz createQuiz(@RequestBody QuizCreationDTO quizDTO) {
+    public Quiz createQuiz(@Valid @RequestBody QuizCreation quizDTO) {
         Quiz quiz = new Quiz(
                 UUID.randomUUID(),
                 quizDTO.getTitle(),
                 quizDTO.getText(),
                 quizDTO.getOptions(),
-                quizDTO.getAnswer() != null ? quizDTO.getAnswer() : -1
+                quizDTO.getAnswer()
         );
         quizzes.put(quiz.getId(), quiz);
         return quiz;
@@ -82,7 +84,7 @@ public class QuizController {
     public AnswerResult submitAnswer(
             @Parameter(description = "ID of the quiz", example = "550e8400-e29b-41d4-a716-446655440000")
             @PathVariable UUID id,
-            @RequestParam int answer,
+            @RequestBody AnswerRequest answerRequest,
             @RequestHeader(name = "X-Trace-Id", required = false) String traceId
     ) {
         if (traceId == null) {
@@ -94,8 +96,18 @@ public class QuizController {
             quiz = quizzes.get(id);
         }
 
-        boolean isCorrect = quiz != null && answer == quiz.getCorrectOptionIndex();
-        LOGGER.info("TraceId: {}, QuizId: {}, Answer: {}", traceId, id, answer);
+        if (quiz == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
+        }
+
+        Set<Integer> userAnswers = answerRequest.getAnswer();
+        Set<Integer> correctAnswers = quiz.getCorrectAnswers();
+
+        boolean isCorrect = userAnswers != null &&
+                correctAnswers != null &&
+                userAnswers.equals(correctAnswers);
+
+        LOGGER.info("TraceId: {}, QuizId: {}, Answers: {}", traceId, id, userAnswers);
 
         return new AnswerResult(
                 isCorrect,

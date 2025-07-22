@@ -19,6 +19,6 @@ public class Quiz {
     private Set<String> options;
 
     @JsonIgnore // Исключаем из JSON
-    private int correctOptionIndex;
+    private Set<Integer> correctAnswers;
 
 }
