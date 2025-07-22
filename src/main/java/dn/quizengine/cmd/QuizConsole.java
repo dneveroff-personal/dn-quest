@@ -8,6 +8,6 @@ public class QuizConsole implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Wellcome to the DN Quiz Console!");
+        System.out.println("\nWellcome to the DN Quiz Console!\nStart from http://localhost:8080/\n");
     }
 }
