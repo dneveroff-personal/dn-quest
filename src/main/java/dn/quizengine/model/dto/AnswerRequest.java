@@ -1,4 +1,4 @@
-package dn.quizengine.model;
+package dn.quizengine.model.dto;
 
 import lombok.Data;
 

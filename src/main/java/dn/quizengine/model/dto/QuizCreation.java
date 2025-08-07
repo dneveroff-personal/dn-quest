@@ -1,4 +1,4 @@
-package dn.quizengine.model;
+package dn.quizengine.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

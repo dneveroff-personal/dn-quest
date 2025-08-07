@@ -1,9 +1,7 @@
-package dn.quizengine.model;
+package dn.quizengine.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -11,7 +9,7 @@ public class AnswerResult {
 
     private boolean success;
     private String feedback;
-    private UUID quizId; // Для логирования
+    private Long quizId; // Для логирования
     private String traceId; // Для отслеживания запросов в микросервисах
 
 }

@@ -1,21 +1,24 @@
 package dn.quizengine.controller;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import dn.quizengine.model.AnswerRequest;
-import dn.quizengine.model.AnswerResult;
-import dn.quizengine.model.Quiz;
-import dn.quizengine.model.QuizCreation;
+import dn.quizengine.model.QuizRepository;
+import dn.quizengine.model.dto.AnswerRequest;
+import dn.quizengine.model.dto.AnswerResult;
+import dn.quizengine.model.dto.Quiz;
+import dn.quizengine.model.dto.QuizCreation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,19 +28,26 @@ import org.springframework.web.server.ResponseStatusException;
 public class QuizController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QuizController.class);
-    private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
     private final Cache<UUID, Quiz> quizCache = Caffeine.newBuilder().maximumSize(10_000).build();
+    private final QuizRepository quizRepository;
+
+    @Autowired
+    public QuizController(QuizRepository quizRepository) {
+        this.quizRepository = quizRepository;
+    }
 
     @PostConstruct
     public void init() {
-        Quiz javaQuiz = new Quiz(
-                UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
-                "The Java Logo",
-                "What is depicted on the Java logo?",
-                Set.of("Robot", "Tea leaf", "Cup of coffee", "Bug"),
-                Set.of(2)
-        );
-        quizzes.put(javaQuiz.getId(), javaQuiz);
+        if (quizRepository.count() == 0) {
+            Quiz quiz = new Quiz();
+            quiz.setTitle("The Java Logo");
+            quiz.setText("What is depicted on the Java logo?");
+            quiz.setOptions(Set.of("Robot", "Tea leaf", "Cup of coffee", "Bug"));
+            quiz.setCorrectAnswers(Set.of(2));
+            //Quiz savedQuiz = quizRepository.save(quiz);
+            //quizzes.put(savedQuiz.getId(), savedQuiz);
+        }
     }
 
     @PostMapping
@@ -46,15 +56,15 @@ public class QuizController {
             description = "Create a new quiz with title, text, options and correct answer index"
     )
     public Quiz createQuiz(@Valid @RequestBody QuizCreation quizDTO) {
-        Quiz quiz = new Quiz(
-                UUID.randomUUID(),
-                quizDTO.getTitle(),
-                quizDTO.getText(),
-                quizDTO.getOptions(),
-                quizDTO.getAnswer()
-        );
-        quizzes.put(quiz.getId(), quiz);
-        return quiz;
+        Quiz quiz = new Quiz();
+        quiz.setTitle(quizDTO.getTitle());
+        quiz.setText(quizDTO.getText());
+        quiz.setOptions(quizDTO.getOptions());
+        quiz.setCorrectAnswers(quizDTO.getAnswer());
+
+        //Quiz savedQuiz = quizRepository.save(quiz);
+        //quizzes.put(savedQuiz.getId(), savedQuiz);
+        return quizRepository.save(quiz);
     }
 
     @GetMapping
@@ -62,43 +72,34 @@ public class QuizController {
             summary = "Get all quizzes",
             description = "Returns list of all available quizzes"
     )
-    public Set<Quiz> getAllQuizzes() {
-        return Set.copyOf(quizzes.values());
+    public List<Quiz> getAllQuizzes() {
+        return quizRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its UUID")
+    @Operation(summary = "Get quiz by ID", description = "Returns a quiz by its ID")
     public Quiz getQuiz(
-            @Parameter(description = "ID of the quiz", example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID id
+            @Parameter(description = "ID of the quiz", example = "1")
+            @PathVariable Long id
     ) {
-        Quiz quiz = quizCache.get(id, quizzes::get);
-        if (quiz == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
-        }
-        return quiz;
+        return quizRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
     }
 
     @PostMapping("/{id}/solve")
-    @Operation(summary = "Answer on quiz by ID", description = "Post UUID of question, and add an answer in param")
+    @Operation(summary = "Answer on quiz by ID", description = "Post ID of question, and add an answer in param")
     public AnswerResult submitAnswer(
-            @Parameter(description = "ID of the quiz", example = "550e8400-e29b-41d4-a716-446655440000")
-            @PathVariable UUID id,
+            @Parameter(description = "ID of the quiz", example = "1")
+            @PathVariable Long id,
             @RequestBody AnswerRequest answerRequest,
             @RequestHeader(name = "X-Trace-Id", required = false) String traceId
     ) {
         if (traceId == null) {
-            traceId = "gen-" + UUID.randomUUID();
+            traceId = "gen-" + System.currentTimeMillis();
         }
 
-        Quiz quiz = quizCache.getIfPresent(id);
-        if (quiz == null) {
-            quiz = quizzes.get(id);
-        }
-
-        if (quiz == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found");
-        }
+        Quiz quiz = quizRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found"));
 
         Set<Integer> userAnswers = answerRequest.getAnswer();
         Set<Integer> correctAnswers = quiz.getCorrectAnswers();

@@ -3,11 +3,19 @@ package dn.quizengine.cmd;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.function.Consumer;
+
 @Component
 public class QuizConsole implements CommandLineRunner {
 
+    private final Consumer<String> cmdPrint;
+
+    public QuizConsole(Consumer<String> cmdPrint) {
+        this.cmdPrint = cmdPrint;
+    }
+
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("\nWellcome to the DN Quiz Console!\nStart from http://localhost:8080/\n");
+        cmdPrint.accept("\nWellcome to the DN Quiz Console!\nStart from http://localhost:8080/\n");
     }
 }
