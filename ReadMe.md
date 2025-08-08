@@ -26,9 +26,18 @@ For further reference, please consider the following sections:
 
 ### Docker Compose support
 
-This project contains a Docker Compose file named `compose.yaml`.
+## Commands:
 
-However, no services were found. As of now, the application won't start!
+# To build new jar
+./gradlew bootJar
 
-Please make sure to add at least one service in the `compose.yaml` file.
+# To build new docker container
+docker-compose build
+
+# To run docker 
+docker-compose up -d --remove-orphans
+
+# To stop docker 
+docker-compose down --remove-orphans
+
 
