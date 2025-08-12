@@ -7,11 +7,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class AppUserAdapter implements UserDetails {
+public class UserAdapter implements UserDetails {
 
-    private final AppUser user;
+    private final User user;
 
-    public AppUserAdapter(AppUser user) {
+    public UserAdapter(User user) {
         this.user = user;
     }
 
@@ -27,7 +27,7 @@ public class AppUserAdapter implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return user.getEmail();
     }
 
     @Override

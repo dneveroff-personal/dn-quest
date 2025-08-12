@@ -8,9 +8,9 @@ import java.util.UUID;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import dn.quizengine.model.dto.*;
-import dn.quizengine.model.repository.AppUserRepository;
+import dn.quizengine.model.repository.UserRepository;
 import dn.quizengine.model.repository.QuizRepository;
-import dn.quizengine.model.user.AppUser;
+import dn.quizengine.model.user.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,14 +35,10 @@ public class QuizController {
     //private final ConcurrentHashMap<UUID, Quiz> quizzes = new ConcurrentHashMap<>();
     private final Cache<UUID, Quiz> quizCache = Caffeine.newBuilder().maximumSize(10_000).build();
     private final QuizRepository quizRepository;
-    private final AppUserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public QuizController(QuizRepository quizRepository, AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public QuizController(QuizRepository quizRepository) {
         this.quizRepository = quizRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
@@ -48,6 +48,7 @@ public class QuizController {
             quiz.setTitle("The Java Logo");
             quiz.setText("What is depicted on the Java logo?");
             quiz.setOptions(Set.of("Robot", "Tea leaf", "Cup of coffee", "Bug"));
+            quiz.setAuthor("TEST1");
             quiz.setCorrectAnswers(Set.of(2));
             //Quiz savedQuiz = quizRepository.save(quiz);
             //quizzes.put(savedQuiz.getId(), savedQuiz);
@@ -59,47 +60,17 @@ public class QuizController {
             summary = "Create new quiz",
             description = "Create a new quiz with title, text, options and correct answer index"
     )
-    public Quiz createQuiz(@Valid @RequestBody QuizCreation quizDTO) {
+    public Quiz createQuiz(@Valid @RequestBody QuizCreation quizDTO, @AuthenticationPrincipal UserDetails details) {
         Quiz quiz = new Quiz();
         quiz.setTitle(quizDTO.getTitle());
         quiz.setText(quizDTO.getText());
         quiz.setOptions(quizDTO.getOptions());
         quiz.setCorrectAnswers(quizDTO.getAnswer());
+        quiz.setAuthor(Optional.ofNullable(details.getUsername()).orElse("TEST2"));
 
         //Quiz savedQuiz = quizRepository.save(quiz);
         //quizzes.put(savedQuiz.getId(), savedQuiz);
         return quizRepository.save(quiz);
-    }
-
-    @GetMapping(path = "/test")
-    public String test() {
-        return "Access to '/test' granted";
-    }
-
-    @GetMapping(path = "/ping")
-    public String ping() {
-        return "YOU SEND PING - HERE THE PONG!";
-    }
-
-    @PostMapping(path = "/register")
-    public String register(@RequestBody RegistrationRequest request) {
-        String userName = request.getUsername();
-
-        return userRepository.findAppUserByUsername(userName)
-                .map(user -> {
-                    user.setPassword(passwordEncoder.encode(request.getPassword()));
-                    user.setAuthority(request.getAuthority());
-                    userRepository.save(user);
-                    return "User " + userName + " has been updated!";
-                })
-                .orElseGet(() -> {
-                    var user = new AppUser();
-                    user.setUsername(userName);
-                    user.setPassword(passwordEncoder.encode(request.getPassword()));
-                    user.setAuthority(request.getAuthority());
-                    userRepository.save(user);
-                    return "New user " + userName +" successfully registered!";
-                });
     }
 
     @GetMapping
@@ -151,6 +122,23 @@ public class QuizController {
                 id,
                 traceId
         );
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "DELETE header handler", description = "Remove quiz by ID")
+    public ResponseEntity<String> deleteQuiz(
+            @Parameter(description = "ID of the quiz", example = "1")
+            @PathVariable Long id, Authentication auth
+    ) {
+        Quiz quiz = quizRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!quiz.getAuthor().equals(auth.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        quizRepository.delete(quiz);
+        return ResponseEntity.ok("Quiz " + quiz.getTitle() + " has been deleted.");
     }
 
 }

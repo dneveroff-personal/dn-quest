@@ -23,6 +23,7 @@ public class Quiz {
 
     private String title;
     private String text;
+    private String author;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
