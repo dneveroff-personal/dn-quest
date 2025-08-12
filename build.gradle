@@ -37,9 +37,12 @@ dependencies {
     // Для разработки
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
+    // Для секьюрити
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     // Для тестирования
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    //testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // Доп. зависимости
     implementation 'org.springframework.boot:spring-boot-starter-cache'

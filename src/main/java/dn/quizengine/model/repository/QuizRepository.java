@@ -1,4 +1,4 @@
-package dn.quizengine.model;
+package dn.quizengine.model.repository;
 
 import dn.quizengine.model.dto.Quiz;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -10,6 +10,11 @@ The following was discovered as part of building this project:
 ### To run Swagger in UI run 
 http://localhost:8080/swagger-ui/index.html
 
+### To run PgAdmin
+http://localhost:5050
+
+Email: admin@localhost.com
+Password: admin
 
 
 ### Reference Documentation
@@ -40,4 +45,5 @@ docker-compose up -d --remove-orphans
 # To stop docker 
 docker-compose down --remove-orphans
 
-
+# To see LOGS
+docker logs -f quiz-app

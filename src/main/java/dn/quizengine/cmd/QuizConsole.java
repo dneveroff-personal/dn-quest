@@ -16,6 +16,7 @@ public class QuizConsole implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        cmdPrint.accept("\nWellcome to the DN Quiz Console!\nStart from http://localhost:8080/\n");
+        cmdPrint.accept("\nWellcome to the DN Quiz Console!\nStart from http://localhost:8080/\n" +
+                "To work with database via PgAdmin http://localhost:5050\n");
     }
 }
