@@ -1,4 +1,4 @@
-package dn.quizengine.model.repository;
+package dn.quizengine.repository;
 
 import dn.quizengine.model.user.User;
 import org.springframework.data.repository.CrudRepository;

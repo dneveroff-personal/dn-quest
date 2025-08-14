@@ -1,7 +1,6 @@
 package dn.quizengine.config;
 
-import dn.quizengine.model.repository.UserRepository;
-import dn.quizengine.service.UserService;
+import dn.quizengine.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

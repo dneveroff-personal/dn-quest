@@ -1,10 +1,9 @@
 package dn.quizengine.service;
 
 import dn.quizengine.model.dto.RegisterRequest;
-import dn.quizengine.model.repository.UserRepository;
+import dn.quizengine.repository.UserRepository;
 import dn.quizengine.model.user.User;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,15 +18,6 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
-/*    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository
-                .findUserByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Not found"));
-
-        return new UserAdapter(user);
-    }*/
 
     public void register(RegisterRequest request) {
         if (!request.getEmail().matches("^[^@]+@[^@]+\\.[^@]+$") ||
