@@ -11,20 +11,35 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  app:
-    build: .
-    container_name: quiz-app
-    depends_on:
-      - db
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz-backend
     ports:
       - "8080:8080"
-      - "5005:5005"   # <-- добавляем порт для работы дебага
+      - "5005:5005"   # <-- порт для работы дебага
     environment:
+      SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/quizdb
       SPRING_DATASOURCE_USERNAME: dn
       SPRING_DATASOURCE_PASSWORD: dn
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: quiz-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
 
   pgadmin:
     image: dpage/pgadmin4

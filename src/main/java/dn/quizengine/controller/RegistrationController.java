@@ -17,7 +17,7 @@ public class RegistrationController {
 
     @GetMapping(path = "/ping")
     public String ping() {
-        return "YOU SEND PING - HERE THE PONG!";
+        return "YOU SEND PING - HERE THE PONG 002!";
     }
 
     @PostMapping(path = "/register")

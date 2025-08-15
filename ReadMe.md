@@ -1,14 +1,10 @@
-# Read Me First
-
-The following was discovered as part of building this project:
-
-* No Docker Compose services found. As of now, the application won't start! Please add at least one service to the
-  `compose.yaml` file.
-
-# Getting Started
+# Welcome to the Quiz engine!
 
 ### To run Swagger in UI run 
 http://localhost:8080/swagger-ui/index.html
+
+### Ping
+http://localhost:8080/ping
 
 ### To run PgAdmin
 http://localhost:5050
@@ -16,34 +12,46 @@ http://localhost:5050
 Email: admin@localhost.com
 Password: admin
 
-
-### Reference Documentation
-
-For further reference, please consider the following sections:
-
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/3.5.3/gradle-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/3.5.3/gradle-plugin/packaging-oci-image.html)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/3.5.3/reference/using/devtools.html)
-* [Docker Compose Support](https://docs.spring.io/spring-boot/3.5.3/reference/features/dev-services.html#features.dev-services.docker-compose)
-* [Spring Web](https://docs.spring.io/spring-boot/3.5.3/reference/web/servlet.html)
+### To run Front
+http://localhost:5173/
 
 
-### Docker Compose support
+# Docker Compose support
 
 ## Commands:
 
-# To build new jar
+### To build new jar
 ./gradlew bootJar
 
-# To build new docker container
-docker-compose build
+### To build new docker container
+docker compose build
 
-# To run docker 
-docker-compose up -d --remove-orphans
+### To run docker 
+docker compose up -d --build --remove-orphans
 
-# To stop docker 
-docker-compose down --remove-orphans
+### To stop docker 
+docker compose down --remove-orphans
 
-# To see LOGS
+### To see LOGS
 docker logs -f quiz-app
+
+
+# Vue + Vite frontend in /frontend folder
+
+### To build files for static to use in backend 
+npm run build
+
+### To build files static into backend directly (already setup in package.json)
+npm run build:static
+
+
+# MAKEFILE
+
+### Make Docker down and up
+make docker-upd
+
+### Make docker down, build backend, docker up again
+make build-back
+
+### Make run npm front build, copy to backend and restart docker
+make build-front:

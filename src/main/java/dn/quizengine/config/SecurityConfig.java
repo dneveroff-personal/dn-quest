@@ -36,9 +36,14 @@ public class SecurityConfig {
                 //.userDetailsService(authService)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/ping").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/assets/**",
+                                "/api/ping",
+                                "/actuator/shutdown"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
-                        .requestMatchers("/actuator/shutdown").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());
