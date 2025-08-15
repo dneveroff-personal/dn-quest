@@ -47,7 +47,9 @@ dependencies {
     // Доп. зависимости
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+
+    // Telegram
+    implementation 'org.telegram:telegrambots:6.9.7.1'
 }
 
 // Конфигурация тестов

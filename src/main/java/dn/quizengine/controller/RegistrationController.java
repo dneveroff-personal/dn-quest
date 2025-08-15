@@ -5,9 +5,11 @@ import dn.quizengine.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
-@RequestMapping("/api")
-public class RegistrationController {
+@RequestMapping(Routes.API)
+public class RegistrationController implements Routes {
 
     private final UserService userService;
 
@@ -15,12 +17,12 @@ public class RegistrationController {
         this.userService = userService;
     }
 
-    @GetMapping(path = "/ping")
+    @GetMapping(PING)
     public String ping() {
-        return "YOU SEND PING - HERE THE PONG 002!";
+        return "YOU SEND PING, HERE IS THE PONG TIME -> " + LocalDateTime.now();
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping(REGISTER)
     public ResponseEntity<Object> register(@RequestBody RegisterRequest request) {
         userService.register(request);
         return ResponseEntity.ok("User registered successfully!");
