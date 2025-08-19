@@ -40,7 +40,7 @@ public class QuizPostController implements Routes {
             @RequestBody AnswerRequest answerRequest,
             Principal user) {
 
-        return quizService.getAnswerResult(id, answerRequest, user);
+        return quizService.getAnswerResult(id, answerRequest, user.getName());
     }
 
 }
