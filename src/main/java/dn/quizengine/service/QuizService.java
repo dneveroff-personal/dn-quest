@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -45,11 +46,15 @@ public class QuizService {
         return quiz.getTitle();
     }
 
+    public List<Quiz> getAllQuizzes() {
+        return quizRepository.findAll();
+    }
+
     public Page<Quiz> getAllQuizzes(int page, int pageSize) {
         return quizRepository.findAll(PageRequest.of(page, pageSize));
     }
 
-    public AnswerResult getAnswerResult(Long id, AnswerRequest answerRequest, Principal user) {
+    public AnswerResult getAnswerResult(Long id, AnswerRequest answerRequest, String userName) {
         Quiz quiz = getQuizById(id);
         Set<Integer> userAnswers = answerRequest.getAnswer();
         Set<Integer> correctAnswers = quiz.getCorrectAnswers();
@@ -59,7 +64,7 @@ public class QuizService {
 
         if (isCorrect) {
             completedQuizRepository.save(
-                    new CompletedQuiz(quiz.getId(), user.getName(), LocalDateTime.now())
+                    new CompletedQuiz(quiz.getId(), userName, LocalDateTime.now())
             );
         }
 

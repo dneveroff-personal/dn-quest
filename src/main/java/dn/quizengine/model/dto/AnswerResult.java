@@ -11,4 +11,8 @@ public class AnswerResult {
     private String feedback;
     private Long quizId; // Для логирования
 
+    @Override
+    public String toString() {
+        return quizId.toString() + ": " + (success ? "✅ Верно!" : "❌ Неправильно!") + "\n" + getFeedback();
+    }
 }
