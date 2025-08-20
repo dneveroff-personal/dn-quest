@@ -10,7 +10,7 @@ public interface Routes {
 
     // Get Controller
     String GET = API + "/get";
-    String GET_ALL = "/all";
+    String ALL = "/all";
     String GET_COMPLETED = "/completed";
 
     // Registration controller

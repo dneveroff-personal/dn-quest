@@ -23,7 +23,7 @@ public class QuizGetController implements Routes {
         this.quizService = quizService;
     }
 
-    @GetMapping(GET_ALL)
+    @GetMapping(ALL)
     public Page<Quiz> getAllQuizzes(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize) {

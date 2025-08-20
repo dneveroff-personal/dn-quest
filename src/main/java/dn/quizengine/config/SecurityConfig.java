@@ -40,6 +40,13 @@ public class SecurityConfig {
                                 "/",
                                 "/index.html",
                                 "/assets/**",
+                                "/*.js",
+                                "/*.css",
+                                "/*.svg",
+                                "/favicon.ico",
+                                "/*.png",
+                                "/*.txt",
+                                "/*.json",
                                 "/api/ping",
                                 "/actuator/shutdown"
                         ).permitAll()

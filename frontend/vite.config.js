@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { createHash } from 'node:crypto'
+import path from "path"
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,13 +13,10 @@ export default defineConfig({
     })
   ],
   base: './', // важно! чтобы пути были относительные
-  define: {
-    'crypto.hash': undefined, // на всякий случай убираем лишнее
-  },
   resolve: {
     alias: {
-      crypto: 'node:crypto'
-    }
+      "@": path.resolve(__dirname, "./src"),
+    },
   },
   server: {
     port: 5173,
@@ -29,5 +26,10 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    outDir: 'dist',   // куда билдит (по умолчанию dist)
+    assetsDir: 'assets', // папка для js/css/img
+    emptyOutDir: true,   // очищает dist перед билдом
   }
 })
