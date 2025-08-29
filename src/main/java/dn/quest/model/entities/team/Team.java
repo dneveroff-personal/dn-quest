@@ -19,8 +19,8 @@ public class Team {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "captain_id")
-    private User captain;                   // текущий капитан
+    @JoinColumn(name = "captain_id", nullable = false)
+    private User captain;
 
     private String logoUrl;
 

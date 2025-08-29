@@ -1,35 +1,21 @@
 package dn.quest.services.interfaces;
 
-import dn.quest.model.entities.enums.Difficulty;
-import dn.quest.model.entities.enums.QuestType;
-import dn.quest.model.entities.quest.Quest;
+import dn.quest.model.dto.QuestDTO;
 
-import java.time.Instant;
 import java.util.List;
 
 public interface QuestService {
 
-    Quest create(String title,
-                 String descriptionHtml,
-                 Difficulty difficulty,
-                 QuestType type,
-                 Instant startAt);
+    QuestDTO create(QuestDTO questDTO);
 
-    Quest update(Long questId,
-                 String title,
-                 String descriptionHtml,
-                 Difficulty difficulty,
-                 QuestType type,
-                 Instant startAt,
-                 Instant endAt,
-                 Boolean published);
+    QuestDTO update(Long id, QuestDTO questDTO);
 
-    void addAuthor(Long questId, Integer userId);
-    void removeAuthor(Long questId, Integer userId);
+    void delete(Long id);
 
-    List<Quest> listActiveForMainPage(); // published=true & startAt<=now & endAt IS NULL
-    Quest getById(Long id);
+    QuestDTO getById(Long id);
 
-    // автогенерация номера квеста (sequence/сервис) — внутри create()
+    List<QuestDTO> getAll();
+
+    List<QuestDTO> getPublished();
 
 }

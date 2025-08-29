@@ -54,7 +54,7 @@ dependencies {
 }
 
 // Конфигурация тестов
-tasks.named('test') {
+test {
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"

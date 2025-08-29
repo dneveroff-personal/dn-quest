@@ -1,5 +1,6 @@
 package dn.quest.services;
 
+import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.level.Code;
 import dn.quest.model.entities.quest.level.CodeAttempt;
@@ -7,8 +8,6 @@ import dn.quest.model.entities.quest.level.Level;
 import dn.quest.model.entities.quest.level.LevelCompletion;
 import dn.quest.model.entities.quest.level.LevelProgress;
 import dn.quest.model.entities.user.User;
-import dn.quest.model.entities.team.Team;
-import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +16,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
 public class AttemptService {
@@ -28,40 +26,26 @@ public class AttemptService {
     private final CodeAttemptRepository attemptRepo;
     private final LevelProgressRepository progressRepo;
     private final LevelCompletionRepository completionRepo;
-    private final GameSessionRepository gameSessionRepo;
 
     public AttemptService(GameSessionRepository sessionRepo,
                           LevelRepository levelRepo,
                           CodeRepository codeRepo,
                           CodeAttemptRepository attemptRepo,
                           LevelProgressRepository progressRepo,
-                          LevelCompletionRepository completionRepo,
-                          GameSessionRepository gameSessionRepo) {
+                          LevelCompletionRepository completionRepo) {
         this.sessionRepo = sessionRepo;
         this.levelRepo = levelRepo;
         this.codeRepo = codeRepo;
         this.attemptRepo = attemptRepo;
         this.progressRepo = progressRepo;
         this.completionRepo = completionRepo;
-        this.gameSessionRepo = gameSessionRepo;
     }
 
-    /**
-     * Основная процедура обработки попытки.
-     *
-     * @param sessionId id сессии
-     * @param userId id пользователя, который ввёл (nullable для соло?)
-     * @param levelId id текущего уровня
-     * @param rawSubmitted входной код от UI
-     * @param ip опционально
-     * @param userAgent опционально
-     * @return созданный CodeAttempt
-     */
     @Transactional
-    public CodeAttempt processAttempt(Long sessionId, Integer userId, Long levelId, String rawSubmitted,
+    public CodeAttempt processAttempt(Long sessionId, Long userId, Long levelId, String rawSubmitted,
                                       String ip, String userAgent) {
 
-        // 1) загрузить session / level / progress
+        // 1. Загружаем session / level / progress
         GameSession session = sessionRepo.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
         Level level = levelRepo.findById(levelId)
@@ -70,26 +54,25 @@ public class AttemptService {
         LevelProgress progress = progressRepo.findBySessionAndLevel(session, level)
                 .orElseThrow(() -> new IllegalStateException("Level not opened for this session"));
 
-        // 2) нормализовать (по ТЗ: только lower-case). Я также обрезаю пробелы минимально.
+        // 2. Нормализация ввода
         String normalized = rawSubmitted == null ? "" : rawSubmitted.trim().toLowerCase(Locale.ROOT);
 
-        // 3) получить коды для уровня
+        // 3. Получаем список кодов для уровня
         List<Code> codes = codeRepo.findByLevel(level);
 
-        // 4) попытка - ищем совпадение среди codes (value stored already normalized)
-        Code matched = null;
-        for (Code c : codes) {
-            if (c.getValue().equals(normalized)) { matched = c; break; }
-        }
+        // 4. Пытаемся найти совпадение
+        Code matched = codes.stream()
+                .filter(c -> c.getValue().equals(normalized))
+                .findFirst()
+                .orElse(null);
 
-        // 5) детект duplicate: если matched != null и уже был ACCEPTED для этого session и того же matched (или sector)
-        boolean isDuplicate = false;
-        AttemptResult result;
+        // 5. Создаём попытку
         CodeAttempt attempt = new CodeAttempt();
         attempt.setSession(session);
         attempt.setLevel(level);
         if (userId != null) {
-            User u = new User(); u.setId(userId); // можно загрузить пользователя при необходимости
+            User u = new User();
+            u.setId(userId);
             attempt.setUser(u);
         }
         attempt.setSubmittedRaw(rawSubmitted);
@@ -98,86 +81,79 @@ public class AttemptService {
         attempt.setIp(ip);
         attempt.setUserAgent(userAgent);
 
+        AttemptResult result;
+
+        // --- если код не найден
         if (matched == null) {
-            // wrong
             result = AttemptResult.WRONG;
             attempt.setResult(result);
-            attemptRepo.save(attempt);
-            return attempt;
+            return attemptRepo.save(attempt);
         }
 
-        // matched != null
-        // проверяем, была ли раньше запись ACCEPTED_NORMAL/ACCEPTED_BONUS/... по тому же matchedCode в этой сессии
+        // --- если код найден, проверяем DUPLICATE
         List<CodeAttempt> prevAccepted = attemptRepo.findBySessionAndMatchedCode(session, matched);
         if (!prevAccepted.isEmpty()) {
-            // уже были — считаем DUPLICATE (повтор)
-            isDuplicate = true;
-        }
-
-        if (isDuplicate) {
             result = AttemptResult.DUPLICATE;
             attempt.setResult(result);
             attempt.setMatchedCode(matched);
             attempt.setMatchedSectorNo(matched.getSectorNo());
-            attemptRepo.save(attempt);
-            return attempt;
+            return attemptRepo.save(attempt);
         }
 
-        // если не повтор: в зависимости от типа кода — применяем
+        // --- Новый корректный код
         switch (matched.getType()) {
-            case NORMAL:
-                // помечаем принятой нормальной попыткой
+            case NORMAL -> {
                 result = AttemptResult.ACCEPTED_NORMAL;
-                // update progress: если сектор новый — увеличиваем completedSectors и, возможно, пометим сектор закрытым
-                // Todo: Здесь нужна логика: отслеживать какие sectorNo уже закрыты — можно хранить в отдельной таблице/поле.
-                progress.setCompletedSectors(progress.getCompletedSectors() + 1);
-                if (/* достигли requiredSectors */ progress.getCompletedSectors() >= level.getRequiredSectors()) {
-                    // закрытие уровня: создаём LevelCompletion и отмечаем progress.completedAt
+
+                // увеличиваем счётчик закрытых секторов
+                progress.setSectorsClosed(progress.getSectorsClosed() + 1);
+
+                // проверяем, собраны ли все нужные сектора
+                if (progress.getSectorsClosed() >= level.getRequiredSectors()) {
+                    Instant passTime = Instant.now();
                     LevelCompletion completion = new LevelCompletion();
                     completion.setSession(session);
                     completion.setLevel(level);
-                    // passedByUser — если есть userId — ставим
+
                     if (userId != null) {
-                        User u = new User(); u.setId(userId);
+                        User u = new User();
+                        u.setId(userId);
                         completion.setPassedByUser(u);
                     }
-                    Instant passTime = Instant.now();
+
                     completion.setPassTime(passTime);
                     long duration = Duration.between(progress.getStartedAt(), passTime).getSeconds();
                     completion.setDurationSec(duration);
-                    // бонус/штраф на уровне: для простоты — суммируем shiftSeconds от matched codes
-                    completion.setBonusOnLevelSec(0);
-                    completion.setPenaltyOnLevelSec(0);
+                    completion.setBonusOnLevelSec(progress.getBonusOnLevelSec());
+                    completion.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec());
 
                     completionRepo.save(completion);
 
-                    progress.setCompletedAt(passTime);
+                    progress.setClosedAt(passTime);
                 }
+
                 progressRepo.save(progress);
-                break;
+            }
 
-            case BONUS:
+            case BONUS -> {
                 result = AttemptResult.ACCEPTED_BONUS;
-                // применить бонус к сессии
-                session.setBonusTimeSumSec(session.getBonusTimeSumSec() + matched.getShiftSeconds());
-                gameSessionRepo.save(session);
-                break;
+                progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + matched.getShiftSeconds());
+                progressRepo.save(progress);
+            }
 
-            case PENALTY:
+            case PENALTY -> {
                 result = AttemptResult.ACCEPTED_PENALTY;
-                session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + Math.abs(matched.getShiftSeconds()));
-                gameSessionRepo.save(session);
-                break;
+                progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + Math.abs(matched.getShiftSeconds()));
+                progressRepo.save(progress);
+            }
 
-            default:
-                result = AttemptResult.WRONG;
+            default -> result = AttemptResult.WRONG;
         }
 
         attempt.setMatchedCode(matched);
         attempt.setMatchedSectorNo(matched.getSectorNo());
         attempt.setResult(result);
-        attemptRepo.save(attempt);
 
-        return attempt;
+        return attemptRepo.save(attempt);
     }
 }

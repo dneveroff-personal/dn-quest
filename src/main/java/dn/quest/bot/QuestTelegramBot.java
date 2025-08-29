@@ -1,14 +1,10 @@
 package dn.quest.bot;
 
-import dn.quest.model.entities.quest.Quest;
 import dn.quest.services.interfaces.QuestService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.util.List;
-import java.util.Set;
 
 public class QuestTelegramBot extends TelegramLongPollingBot {
 

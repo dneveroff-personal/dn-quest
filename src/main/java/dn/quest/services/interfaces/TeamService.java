@@ -8,16 +8,19 @@ import java.util.Set;
 
 public interface TeamService {
 
-    Team createTeam(String name, Integer captainUserId);
+    TeamDTO createTeam(String name, Long captainUserId);
+
     Team getById(Long id);
 
     TeamDTO getTeamDTO(Long teamId);
+
     Set<UserDTO> listMembers(Long teamId);
 
-    void addMember(Long teamId, Integer userId);
-    void removeMember(Long teamId, Integer userId);
+    void addMember(Long teamId, Long userId);
 
-    void transferCaptain(Long teamId, Integer newCaptainUserId);
+    void removeMember(Long teamId, Long userId);
+
+    void transferCaptain(Long teamId, Long newCaptainUserId);
 
     void deleteTeam(Long teamId);
 

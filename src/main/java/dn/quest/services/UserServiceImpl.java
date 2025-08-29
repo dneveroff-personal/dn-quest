@@ -1,18 +1,16 @@
 package dn.quest.services;
 
 import dn.quest.model.dto.UserDTO;
-import dn.quest.model.entities.enums.UserRole;
 import dn.quest.model.entities.user.User;
 import dn.quest.repositories.UserRepository;
 import dn.quest.services.interfaces.UserService;
-import jakarta.persistence.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,87 +18,68 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // бин уже есть в проекте
 
     @Override
-    public UserDTO register(String username, String email, String rawPassword, String publicName) {
-        userRepository.findByUsername(username).ifPresent(u -> {
-            throw new IllegalArgumentException("username already taken");
-        });
-        // если email обязателен, стоит проверять на null/blank и уникальность
-        if (email != null && !email.isBlank()) {
-            // у тебя на таблице стоит unique constraint по email
-            userRepository.findAll().stream()
-                    .filter(u -> email.equalsIgnoreCase(u.getEmail()))
-                    .findAny()
-                    .ifPresent(u -> { throw new IllegalArgumentException("email already taken"); });
-        }
-
-        User u = new User();
-        u.setUsername(username);
-        u.setEmail(email);
-        u.setPasswordHash(passwordEncoder.encode(rawPassword));
-        u.setPublicName(publicName);
-        u.getRoles().add(UserRole.PLAYER);
-
-        u = userRepository.save(u);
-        return toDto(u);
+    public UserDTO create(UserDTO userDTO) {
+        User user = toEntity(userDTO);
+        user = userRepository.save(user);
+        return toDTO(user);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public UserDTO getById(Integer id) {
-        return userRepository.findById(id).map(this::toDto)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
+    public UserDTO update(UserDTO userDTO) {
+        User existing = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        existing.setUsername(userDTO.getPublicName());
+        // при необходимости можно добавить другие поля
+        return toDTO(userRepository.save(existing));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Integer getIdByUsername(String username) {
+    public void delete(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDTO getById(Long id) {
+        return userRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public UserDTO getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(User::getId)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
-    public UserDTO updateProfile(Integer id, String newPublicName, String newEmail) {
-        User u = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
-
-        if (newPublicName != null) u.setPublicName(newPublicName);
-
-        if (newEmail != null) {
-            // простая проверка уникальности; можно вынести в репозиторий
-            boolean emailTaken = userRepository.findAll().stream()
-                    .anyMatch(other -> !other.getId().equals(id)
-                            && newEmail.equalsIgnoreCase(other.getEmail()));
-            if (emailTaken) throw new IllegalArgumentException("email already taken");
-
-            u.setEmail(newEmail);
-        }
-
-        return toDto(userRepository.save(u));
+    public UserDTO getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
-    public void changePassword(Integer id, String oldRawPassword, String newRawPassword) {
-        User u = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user not found"));
-
-        if (!passwordEncoder.matches(oldRawPassword, u.getPasswordHash())) {
-            throw new IllegalArgumentException("old password invalid");
-        }
-        u.setPasswordHash(passwordEncoder.encode(newRawPassword));
-        userRepository.save(u);
+    public List<UserDTO> getAll() {
+        return userRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserDTO> listAll() {
-        return userRepository.findAll().stream().map(this::toDto).toList();
+    // ===== Маппинг =====
+    private UserDTO toDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .publicName(user.getPublicName())
+                .build();
     }
 
-    private UserDTO toDto(User u) {
-        return new UserDTO(u.getId(), u.getPublicName());
+    private User toEntity(UserDTO dto) {
+        User user = new User();
+        user.setId(dto.getId());
+        user.setUsername(dto.getPublicName());
+        return user;
     }
 }

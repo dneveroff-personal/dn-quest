@@ -29,7 +29,7 @@ public class TeamServiceImpl implements TeamService {
     private final UserRepository userRepository;
 
     @Override
-    public Team createTeam(String name, Integer captainUserId) {
+    public TeamDTO createTeam(String name, Long captainUserId) {
         User captain = userRepository.findById(captainUserId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + captainUserId));
 
@@ -47,7 +47,7 @@ public class TeamServiceImpl implements TeamService {
         tm.setJoinedAt(Instant.now());
         teamMemberRepository.save(tm);
 
-        return saved;
+        return getTeamDTO(saved.getId());
     }
 
     @Override
@@ -66,6 +66,7 @@ public class TeamServiceImpl implements TeamService {
         return TeamDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
+                .captain(new UserDTO(team.getCaptain().getId(), team.getCaptain().getPublicName()))
                 .members(members)
                 .build();
     }
@@ -81,7 +82,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void addMember(Long teamId, Integer userId) {
+    public void addMember(Long teamId, Long userId) {
         Team team = getById(teamId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
@@ -98,7 +99,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void removeMember(Long teamId, Integer userId) {
+    public void removeMember(Long teamId, Long userId) {
         Team team = getById(teamId);
 
         // запрет удалить капитана
@@ -114,7 +115,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void transferCaptain(Long teamId, Integer newCaptainUserId) {
+    public void transferCaptain(Long teamId, Long newCaptainUserId) {
         Team team = getById(teamId);
         User newCaptain = userRepository.findById(newCaptainUserId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + newCaptainUserId));

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserDTO {
 
-    private Integer id;       // в entity id — Integer
+    private Long id;       // в entity id — Integer
     private String publicName;
 
 }

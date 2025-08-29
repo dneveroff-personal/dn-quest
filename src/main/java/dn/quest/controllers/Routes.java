@@ -2,11 +2,14 @@ package dn.quest.controllers;
 
 public interface Routes {
     // COMMON
-    String ID = "/{id:\\d+}";
     String API = "/api";
     String ATTEMPT = "/attempt";
+    String EMAIL = "/{email}";
+    String ID = "/{id:\\d+}";
     String LEVEL = "/level";
     String USER_ID = "/{userId}";
+    String USER_NAME = "/{username}";
+    String PUBLISHED = "/published";
 
     // Delete Controller
     String DELETE = API + "/delete";
@@ -42,5 +45,10 @@ public interface Routes {
     String TEAM_MEMBERS = ID + "/members";
     String TEAM_MEMBER_ADD = TEAM_MEMBERS + USER_ID;
     String TEAM_TRANSFER_CAPTAIN = ID + "/transfer-captain" + USER_ID;
+
+    //Users
+    String USERS = API + "/users";
+    String USERS_BY_NAME = "/by-username" + USER_NAME;
+    String BY_EMAIL = "/by-email" + EMAIL;
 
 }

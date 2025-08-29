@@ -7,6 +7,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -38,6 +40,14 @@ public class Level {
     @Column(nullable=false)
     private Integer requiredSectors = 0;
 
+    @OneToMany(mappedBy = "level", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<LevelCompletion> completions = new HashSet<>();
+
+    @OneToMany(mappedBy = "level", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CodeAttempt> attempts = new HashSet<>();
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    private LocalDateTime completedAt;
 }

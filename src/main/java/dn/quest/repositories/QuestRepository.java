@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface QuestRepository extends JpaRepository<Quest, Long> {
+
     List<Quest> findByEndAtIsNullOrderByStartAtAsc();
     @Query("""
         SELECT q FROM Quest q
@@ -17,4 +18,5 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
           AND q.endAt IS NULL
         ORDER BY q.startAt ASC
     """)
-    List<Quest> findAvailableQuests(@Param("now") LocalDateTime now);}
+    List<Quest> findAvailableQuests(@Param("now") LocalDateTime now);
+}

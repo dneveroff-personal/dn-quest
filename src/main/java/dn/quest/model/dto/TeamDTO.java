@@ -16,5 +16,6 @@ public class TeamDTO {
     private Long id;
     private String name;
     private Set<UserDTO> members;
+    private UserDTO captain;
 
 }

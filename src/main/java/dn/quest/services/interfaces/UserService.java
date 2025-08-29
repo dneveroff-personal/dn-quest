@@ -1,27 +1,23 @@
 package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.UserDTO;
+import dn.quest.model.entities.user.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    // Регистрация: username + email + пароль + publicName
-    UserDTO register(String username, String email, String rawPassword, String publicName);
+    UserDTO create(UserDTO userDTO);
 
-    // Публичное чтение
-    UserDTO getById(Integer id);
+    UserDTO update(UserDTO userDTO);
 
-    // Технические/внутренние сценарии (не отдаём наружу email)
-    Integer getIdByUsername(String username); // удобный хелпер для security/поиска
+    void delete(Long id);
 
-    // Профиль: можно менять publicName и/или email
-    UserDTO updateProfile(Integer id, String newPublicName, String newEmail);
+    UserDTO getById(Long id);
 
-    // Смена пароля (по месту — только если понадобится)
-    void changePassword(Integer id, String oldRawPassword, String newRawPassword);
+    UserDTO getByUsername(String username);
 
-    // Служебное
-    List<UserDTO> listAll();
+    UserDTO getByEmail(String email);
 
+    List<UserDTO> getAll();
 }

@@ -42,4 +42,11 @@ public class LevelCompletion {
 
     // удобный геттер
     public Duration duration() { return Duration.ofSeconds(durationSec); }
+
+    @PrePersist
+    public void prePersist() {
+        if (passTime == null) {
+            passTime = Instant.now();
+        }
+    }
 }

@@ -8,8 +8,9 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name="level_progress",
-        uniqueConstraints = @UniqueConstraint(name="uk_session_level", columnNames={"session_id","level_id"}))
+@Table(name = "level_progress",
+        uniqueConstraints = @UniqueConstraint(name = "uk_progress_session_level",
+                columnNames = {"session_id","level_id"}))
 public class LevelProgress {
 
     @Id
@@ -22,11 +23,20 @@ public class LevelProgress {
     @ManyToOne(fetch=FetchType.LAZY) @JoinColumn(name="level_id", nullable=false)
     private Level level;
 
+    @Column(nullable=false)
     private Instant startedAt = Instant.now();
-    private Instant completedAt;
+
+    private Instant closedAt;                 // null, если ещё активен
 
     @Column(nullable=false)
-    private int completedSectors = 0;
+    private int sectorsClosed = 0;            // число закрытых NORMAL-секторов
 
-    // helpers: isCompleted() -> completedAt != null
+    @Column(nullable=false)
+    private int bonusOnLevelSec = 0;
+
+    @Column(nullable=false)
+    private int penaltyOnLevelSec = 0;
+
+    public boolean isActive() { return closedAt == null; }
+
 }
