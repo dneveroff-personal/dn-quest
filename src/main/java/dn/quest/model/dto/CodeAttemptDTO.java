@@ -16,10 +16,9 @@ import java.time.Instant;
 public class CodeAttemptDTO {
 
     private Long id;
-    private Integer userId;
+    private Long userId;
     private String submittedRaw;
     private String submittedNormalized;
     private AttemptResult result;
     private Instant createdAt;
-
 }

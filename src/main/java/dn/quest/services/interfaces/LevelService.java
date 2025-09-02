@@ -1,21 +1,25 @@
 package dn.quest.services.interfaces;
 
-import dn.quest.model.entities.enums.CodeType;
-import dn.quest.model.entities.quest.level.Code;
-import dn.quest.model.entities.quest.level.Level;
+import dn.quest.model.dto.LevelDTO;
+import dn.quest.model.entities.quest.Quest;
+
+import java.util.List;
 
 public interface LevelService {
 
-    Level addLevel(Long questId, int orderIndex, String title, String descriptionHtml,
-                   Integer apTime, Integer requiredSectors);
+    LevelDTO getById(Long id);
 
-    Level updateLevel(Long levelId, String title, String descriptionHtml,
-                      Integer apTime, Integer requiredSectors, Integer newOrderIndex);
+    List<LevelDTO> getAll();
 
-    void deleteLevel(Long levelId);
+    List<LevelDTO> getAllByQuest(Quest quest);
 
-    // Работа с кодами
-    Code addCode(Long levelId, CodeType type, Integer sectorNo, String value, int shiftSeconds);
-    void deleteCode(Long codeId);
+    LevelDTO create(LevelDTO dto);
 
+    LevelDTO update(Long id, LevelDTO dto);
+
+    void delete(Long id);
+
+    LevelDTO getFirstInQuest(Quest quest);
+
+    LevelDTO getNext(Quest quest, Integer orderIndex);
 }

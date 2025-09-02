@@ -1,7 +1,6 @@
 package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.UserDTO;
-import dn.quest.model.entities.user.User;
 
 import java.util.List;
 

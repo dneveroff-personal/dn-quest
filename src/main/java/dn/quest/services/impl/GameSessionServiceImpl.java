@@ -1,4 +1,4 @@
-package dn.quest.services;
+package dn.quest.services.impl;
 
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.enums.CodeType;

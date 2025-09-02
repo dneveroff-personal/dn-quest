@@ -1,6 +1,6 @@
 package dn.quest.controllers;
 
-import dn.quest.services.UserServiceImpl;
+import dn.quest.services.impl.UserServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;

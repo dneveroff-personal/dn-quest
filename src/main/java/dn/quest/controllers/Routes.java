@@ -10,6 +10,11 @@ public interface Routes {
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
+    String SUBMIT = "/submit";
+
+    // Attempts Controller
+    String ATTEMPTS = API + "/attempts";
+
 
     // Delete Controller
     String DELETE = API + "/delete";
@@ -19,20 +24,10 @@ public interface Routes {
     String ALL = "/all";
     String GET_COMPLETED = "/completed";
 
-    // Registration controller
-    String PING = "/ping";
-    String REGISTER = "/register";
-
     // Post Controller
     String POST = API + "/post";
     String POST_NEW = "/new";
     String POST_SOLVE = ID + "/solve";
-
-    // Session
-    String SESSIONS = API + "/sessions";
-    String SESSION_ID = "/{sessionId}";
-    String SESSION_ATTEMPT = SESSION_ID + ATTEMPT;
-    String SESSION_LEVEL = SESSION_ID + LEVEL;
 
     // Quest
     String QUESTS = API + "/quests";
@@ -40,15 +35,28 @@ public interface Routes {
     String START = "/start";
     String QUEST_START = QUEST_ID + START;
 
+    // Registration controller
+    String PING = "/ping";
+    String REGISTER = "/register";
+
+    // Session
+    String SESSIONS = API + "/sessions";
+    String SESSION_ID = "/{sessionId}";
+    String SESSION_ATTEMPT = SESSION_ID + ATTEMPT;
+    String SESSION_LEVEL = SESSION_ID + LEVEL;
+
     // Team
     String TEAMS = API + "/teams";
     String TEAM_MEMBERS = ID + "/members";
     String TEAM_MEMBER_ADD = TEAM_MEMBERS + USER_ID;
     String TEAM_TRANSFER_CAPTAIN = ID + "/transfer-captain" + USER_ID;
 
-    //Users
+    // Users
     String USERS = API + "/users";
     String USERS_BY_NAME = "/by-username" + USER_NAME;
     String BY_EMAIL = "/by-email" + EMAIL;
+
+    // Level
+    String LEVELS = API + "/levels";
 
 }

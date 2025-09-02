@@ -6,7 +6,7 @@ import dn.quest.model.entities.user.User;
 import dn.quest.repositories.TeamMemberRepository;
 import dn.quest.repositories.TeamRepository;
 import dn.quest.repositories.UserRepository;
-import dn.quest.services.TeamServiceImpl;
+import dn.quest.services.impl.TeamServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

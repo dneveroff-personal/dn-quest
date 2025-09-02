@@ -5,17 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LevelDTO {
-
+public class GameSessionDTO {
     private Long id;
     private Long questId;
-    private Integer orderIndex;
-    private String title;
-    private String descriptionHtml;
-    private Integer apTime;        // auto-pass time (сек)
-    private Integer requiredSectors;
+    private Long teamId;
+    private Instant startedAt;
+    private Instant finishedAt;
 }

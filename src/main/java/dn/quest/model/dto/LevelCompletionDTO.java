@@ -17,7 +17,7 @@ public class LevelCompletionDTO {
     private Long levelId;
     private Long teamId;                // или null если соло
     private String teamName;
-    private Integer passedByUserId;
+    private Long passedByUserId;
     private String passedByPublicName;
     private Instant passTime;
     private String durationHHMMSS;      // уже отформатированная строка
