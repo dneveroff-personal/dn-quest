@@ -1,7 +1,6 @@
 package dn.quest.model.entities.quest;
 
 import dn.quest.model.entities.enums.ApplicantType;
-import dn.quest.model.entities.enums.CodeType;
 import dn.quest.model.entities.enums.ParticipationStatus;
 import dn.quest.model.entities.team.Team;
 import dn.quest.model.entities.user.User;

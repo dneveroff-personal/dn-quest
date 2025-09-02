@@ -5,6 +5,133 @@
 PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 
 Актуальное состояние проекта.  
+# Текущее дерево файлов:
+в корне у нас есть из важного  Makefile, Dockerfile, docker-compose.yaml, build.gradle, .env, settings.gradle, 
+а так же папки src (где весь java Spring проект) и frontend (где Vue+Vite фронтэнд, который копирует сбилдженое содержимое
+из папки dist в папку статики SpringBoot-а /src/main/resources/static )
+
+содержимое папки frontend/src:
+├── App.vue
+├── assets
+├── components
+│   └── QuizCard.vue
+├── main.js
+├── services
+│   └── api.js
+└── style.css
+В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.
+
+содержимое папки src:
+├── main
+│   ├── java
+│   │   └── dn
+│   │       └── quest
+│   │           ├── bot
+│   │           │   ├── config
+│   │           │   │   └── TelegramBotConfig.java
+│   │           │   └── QuestTelegramBot.java
+│   │           ├── cmd
+│   │           │   └── QuizConsole.java
+│   │           ├── config
+│   │           │   ├── Helpers.java
+│   │           │   └── SecurityConfig.java
+│   │           ├── controllers
+│   │           │   ├── AttemptController.java
+│   │           │   ├── LevelController.java
+│   │           │   ├── QuestController.java
+│   │           │   ├── RegistrationController.java
+│   │           │   ├── Routes.java
+│   │           │   ├── TeamController.java
+│   │           │   └── UserController.java
+│   │           ├── exceptions
+│   │           │   └── GlobalExceptionHandler.java
+│   │           ├── model
+│   │           │   ├── dto
+│   │           │   │   ├── CodeAttemptDTO.java
+│   │           │   │   ├── CodeDTO.java
+│   │           │   │   ├── GameSessionDTO.java
+│   │           │   │   ├── LevelCompletionDTO.java
+│   │           │   │   ├── LevelDTO.java
+│   │           │   │   ├── QuestDTO.java
+│   │           │   │   ├── RegisterDTO.java
+│   │           │   │   ├── TeamDTO.java
+│   │           │   │   └── UserDTO.java
+│   │           │   └── entities
+│   │           │       ├── enums
+│   │           │       │   ├── ApplicantType.java
+│   │           │       │   ├── AttemptResult.java
+│   │           │       │   ├── CodeType.java
+│   │           │       │   ├── Difficulty.java
+│   │           │       │   ├── ParticipationStatus.java
+│   │           │       │   ├── QuestType.java
+│   │           │       │   ├── SessionStatus.java
+│   │           │       │   ├── TeamRole.java
+│   │           │       │   └── UserRole.java
+│   │           │       ├── quest
+│   │           │       │   ├── GameSession.java
+│   │           │       │   ├── level
+│   │           │       │   │   ├── CodeAttempt.java
+│   │           │       │   │   ├── Code.java
+│   │           │       │   │   ├── LevelCompletion.java
+│   │           │       │   │   ├── Level.java
+│   │           │       │   │   └── LevelProgress.java
+│   │           │       │   ├── ParticipationRequest.java
+│   │           │       │   └── Quest.java
+│   │           │       ├── team
+│   │           │       │   ├── Team.java
+│   │           │       │   └── TeamMember.java
+│   │           │       └── user
+│   │           │           └── User.java
+│   │           ├── QuizEngineApplication.java
+│   │           ├── repositories
+│   │           │   ├── CodeAttemptRepository.java
+│   │           │   ├── CodeRepository.java
+│   │           │   ├── GameSessionRepository.java
+│   │           │   ├── LevelCompletionRepository.java
+│   │           │   ├── LevelProgressRepository.java
+│   │           │   ├── LevelRepository.java
+│   │           │   ├── ParticipationRequestRepository.java
+│   │           │   ├── QuestRepository.java
+│   │           │   ├── TeamMemberRepository.java
+│   │           │   ├── TeamRepository.java
+│   │           │   └── UserRepository.java
+│   │           └── services
+│   │               ├── impl
+│   │               │   ├── AttemptServiceImpl.java
+│   │               │   ├── GameSessionServiceImpl.java
+│   │               │   ├── LevelServiceImpl.java
+│   │               │   ├── QuestServiceImpl.java
+│   │               │   ├── TeamServiceImpl.java
+│   │               │   └── UserServiceImpl.java
+│   │               └── interfaces
+│   │                   ├── AttemptService.java
+│   │                   ├── GameSessionService.java
+│   │                   ├── LevelService.java
+│   │                   ├── ParticipationService.java
+│   │                   ├── QuestService.java
+│   │                   ├── TeamService.java
+│   │                   └── UserService.java
+│   └── resources
+│       ├── application.properties
+│       ├── banner.txt
+│       ├── static
+│       │   ├── assets
+│       │   │   ├── FiraCode-Regular-CRwVj4V2.woff2
+│       │   │   ├── index-CMBTJsyV.css
+│       │   │   ├── index-mYOnWHD1.js
+│       │   │   ├── LatoLatin-Regular-Dmlz1U0B.woff2
+│       │   │   └── LatoLatin-Semibold-Dbk81p2D.woff2
+│       │   ├── favicon.ico
+│       │   ├── index.html
+│       │   └── vite.svg
+│       └── templates
+└── test
+└── java
+└── service
+└── TeamServiceImplTest.java
+
+
+
 Мы уже многое написали. Ты можешь не помнить, но мы все это уже обговаривали с тобой в этом чате.
 Если ты хочешь посмотреть, вспомнить, в каком из файлов какой код - скажи мне.
 Ниже список файлов, которые у нас есть в проекте:
@@ -25,6 +152,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 ## 4. Controllers
 - [x] AttemptController.java
 - [x] LevelController.java 
+- [x] ParticipationController.java 
 - [x] QuestController.java
 - [x] RegistrationController.java
 - [x] Routes.java
@@ -40,6 +168,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - [x] GameSessionDTO.java
 - [x] LevelCompletionDTO.java
 - [x] LevelDTO.java
+- [x] ParticipationRequestDTO.java
 - [x] QuestDTO.java
 - [x] RegisterDTO.java
 - [x] TeamDTO.java
@@ -83,7 +212,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - [x] LevelCompletionRepository.java
 - [x] LevelProgressRepository.java
 - [x] LevelRepository.java
-- [!] ParticipationRequestRepository.java
+- [x] ParticipationRequestRepository.java
 - [x] QuestRepository.java
 - [x] TeamMemberRepository.java
 - [x] TeamRepository.java
@@ -95,6 +224,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - [x] AttemptServiceImpl.java
 - [x] GameSessionServiceImpl.java
 - [x] LevelServiceImpl.java
+- [x] ParticipationServiceImpl.java
 - [x] QuestServiceImpl.java
 - [x] TeamServiceImpl.java
 - [x] UserServiceImpl.java
@@ -103,7 +233,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - [x] AttemptService.java
 - [x] GameSessionService.java
 - [x] LevelService.java
-- [!] ParticipationService.java
+- [x] ParticipationService.java
 - [x] QuestService.java
 - [x] TeamService.java
 - [x] UserService.java

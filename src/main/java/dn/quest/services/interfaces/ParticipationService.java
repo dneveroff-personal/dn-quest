@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ParticipationService {
 
-    ParticipationRequest createRequest(Long questId, ApplicantType type, Integer userIdOrNull, Long teamIdOrNull);
+    ParticipationRequest createRequest(Long questId, ApplicantType type, Long userIdOrNull, Long teamIdOrNull);
     ParticipationRequest changeStatus(Long requestId, ParticipationStatus newStatus);
     List<ParticipationRequest> listByQuest(Long questId, ParticipationStatus status);
 

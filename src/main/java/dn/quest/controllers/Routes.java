@@ -63,4 +63,9 @@ public interface Routes {
     // Level
     String LEVELS = API + "/levels";
 
+    // Participations
+    String PARTICIPATION = API + "/participation";
+    String PARTICIPATION_STATUS = ID + STATUS;
+    String PARTICIPATORS = "/by-quest" + QUEST_ID;
+
 }
