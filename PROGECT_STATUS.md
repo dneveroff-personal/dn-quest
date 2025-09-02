@@ -38,6 +38,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   │           ├── controllers
 │   │           │   ├── AttemptController.java
 │   │           │   ├── LevelController.java
+│   │           │   ├── ParticipationController.java
 │   │           │   ├── QuestController.java
 │   │           │   ├── RegistrationController.java
 │   │           │   ├── Routes.java
@@ -52,6 +53,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   │           │   │   ├── GameSessionDTO.java
 │   │           │   │   ├── LevelCompletionDTO.java
 │   │           │   │   ├── LevelDTO.java
+│   │           │   │   ├── ParticipationRequestDTO.java
 │   │           │   │   ├── QuestDTO.java
 │   │           │   │   ├── RegisterDTO.java
 │   │           │   │   ├── TeamDTO.java
@@ -100,6 +102,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   │               │   ├── AttemptServiceImpl.java
 │   │               │   ├── GameSessionServiceImpl.java
 │   │               │   ├── LevelServiceImpl.java
+│   │               │   ├── ParticipationServiceImpl.java
 │   │               │   ├── QuestServiceImpl.java
 │   │               │   ├── TeamServiceImpl.java
 │   │               │   └── UserServiceImpl.java

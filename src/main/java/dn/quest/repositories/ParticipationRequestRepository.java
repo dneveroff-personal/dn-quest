@@ -13,4 +13,5 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     List<ParticipationRequest> findByQuestAndStatus(Quest quest, ParticipationStatus status);
     List<ParticipationRequest> findByQuestAndTeam(Quest quest, Team team);
     List<ParticipationRequest> findByQuestAndUser(Quest quest, User user);
+    List<ParticipationRequest> findByQuest(Quest quest);
 }

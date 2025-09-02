@@ -3,6 +3,7 @@ package dn.quest.controllers;
 import dn.quest.model.dto.ParticipationRequestDTO;
 import dn.quest.model.entities.enums.ParticipationStatus;
 import dn.quest.services.interfaces.ParticipationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +20,13 @@ public class ParticipationController implements Routes {
 
     @PostMapping
     public ResponseEntity<ParticipationRequestDTO> createRequest(
-            @RequestParam Long questId,
-            @RequestParam String type,
-            @RequestParam(required = false) Long userId,
-            @RequestParam(required = false) Long teamId
+            @Valid @RequestBody ParticipationRequestDTO dto
     ) {
         var request = participationService.createRequest(
-                questId,
-                Enum.valueOf(dn.quest.model.entities.enums.ApplicantType.class, type),
-                userId,
-                teamId
+                dto.getQuestId(),
+                dto.getType(),
+                dto.getUserId(),
+                dto.getTeamId()
         );
         return ResponseEntity.ok(toDTO(request));
     }
