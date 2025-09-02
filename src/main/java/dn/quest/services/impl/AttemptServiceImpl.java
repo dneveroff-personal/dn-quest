@@ -2,16 +2,19 @@ package dn.quest.services.impl;
 
 import dn.quest.model.dto.CodeAttemptDTO;
 import dn.quest.model.entities.quest.level.CodeAttempt;
-import dn.quest.model.entities.user.User;
+import dn.quest.model.entities.quest.level.Level;
 import dn.quest.repositories.CodeAttemptRepository;
-import dn.quest.repositories.UserRepository;
+import dn.quest.repositories.GameSessionRepository;
+import dn.quest.repositories.LevelRepository;
 import dn.quest.services.interfaces.AttemptService;
+import dn.quest.services.interfaces.GameSessionService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,57 +22,74 @@ import java.util.stream.Collectors;
 public class AttemptServiceImpl implements AttemptService {
 
     private final CodeAttemptRepository codeAttemptRepository;
-    private final UserRepository userRepository;
+    private final GameSessionRepository gameSessionRepository;
+    private final LevelRepository levelRepository;
+    private final GameSessionService gameSessionService;
 
     @Override
-    public CodeAttemptDTO submit(CodeAttemptDTO dto) {
-        CodeAttempt entity = toEntity(dto);
-        entity = codeAttemptRepository.save(entity);
-        return toDTO(entity);
-    }
+    public CodeAttemptDTO submit(CodeAttemptDTO attemptDTO) {
+        if (attemptDTO.getSessionId() == null) {
+            throw new IllegalArgumentException("sessionId is required");
+        }
+        // вызов логики из GameSessionService
+        var result = gameSessionService.submitCode(
+                attemptDTO.getSessionId(),
+                attemptDTO.getSubmittedRaw(),
+                attemptDTO.getUserId() != null ? attemptDTO.getUserId().intValue() : null
+        );
 
-    @Override
-    public CodeAttemptDTO getById(Long id) {
-        return codeAttemptRepository.findById(id)
-                .map(this::toDTO)
-                .orElseThrow(() -> new RuntimeException("Attempt not found"));
-    }
+        // создаём CodeAttemptDTO для ответа
+        var session = gameSessionRepository.findById(attemptDTO.getSessionId())
+                .orElseThrow(() -> new EntityNotFoundException("Session not found"));
+        Level level = levelRepository.findById(attemptDTO.getLevelId())
+                .orElse(null);
 
-    @Override
-    public List<CodeAttemptDTO> getAll() {
-        return codeAttemptRepository.findAll()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    // ===== Маппинг =====
-    private CodeAttemptDTO toDTO(CodeAttempt entity) {
         return CodeAttemptDTO.builder()
-                .id(entity.getId())
-                .userId(entity.getUser() != null ? entity.getUser().getId() : null)
-                .submittedRaw(entity.getSubmittedRaw())
-                .submittedNormalized(entity.getSubmittedNormalized())
-                .result(entity.getResult())
-                .createdAt(entity.getCreatedAt())
+                .sessionId(session.getId())
+                .levelId(level != null ? level.getId() : null)
+                .userId(attemptDTO.getUserId())
+                .submittedRaw(attemptDTO.getSubmittedRaw())
+                .submittedNormalized(attemptDTO.getSubmittedRaw() != null ? attemptDTO.getSubmittedRaw().trim().toLowerCase() : "")
+                .result(result)
                 .build();
     }
 
-    private CodeAttempt toEntity(CodeAttemptDTO dto) {
-        CodeAttempt entity = new CodeAttempt();
-        entity.setId(dto.getId());
+    @Override
+    @Transactional(readOnly = true)
+    public CodeAttemptDTO getById(Long id) {
+        return codeAttemptRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new EntityNotFoundException("CodeAttempt not found: " + id));
+    }
 
-        if (dto.getUserId() != null) {
-            User user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found with id " + dto.getUserId()));
-            entity.setUser(user);
-        }
+    @Override
+    @Transactional(readOnly = true)
+    public List<CodeAttemptDTO> getAll() {
+        return codeAttemptRepository.findAll().stream()
+                .map(this::toDTO)
+                .toList();
+    }
 
-        entity.setSubmittedRaw(dto.getSubmittedRaw());
-        entity.setSubmittedNormalized(dto.getSubmittedNormalized());
-        entity.setResult(dto.getResult());
-        entity.setCreatedAt(dto.getCreatedAt());
+    @Override
+    @Transactional(readOnly = true)
+    public List<CodeAttemptDTO> getLastAttempts(Long sessionId, Long levelId, int limit) {
 
-        return entity;
+        return codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(0, limit))
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private CodeAttemptDTO toDTO(CodeAttempt attempt) {
+        return CodeAttemptDTO.builder()
+                .id(attempt.getId())
+                .sessionId(attempt.getSession() != null ? attempt.getSession().getId() : null)
+                .levelId(attempt.getLevel() != null ? attempt.getLevel().getId() : null)
+                .userId(attempt.getUser() != null ? attempt.getUser().getId() : null)
+                .submittedRaw(attempt.getSubmittedRaw())
+                .submittedNormalized(attempt.getSubmittedNormalized())
+                .result(attempt.getResult())
+                .createdAt(attempt.getCreatedAt())
+                .build();
     }
 }

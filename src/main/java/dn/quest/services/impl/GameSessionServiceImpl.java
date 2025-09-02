@@ -1,5 +1,6 @@
 package dn.quest.services.impl;
 
+import dn.quest.model.dto.GameSessionDTO;
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.enums.CodeType;
 import dn.quest.model.entities.enums.QuestType;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,21 @@ public class GameSessionServiceImpl implements GameSessionService {
     public GameSession start(Long questId, Integer userId, Long teamId) {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+
+        // Проверяем, не существует ли уже активная сессия
+        if (quest.getType() == QuestType.SOLO && userId != null) {
+            User user = userRepository.findById(userId.longValue())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+            Optional<GameSession> existing = gameSessionRepository.findByQuestAndUser(quest, user)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
+            if (existing.isPresent()) return existing.get();
+        } else if (quest.getType() == QuestType.TEAM && teamId != null) {
+            Team team = teamRepository.findById(teamId)
+                    .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
+            Optional<GameSession> existing = gameSessionRepository.findByQuestAndTeam(quest, team)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
+            if (existing.isPresent()) return existing.get();
+        }
 
         GameSession session = new GameSession();
         session.setQuest(quest);
@@ -172,10 +189,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Override
     @Transactional(readOnly = true)
     public List<CodeAttempt> lastAttempts(Long sessionId, Long levelId, int limit) {
-        GameSession session = findSession(sessionId);
-        Level level = levelRepository.findById(levelId)
-                .orElseThrow(() -> new EntityNotFoundException("Level not found: " + levelId));
-        return codeAttemptRepository.findLastAttempts(session, level, PageRequest.of(0, Math.max(1, limit)));
+        return codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(0, Math.max(1, limit)));
     }
 
     @Override
@@ -198,6 +212,13 @@ public class GameSessionServiceImpl implements GameSessionService {
             session.setFinishedAt(now);
         }
         return gameSessionRepository.save(session);
+    }
+
+    public List<GameSessionDTO> getSessionsByQuest(Long questId) {
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+        List<GameSession> sessions = gameSessionRepository.findByQuest(quest);
+        return toDTO(sessions);
     }
 
     // --------- helpers ---------
@@ -245,4 +266,25 @@ public class GameSessionServiceImpl implements GameSessionService {
             levelProgressRepository.save(nextProgress);
         }
     }
+
+    // ---------------- Mapping ----------------
+    private GameSessionDTO toDTO(GameSession session) {
+        return GameSessionDTO.builder()
+                .id(session.getId())
+                .questId(session.getQuest() != null ? session.getQuest().getId() : null)
+                .userId(session.getUser() != null ? session.getUser().getId() : null)
+                .teamId(session.getTeam() != null ? session.getTeam().getId() : null)
+                .startedAt(session.getStartedAt())
+                .finishedAt(session.getFinishedAt())
+                .status(session.getStatus() != null ? session.getStatus().name() : null)
+                .build();
+    }
+
+    // Optional: из списка
+    private List<GameSessionDTO> toDTO(List<GameSession> sessions) {
+        return sessions.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
 }

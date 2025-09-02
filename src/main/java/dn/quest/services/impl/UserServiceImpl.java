@@ -30,8 +30,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO update(UserDTO userDTO) {
         User existing = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        existing.setUsername(userDTO.getPublicName());
-        // при необходимости можно добавить другие поля
+        existing.setUsername(userDTO.getPublicName()); // текущая логика проекта
         return toDTO(userRepository.save(existing));
     }
 
@@ -68,6 +67,16 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
     // ===== Маппинг =====
     private UserDTO toDTO(User user) {
         return UserDTO.builder()
@@ -79,6 +88,7 @@ public class UserServiceImpl implements UserService {
     private User toEntity(UserDTO dto) {
         User user = new User();
         user.setId(dto.getId());
+        // текущая модель: username устанавливаем из publicName
         user.setUsername(dto.getPublicName());
         return user;
     }

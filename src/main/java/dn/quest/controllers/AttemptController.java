@@ -29,4 +29,13 @@ public class AttemptController implements Routes {
     public ResponseEntity<List<CodeAttemptDTO>> getAll() {
         return ResponseEntity.ok(attemptService.getAll());
     }
+
+    @GetMapping("/last")
+    public ResponseEntity<List<CodeAttemptDTO>> getLastAttempts(
+            @RequestParam Long sessionId,
+            @RequestParam Long levelId,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return ResponseEntity.ok(attemptService.getLastAttempts(sessionId, levelId, limit));
+    }
 }

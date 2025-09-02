@@ -19,4 +19,9 @@ public interface UserService {
     UserDTO getByEmail(String email);
 
     List<UserDTO> getAll();
+
+    // ---- добавлено для регистрации ----
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

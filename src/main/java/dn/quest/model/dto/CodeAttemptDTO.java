@@ -1,7 +1,6 @@
 package dn.quest.model.dto;
 
 import dn.quest.model.entities.enums.AttemptResult;
-import dn.quest.model.entities.enums.CodeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +15,17 @@ import java.time.Instant;
 public class CodeAttemptDTO {
 
     private Long id;
-    private Long userId;
-    private String submittedRaw;
-    private String submittedNormalized;
-    private AttemptResult result;
-    private Instant createdAt;
+
+    private Long sessionId;           // GameSession
+    private Long levelId;             // Level
+    private Long userId;              // кто отправил
+
+    private String submittedRaw;      // то, что ввёл пользователь
+    private String submittedNormalized; // нормализованная версия
+
+    private Long matchedCodeId;       // если совпало с каким-то кодом
+    private Integer matchedSectorNo;  // сектор, к которому относится код
+
+    private AttemptResult result;     // ACCEPTED/DUPLICATE/WRONG и т.п.
+    private Instant createdAt;        // когда отправлено
 }

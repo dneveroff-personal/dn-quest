@@ -6,10 +6,12 @@ public interface Routes {
     String ATTEMPT = "/attempt";
     String EMAIL = "/{email}";
     String ID = "/{id:\\d+}";
+    String LEADERBOARD = "/leaderboard";
     String LEVEL = "/level";
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
+    String STATUS = "/status";
     String SUBMIT = "/submit";
 
     // Attempts Controller
@@ -34,6 +36,7 @@ public interface Routes {
     String QUEST_ID = "/{questId}";
     String START = "/start";
     String QUEST_START = QUEST_ID + START;
+    String QUEST_LEADERBOARD = QUEST_ID + LEADERBOARD;
 
     // Registration controller
     String PING = "/ping";
@@ -44,6 +47,7 @@ public interface Routes {
     String SESSION_ID = "/{sessionId}";
     String SESSION_ATTEMPT = SESSION_ID + ATTEMPT;
     String SESSION_LEVEL = SESSION_ID + LEVEL;
+    String SESSION_STATUS = "/sessions" + SESSION_ID + STATUS;
 
     // Team
     String TEAMS = API + "/teams";
