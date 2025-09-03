@@ -25,29 +25,16 @@ public class RegistrationController implements Routes {
 
     @PostMapping(REGISTER)
     public ResponseEntity<UserDTO> register(@RequestBody RegisterDTO request) {
-        // простая валидация
-        if (request == null || !StringUtils.hasText(request.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (request == null || !StringUtils.hasText(request.getUsername()) || !StringUtils.hasText(request.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
         }
 
-        // проверки уникальности (через сервис)
-        if (userService.existsByUsername(request.getUsername())) {
+        try {
+            UserDTO created = userService.register(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        if (StringUtils.hasText(request.getEmail()) && userService.existsByEmail(request.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        // текущая модель: UserDTO -> publicName; в UserServiceImpl username берётся из publicName
-        String publicName = StringUtils.hasText(request.getPublicName())
-                ? request.getPublicName()
-                : request.getUsername();
-
-        UserDTO dto = UserDTO.builder()
-                .publicName(publicName)
-                .build();
-
-        UserDTO created = userService.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 }

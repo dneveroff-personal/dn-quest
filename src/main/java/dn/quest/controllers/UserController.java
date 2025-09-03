@@ -15,11 +15,6 @@ public class UserController implements Routes {
 
     private final UserService userService;
 
-    @PostMapping
-    public ResponseEntity<UserDTO> create(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.create(userDTO));
-    }
-
     @PutMapping(ID)
     public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         userDTO.setId(id); // гарантируем, что id из URL пойдет в DTO

@@ -1,49 +1,37 @@
 <template>
   <n-config-provider :theme="darkTheme">
     <n-message-provider>
-      <div class="p-6">
-        <h1 class="text-2xl font-bold mb-6 text-center">Quiz Engine</h1>
+      <n-layout class="min-h-screen">
+        <!-- HEADER -->
+        <n-layout-header bordered class="p-4 flex items-center justify-between">
+          <AppHeader />
+        </n-layout-header>
 
-        <n-spin :show="loading">
-          <div class="grid gap-4">
-            <QuizCard
-                v-for="quiz in quizzes"
-                :key="quiz.id"
-                :quiz="quiz"
-                @answered="handleAnswered"
-            />
+        <!-- MAIN CONTENT -->
+        <n-layout-content content-style="padding: 24px;" class="bg-gray-900">
+          <div class="max-w-5xl mx-auto">
+            <router-view />
           </div>
-        </n-spin>
-      </div>
+        </n-layout-content>
+
+        <!-- FOOTER -->
+        <n-layout-footer bordered class="text-center p-4">
+          <n-text depth="3">DN Quest Engine © 2025</n-text>
+        </n-layout-footer>
+      </n-layout>
     </n-message-provider>
   </n-config-provider>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
-import { darkTheme, NConfigProvider, NMessageProvider, NSpin } from "naive-ui"
-import QuizCard from "./components/QuizCard.vue"
-import api from "@/services/api"
-
-const quizzes = ref([])
-const loading = ref(false)
-
-async function loadQuizzes() {
-  loading.value = true
-  try {
-    const response = await api.get("/get/all") // твой эндпоинт
-    quizzes.value = response.data.content
-  } catch (error) {
-    console.error("Ошибка загрузки квизов", error)
-  } finally {
-    loading.value = false
-  }
-}
-
-function handleAnswered({ id, result }) {
-  console.log("Результат квиза:", id, result)
-  // Можно показывать сообщение или перезагружать квизы
-}
-
-onMounted(loadQuizzes)
+import { darkTheme } from "naive-ui"
+import AppHeader from "@/components/AppHeader.vue"
 </script>
+
+<style>
+/* Чтобы фон тёмной темы смотрелся стильно */
+body {
+  background-color: #0f172a; /* slate-900 */
+  color: #e2e8f0; /* slate-200 */
+}
+</style>

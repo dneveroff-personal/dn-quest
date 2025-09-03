@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RegisterDTO {
 
-    private String username;    // обязателен сейчас
-    private String publicName;  // необязателен; по умолчанию = username
-    private String email;       // пока не сохраняем (DTO UserDTO его не несёт)
-    private String password;    // пока не сохраняем (пароли добавим, когда расширим модель)
+    private String username;
+    private String publicName;
+    private String email;
+    private String password;
 
 }

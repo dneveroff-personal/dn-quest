@@ -7,14 +7,14 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 Актуальное состояние проекта.  
 # Текущее дерево файлов:
 в корне у нас есть из важного  Makefile, Dockerfile, docker-compose.yaml, build.gradle, .env, settings.gradle, 
-а так же папки src (где весь java Spring проект) и frontend (где Vue+Vite фронтэнд, который копирует сбилдженое содержимое
+а так же папки src (где весь java Spring проект) и frontend (где Vue+Vite + naive-ui + axios фронтэнд, который копирует сбилдженое содержимое
 из папки dist в папку статики SpringBoot-а /src/main/resources/static )
 
 содержимое папки frontend/src:
 ├── App.vue
 ├── assets
 ├── components
-│   └── QuizCard.vue
+│   └── QuestCard.vue
 ├── main.js
 ├── services
 │   └── api.js
@@ -31,7 +31,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   │           │   │   └── TelegramBotConfig.java
 │   │           │   └── QuestTelegramBot.java
 │   │           ├── cmd
-│   │           │   └── QuizConsole.java
+│   │           │   └── QuestConsole.java
 │   │           ├── config
 │   │           │   ├── Helpers.java
 │   │           │   └── SecurityConfig.java
@@ -84,7 +84,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   │           │       │   └── TeamMember.java
 │   │           │       └── user
 │   │           │           └── User.java
-│   │           ├── QuizEngineApplication.java
+│   │           ├── QuestEngineApplication.java
 │   │           ├── repositories
 │   │           │   ├── CodeAttemptRepository.java
 │   │           │   ├── CodeRepository.java
@@ -143,14 +143,14 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 📌 Без отметки `[ ]`, файл создан, но внутри недоработан или пуст и требует работы.
 
 ## 1. Application Entry
-- [x] QuizEngineApplication.java
+- [x] QuestEngineApplication.java
 
 ## 2. Config
 - [x] Helpers.java
 - [x] SecurityConfig.java
 
 ## 3. CMD
-- [x] QuizConsole.java
+- [x] QuestConsole.java
 
 ## 4. Controllers
 - [x] AttemptController.java
@@ -366,4 +366,48 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - Сервисы — «толстые» (бизнес-логика, маппинг, валидация), работают с DTO. Внутри имплементации мы маппим DTO ↔ Entity.
 
 
+ТЕКУЩИЕ ЗАДАЧИ:
+По задачам фронта:
+1. Главная страница → список доступных квестов.
+- Бэк уже готов: QuestController даёт список (скорее всего GET /quests).
+- На фронте нужен компонент QuestList.vue или что-то в этом духе.
+- Он будет запрашивать квесты через fetch/axios и рисовать карточки.
 
+2. Детали квеста (страница квеста).
+- Здесь кнопка «Подать заявку» (если пользователь/команда ещё не подали).
+- Кнопку будем скрывать, если заявка уже есть.
+
+3. Авторизация/регистрация (у нас UserController и RegistrationController есть).
+- Значит, нужен экран логина/регистрации, хранение JWT в localStorage, и добавление Authorization в запросы.
+
+4. Личный кабинет / мои квесты (список, где игрок участвует).
+
+
+## Предлагаю план по фронту (первый этап):
+1. Структура проекта (чтобы было по best practices)
+В frontend/src заведём:
+    - views/ — страницы (Home.vue, QuestDetails.vue, Login.vue, Register.vue и т.д.).
+    - components/ — переиспользуемые компоненты (QuestCard.vue, Header.vue).
+    - router/ — роутинг (index.js).
+    - store/ — глобальное состояние (например, pinia или простая реактивная обёртка для начала).
+    - services/ — API (уже есть api.js, можно расширить).
+
+2. Главная страница (Home.vue)
+   - Тянем список квестов с бэка (GET /api/quests).
+   - Рисуем карточки с названием, описанием и ссылкой «Подробнее».
+
+3. Компонент QuestCard.vue
+   - Показывает заголовок, описание, дату начала/окончания.
+   - Кнопка «Подробнее» ведёт на страницу квеста.
+
+4. Роутинг
+   - / → список квестов (Home).
+   - /quest/:id → страница одного квеста с кнопкой «Подать заявку».
+
+5. Axios + JWT 
+   - Сейчас у тебя auth: { username, password }, но дальше будет токен.
+   - Сделаем перехватчик, чтобы автоматически подставлять Authorization: Bearer <token>.
+
+   6. Визуал
+   - Оставляем Naive UI + Tailwind (можно постепенно добавить).
+   - Делаем тёмную тему по умолчанию.

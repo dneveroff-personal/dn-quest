@@ -23,20 +23,20 @@ public class QuestTelegramBot extends TelegramLongPollingBot {
             Long chatId = update.getMessage().getChatId();
 
             if ("/start".equals(messageText)) {
-                sendQuizList(chatId);
+                sendQuestList(chatId);
             } else if (messageText.startsWith("/answer_")) {
                 processAnswer(chatId, messageText);
             }
         }*/
     }
 
-   /* private void sendQuizList(Long chatId) {
-        List<Quest> quizzes = questService.getAllQuizzes();
+   /* private void sendQuestList(Long chatId) {
+        List<Quest> quests = questService.getAllquests();
         StringBuilder message = new StringBuilder("Доступные квизы:\n");
 
-        quizzes.forEach(quiz -> {
-            message.append(quiz.getTitle()).append("\n");
-            message.append("Для ответа: /answer_").append(quiz.getId()).append(" [номер_ответа]\n\n");
+        quests.forEach(quest -> {
+            message.append(quest.getTitle()).append("\n");
+            message.append("Для ответа: /answer_").append(quest.getId()).append(" [номер_ответа]\n\n");
         });
 
         sendMessage(chatId, message.toString());
@@ -44,12 +44,12 @@ public class QuestTelegramBot extends TelegramLongPollingBot {
 
   /*  private void processAnswer(Long chatId, String command) {
         String[] parts = command.split("_");
-        Long quizId = Long.parseLong(parts[1]);
+        Long questId = Long.parseLong(parts[1]);
 
         // Todo: replace with get answers in correct class form
         AnswerRequest answerRequest = new AnswerRequest();
         answerRequest.setAnswer(Set.of(Integer.parseInt(parts[2])));
-        AnswerResult result = questService.getAnswerResult(quizId, answerRequest, "admin");
+        AnswerResult result = questService.getAnswerResult(questId, answerRequest, "admin");
 
         sendMessage(chatId, result.toString());
     }*/
@@ -68,7 +68,7 @@ public class QuestTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "YourQuizBot"; // Юзернейм без @
+        return "YourQuestBot"; // Юзернейм без @
     }
 
     @Override

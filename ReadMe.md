@@ -1,4 +1,4 @@
-# Welcome to the Quiz engine!
+# Welcome to the Quest engine!
 
 ### To run Swagger in UI run 
 http://localhost:8080/swagger-ui/index.html
@@ -33,7 +33,7 @@ docker compose up -d --build --remove-orphans
 docker compose down --remove-orphans
 
 ### To see LOGS
-docker logs -f quiz-app
+docker logs -f quest-app
 
 
 # Vue + Vite frontend in /frontend folder

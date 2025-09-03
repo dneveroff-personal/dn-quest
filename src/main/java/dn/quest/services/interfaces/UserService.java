@@ -1,16 +1,17 @@
 package dn.quest.services.interfaces;
 
+import dn.quest.model.dto.RegisterDTO;
 import dn.quest.model.dto.UserDTO;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserDTO create(UserDTO userDTO);
-
     UserDTO update(UserDTO userDTO);
 
     void delete(Long id);
+
+    UserDTO register(RegisterDTO dto);
 
     UserDTO getById(Long id);
 

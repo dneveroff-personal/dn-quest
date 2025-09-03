@@ -6,17 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:static": "vite build && rm -rf ../src/main/resources/static && mkdir -p ../src/main/resources/static && cp -r dist/* ../src/main/resources/static/",
+    "build:static": "vite build --mode production && rm -rf ../src/main/resources/static && mkdir -p ../src/main/resources/static && cp -r dist/* ../src/main/resources/static/",
     "preview": "vite preview"
   },
   "dependencies": {
     "axios": "^1.11.0",
     "naive-ui": "^2.42.0",
     "vfonts": "^0.0.3",
-    "vue": "^3.5.18"
+    "vue": "^3.5.18",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.1.2"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

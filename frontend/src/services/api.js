@@ -1,11 +1,17 @@
-import axios from 'axios';
+// src/services/api.js
+import axios from "axios";
 
 const api = axios.create({
-    baseURL: '/api',
-    auth: {
-        username: 'dn2@localhost.com',
-        password: 'pass2'
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+});
+
+// JWT interceptor (если токен есть)
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
 });
 
 export default api;

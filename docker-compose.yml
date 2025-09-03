@@ -2,11 +2,11 @@
 services:
   db:
     image: postgres:16
-    container_name: quiz-db
+    container_name: quest-db
     environment:
       POSTGRES_USER: dn
       POSTGRES_PASSWORD: dn
-      POSTGRES_DB: quizdb
+      POSTGRES_DB: dnqdb
     ports:
       - "5432:5432"
     volumes:
@@ -16,13 +16,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: quiz-backend
+    container_name: quest-backend
     ports:
       - "8080:8080"
       - "5005:5005"   # <-- порт для работы дебага
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/quizdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dnqdb
       SPRING_DATASOURCE_USERNAME: ${SPRING_DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DB_PASS}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -36,9 +36,12 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: quiz-frontend
+    container_name: quest-frontend
     ports:
       - "5173:5173"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=http://backend:8080/api
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -47,7 +50,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: quiz-pgadmin
+    container_name: quest-pgadmin
     depends_on:
       - db
     environment:

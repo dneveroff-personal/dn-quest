@@ -8,6 +8,7 @@ public interface Routes {
     String ID = "/{id:\\d+}";
     String LEADERBOARD = "/leaderboard";
     String LEVEL = "/level";
+    String LOGIN = "/login";
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
@@ -16,20 +17,6 @@ public interface Routes {
 
     // Attempts Controller
     String ATTEMPTS = API + "/attempts";
-
-
-    // Delete Controller
-    String DELETE = API + "/delete";
-
-    // Get Controller
-    String GET = API + "/get";
-    String ALL = "/all";
-    String GET_COMPLETED = "/completed";
-
-    // Post Controller
-    String POST = API + "/post";
-    String POST_NEW = "/new";
-    String POST_SOLVE = ID + "/solve";
 
     // Quest
     String QUESTS = API + "/quests";

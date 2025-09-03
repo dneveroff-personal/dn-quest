@@ -6,10 +6,10 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @EnableCaching
 @SpringBootApplication
-public class QuizEngineApplication {
+public class QuestEngineApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(QuizEngineApplication.class, args);
+        SpringApplication.run(QuestEngineApplication.class, args);
     }
 
 }

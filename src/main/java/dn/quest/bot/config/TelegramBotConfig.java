@@ -13,7 +13,7 @@ public class TelegramBotConfig {
     private String botToken;
 
     @Bean
-    public TelegramLongPollingBot quizBot(QuestService questService) {
+    public TelegramLongPollingBot questBot(QuestService questService) {
         return new QuestTelegramBot(botToken, questService);
     }
 }
