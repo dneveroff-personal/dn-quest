@@ -1,23 +1,27 @@
 import api from "./api";
 
-export async function login(username, password) {
-    const response = await api.post("/login", { username, password });
-    const token = response.data.token;
-    localStorage.setItem("token", token);
-    return token;
-}
-
 export function getToken() {
     return localStorage.getItem("token");
 }
 
-export function logout() {
-    localStorage.removeItem("token");
+export function setToken(token) {
+    localStorage.setItem("token", token);
+    window.dispatchEvent(new Event("user-changed"));
 }
 
-// Axios интерцептор
-api.interceptors.request.use(config => {
+export function logout() {
+    localStorage.removeItem("token");
+    window.dispatchEvent(new Event("user-changed"));
+}
+
+export async function fetchCurrentUser() {
     const token = getToken();
-    if (token) config.headers["Authorization"] = `Bearer ${token}`;
-    return config;
-});
+    if (!token) return null;
+    try {
+        const resp = await api.get("/users/me");
+        return resp.data;
+    } catch (err) {
+        console.error("fetchCurrentUser failed", err);
+        return null;
+    }
+}

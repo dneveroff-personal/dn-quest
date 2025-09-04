@@ -9,6 +9,7 @@ public interface Routes {
     String LEADERBOARD = "/leaderboard";
     String LEVEL = "/level";
     String LOGIN = "/login";
+    String ME = "/me";
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";

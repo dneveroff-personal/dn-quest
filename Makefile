@@ -26,4 +26,5 @@ build-back:
 
 build-front: build-static docker-upd
 
-all: clean build-static build-back
+all-clean: clean build-static build-back
+all: build-static build-back

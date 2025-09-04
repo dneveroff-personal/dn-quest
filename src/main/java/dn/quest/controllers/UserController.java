@@ -3,7 +3,10 @@ package dn.quest.controllers;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +48,16 @@ public class UserController implements Routes {
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
+    }
+
+    @GetMapping(ME)
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        UserDTO dto = userService.getByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(dto);
     }
 
 }

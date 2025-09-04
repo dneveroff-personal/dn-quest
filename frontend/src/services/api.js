@@ -5,7 +5,7 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-// JWT interceptor (если токен есть)
+// JWT interceptor: добавляем токен в заголовок Authorization
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {

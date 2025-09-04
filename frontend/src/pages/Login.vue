@@ -2,33 +2,40 @@
   <n-config-provider :theme="darkTheme">
     <n-message-provider>
       <div class="flex flex-col items-center justify-center min-h-screen p-6">
-        <n-card title="Вход" class="w-full max-w-md shadow-lg">
-          <div class="flex flex-col gap-4">
-
-            <!-- Username -->
+        <n-card title="Login" class="w-full max-w-md shadow-lg">
+          <!-- Форма -->
+          <form @submit.prevent="doLogin" class="flex flex-col gap-4">
+            <!-- input username -->
             <n-input
                 v-model:value="username"
                 placeholder="Username"
                 clearable
+                @keyup.enter="doLogin"
             />
 
-            <!-- Password -->
+            <!-- input password -->
             <n-input
-                type="password"
                 v-model:value="password"
+                type="password"
                 placeholder="Password"
                 clearable
+                @keyup.enter="doLogin"
             />
 
-            <!-- Buttons -->
-            <n-button type="primary" block @click="doLogin" :loading="loading">
-              Войти
+            <!-- кнопка -->
+            <n-button
+                type="primary"
+                block
+                :loading="loading"
+                attr-type="submit"
+            >
+            Войти
             </n-button>
+
             <n-button text block @click="$router.push('/register')">
               Нет аккаунта? Зарегистрироваться
             </n-button>
-
-          </div>
+          </form>
         </n-card>
       </div>
     </n-message-provider>
@@ -40,6 +47,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { darkTheme, useMessage } from "naive-ui";
 import api from "@/services/api";
+import { fetchCurrentUser } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -49,34 +57,29 @@ const password = ref("");
 const loading = ref(false);
 
 async function doLogin() {
-  // Проверяем обязательные поля
-  if (!username.value.trim() || !password.value.trim()) {
-    message.error("Username и Password обязательны!");
+  if (!username.value || !password.value) {
+    message.error("Username и Password обязательны");
     return;
   }
 
   loading.value = true;
 
   try {
-    const response = await api.post("/login", {
-      username: username.value.trim(),
-      password: password.value.trim()
+    const resp = await api.post("/login", {
+      username: username.value,
+      password: password.value,
     });
 
-    // Сохраняем токен, если бэкенд его возвращает
-    if (response.data?.token) {
-      localStorage.setItem("token", response.data.token);
-    }
+    const token = resp.data.token;
+    localStorage.setItem("token", token);
 
-    message.success("Вы вошли в систему!");
-    router.push("/"); // или ваша главная страница
+    const user = await fetchCurrentUser();
+    message.success(`Добро пожаловать, ${user.publicName}`);
+
+    router.push("/");
   } catch (err) {
-    if (err.response?.status === 401) {
-      message.error("Неверный username или password");
-    } else {
-      message.error("Ошибка входа");
-    }
-    console.error(err);
+    message.error("Неправильный логин или пароль");
+    console.error("Ошибка логина", err);
   } finally {
     loading.value = false;
   }

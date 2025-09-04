@@ -1,17 +1,35 @@
-import { createRouter, createWebHistory } from "vue-router"
-import Home from "@/pages/Home.vue"
-import Login from "@/pages/Login.vue"
-import Register from "@/pages/Register.vue"
+// src/router/index.js
+import { createRouter, createWebHistory } from "vue-router";
+import Register from "@/pages/Register.vue";
+import Login from "@/pages/Login.vue";
+import Home from "@/pages/Home.vue";
+import { getToken, fetchCurrentUser } from "@/services/auth";
 
 const routes = [
-    { path: "/", name: "Home", component: Home },
-    { path: "/login", name: "Login", component: Login },
-    { path: "/register", name: "Register", component: Register }
-]
+    { path: "/", component: Home },
+    { path: "/login", component: Login },
+    { path: "/register", component: Register }
+];
 
 const router = createRouter({
     history: createWebHistory(),
     routes
-})
+});
 
-export default router
+router.beforeEach(async (to, from, next) => {
+    const token = getToken();
+
+    if (to.meta.requiresAuth) {
+        if (!token) {
+            return next("/login");
+        }
+
+        // Можно проверять валидность токена
+        const user = await fetchCurrentUser();
+        if (!user) return next("/login");
+    }
+
+    next();
+});
+
+export default router;
