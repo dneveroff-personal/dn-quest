@@ -1,13 +1,13 @@
 package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.RegisterDTO;
+import dn.quest.model.dto.UserAdminDTO;
 import dn.quest.model.dto.UserDTO;
+import dn.quest.model.entities.enums.UserRole;
 
 import java.util.List;
 
 public interface UserService {
-
-    UserDTO update(UserDTO userDTO);
 
     void delete(Long id);
 
@@ -19,7 +19,9 @@ public interface UserService {
 
     UserDTO getByEmail(String email);
 
-    List<UserDTO> getAll();
+    List<UserAdminDTO> getAll();
+
+    UserDTO updateRole(Long id, UserRole role);
 
     // ---- добавлено для регистрации ----
     boolean existsByUsername(String username);

@@ -36,11 +36,9 @@ public class User {
     @Column(length = 128)
     private String publicName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name="user_id"))
+    @Column(nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
-    @Column(name="role", nullable = false, length = 16)
-    private Set<UserRole> roles = new HashSet<>();
+    private UserRole role = UserRole.PLAYER;
 
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();

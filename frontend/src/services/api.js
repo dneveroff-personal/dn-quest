@@ -14,4 +14,7 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+export function clearToken() {
+    localStorage.removeItem("token");
+}
 export default api;

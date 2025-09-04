@@ -66,7 +66,7 @@ public class TeamServiceImpl implements TeamService {
         return TeamDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
-                .captain(new UserDTO(team.getCaptain().getId(), team.getCaptain().getPublicName()))
+                .captain(new UserDTO(team.getCaptain().getId(), team.getCaptain().getPublicName(), team.getCaptain().getRole()))
                 .members(members)
                 .build();
     }
@@ -77,7 +77,7 @@ public class TeamServiceImpl implements TeamService {
         Team team = getById(teamId);
         return teamMemberRepository.findByTeam(team).stream()
                 .map(TeamMember::getUser)
-                .map(u -> new UserDTO(u.getId(), u.getPublicName()))
+                .map(u -> new UserDTO(u.getId(), u.getPublicName(), u.getRole()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

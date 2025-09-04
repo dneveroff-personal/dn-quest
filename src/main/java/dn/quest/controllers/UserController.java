@@ -1,10 +1,13 @@
 package dn.quest.controllers;
 
+import dn.quest.model.dto.UserAdminDTO;
 import dn.quest.model.dto.UserDTO;
+import dn.quest.model.entities.enums.UserRole;
 import dn.quest.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +20,6 @@ import java.util.List;
 public class UserController implements Routes {
 
     private final UserService userService;
-
-    @PutMapping(ID)
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        userDTO.setId(id); // гарантируем, что id из URL пойдет в DTO
-        return ResponseEntity.ok(userService.update(userDTO));
-    }
 
     @DeleteMapping(ID)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -46,7 +43,7 @@ public class UserController implements Routes {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAll() {
+    public ResponseEntity<List<UserAdminDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 
@@ -58,6 +55,11 @@ public class UserController implements Routes {
 
         UserDTO dto = userService.getByUsername(userDetails.getUsername());
         return ResponseEntity.ok(dto);
+    }
+
+    @PatchMapping(ROLE_BY_ID)
+    public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @RequestParam UserRole role) {
+        return ResponseEntity.ok(userService.updateRole(id, role));
     }
 
 }

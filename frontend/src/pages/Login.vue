@@ -1,45 +1,19 @@
 <template>
-  <n-config-provider :theme="darkTheme">
-    <n-message-provider>
-      <div class="flex flex-col items-center justify-center min-h-screen p-6">
-        <n-card title="Login" class="w-full max-w-md shadow-lg">
-          <!-- Форма -->
-          <form @submit.prevent="doLogin" class="flex flex-col gap-4">
-            <!-- input username -->
-            <n-input
-                v-model:value="username"
-                placeholder="Username"
-                clearable
-                @keyup.enter="doLogin"
-            />
-
-            <!-- input password -->
-            <n-input
-                v-model:value="password"
-                type="password"
-                placeholder="Password"
-                clearable
-                @keyup.enter="doLogin"
-            />
-
-            <!-- кнопка -->
-            <n-button
-                type="primary"
-                block
-                :loading="loading"
-                attr-type="submit"
-            >
-            Войти
-            </n-button>
-
-            <n-button text block @click="$router.push('/register')">
-              Нет аккаунта? Зарегистрироваться
-            </n-button>
-          </form>
-        </n-card>
-      </div>
-    </n-message-provider>
-  </n-config-provider>
+  <div class="flex items-center justify-center min-h-screen bg-gray-900">
+    <n-card class="w-full max-w-md p-6 shadow-2xl rounded-2xl">
+      <h2 class="text-2xl font-bold text-center mb-6">Вход</h2>
+      <form @submit.prevent="doLogin" class="flex flex-col gap-4">
+        <n-input v-model:value="username" placeholder="Username" clearable />
+        <n-input v-model:value="password" type="password" placeholder="Password" clearable />
+        <n-button type="primary" block :loading="loading" attr-type="submit">
+          Войти
+        </n-button>
+        <n-button text block @click="$router.push('/register')">
+          Нет аккаунта? Зарегистрироваться
+        </n-button>
+      </form>
+    </n-card>
+  </div>
 </template>
 
 <script setup>
@@ -48,6 +22,7 @@ import { useRouter } from "vue-router";
 import { darkTheme, useMessage } from "naive-ui";
 import api from "@/services/api";
 import { fetchCurrentUser } from "@/services/auth";
+import { setToken } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -71,7 +46,7 @@ async function doLogin() {
     });
 
     const token = resp.data.token;
-    localStorage.setItem("token", token);
+    setToken(token);
 
     const user = await fetchCurrentUser();
     message.success(`Добро пожаловать, ${user.publicName}`);

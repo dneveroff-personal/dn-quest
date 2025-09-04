@@ -55,6 +55,7 @@ import { useRouter } from "vue-router";
 import { darkTheme, useMessage } from "naive-ui";
 import api from "@/services/api";
 import { fetchCurrentUser } from "@/services/auth";
+import { setToken } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -91,7 +92,7 @@ async function doRegister() {
     });
 
     const token = resp.data.token;
-    localStorage.setItem("token", token);
+    setToken(token);
 
     const user = await fetchCurrentUser();
     message.success(`Добро пожаловать, ${user.publicName}`);

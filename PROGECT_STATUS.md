@@ -14,11 +14,21 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 ├── App.vue
 ├── assets
 ├── components
-│   └── QuestCard.vue
+│   ├── AppHeader.vue
+│   └── QuestGame.vue
 ├── main.js
+├── pages
+│   ├── Home.vue
+│   ├── Login.vue
+│   ├── Register.vue
+│   └── UserMe.vue
+├── router
+│   └── index.js
 ├── services
-│   └── api.js
+│   ├── api.js
+│   └── auth.js
 └── style.css
+
 В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.
 
 содержимое папки src:
@@ -137,120 +147,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 
 Мы уже многое написали. Ты можешь не помнить, но мы все это уже обговаривали с тобой в этом чате.
 Если ты хочешь посмотреть, вспомнить, в каком из файлов какой код - скажи мне.
-Ниже список файлов, которые у нас есть в проекте:
-📌 Отмечено галочкой `[x]`, если он полностью готов или просто в рабочем актуальном состоянии.
-📌 Отмечено восклицательным знаком `[!]`, если он рассинхронизирован/недоработан и требует пересмотра.
-📌 Без отметки `[ ]`, файл создан, но внутри недоработан или пуст и требует работы.
 
-## 1. Application Entry
-- [x] QuestEngineApplication.java
-
-## 2. Config
-- [x] Helpers.java
-- [x] SecurityConfig.java
-
-## 3. CMD
-- [x] QuestConsole.java
-
-## 4. Controllers
-- [x] AttemptController.java
-- [x] LevelController.java 
-- [x] ParticipationController.java 
-- [x] QuestController.java
-- [x] RegistrationController.java
-- [x] Routes.java
-- [x] TeamController.java
-- [x] UserController.java
-
-## 5. Exceptions
-- [x] GlobalExceptionHandler.java
-
-## 6. DTO
-- [x] CodeAttemptDTO.java
-- [x] CodeDTO.java
-- [x] GameSessionDTO.java
-- [x] LevelCompletionDTO.java
-- [x] LevelDTO.java
-- [x] ParticipationRequestDTO.java
-- [x] QuestDTO.java
-- [x] RegisterDTO.java
-- [x] TeamDTO.java
-- [x] UserDTO.java
-
-## 7. Entities
-### Enums
-- [x] ApplicantType.java
-- [x] AttemptResult.java
-- [x] CodeType.java
-- [x] Difficulty.java
-- [x] ParticipationStatus.java
-- [x] QuestType.java
-- [x] SessionStatus.java
-- [x] TeamRole.java
-- [x] UserRole.java
-
-### Quest
-- [x] GameSession.java
-- [x] Quest.java
-- [x] ParticipationRequest.java
-
-### Quest.Level
-- [x] CodeAttempt.java
-- [x] Code.java
-- [x] LevelCompletion.java
-- [x] Level.java
-- [x] LevelProgress.java
-
-### Team
-- [x] Team.java
-- [x] TeamMember.java
-
-### User
-- [x] User.java
-
-## 8. Repositories
-- [x] CodeAttemptRepository.java
-- [x] CodeRepository.java
-- [x] GameSessionRepository.java
-- [x] LevelCompletionRepository.java
-- [x] LevelProgressRepository.java
-- [x] LevelRepository.java
-- [x] ParticipationRequestRepository.java
-- [x] QuestRepository.java
-- [x] TeamMemberRepository.java
-- [x] TeamRepository.java
-- [x] UserRepository.java
-
-## 9. Services
-
-### Implementations
-- [x] AttemptServiceImpl.java
-- [x] GameSessionServiceImpl.java
-- [x] LevelServiceImpl.java
-- [x] ParticipationServiceImpl.java
-- [x] QuestServiceImpl.java
-- [x] TeamServiceImpl.java
-- [x] UserServiceImpl.java
-
-### Interfaces
-- [x] AttemptService.java
-- [x] GameSessionService.java
-- [x] LevelService.java
-- [x] ParticipationService.java
-- [x] QuestService.java
-- [x] TeamService.java
-- [x] UserService.java
-
-## 10. Resources (Font-End Vue+Vite compiled)
-- [ ] static/
-для фронта наверное сделаем отдельно список, какие у нас есть фронт страницы и компоненты
-
-## 11. Tests
-- [x] TeamServiceImplTest.java
-
----
-
-Теперь я расскажу что мы делаем вцелом, чтобы ты понимала, что мы сделали уже, а что еще нет и что должно быть:
 Итак, какая задача вообщем: вообщем мы делаем приложение, где пользователи, могут играть в онлайн квесты командой или по одиночке. 
 Главное, чтобы у нас все было современно, красиво, компактно, быстро, расширяемо и отказоустойчиво. Качество кода — это главный приоритет!
 
@@ -365,49 +262,11 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 - Контроллеры — «тонкие» (REST API). Контроллер остаётся тонким и простым.
 - Сервисы — «толстые» (бизнес-логика, маппинг, валидация), работают с DTO. Внутри имплементации мы маппим DTO ↔ Entity.
 
-
-ТЕКУЩИЕ ЗАДАЧИ:
-По задачам фронта:
-1. Главная страница → список доступных квестов.
-- Бэк уже готов: QuestController даёт список (скорее всего GET /quests).
-- На фронте нужен компонент QuestList.vue или что-то в этом духе.
-- Он будет запрашивать квесты через fetch/axios и рисовать карточки.
-
-2. Детали квеста (страница квеста).
-- Здесь кнопка «Подать заявку» (если пользователь/команда ещё не подали).
-- Кнопку будем скрывать, если заявка уже есть.
-
-3. Авторизация/регистрация (у нас UserController и RegistrationController есть).
-- Значит, нужен экран логина/регистрации, хранение JWT в localStorage, и добавление Authorization в запросы.
-
-4. Личный кабинет / мои квесты (список, где игрок участвует).
-
-
-## Предлагаю план по фронту (первый этап):
-1. Структура проекта (чтобы было по best practices)
-В frontend/src заведём:
-    - views/ — страницы (Home.vue, QuestDetails.vue, Login.vue, Register.vue и т.д.).
-    - components/ — переиспользуемые компоненты (QuestCard.vue, Header.vue).
-    - router/ — роутинг (index.js).
-    - store/ — глобальное состояние (например, pinia или простая реактивная обёртка для начала).
-    - services/ — API (уже есть api.js, можно расширить).
-
-2. Главная страница (Home.vue)
-   - Тянем список квестов с бэка (GET /api/quests).
-   - Рисуем карточки с названием, описанием и ссылкой «Подробнее».
-
-3. Компонент QuestCard.vue
-   - Показывает заголовок, описание, дату начала/окончания.
-   - Кнопка «Подробнее» ведёт на страницу квеста.
-
-4. Роутинг
-   - / → список квестов (Home).
-   - /quest/:id → страница одного квеста с кнопкой «Подать заявку».
-
-5. Axios + JWT 
-   - Сейчас у тебя auth: { username, password }, но дальше будет токен.
-   - Сделаем перехватчик, чтобы автоматически подставлять Authorization: Bearer <token>.
-
-   6. Визуал
-   - Оставляем Naive UI + Tailwind (можно постепенно добавить).
-   - Делаем тёмную тему по умолчанию.
+Сейчас мы делаем Фронтэнд
+По файлам ты можешь увидеть, что уже сделано.
+Готова аутентификация, регистрация пользователей.
+Пустой шаблон главной страницы.
+Сейчас мы занимаемся настройкой визуальной части, чтобы все было красиво в темной теме NaiveUI и юзерфрендли по лучшим BestPractice Vue+Vite +NaiveUI.
+А так же делаем личный кабинет юзера, для начала администратора. мы в первую очередь делаем для Админа. 
+На его странице должна быть возможность увидеть список всех пользователей сайта и совершить с любым из них следующие действия: удалить пользователя, назначить ему роль AUTHOR.
+Пока что мы еще не сделали идентификацию по ролям, кто сейчас на сайте просто игрок, автор или админ.

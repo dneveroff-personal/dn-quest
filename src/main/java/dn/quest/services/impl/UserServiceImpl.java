@@ -1,6 +1,7 @@
 package dn.quest.services.impl;
 
 import dn.quest.model.dto.RegisterDTO;
+import dn.quest.model.dto.UserAdminDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
 import dn.quest.model.entities.user.User;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,15 +26,11 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserDTO update(UserDTO userDTO) {
-        User existing = userRepository.findById(userDTO.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        existing.setUsername(userDTO.getPublicName()); // текущая логика проекта
-        return toDTO(userRepository.save(existing));
-    }
-
-    @Override
     public void delete(Long id) {
+        if (UserRole.ADMIN.equals(getById(id).getRole())) {
+            throw new IllegalArgumentException("Cannot delete an administrative user");
+        }
+
         userRepository.deleteById(id);
     }
 
@@ -53,7 +49,7 @@ public class UserServiceImpl implements UserService {
         user.setPublicName(StringUtils.hasText(dto.getPublicName()) ? dto.getPublicName() : dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
-        user.getRoles().add(UserRole.PLAYER);
+        user.setRole(UserRole.PLAYER);
 
         user = userRepository.save(user);
         return toDTO(user);
@@ -81,10 +77,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAll() {
+    public List<UserAdminDTO> getAll() {
         return userRepository.findAll().stream()
-                .map(this::toDTO)
+                .map(this::toAdminDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDTO updateRole(Long id, UserRole role) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        return toDTO(userRepository.save(user));
     }
 
     @Override
@@ -102,6 +106,17 @@ public class UserServiceImpl implements UserService {
         return UserDTO.builder()
                 .id(user.getId())
                 .publicName(user.getPublicName())
+                .role(user.getRole())
+                .build();
+    }
+
+    private UserAdminDTO toAdminDTO(User user) {
+        return UserAdminDTO.builder()
+                .id(user.getId())
+                .publicName(user.getPublicName())
+                .role(user.getRole())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .build();
     }
 
@@ -111,7 +126,7 @@ public class UserServiceImpl implements UserService {
         user.setPublicName(StringUtils.hasText(dto.getPublicName()) ? dto.getPublicName() : dto.getUsername());
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         user.setEmail(dto.getEmail());
-        user.setRoles(Set.of(UserRole.PLAYER));
+        user.setRole(UserRole.PLAYER);
         return user;
     }
 }

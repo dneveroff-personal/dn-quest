@@ -106,7 +106,7 @@ public class QuestServiceImpl implements QuestService {
                 .endAt(quest.getEndAt())
                 .published(quest.isPublished())
                 .authors(quest.getAuthors().stream()
-                        .map(u -> new UserDTO(u.getId(), u.getPublicName()))
+                        .map(u -> new UserDTO(u.getId(), u.getPublicName(), u.getRole()))
                         .collect(Collectors.toSet()))
                 .build();
     }

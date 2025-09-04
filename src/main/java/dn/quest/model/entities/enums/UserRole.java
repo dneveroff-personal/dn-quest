@@ -1,5 +1,7 @@
 package dn.quest.model.entities.enums;
 
 public enum UserRole {
-    PLAYER, AUTHOR, ADMIN
+    PLAYER,   // только играть
+    AUTHOR,   // может и играть, и создавать игры
+    ADMIN     // может всё
 }

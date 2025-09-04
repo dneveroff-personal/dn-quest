@@ -13,10 +13,11 @@ public interface Routes {
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
+    String ROLE = "/role";
     String STATUS = "/status";
     String SUBMIT = "/submit";
 
-    // Attempts Controller
+    // Attempts
     String ATTEMPTS = API + "/attempts";
 
     // Quest
@@ -26,7 +27,7 @@ public interface Routes {
     String QUEST_START = QUEST_ID + START;
     String QUEST_LEADERBOARD = QUEST_ID + LEADERBOARD;
 
-    // Registration controller
+    // Registration
     String PING = "/ping";
     String REGISTER = "/register";
 
@@ -47,6 +48,7 @@ public interface Routes {
     String USERS = API + "/users";
     String USERS_BY_NAME = "/by-username" + USER_NAME;
     String BY_EMAIL = "/by-email" + EMAIL;
+    String ROLE_BY_ID = ID + ROLE;
 
     // Level
     String LEVELS = API + "/levels";
