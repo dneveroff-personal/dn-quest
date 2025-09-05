@@ -1,3 +1,24 @@
+<template>
+  <div class="p-6 space-y-6 bg-[var(--color-bg)] min-h-screen">
+    <!-- Профиль пользователя -->
+    <n-card v-if="user" class="bg-[var(--color-bg-card)] text-[var(--color-text)]">
+      <h2 class="text-lg font-bold mb-2 text-[var(--color-text-strong)]">Ваш профиль</h2>
+      <p><b>Имя:</b> {{ user.publicName }}</p>
+      <p><b>Username:</b> {{ user.username }}</p>
+      <p><b>Email:</b> {{ user.email }}</p>
+      <p><b>Роль:</b> {{ user.role }}</p>
+    </n-card>
+
+    <!-- Таблица пользователей -->
+    <n-card class="bg-[var(--color-bg-card)] text-[var(--color-text)]">
+      <h2 class="text-lg font-bold mb-4 text-[var(--color-text-strong)]">Пользователи</h2>
+      <n-spin :show="loading">
+        <n-data-table :columns="columns" :data="users" :pagination="{ pageSize: 10 }" />
+      </n-spin>
+    </n-card>
+  </div>
+</template>
+
 <script setup>
 import { ref, onMounted, h } from "vue";
 import api from "../services/api";
@@ -104,26 +125,3 @@ onMounted(() => {
   loadUsers();
 });
 </script>
-
-<template>
-  <div class="p-6 space-y-6">
-    <n-card v-if="user">
-      <h2 class="text-lg font-bold mb-2">Ваш профиль</h2>
-      <p><b>Имя:</b> {{ user.publicName }}</p>
-      <p><b>Username:</b> {{ user.username }}</p>
-      <p><b>Email:</b> {{ user.email }}</p>
-      <p><b>Роль:</b> {{ user.role }}</p>
-    </n-card>
-
-    <n-card>
-      <h2 class="text-lg font-bold mb-4">Пользователи</h2>
-      <n-spin :show="loading">
-        <n-data-table
-            :columns="columns"
-            :data="users"
-            :pagination="{ pageSize: 10 }"
-        />
-      </n-spin>
-    </n-card>
-  </div>
-</template>

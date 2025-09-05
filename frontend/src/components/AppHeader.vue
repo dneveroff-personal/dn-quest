@@ -1,33 +1,43 @@
 <template>
-  <div class="flex items-center justify-between w-full p-6 bg-purple-900 shadow-md">
-    <div class="text-2xl font-bold text-white">
-      <router-link to="/">DN Quest</router-link>
-    </div>
-
-    <div class="flex gap-5 items-center">
-      <router-link v-if="!currentUser"
-                   to="/login"
-                   class="px-6 py-3 rounded-xl text-white bg-indigo-600 hover:bg-indigo-500 transition text-lg font-semibold">
-        Login
-      </router-link>
-      <router-link v-if="!currentUser"
-                   to="/register"
-                   class="px-6 py-3 rounded-xl text-white bg-purple-600 hover:bg-purple-500 transition text-lg font-semibold">
-        Register
-      </router-link>
-
-      <div v-if="currentUser" class="flex items-center gap-3">
-        <span class="text-white text-lg font-medium">{{ currentUser.publicName }}</span>
-        <router-link v-if="currentUser?.role === 'ADMIN'"
-                     to="/admin/users/manage"
-                     class="px-6 py-3 rounded-xl text-white bg-yellow-600 hover:bg-yellow-500 transition text-lg font-semibold">
-          Manage Users
+  <div class="flex flex-col w-full p-6 bg-[var(--color-bg-card)] shadow-md">
+    <!-- Верхняя строка: DN Quest + пользователь + Logout -->
+    <div class="flex items-center justify-between w-full">
+      <div class="flex items-center gap-4">
+        <!-- DN Quest: градиентный текст -->
+        <router-link to="/" class="dn-quest-link text-2xl font-bold transition-opacity hover:opacity-80">
+          DN Quest
         </router-link>
+
+        <!-- Имя пользователя с иконкой -->
+        <div v-if="currentUser" class="flex items-center gap-2 text-[var(--color-text)] text-lg font-medium">
+          <span>🧑‍</span>
+          <span>{{ currentUser.publicName }}</span>
+        </div>
+      </div>
+
+      <!-- Logout кнопка -->
+      <div v-if="currentUser">
         <button @click="logout"
-                class="px-6 py-3 rounded-xl text-white bg-red-600 hover:bg-red-500 transition text-lg font-semibold">
+                class="text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors font-semibold">
           Logout
         </button>
       </div>
+    </div>
+
+    <!-- Нижняя строка: навигационные кнопки -->
+    <div class="flex flex-wrap gap-3 mt-3 justify-center">
+      <router-link v-if="!currentUser" to="/login"
+                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+        Login
+      </router-link>
+      <router-link v-if="!currentUser" to="/register"
+                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+        Register
+      </router-link>
+      <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users/manage"
+                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+        Manage Users
+      </router-link>
     </div>
   </div>
 </template>

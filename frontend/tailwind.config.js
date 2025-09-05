@@ -5,7 +5,15 @@ export default {
         "./src/**/*.{vue,js,ts,jsx,tsx}"
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                brand: {
+                    indigo: "#6366f1",  // основной акцент
+                    emerald: "#10b981",
+                    rose: "#f43f5e"
+                }
+            }
+        },
     },
     plugins: [],
 }
