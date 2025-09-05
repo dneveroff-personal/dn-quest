@@ -1,33 +1,38 @@
 <template>
-  <n-config-provider :theme="darkTheme">
+  <n-config-provider>
     <n-message-provider>
-      <div class="flex flex-col items-center justify-center min-h-screen p-6">
-        <n-card title="Регистрация" class="w-full max-w-md shadow-lg">
-          <form @submit.prevent="doRegister" class="flex flex-col gap-4">
+      <div class="flex items-center justify-center min-h-screen w-full px-4 bg-gradient-to-br from-purple-700 to-purple-900">
+        <n-card class="w-full max-w-3xl min-w-[40vw] p-12 shadow-2xl rounded-3xl bg-purple-900 text-white">
+          <h2 class="text-3xl font-bold text-center mb-8 text-white">Регистрация</h2>
+          <form @submit.prevent="doRegister" class="flex flex-col gap-8">
             <n-input
                 v-model:value="username"
                 placeholder="Username (обязательно)"
                 clearable
-                @keyup.enter="doRegister"
+                size="large"
+                class="rounded-xl p-4 text-lg"
             />
             <n-input
                 v-model:value="email"
                 placeholder="Email (необязательно)"
                 clearable
-                @keyup.enter="doRegister"
+                size="large"
+                class="rounded-xl p-4 text-lg"
             />
             <n-input
                 v-model:value="publicName"
                 placeholder="Public name (ник)"
                 clearable
-                @keyup.enter="doRegister"
+                size="large"
+                class="rounded-xl p-4 text-lg"
             />
             <n-input
                 v-model:value="password"
                 type="password"
                 placeholder="Password"
                 clearable
-                @keyup.enter="doRegister"
+                size="large"
+                class="rounded-xl p-4 text-lg"
             />
 
             <n-button
@@ -35,11 +40,18 @@
                 block
                 :loading="loading"
                 attr-type="submit"
+                size="large"
+                class="rounded-xl py-4 text-lg font-semibold"
             >
               Зарегистрироваться
             </n-button>
-
-            <n-button text block @click="$router.push('/login')">
+            <n-button
+                text
+                block
+                @click="$router.push('/login')"
+                size="large"
+                class="rounded-xl py-4 text-lg font-semibold"
+            >
               Уже есть аккаунт? Войти
             </n-button>
           </form>
@@ -52,10 +64,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { darkTheme, useMessage } from "naive-ui";
+import { useMessage } from "naive-ui";
 import api from "@/services/api";
-import { fetchCurrentUser } from "@/services/auth";
-import { setToken } from "@/services/auth";
+import { fetchCurrentUser, setToken } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -73,37 +84,20 @@ async function doRegister() {
   }
 
   loading.value = true;
-
   try {
-    // Создаём пользователя
-    await api.post("/register", {
-      username: username.value,
-      email: email.value,
-      publicName: publicName.value,
-      password: password.value,
-    });
-
+    await api.post("/register", { username: username.value, email: email.value, publicName: publicName.value, password: password.value });
     message.success("Аккаунт создан! Выполняем вход...");
 
-    // Сразу логиним (важно: путь зависит от бэка!)
-    const resp = await api.post("/login", {
-      username: username.value,
-      password: password.value,
-    });
-
-    const token = resp.data.token;
-    setToken(token);
+    const resp = await api.post("/login", { username: username.value, password: password.value });
+    setToken(resp.data.token);
 
     const user = await fetchCurrentUser();
     message.success(`Добро пожаловать, ${user.publicName}`);
 
     router.push("/");
   } catch (err) {
-    if (err.response?.status === 409) {
-      message.error("Пользователь с таким именем или email уже существует");
-    } else {
-      message.error("Ошибка регистрации");
-    }
+    if (err.response?.status === 409) message.error("Пользователь с таким именем или email уже существует");
+    else message.error("Ошибка регистрации");
     console.error("Ошибка регистрации", err);
   } finally {
     loading.value = false;
