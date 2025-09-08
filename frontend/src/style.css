@@ -39,15 +39,38 @@
 /* Стили для тела и текста */
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: inherit;
+  /* убрали display:flex / place-items:center — это ломало ширины контейнера */
 }
 
+.app-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+@media (min-width: 1024px) {
+  .app-content {
+    max-width: 1200px;  /* но не станет больше 1200px */
+  }
+}
+
+/* Гарантируем, что n-grid / n-grid-item / n-card растягиваются по ширине контейнера */
+.app-content .n-grid,
+.app-content .n-grid > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.app-content .n-card {
+  width: 100%;
+  min-width: 0; /* важно для корректной работы flex/grid */
+}
 /* Ссылки */
 a {
   font-weight: 600;
@@ -129,4 +152,9 @@ button {
 }
 .dn-quest-link:hover {
   opacity: 0.8;
+}
+
+.quest-card {
+  width: 90%;
+  max-width: 900px;
 }

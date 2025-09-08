@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 "/api/quests/published",
                                 "/api/register",
                                 "/api/login",
+                                "/api/users/me",
                                 "/api/ping"
                         ).permitAll()
                         // только AUTHOR может создавать квесты

@@ -62,7 +62,7 @@ public class UserController implements Routes {
     @GetMapping(ME)
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         UserDTO dto = userService.getByUsername(userDetails.getUsername());

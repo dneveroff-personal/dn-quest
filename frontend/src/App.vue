@@ -1,3 +1,4 @@
+<!-- src/App.vue -->
 <template>
   <n-config-provider :theme="darkTheme">
     <div class="flex items-center gap-4 mb-6">
@@ -19,7 +20,7 @@
 
         <!-- MAIN CONTENT -->
         <n-layout-content content-style="padding: 24px;" class="bg-[var(--color-bg)]">
-          <div class="max-w-5xl mx-auto">
+          <div class="app-content">
             <router-view />
           </div>
         </n-layout-content>

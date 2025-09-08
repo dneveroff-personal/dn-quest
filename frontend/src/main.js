@@ -7,17 +7,22 @@ import "vfonts/Lato.css"; // основной шрифт
 import "vfonts/FiraCode.css"; // моноширинный
 import "./style.css"; // твой кастомный CSS
 
-import { create,
+// src/main.js (фрагмент)
+import {
+    create,
     NButton, NCard, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter,
-    NText, NImage, NConfigProvider, NMessageProvider, NSpin, NInput, NGrid, NGridItem
+    NText, NImage, NConfigProvider, NMessageProvider, NSpin, NInput, NGrid, NGridItem,
+    NForm, NFormItem, NSelect, NSwitch, NTag
 } from "naive-ui";
 
 const naive = create({
     components: [
         NButton, NCard, NLayout, NLayoutHeader, NLayoutContent, NLayoutFooter,
-        NText, NImage, NConfigProvider, NMessageProvider, NSpin, NInput, NGrid, NGridItem
+        NText, NImage, NConfigProvider, NMessageProvider, NSpin, NInput, NGrid, NGridItem,
+        NForm, NFormItem, NSelect, NSwitch, NTag
     ],
 });
+
 
 const app = createApp(App);
 app.use(router);

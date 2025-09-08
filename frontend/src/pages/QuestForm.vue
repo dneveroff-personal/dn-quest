@@ -1,174 +1,176 @@
+<!-- src/pages/QuestForm.vue -->
 <template>
-  <div class="p-6 space-y-6 bg-[var(--color-bg)] min-h-screen">
-    <n-card class="card max-w-2xl mx-auto space-y-6">
-      <h2 class="text-2xl font-bold text-[var(--color-text-strong)]">Создать квест</h2>
+  <div class="flex items-center justify-center min-h-screen w-full px-4 bg-[var(--color-bg)]">
+    <n-card class="w-full max-w-3xl p-8 shadow-2xl rounded-3xl bg-[var(--color-bg-card)] text-[var(--color-text)]">
+      <h2 class="text-2xl font-bold mb-6">
+        {{ isEditMode ? "Редактировать квест" : "Создать квест" }}
+      </h2>
 
-      <!-- Название -->
-      <div class="flex flex-col">
-        <label class="mb-1 font-semibold text-[var(--color-text)]" for="title">Название</label>
-        <input
-            id="title"
-            type="text"
-            v-model="form.title"
-            placeholder="Название квеста"
-            class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
-        />
-      </div>
+      <n-form @submit.prevent="handleSubmit" label-placement="top">
+        <n-form-item label="Название">
+          <n-input v-model:value="form.title" placeholder="Введите название квеста" />
+        </n-form-item>
 
-      <!-- Описание -->
-      <div class="flex flex-col">
-        <label class="mb-1 font-semibold text-[var(--color-text)]" for="description">Описание (HTML)</label>
-        <textarea
-            id="description"
-            v-model="form.descriptionHtml"
-            rows="5"
-            placeholder="Описание квеста"
-            class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
-        ></textarea>
-      </div>
+        <n-form-item label="Описание (HTML)">
+          <n-input type="textarea" v-model:value="form.descriptionHtml" placeholder="Введите описание (html)" />
+        </n-form-item>
 
-      <!-- Сложность -->
-      <div class="flex flex-col">
-        <label class="mb-1 font-semibold text-[var(--color-text)]" for="difficulty">Сложность</label>
-        <select
-            id="difficulty"
-            v-model="form.difficulty"
-            class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
-        >
-          <option disabled value="">Выберите сложность</option>
-          <option v-for="d in difficulties" :key="d" :value="d">{{ d }}</option>
-        </select>
-      </div>
+        <n-form-item label="Изображение (URL)">
+          <n-input v-model:value="form.imageUrl" placeholder="https://..." />
+        </n-form-item>
 
-      <!-- Тип -->
-      <div class="flex flex-col">
-        <label class="mb-1 font-semibold text-[var(--color-text)]" for="type">Тип</label>
-        <select
-            id="type"
-            v-model="form.type"
-            class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
-        >
-          <option disabled value="">Выберите тип</option>
-          <option v-for="t in types" :key="t" :value="t">{{ t }}</option>
-        </select>
-      </div>
+        <n-form-item label="Сложность">
+          <n-select v-model:value="form.difficulty" :options="difficultyOptions" placeholder="Выберите сложность" />
+        </n-form-item>
 
-      <!-- Даты -->
-      <div class="flex gap-4">
-        <div class="flex flex-col flex-1">
-          <label class="mb-1 font-semibold text-[var(--color-text)]" for="startAt">Начало</label>
-          <input
-              id="startAt"
-              type="datetime-local"
-              v-model="form.startAt"
-              class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
+        <n-form-item label="Тип">
+          <n-select v-model:value="form.type" :options="typeOptions" placeholder="Выберите тип" />
+        </n-form-item>
+
+        <n-form-item label="Дата начала">
+          <n-input v-model:value="form.startAtLocal" placeholder="yyyy-MM-ddTHH:mm" />
+          <div class="text-xs opacity-60 mt-1">формат: yyyy-MM-ddTHH:mm (локальное время). Будет автоматически конвертировано в ISO UTC.</div>
+        </n-form-item>
+
+        <n-form-item label="Дата окончания">
+          <n-input v-model:value="form.endAtLocal" placeholder="yyyy-MM-ddTHH:mm" />
+        </n-form-item>
+
+        <n-form-item label="Авторы">
+          <n-select
+              v-model:value="form.authors"
+              multiple
+              :options="authorOptions"
+              placeholder="Выберите авторов"
+              style="width: 100%"
           />
+        </n-form-item>
+
+        <n-form-item label="Опубликован">
+          <n-switch v-model:value="form.published" />
+        </n-form-item>
+
+        <div class="flex justify-end gap-4 mt-6">
+          <n-button @click="cancel" type="default">Отмена</n-button>
+          <n-button type="primary" attr-type="submit">
+            {{ isEditMode ? "Сохранить" : "Создать" }}
+          </n-button>
         </div>
-        <div class="flex flex-col flex-1">
-          <label class="mb-1 font-semibold text-[var(--color-text)]" for="endAt">Конец</label>
-          <input
-              id="endAt"
-              type="datetime-local"
-              v-model="form.endAt"
-              class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)]"
-          />
-        </div>
-      </div>
-
-      <!-- Публикация -->
-      <div class="flex items-center gap-2">
-        <input type="checkbox" id="published" v-model="form.published" />
-        <label for="published" class="text-[var(--color-text)]">Опубликован</label>
-      </div>
-
-      <!-- Авторы -->
-      <div class="flex flex-col">
-        <label class="mb-1 font-semibold text-[var(--color-text)]">Авторы</label>
-        <select
-            v-model="form.authors"
-            multiple
-            class="p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-[var(--color-accent)] h-40"
-        >
-          <option v-for="author in availableAuthors" :key="author.id" :value="author">
-            {{ author.publicName || author.username }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Кнопка создания -->
-      <div class="flex justify-end">
-        <button @click="submit" class="btn-accent">Создать квест</button>
-      </div>
+      </n-form>
     </n-card>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import api from "../services/api";
+import { ref, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { NCard, NButton, NForm, NFormItem, NInput, NSelect, NSwitch } from "naive-ui";
+import api from "@/services/api";
+
+const router = useRouter();
+const route = useRoute();
+
+const isEditMode = computed(() => !!route.params.id);
 
 const form = ref({
   title: "",
   descriptionHtml: "",
-  difficulty: "",
-  type: "",
-  startAt: "",
-  endAt: "",
-  published: false,
-  authors: []
+  imageUrl: "",
+  difficulty: null,
+  type: null,
+  // для удобства пользователю — временные локальные поля (yyyy-MM-ddTHH:mm)
+  startAtLocal: "",
+  endAtLocal: "",
+  authors: [], // массив id
+  published: false
 });
 
-// Списки для селектов
-const difficulties = ["EASY", "MEDIUM", "HARD"];
-const types = ["SOLO", "TEAM"];
-
-// Авторы
-const availableAuthors = ref([]);
+const authorOptions = ref([]);
+const difficultyOptions = [
+  { label: "Легко", value: "EASY" },
+  { label: "Средне", value: "MEDIUM" },
+  { label: "Сложно", value: "HARD" },
+];
+const typeOptions = [
+  { label: "Одиночный", value: "SINGLE" },
+  { label: "Командный", value: "TEAM" },
+  // используй реальные значения enum из бэка
+];
 
 async function loadAuthors() {
   try {
     const { data } = await api.get("/users?role=AUTHOR");
-    availableAuthors.value = data;
+    authorOptions.value = data.map(a => ({ label: a.publicName, value: a.id }));
   } catch (err) {
-    console.error("Не удалось загрузить авторов", err);
+    console.error("Ошибка загрузки авторов", err);
   }
 }
 
-// Отправка формы
-async function submit() {
+function toLocalInput(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  // yyyy-MM-ddTHH:mm
+  const pad = n => (n < 10 ? "0" + n : n);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function toIsoFromLocal(local) {
+  if (!local) return null;
+  // local: "yyyy-MM-ddTHH:mm" — treat as local time, convert to ISO
+  const d = new Date(local);
+  return d.toISOString();
+}
+
+async function loadQuest() {
+  if (!isEditMode.value) return;
+  try {
+    const { data } = await api.get(`/quests/${route.params.id}`);
+    form.value.title = data.title || "";
+    form.value.descriptionHtml = data.descriptionHtml || "";
+    form.value.imageUrl = data.imageUrl || "";
+    form.value.difficulty = data.difficulty || null;
+    form.value.type = data.type || null;
+    form.value.startAtLocal = toLocalInput(data.startAt);
+    form.value.endAtLocal = toLocalInput(data.endAt);
+    form.value.authors = (data.authors || []).map(a => a.id);
+    form.value.published = !!data.published;
+  } catch (err) {
+    console.error("Ошибка загрузки квеста", err);
+  }
+}
+
+async function handleSubmit() {
   try {
     const payload = {
       title: form.value.title,
       descriptionHtml: form.value.descriptionHtml,
-      difficulty: form.value.difficulty || null,
-      type: form.value.type || null,
-      startAt: form.value.startAt ? new Date(form.value.startAt).toISOString() : null,
-      endAt: form.value.endAt ? new Date(form.value.endAt).toISOString() : null,
+      imageUrl: form.value.imageUrl,
+      difficulty: form.value.difficulty,
+      type: form.value.type,
+      startAt: toIsoFromLocal(form.value.startAtLocal),
+      endAt: toIsoFromLocal(form.value.endAtLocal),
       published: form.value.published,
-      authors: form.value.authors.map(a => ({ id: a.id }))
+      authors: form.value.authors.map(id => ({ id }))
     };
 
-    console.log(payload); // проверьте в консоли
-
-    await api.post("/quests", payload);
-    alert("Квест создан!");
-    form.value = {
-      title: "",
-      descriptionHtml: "",
-      difficulty: "",
-      type: "",
-      startAt: "",
-      endAt: "",
-      published: false,
-      authors: []
-    };
+    if (isEditMode.value) {
+      await api.put(`/quests/${route.params.id}`, payload);
+    } else {
+      await api.post("/quests", payload);
+    }
+    router.push("/");
   } catch (err) {
-    console.error(err);
-    alert("Ошибка создания квеста");
+    console.error("Ошибка сохранения квеста", err);
+    // можно показать нативный message
   }
 }
 
-onMounted(() => {
-  loadAuthors();
+function cancel() {
+  router.push("/");
+}
+
+onMounted(async () => {
+  await loadAuthors();
+  await loadQuest();
 });
 </script>

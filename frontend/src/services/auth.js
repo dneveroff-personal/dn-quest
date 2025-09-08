@@ -21,6 +21,9 @@ export async function fetchCurrentUser() {
         const resp = await api.get("/users/me");
         return resp.data;
     } catch (err) {
+        if (err.response?.status === 401) {
+            return null;
+        }
         console.error("fetchCurrentUser failed", err);
         return null;
     }
