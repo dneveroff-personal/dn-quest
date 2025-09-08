@@ -1,14 +1,15 @@
 package dn.quest.services.interfaces;
 
+import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
 
 import java.util.List;
 
 public interface QuestService {
 
-    QuestDTO create(QuestDTO questDTO);
+    QuestDTO createQuest(QuestCreateUpdateDTO dto, String authorUsername);
 
-    QuestDTO update(Long id, QuestDTO questDTO);
+    QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, String authorUsername);
 
     void delete(Long id);
 
@@ -17,5 +18,4 @@ public interface QuestService {
     List<QuestDTO> getAll();
 
     List<QuestDTO> getPublished();
-
 }

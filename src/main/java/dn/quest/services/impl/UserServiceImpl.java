@@ -84,6 +84,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserDTO> getByRole(UserRole role) {
+        return userRepository.findByRole(role).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());    }
+
+    @Override
     public UserDTO updateRole(Long id, UserRole role) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));

@@ -1,7 +1,9 @@
 package dn.quest.services.impl;
 
+import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
 import dn.quest.model.dto.UserDTO;
+import dn.quest.model.entities.enums.UserRole;
 import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.user.User;
 import dn.quest.repositories.QuestRepository;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,8 +28,8 @@ public class QuestServiceImpl implements QuestService {
     private final UserRepository userRepository;
 
     @Override
-    public QuestDTO create(QuestDTO questDTO) {
-        Quest quest = toEntity(questDTO);
+    public QuestDTO createQuest(QuestCreateUpdateDTO dto, String authorUsername) {
+        Quest quest = toEntity(dto, authorUsername);
         quest.setCreatedAt(Instant.now());
         quest.setUpdatedAt(Instant.now());
 
@@ -35,29 +38,40 @@ public class QuestServiceImpl implements QuestService {
     }
 
     @Override
-    public QuestDTO update(Long id, QuestDTO questDTO) {
+    public QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, String username) {
         Quest existing = questRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + id));
 
-        existing.setTitle(questDTO.getTitle());
-        existing.setDescriptionHtml(questDTO.getDescriptionHtml());
-        existing.setDifficulty(questDTO.getDifficulty());
-        existing.setType(questDTO.getType());
-        existing.setStartAt(questDTO.getStartAt());
-        existing.setEndAt(questDTO.getEndAt());
-        existing.setPublished(questDTO.isPublished());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
-        // Обновляем авторов
-        if (questDTO.getAuthors() != null) {
-            existing.getAuthors().clear();
-            for (UserDTO authorDTO : questDTO.getAuthors()) {
-                User user = userRepository.findById(authorDTO.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("User not found: " + authorDTO.getId()));
-                existing.getAuthors().add(user);
-            }
+        // Проверка прав: автор квеста или админ
+        boolean isAdmin = user.getRole() == UserRole.ADMIN;
+        boolean isAuthor = existing.getAuthors().contains(user);
+        if (!isAdmin && !isAuthor) {
+            throw new RuntimeException("You are not allowed to edit this quest");
         }
 
+        existing.setTitle(dto.getTitle());
+        existing.setDescriptionHtml(dto.getDescriptionHtml());
+        existing.setDifficulty(dto.getDifficulty());
+        existing.setType(dto.getType());
+        existing.setStartAt(dto.getStartAt());
+        existing.setEndAt(dto.getEndAt());
+        if (dto.getPublished() != null) {
+            existing.setPublished(dto.getPublished());
+        }
         existing.setUpdatedAt(Instant.now());
+
+        // обновляем авторов, если переданы и если админ или автор
+        if (dto.getAuthors() != null) {
+            Set<User> newAuthors = dto.getAuthors().stream()
+                    .map(a -> userRepository.findById(a.getId())
+                            .orElseThrow(() -> new RuntimeException("User not found: " + a.getId())))
+                    .collect(Collectors.toSet());
+            existing.setAuthors(newAuthors);
+        }
+
         return toDTO(questRepository.save(existing));
     }
 
@@ -111,24 +125,19 @@ public class QuestServiceImpl implements QuestService {
                 .build();
     }
 
-    private Quest toEntity(QuestDTO dto) {
+    private Quest toEntity(QuestCreateUpdateDTO dto, String authorUsername) {
         Quest quest = new Quest();
-        quest.setId(dto.getId());
         quest.setTitle(dto.getTitle());
         quest.setDescriptionHtml(dto.getDescriptionHtml());
         quest.setDifficulty(dto.getDifficulty());
         quest.setType(dto.getType());
         quest.setStartAt(dto.getStartAt());
         quest.setEndAt(dto.getEndAt());
-        quest.setPublished(dto.isPublished());
+        quest.setPublished(dto.getPublished() != null ? dto.getPublished() : false);
 
-        if (dto.getAuthors() != null) {
-            for (UserDTO authorDTO : dto.getAuthors()) {
-                User user = userRepository.findById(authorDTO.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("User not found: " + authorDTO.getId()));
-                quest.getAuthors().add(user);
-            }
-        }
+        User user = userRepository.findByUsername(authorUsername)
+                .orElseThrow(() -> new EntityNotFoundException("Author not found: " + authorUsername));
+        quest.getAuthors().add(user);
 
         return quest;
     }

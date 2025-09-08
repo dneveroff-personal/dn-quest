@@ -54,4 +54,4 @@ make docker-upd
 make build-back
 
 ### Make run npm front build, copy to backend and restart docker
-make build-front:
+make build-front

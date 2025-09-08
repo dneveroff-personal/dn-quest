@@ -4,7 +4,6 @@ import dn.quest.repositories.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -47,6 +46,9 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/ping"
                         ).permitAll()
+                        // только AUTHOR может создавать квесты
+                        .requestMatchers(HttpMethod.POST, "/api/quests").hasRole("AUTHOR")
+                        // остальные запросы — авторизованным
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -56,12 +58,16 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .map(user -> User.builder()
-                        .username(user.getUsername())
-                        .password(user.getPasswordHash())
-                        .roles("USER")
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            dn.quest.model.entities.user.User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            return User.builder()
+                    .username(user.getUsername())
+                    .password(user.getPasswordHash())
+                    // из базы подставляем роль
+                    .roles(user.getRole().name()) // например, "AUTHOR", "PLAYER", "ADMIN"
+                    .build();
+        };
     }
 }

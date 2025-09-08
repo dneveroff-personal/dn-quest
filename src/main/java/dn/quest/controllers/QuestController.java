@@ -1,5 +1,6 @@
 package dn.quest.controllers;
 
+import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
 import dn.quest.model.entities.enums.SessionStatus;
 import dn.quest.model.entities.quest.GameSession;
@@ -7,8 +8,11 @@ import dn.quest.services.interfaces.GameSessionService;
 import dn.quest.services.interfaces.QuestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -21,13 +25,18 @@ public class QuestController implements Routes {
 
     // ---------- Quest CRUD ----------
     @PostMapping
-    public ResponseEntity<QuestDTO> create(@RequestBody QuestDTO questDTO) {
-        return ResponseEntity.ok(questService.create(questDTO));
+    public ResponseEntity<QuestDTO> createQuest(@RequestBody QuestCreateUpdateDTO dto,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        QuestDTO created = questService.createQuest(dto, userDetails.getUsername());
+        return ResponseEntity.created(URI.create(QUESTS + "/" + created.getId())).body(created);
     }
 
     @PutMapping(ID)
-    public ResponseEntity<QuestDTO> update(@PathVariable Long id, @RequestBody QuestDTO questDTO) {
-        return ResponseEntity.ok(questService.update(id, questDTO));
+    public ResponseEntity<QuestDTO> updateQuest(@PathVariable Long id,
+                                                @RequestBody QuestCreateUpdateDTO dto,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        QuestDTO quest = questService.updateQuest(id, dto, userDetails.getUsername());
+        return ResponseEntity.ok(quest);
     }
 
     @DeleteMapping(ID)

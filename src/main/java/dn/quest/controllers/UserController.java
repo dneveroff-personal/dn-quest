@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(Routes.USERS)
@@ -42,9 +43,20 @@ public class UserController implements Routes {
         return ResponseEntity.ok(userService.getByEmail(email));
     }
 
+    // ==== Новый универсальный эндпоинт getAll с фильтром по роли ====
     @GetMapping
-    public ResponseEntity<List<UserAdminDTO>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<List<UserDTO>> getAll(@RequestParam(required = false) UserRole role) {
+        List<UserDTO> users;
+
+        if (role != null) {
+            users = userService.getByRole(role); // фильтр по роли
+        } else {
+            users = userService.getAll().stream()
+                    .map(u -> new UserDTO(u.getId(), u.getPublicName(), u.getRole()))
+                    .toList();
+        }
+
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping(ME)
@@ -61,5 +73,4 @@ public class UserController implements Routes {
     public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @RequestParam UserRole role) {
         return ResponseEntity.ok(userService.updateRole(id, role));
     }
-
 }

@@ -11,6 +11,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 из папки dist в папку статики SpringBoot-а /src/main/resources/static )
 
 содержимое папки frontend/src:
+.
 ├── App.vue
 ├── assets
 ├── components
@@ -30,120 +31,124 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 └── style.css
 
 
+
 В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.
 
 содержимое папки src:
-├── main
-│   ├── java
-│   │   └── dn
-│   │       └── quest
-│   │           ├── bot
-│   │           │   ├── config
-│   │           │   │   └── TelegramBotConfig.java
-│   │           │   └── QuestTelegramBot.java
-│   │           ├── cmd
-│   │           │   └── QuestConsole.java
-│   │           ├── config
-│   │           │   ├── Helpers.java
-│   │           │   └── SecurityConfig.java
-│   │           ├── controllers
-│   │           │   ├── AttemptController.java
-│   │           │   ├── LevelController.java
-│   │           │   ├── ParticipationController.java
-│   │           │   ├── QuestController.java
-│   │           │   ├── RegistrationController.java
-│   │           │   ├── Routes.java
-│   │           │   ├── TeamController.java
-│   │           │   └── UserController.java
-│   │           ├── exceptions
-│   │           │   └── GlobalExceptionHandler.java
-│   │           ├── model
-│   │           │   ├── dto
-│   │           │   │   ├── CodeAttemptDTO.java
-│   │           │   │   ├── CodeDTO.java
-│   │           │   │   ├── GameSessionDTO.java
-│   │           │   │   ├── LevelCompletionDTO.java
-│   │           │   │   ├── LevelDTO.java
-│   │           │   │   ├── ParticipationRequestDTO.java
-│   │           │   │   ├── QuestDTO.java
-│   │           │   │   ├── RegisterDTO.java
-│   │           │   │   ├── TeamDTO.java
-│   │           │   │   └── UserDTO.java
-│   │           │   └── entities
-│   │           │       ├── enums
-│   │           │       │   ├── ApplicantType.java
-│   │           │       │   ├── AttemptResult.java
-│   │           │       │   ├── CodeType.java
-│   │           │       │   ├── Difficulty.java
-│   │           │       │   ├── ParticipationStatus.java
-│   │           │       │   ├── QuestType.java
-│   │           │       │   ├── SessionStatus.java
-│   │           │       │   ├── TeamRole.java
-│   │           │       │   └── UserRole.java
-│   │           │       ├── quest
-│   │           │       │   ├── GameSession.java
-│   │           │       │   ├── level
-│   │           │       │   │   ├── CodeAttempt.java
-│   │           │       │   │   ├── Code.java
-│   │           │       │   │   ├── LevelCompletion.java
-│   │           │       │   │   ├── Level.java
-│   │           │       │   │   └── LevelProgress.java
-│   │           │       │   ├── ParticipationRequest.java
-│   │           │       │   └── Quest.java
-│   │           │       ├── team
-│   │           │       │   ├── Team.java
-│   │           │       │   └── TeamMember.java
-│   │           │       └── user
-│   │           │           └── User.java
-│   │           ├── QuestEngineApplication.java
-│   │           ├── repositories
-│   │           │   ├── CodeAttemptRepository.java
-│   │           │   ├── CodeRepository.java
-│   │           │   ├── GameSessionRepository.java
-│   │           │   ├── LevelCompletionRepository.java
-│   │           │   ├── LevelProgressRepository.java
-│   │           │   ├── LevelRepository.java
-│   │           │   ├── ParticipationRequestRepository.java
-│   │           │   ├── QuestRepository.java
-│   │           │   ├── TeamMemberRepository.java
-│   │           │   ├── TeamRepository.java
-│   │           │   └── UserRepository.java
-│   │           └── services
-│   │               ├── impl
-│   │               │   ├── AttemptServiceImpl.java
-│   │               │   ├── GameSessionServiceImpl.java
-│   │               │   ├── LevelServiceImpl.java
-│   │               │   ├── ParticipationServiceImpl.java
-│   │               │   ├── QuestServiceImpl.java
-│   │               │   ├── TeamServiceImpl.java
-│   │               │   └── UserServiceImpl.java
-│   │               └── interfaces
-│   │                   ├── AttemptService.java
-│   │                   ├── GameSessionService.java
-│   │                   ├── LevelService.java
-│   │                   ├── ParticipationService.java
-│   │                   ├── QuestService.java
-│   │                   ├── TeamService.java
-│   │                   └── UserService.java
-│   └── resources
-│       ├── application.properties
-│       ├── banner.txt
-│       ├── static
-│       │   ├── assets
-│       │   │   ├── FiraCode-Regular-CRwVj4V2.woff2
-│       │   │   ├── index-CMBTJsyV.css
-│       │   │   ├── index-mYOnWHD1.js
-│       │   │   ├── LatoLatin-Regular-Dmlz1U0B.woff2
-│       │   │   └── LatoLatin-Semibold-Dbk81p2D.woff2
-│       │   ├── favicon.ico
-│       │   ├── index.html
-│       │   └── vite.svg
-│       └── templates
-└── test
-└── java
-└── service
-└── TeamServiceImplTest.java
-
+├── java
+│   └── dn
+│       └── quest
+│           ├── bot
+│           │   ├── config
+│           │   │   └── TelegramBotConfig.java
+│           │   └── QuestTelegramBot.java
+│           ├── cmd
+│           │   └── QuestConsole.java
+│           ├── config
+│           │   ├── DataInitializer.java
+│           │   ├── Helpers.java
+│           │   ├── JwtAuthenticationFilter.java
+│           │   ├── JwtUtil.java
+│           │   └── SecurityConfig.java
+│           ├── controllers
+│           │   ├── AttemptController.java
+│           │   ├── AuthController.java
+│           │   ├── LevelController.java
+│           │   ├── ParticipationController.java
+│           │   ├── QuestController.java
+│           │   ├── RegistrationController.java
+│           │   ├── Routes.java
+│           │   ├── TeamController.java
+│           │   └── UserController.java
+│           ├── exceptions
+│           │   └── GlobalExceptionHandler.java
+│           ├── model
+│           │   ├── dto
+│           │   │   ├── CodeAttemptDTO.java
+│           │   │   ├── CodeDTO.java
+│           │   │   ├── GameSessionDTO.java
+│           │   │   ├── LevelCompletionDTO.java
+│           │   │   ├── LevelDTO.java
+│           │   │   ├── LoginRequestDTO.java
+│           │   │   ├── LoginResponseDTO.java
+│           │   │   ├── ParticipationRequestDTO.java
+│           │   │   ├── QuestDTO.java
+│           │   │   ├── RegisterDTO.java
+│           │   │   ├── TeamDTO.java
+│           │   │   ├── UserAdminDTO.java
+│           │   │   └── UserDTO.java
+│           │   └── entities
+│           │       ├── enums
+│           │       │   ├── ApplicantType.java
+│           │       │   ├── AttemptResult.java
+│           │       │   ├── CodeType.java
+│           │       │   ├── Difficulty.java
+│           │       │   ├── ParticipationStatus.java
+│           │       │   ├── QuestType.java
+│           │       │   ├── SessionStatus.java
+│           │       │   ├── TeamRole.java
+│           │       │   └── UserRole.java
+│           │       ├── quest
+│           │       │   ├── GameSession.java
+│           │       │   ├── level
+│           │       │   │   ├── CodeAttempt.java
+│           │       │   │   ├── Code.java
+│           │       │   │   ├── LevelCompletion.java
+│           │       │   │   ├── Level.java
+│           │       │   │   └── LevelProgress.java
+│           │       │   ├── ParticipationRequest.java
+│           │       │   └── Quest.java
+│           │       ├── team
+│           │       │   ├── Team.java
+│           │       │   └── TeamMember.java
+│           │       └── user
+│           │           └── User.java
+│           ├── QuestEngineApplication.java
+│           ├── repositories
+│           │   ├── CodeAttemptRepository.java
+│           │   ├── CodeRepository.java
+│           │   ├── GameSessionRepository.java
+│           │   ├── LevelCompletionRepository.java
+│           │   ├── LevelProgressRepository.java
+│           │   ├── LevelRepository.java
+│           │   ├── ParticipationRequestRepository.java
+│           │   ├── QuestRepository.java
+│           │   ├── TeamMemberRepository.java
+│           │   ├── TeamRepository.java
+│           │   └── UserRepository.java
+│           └── services
+│               ├── impl
+│               │   ├── AttemptServiceImpl.java
+│               │   ├── AuthServiceImpl.java
+│               │   ├── GameSessionServiceImpl.java
+│               │   ├── LevelServiceImpl.java
+│               │   ├── ParticipationServiceImpl.java
+│               │   ├── QuestServiceImpl.java
+│               │   ├── TeamServiceImpl.java
+│               │   └── UserServiceImpl.java
+│               └── interfaces
+│                   ├── AttemptService.java
+│                   ├── AuthService.java
+│                   ├── GameSessionService.java
+│                   ├── LevelService.java
+│                   ├── ParticipationService.java
+│                   ├── QuestService.java
+│                   ├── TeamService.java
+│                   └── UserService.java
+└── resources
+├── application.properties
+├── banner.txt
+├── static
+│   ├── assets
+│   │   ├── FiraCode-Regular-CRwVj4V2.woff2
+│   │   ├── index-B2pt3kxZ.css
+│   │   ├── index-BYcQLplK.js
+│   │   ├── LatoLatin-Regular-Dmlz1U0B.woff2
+│   │   └── LatoLatin-Semibold-Dbk81p2D.woff2
+│   ├── favicon.ico
+│   ├── index.html
+│   └── vite.svg
+└── templates
 
 
 Мы уже многое написали. Ты можешь не помнить, но мы все это уже обговаривали с тобой в этом чате.
@@ -267,5 +272,9 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 По файлам ты можешь увидеть, что уже сделано.
 Готова аутентификация, регистрация пользователей.
 Пустой шаблон главной страницы.
-Сейчас мы занимаемся настройкой визуальной части, чтобы все было красиво в темной теме NaiveUI и юзерфрендли по лучшим BestPractice Vue+Vite +NaiveUI.
+Сейчас мы занимаемся настройкой визуальной части, чтобы все было красиво в темной теме NaiveUI и юзерфрендли по лучшим BestPractice Vue+Vite +NaiveUI + Taiwind.
 Пока что мы еще не сделали идентификацию по ролям, кто сейчас на сайте просто игрок, автор или админ.
+
+
+
+нет, 

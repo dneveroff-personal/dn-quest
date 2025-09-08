@@ -10,7 +10,7 @@
 
         <!-- Имя пользователя с иконкой -->
         <div v-if="currentUser" class="flex items-center gap-2 text-[var(--color-text)] text-lg font-medium">
-          <span>🧑‍</span>
+          <span>{{ getUserEmoji(currentUser.role) }}</span>
           <span>{{ currentUser.publicName }}</span>
         </div>
       </div>
@@ -38,30 +38,45 @@
                    class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Manage Users
       </router-link>
+      <router-link v-if="currentUser?.role === 'AUTHOR'"
+                   to="/quests/create"
+                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+        Создать квест
+      </router-link>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { fetchCurrentUser, logout as authLogout } from "@/services/auth";
+  import { ref, onMounted } from "vue";
+  import { useRouter } from "vue-router";
+  import { fetchCurrentUser, logout as authLogout } from "@/services/auth";
 
-const router = useRouter();
-const currentUser = ref(null);
+  const router = useRouter();
+  const currentUser = ref(null);
+  const roleEmojis = {
+    ADMIN: "🤴",
+    AUTHOR: "👩‍🍳",
+    PLAYER: "🕵️‍♂️"
+  };
 
-async function loadUser() {
-  currentUser.value = await fetchCurrentUser();
-}
+  async function loadUser() {
+    currentUser.value = await fetchCurrentUser();
+    console.log(currentUser.value)
+  }
 
-onMounted(() => {
-  loadUser();
-  window.addEventListener("user-changed", loadUser);
-});
+  onMounted(() => {
+    loadUser();
+    window.addEventListener("user-changed", loadUser);
+  });
 
-function logout() {
-  authLogout();
-  currentUser.value = null;
-  router.push("/login");
-}
+  function logout() {
+    authLogout();
+    currentUser.value = null;
+    router.push("/login");
+  }
+
+  function getUserEmoji(role) {
+    return roleEmojis[role] || "🧑";
+  }
 </script>

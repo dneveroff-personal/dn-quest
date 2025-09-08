@@ -21,6 +21,8 @@ public interface UserService {
 
     List<UserAdminDTO> getAll();
 
+    List<UserDTO> getByRole(UserRole role);
+
     UserDTO updateRole(Long id, UserRole role);
 
     // ---- добавлено для регистрации ----
