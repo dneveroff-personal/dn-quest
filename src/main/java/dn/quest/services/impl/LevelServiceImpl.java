@@ -4,6 +4,7 @@ import dn.quest.model.dto.LevelDTO;
 import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.quest.level.Level;
 import dn.quest.repositories.LevelRepository;
+import dn.quest.repositories.QuestRepository;
 import dn.quest.services.interfaces.LevelService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class LevelServiceImpl implements LevelService {
 
     private final LevelRepository levelRepository;
+    private final QuestRepository questRepository;
 
     @Override
     public LevelDTO getById(Long id) {
@@ -86,6 +88,16 @@ public class LevelServiceImpl implements LevelService {
             throw new EntityNotFoundException("Next level not found for quest: " + quest.getId() + " after orderIndex=" + orderIndex);
         }
         return toDto(next);
+    }
+
+    @Override
+    public List<LevelDTO> getAllByQuestId(Long questId) {
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new EntityNotFoundException("Квест не найден: " + questId));
+
+            // вернуть все заявки по квесту — добавим соответствующий метод в репозиторий
+            return levelRepository.findAllOrdered(quest);
+        }
     }
 
     // ---------------- Mapping ----------------

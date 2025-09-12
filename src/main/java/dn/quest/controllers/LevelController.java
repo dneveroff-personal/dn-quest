@@ -11,33 +11,38 @@ import java.util.List;
 @RestController
 @RequestMapping(Routes.LEVELS)
 @RequiredArgsConstructor
-public class LevelController {
+public class LevelController implements Routes {
 
     private final LevelService levelService;
+
+    @GetMapping
+    public ResponseEntity<List<LevelDTO>> getAll() {
+        return ResponseEntity.ok(levelService.getAll());
+    }
 
     @PostMapping
     public ResponseEntity<LevelDTO> create(@RequestBody LevelDTO dto) {
         return ResponseEntity.ok(levelService.create(dto));
     }
 
-    @PutMapping(Routes.ID)
+    @PutMapping(ID)
     public ResponseEntity<LevelDTO> update(@PathVariable Long id, @RequestBody LevelDTO dto) {
         return ResponseEntity.ok(levelService.update(id, dto));
     }
 
-    @DeleteMapping(Routes.ID)
+    @DeleteMapping(ID)
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         levelService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(Routes.ID)
+    @GetMapping(ID)
     public ResponseEntity<LevelDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(levelService.getById(id));
     }
 
-    @GetMapping
-    public ResponseEntity<List<LevelDTO>> getAll() {
-        return ResponseEntity.ok(levelService.getAll());
+    @GetMapping(LEVELS_BY_QUEST)
+    public ResponseEntity<List<LevelDTO>> getByQuest(@PathVariable Long questId) {
+        return ResponseEntity.ok(levelService.getAllByQuestId(questId));
     }
 }

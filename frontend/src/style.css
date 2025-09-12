@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+.n-input .n-input__input-el{
+  font-size: 1.5em;
+}
+
+.n-input .n-input__placeholder {
+  font-size: 1.5em;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

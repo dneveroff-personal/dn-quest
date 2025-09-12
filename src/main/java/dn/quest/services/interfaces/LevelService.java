@@ -22,4 +22,6 @@ public interface LevelService {
     LevelDTO getFirstInQuest(Quest quest);
 
     LevelDTO getNext(Quest quest, Integer orderIndex);
+
+    List<LevelDTO> getAllByQuestId(Long questId);
 }
