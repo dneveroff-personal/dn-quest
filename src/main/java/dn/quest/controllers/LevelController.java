@@ -45,4 +45,10 @@ public class LevelController implements Routes {
     public ResponseEntity<List<LevelDTO>> getByQuest(@PathVariable Long questId) {
         return ResponseEntity.ok(levelService.getAllByQuestId(questId));
     }
+
+    @PutMapping(LEVELS_REORDER)
+    public ResponseEntity<Void> reorder(@RequestBody List<Long> orderedIds) {
+        levelService.reorder(orderedIds);
+        return ResponseEntity.noContent().build();
+    }
 }

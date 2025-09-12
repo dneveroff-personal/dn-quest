@@ -16,7 +16,10 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 ├── assets
 ├── components
 │   ├── AppHeader.vue
-│   └── QuestCard.vue
+│   ├── QuestCard.vue
+│   └── quests
+│       ├── LevelCodes.vue
+│       └── LevelsManager.vue
 ├── main.js
 ├── pages
 │   ├── Home.vue
@@ -30,8 +33,6 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   ├── api.js
 │   └── auth.js
 └── style.css
-
-
 
 В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.
 
@@ -275,4 +276,5 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 Сейчас мы занимаемся настройкой визуальной части, чтобы все было красиво в темной теме NaiveUI и юзерфрендли по лучшим BestPractice Vue+Vite +NaiveUI + Taiwind.
 Готовы карточки квестов на главной странице.
 Готова основная форма редактирования квеста.
-Сейчас начинаем делать управление уровнями квеста, в режиме автора.
+Сейчас делаем управление уровнями квеста, в режиме автора.
+Сейчас покажу файлы и проблема которую надо решить...

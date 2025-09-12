@@ -24,4 +24,6 @@ public interface LevelService {
     LevelDTO getNext(Quest quest, Integer orderIndex);
 
     List<LevelDTO> getAllByQuestId(Long questId);
+
+    void reorder(List<Long> orderedIds);
 }

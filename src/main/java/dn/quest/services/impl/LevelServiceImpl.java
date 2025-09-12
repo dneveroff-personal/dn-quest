@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +46,12 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     public LevelDTO create(LevelDTO dto) {
+        Quest quest = questRepository.findById(dto.getQuestId())
+                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + dto.getQuestId()));
+
         Level level = toEntity(dto);
+        level.setQuest(quest); // 🔹 важный момент
+
         Level saved = levelRepository.save(level);
         return toDto(saved);
     }
@@ -93,11 +99,49 @@ public class LevelServiceImpl implements LevelService {
     @Override
     public List<LevelDTO> getAllByQuestId(Long questId) {
         Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new EntityNotFoundException("Квест не найден: " + questId));
+                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+        return getAllByQuest(quest);
+    }
 
-            // вернуть все заявки по квесту — добавим соответствующий метод в репозиторий
-            return levelRepository.findAllOrdered(quest);
+    @Override
+    @Transactional
+    public void reorder(List<Long> orderedIds) {
+        if (orderedIds == null || orderedIds.isEmpty()) {
+            throw new IllegalArgumentException("Список ID уровней пустой");
         }
+
+        // Загружаем все уровни
+        List<Level> levels = levelRepository.findAllById(orderedIds);
+
+        if (levels.size() != orderedIds.size()) {
+            List<Long> foundIds = levels.stream().map(Level::getId).toList();
+            List<Long> missing = orderedIds.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .toList();
+            throw new EntityNotFoundException("Не найдены уровни с ID: " + missing);
+        }
+
+        // Проверяем, что все уровни принадлежат одному квесту
+        Long questId = levels.get(0).getQuest().getId();
+        boolean allSameQuest = levels.stream().allMatch(l -> l.getQuest().getId().equals(questId));
+        if (!allSameQuest) {
+            throw new IllegalArgumentException("Все уровни должны принадлежать одному квесту");
+        }
+
+        // 🔹 Присваиваем временные уникальные индексы, чтобы избежать конфликта
+        for (int i = 0; i < levels.size(); i++) {
+            levels.get(i).setOrderIndex(i + 1000); // временный большой offset
+        }
+        levelRepository.saveAll(levels);
+        levelRepository.flush(); // сразу применяем изменения
+
+        // 🔹 Присваиваем окончательные порядковые номера
+        AtomicInteger counter = new AtomicInteger(1);
+        orderedIds.forEach(id -> {
+            Level l = levels.stream().filter(x -> x.getId().equals(id)).findFirst().orElseThrow();
+            l.setOrderIndex(counter.getAndIncrement());
+        });
+        levelRepository.saveAll(levels);
     }
 
     // ---------------- Mapping ----------------

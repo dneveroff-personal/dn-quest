@@ -52,7 +52,13 @@ public interface Routes {
 
     // Level
     String LEVELS = API + "/levels";
+    String LEVEL_ID = "/{levelId}";
     String LEVELS_BY_QUEST = "/by-quest" + QUEST_ID;
+    String LEVELS_REORDER = "/reorder";
+
+    // Level codes
+    String LEVEL_CODES = "/level-codes";
+    String CODES_BY_LEVEL = "/by-level" + LEVEL_ID;
 
     // Participations
     String PARTICIPATION = API + "/participation";

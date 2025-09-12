@@ -94,9 +94,7 @@
 
         <!-- Вкладка 2: Уровни -->
         <n-tab-pane name="levels" tab="Уровни">
-          <div class="text-center text-[var(--color-text)] opacity-70 py-10">
-            Тут будет управление уровнями 🔥
-          </div>
+          <LevelsManager ref="levelsManagerRef" :quest-id="questId" />
         </n-tab-pane>
       </n-tabs>
 
@@ -123,11 +121,14 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { NCard, NButton, NForm, NFormItem, NInput, NSelect, NSwitch, NDatePicker, useMessage } from "naive-ui";
 import api from "@/services/api";
+import LevelsManager from "@/components/quests/LevelsManager.vue";
 
+const levelsManagerRef = ref(null);
 const router = useRouter();
 const route = useRoute();
 const message = useMessage();
 const isEditMode = computed(() => !!route.params.id);
+const questId = route.params.id;
 
 const form = ref({
   title: "",
@@ -212,9 +213,17 @@ async function handleSubmit() {
 
     if (isEditMode.value) {
       await api.put(`/quests/${route.params.id}`, payload);
+
+      // 🔹 сохраняем порядок уровней
+      if (levelsManagerRef.value) {
+        const orderedIds = levelsManagerRef.value.getOrderedIds();
+        await api.put("/levels/reorder", orderedIds);
+      }
+
     } else {
       await api.post("/quests", payload);
     }
+
     router.push("/");
   } catch (err) {
     console.error("Ошибка сохранения квеста", err);
