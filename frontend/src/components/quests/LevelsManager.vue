@@ -20,6 +20,9 @@
           <div class="flex justify-between items-center">
             <div>
               <strong>{{ level.orderIndex }}.</strong> {{ level.title }}
+              <span class="ml-4 text-sm text-gray-500">
+            | Секторов: {{ level.requiredSectors }} | Авто-проход: {{ level.apTime || 0 }} сек
+          </span>
             </div>
             <div class="flex gap-2">
               <n-button size="small" @click="openEditLevel(level)">Редактировать</n-button>
