@@ -35,6 +35,6 @@ public class Code {
 
     // сдвиг времени в секундах: >0 для бонуса, <0 для штрафа, 0 — для NORMAL
     @Column(nullable=false)
-    private int shiftSeconds = 0;
+    private Integer shiftSeconds = 0;
 
 }

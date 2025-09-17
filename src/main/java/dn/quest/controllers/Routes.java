@@ -57,7 +57,7 @@ public interface Routes {
     String LEVELS_REORDER = "/reorder";
 
     // Level codes
-    String LEVEL_CODES = "/level-codes";
+    String LEVEL_CODES = API + "/codes";
     String CODES_BY_LEVEL = "/by-level" + LEVEL_ID;
 
     // Participations

@@ -20,4 +20,5 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     @Query("select c from Code c where c.level = :level and c.value = :normalized")
     Optional<Code> findByLevelAndNormalized(@Param("level") Level level,
                                             @Param("normalized") String normalized);
+
 }

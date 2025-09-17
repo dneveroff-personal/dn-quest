@@ -14,9 +14,9 @@ public class CodeDTO {
 
     private Long id;
     private Long levelId;
-    private CodeType type;      // NORMAL / BONUS / PENALTY
-    private Integer sectorNo;   // для NORMAL (1..K), иначе null
-    private String value;       // код (уже нормализованный на бэке)
-    private int shiftSeconds;   // >0 бонус, <0 штраф, 0 normal
+    private CodeType type; // NORMAL / BONUS / PENALTY
+    private Integer sectorNo;                // для NORMAL (1..K), иначе null
+    private String value;                    // код (уже нормализованный на бэке)
+    private Integer shiftSeconds;            // >0 бонус, <0 штраф, 0 normal
 
 }
