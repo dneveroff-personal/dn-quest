@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
 
     List<TeamMember> findByTeam(Team team);
-    List<TeamMember> findByUser(User user);
+    Optional<TeamMember> findByUser(User user);
     Optional<TeamMember> findByTeamAndUser(Team team, User user);
 
 }

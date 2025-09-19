@@ -120,7 +120,7 @@ public class QuestServiceImpl implements QuestService {
                 .endAt(quest.getEndAt())
                 .published(quest.isPublished())
                 .authors(quest.getAuthors().stream()
-                        .map(u -> new UserDTO(u.getId(), u.getPublicName(), u.getRole()))
+                        .map(UserDTO::fromEntity)   // ✅ теперь удобно
                         .collect(Collectors.toSet()))
                 .build();
     }

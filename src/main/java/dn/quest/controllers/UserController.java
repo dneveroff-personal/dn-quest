@@ -1,19 +1,16 @@
 package dn.quest.controllers;
 
-import dn.quest.model.dto.UserAdminDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
 import dn.quest.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(Routes.USERS)
@@ -51,9 +48,7 @@ public class UserController implements Routes {
         if (role != null) {
             users = userService.getByRole(role); // фильтр по роли
         } else {
-            users = userService.getAll().stream()
-                    .map(u -> new UserDTO(u.getId(), u.getPublicName(), u.getRole()))
-                    .toList();
+            users = userService.getAll();
         }
 
         return ResponseEntity.ok(users);

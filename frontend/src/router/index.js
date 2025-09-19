@@ -10,12 +10,43 @@ const routes = [
     { path: "/", component: Home },
     { path: "/login", component: Login },
     { path: "/register", component: Register },
-    { path: "/admin/users/manage", component: ManageUsers, meta: { requiresAuth: true, role: "ADMIN" } },
-    { path: "/quests/create", component: () => import("@/pages/QuestForm.vue"),
-        meta: { requiresAuth: true, role: "AUTHOR" }
+    {
+        path: "/admin/users/manage",
+        component: ManageUsers,
+        meta: {
+            requiresAuth: true,
+            role: "ADMIN"
+        }
     },
-    { path: "/quests/:id/edit", component: () => import("@/pages/QuestForm.vue"),
-        meta: { requiresAuth: true, role: "AUTHOR" }
+    {
+        path: "/quests/create",
+        component: () => import("@/pages/QuestForm.vue"),
+        meta: {
+            requiresAuth: true,
+            role: "AUTHOR"
+        }
+    },
+    {
+        path: "/quests/:id/edit",
+        component: () => import("@/pages/QuestForm.vue"),
+        meta: {
+            requiresAuth: true,
+            role: "AUTHOR"
+        }
+    },
+    {
+        path: "/teams/create",
+        name: "TeamCreate",
+        component: () => import("@/pages/TeamForm.vue"),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: "/teams/:id",
+        name: "TeamPage",
+        component: () => import("@/pages/TeamPage.vue"),
+        meta: { requiresAuth: true }
     }
 ];
 

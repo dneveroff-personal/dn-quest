@@ -1,7 +1,6 @@
 package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.RegisterDTO;
-import dn.quest.model.dto.UserAdminDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
 
@@ -19,13 +18,12 @@ public interface UserService {
 
     UserDTO getByEmail(String email);
 
-    List<UserAdminDTO> getAll();
+    List<UserDTO> getAll();
 
     List<UserDTO> getByRole(UserRole role);
 
     UserDTO updateRole(Long id, UserRole role);
 
-    // ---- добавлено для регистрации ----
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);

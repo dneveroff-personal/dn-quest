@@ -12,13 +12,25 @@
         <div v-if="currentUser" class="flex items-center gap-2 text-[var(--color-text)] text-lg font-medium">
           <span>{{ getUserEmoji(currentUser.role) }}</span>
           <span>{{ currentUser.publicName }}</span>
+          <!-- если он капитан -->
+          <span v-if="currentUser.captain" title="Капитан">©</span>
         </div>
+
+        <!-- если игрок состоит в команде -->
+        <router-link
+            v-if="currentUser?.team"
+            :to="`/teams/${currentUser.team.id}`"
+            class="ml-2 text-base font-semibold text-[var(--color-accent)] hover:text-white transition-colors"
+        >
+          {{ currentUser.team.name }}
+        </router-link>
+
       </div>
 
       <!-- Logout кнопка -->
       <div v-if="currentUser">
         <button @click="logout"
-                class="text-[var(--color-text)] hover:text-[var(--color-accent)] transition-colors font-semibold">
+                class="text-[var(--color-text)] text-xs hover:text-[var(--color-accent)] transition-colors font-semibold">
           Logout
         </button>
       </div>
@@ -37,6 +49,11 @@
       <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users/manage"
                    class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Manage Users
+      </router-link>
+      <router-link v-if="currentUser?.role === 'PLAYER'"
+                   to="/teams/create"
+                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+        Создать команду
       </router-link>
       <router-link v-if="currentUser?.role === 'AUTHOR'"
                    to="/quests/create"
