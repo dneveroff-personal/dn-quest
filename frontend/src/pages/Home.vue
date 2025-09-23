@@ -22,33 +22,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { NSpin } from "naive-ui";
 import api from "@/services/api";
-import { fetchCurrentUser } from "@/services/auth";
 import QuestCard from "@/components/QuestCard.vue";
 
+const props = defineProps({
+  currentUser: { type: Object, default: null }
+});
+
 const quests = ref([]);
-const user = ref(null);
 const loading = ref(false);
 const router = useRouter();
 
 async function loadQuests() {
+  if (!props.currentUser) return;
   loading.value = true;
   try {
-    user.value = await fetchCurrentUser();
-    if (user.value == null) return;
     let response;
-    if (user.value.role === "ADMIN") {
+    if (props.currentUser.role === "ADMIN") {
       response = await api.get("/quests");
       quests.value = response.data;
-    } else if (user.value.role === "AUTHOR") {
+    } else if (props.currentUser.role === "AUTHOR") {
       response = await api.get("/quests");
       quests.value = response.data.filter(
           (q) =>
               q.published ||
-              q.authors?.some((a) => Number(a.id) === Number(user.value.id))
+              q.authors?.some((a) => Number(a.id) === Number(props.currentUser.id))
       );
     } else {
       response = await api.get("/quests/published");
@@ -62,10 +63,10 @@ async function loadQuests() {
 }
 
 function canEdit(quest) {
-  if (!user.value) return false;
-  if (user.value.role === "ADMIN") return true;
-  if (user.value.role === "AUTHOR") {
-    return quest.authors?.some((a) => a.id === user.value.id);
+  if (!props.currentUser) return false;
+  if (props.currentUser.role === "ADMIN") return true;
+  if (props.currentUser.role === "AUTHOR") {
+    return quest.authors?.some((a) => a.id === props.currentUser.id);
   }
   return false;
 }
@@ -79,4 +80,7 @@ function editQuest(id) {
 }
 
 onMounted(loadQuests);
+
+// перезагрузка квестов при смене текущего пользователя
+watch(() => props.currentUser, loadQuests);
 </script>

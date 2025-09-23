@@ -1,9 +1,8 @@
-<!-- src/pages/TeamPage.vue -->
 <template>
   <div class="flex justify-center w-full px-4 py-8 bg-[var(--color-bg)]">
-    <n-card class="w-full max-w-2xl shadow-lg rounded-2xl p-6 bg-[var(--color-bg-card)] text-[var(--color-text)]">
+    <n-card class="w-full max-w-2xl shadow-lg rounded-2xl p-6">
+      <!-- Команда -->
       <h2 class="text-2xl font-bold mb-4">{{ team?.name }}</h2>
-
       <div class="mb-4 text-gray-400">
         <span class="font-medium">Капитан:</span> {{ team?.captain?.publicName }}
       </div>
@@ -14,6 +13,15 @@
           {{ member.publicName }}
         </li>
       </ul>
+
+      <!-- Приглашения -->
+      <InvitationsList />
+
+      <!-- Пригласить -->
+      <div v-if="currentUser?.captain" class="flex mt-4 gap-2">
+        <n-input v-model:value="inviteUsername" placeholder="Введите username" clearable />
+        <n-button type="primary" @click="invitePlayer">Пригласить</n-button>
+      </div>
     </n-card>
   </div>
 </template>
@@ -21,11 +29,18 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { NCard } from "naive-ui";
+import { NButton, NCard, NInput, useMessage } from "naive-ui";
 import api from "@/services/api";
+import InvitationsList from "@/components/InvitationsList.vue";
+
+const props = defineProps({
+  currentUser: Object
+});
 
 const route = useRoute();
 const team = ref(null);
+const inviteUsername = ref("");
+const message = useMessage();
 
 async function loadTeam() {
   try {
@@ -33,6 +48,19 @@ async function loadTeam() {
     team.value = data;
   } catch (err) {
     console.error("Ошибка загрузки команды", err);
+  }
+}
+
+async function invitePlayer() {
+  if (!inviteUsername.value) return;
+  try {
+    await api.post(`/teams/${team.value.id}/invite/${inviteUsername.value}`);
+    await loadTeam();
+    message.success(`Приглашение отправлено игроку ${inviteUsername.value}`);
+    inviteUsername.value = "";
+  } catch (err) {
+    console.error("Ошибка приглашения:", err);
+    message.error("Не удалось отправить приглашение");
   }
 }
 

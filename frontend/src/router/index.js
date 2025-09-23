@@ -47,6 +47,11 @@ const routes = [
         name: "TeamPage",
         component: () => import("@/pages/TeamPage.vue"),
         meta: { requiresAuth: true }
+    },
+    {
+        path: "/invitations",
+        name: "InvitationsPage",
+        component: () => import("@/pages/InvitationsPage.vue"),
     }
 ];
 

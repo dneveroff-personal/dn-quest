@@ -1,5 +1,6 @@
 package dn.quest.controllers;
 
+import dn.quest.model.dto.TeamInvitationDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
 import dn.quest.services.interfaces.UserService;
@@ -67,5 +68,11 @@ public class UserController implements Routes {
     @PatchMapping(ROLE_BY_ID)
     public ResponseEntity<UserDTO> updateRole(@PathVariable Long id, @RequestParam UserRole role) {
         return ResponseEntity.ok(userService.updateRole(id, role));
+    }
+
+    @GetMapping(MY_INVITATIONS)
+    public ResponseEntity<List<TeamInvitationDTO>> myInvitations(@AuthenticationPrincipal UserDetails userDetails) {
+        UserDTO me = userService.getByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(userService.getPendingInvitations(me.getId()));
     }
 }

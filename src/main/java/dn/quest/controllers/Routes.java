@@ -14,6 +14,7 @@ public interface Routes {
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
     String ROLE = "/role";
+    String SEARCH = "/search";
     String STATUS = "/status";
     String SUBMIT = "/submit";
 
@@ -40,15 +41,19 @@ public interface Routes {
 
     // Team
     String TEAMS = API + "/teams";
+    String TEAMS_ID = "/{teamId}";
     String TEAM_MEMBERS = ID + "/members";
     String TEAM_MEMBER_ADD = TEAM_MEMBERS + USER_ID;
     String TEAM_TRANSFER_CAPTAIN = ID + "/transfer-captain" + USER_ID;
+    String TEAM_INVITE_USER = TEAMS_ID + "/invite" + USER_NAME;
+    String TEAM_INVITE_RESPONSE = "/invitations" + ID + "/{action}";
 
     // Users
     String USERS = API + "/users";
     String USERS_BY_NAME = "/by-username" + USER_NAME;
     String BY_EMAIL = "/by-email" + EMAIL;
     String ROLE_BY_ID = ID + ROLE;
+    String MY_INVITATIONS = ME + "/invitations";
 
     // Level
     String LEVELS = API + "/levels";

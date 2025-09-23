@@ -15,13 +15,13 @@
 
         <!-- HEADER -->
         <n-layout-header bordered class="p-4 flex items-center justify-between">
-          <AppHeader />
+          <AppHeader :currentUser="currentUser" />
         </n-layout-header>
 
         <!-- MAIN CONTENT -->
         <n-layout-content content-style="padding: 24px;" class="bg-[var(--color-bg)]">
           <div class="app-content">
-            <router-view />
+            <router-view :currentUser="currentUser" />
           </div>
         </n-layout-content>
 
@@ -35,17 +35,28 @@
 </template>
 
 <script setup>
-import { darkTheme } from "naive-ui";
-import AppHeader from "@/components/AppHeader.vue";
-import { ref } from "vue";
+  import { darkTheme } from "naive-ui";
+  import AppHeader from "@/components/AppHeader.vue";
+  import { ref, onMounted } from "vue";
+  import { fetchCurrentUser } from "@/services/auth";
 
-const theme = ref(localStorage.getItem("theme") || "indigo");
+  const theme = ref(localStorage.getItem("theme") || "indigo");
+  const currentUser = ref(null);
 
-function applyTheme() {
-  document.documentElement.setAttribute("data-theme", theme.value);
-  localStorage.setItem("theme", theme.value);
-}
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", theme.value);
+    localStorage.setItem("theme", theme.value);
+  }
 
-// Применяем сразу при загрузке
-applyTheme();
+  // грузим юзера
+  async function loadUser() {
+    currentUser.value = await fetchCurrentUser();
+    console.log(currentUser.value)
+  }
+
+  onMounted(() => {
+    applyTheme();
+    loadUser();
+    window.addEventListener("user-changed", loadUser);
+  });
 </script>

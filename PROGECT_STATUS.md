@@ -16,6 +16,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 ├── assets
 ├── components
 │   ├── AppHeader.vue
+│   ├── InvitationsList.vue
 │   ├── QuestCard.vue
 │   └── quests
 │       ├── LevelCodes.vue
@@ -23,16 +24,20 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 ├── main.js
 ├── pages
 │   ├── Home.vue
+│   ├── InvitationsPage.vue
 │   ├── Login.vue
 │   ├── ManageUsers.vue
 │   ├── QuestForm.vue
-│   └── Register.vue
+│   ├── Register.vue
+│   ├── TeamForm.vue
+│   └── TeamPage.vue
 ├── router
 │   └── index.js
 ├── services
 │   ├── api.js
 │   └── auth.js
 └── style.css
+
 
 
 В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.

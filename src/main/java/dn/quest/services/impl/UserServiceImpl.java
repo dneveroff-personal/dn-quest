@@ -1,10 +1,14 @@
 package dn.quest.services.impl;
 
 import dn.quest.model.dto.RegisterDTO;
+import dn.quest.model.dto.TeamDTO;
+import dn.quest.model.dto.TeamInvitationDTO;
 import dn.quest.model.dto.UserDTO;
+import dn.quest.model.entities.enums.InvitationStatus;
 import dn.quest.model.entities.enums.UserRole;
 import dn.quest.model.entities.user.User;
 import dn.quest.model.entities.team.TeamMember;
+import dn.quest.repositories.TeamInvitationRepository;
 import dn.quest.repositories.TeamMemberRepository;
 import dn.quest.repositories.UserRepository;
 import dn.quest.services.interfaces.UserService;
@@ -25,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TeamInvitationRepository invitationRepository;
 
     private UserDTO toDTO(User u) {
         TeamMember membership = teamMemberRepository.findByUser(u).orElse(null);
@@ -139,4 +144,28 @@ public class UserServiceImpl implements UserService {
     public boolean existsByEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TeamInvitationDTO> getPendingInvitations(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+
+        return invitationRepository.findByUserAndStatus(user, InvitationStatus.PENDING)
+                .stream()
+                .map(inv -> TeamInvitationDTO.builder()
+                        .id(inv.getId())
+                        .team(TeamDTO.builder()
+                                .id(inv.getTeam().getId())
+                                .name(inv.getTeam().getName())
+                                .captain(toDTO(inv.getTeam().getCaptain()))
+                                .build())
+                        .status(inv.getStatus().name())
+                        .createdAt(inv.getCreatedAt())
+                        .build()
+                )
+                .toList();
+    }
+
 }

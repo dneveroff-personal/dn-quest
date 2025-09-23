@@ -1,22 +1,20 @@
 <template>
   <div class="flex flex-col w-full p-6 bg-[var(--color-bg-card)] shadow-md">
-    <!-- Верхняя строка: DN Quest + пользователь + Logout -->
+    <!-- Верхняя строка -->
     <div class="flex items-center justify-between w-full">
       <div class="flex items-center gap-4">
-        <!-- DN Quest: градиентный текст -->
         <router-link to="/" class="dn-quest-link text-2xl font-bold transition-opacity hover:opacity-80">
           DN Quest
         </router-link>
 
-        <!-- Имя пользователя с иконкой -->
+        <!-- Имя пользователя -->
         <div v-if="currentUser" class="flex items-center gap-2 text-[var(--color-text)] text-lg font-medium">
           <span>{{ getUserEmoji(currentUser.role) }}</span>
           <span>{{ currentUser.publicName }}</span>
-          <!-- если он капитан -->
           <span v-if="currentUser.captain" title="Капитан">©</span>
         </div>
 
-        <!-- если игрок состоит в команде -->
+        <!-- Ссылка на команду -->
         <router-link
             v-if="currentUser?.team"
             :to="`/teams/${currentUser.team.id}`"
@@ -25,39 +23,42 @@
           {{ currentUser.team.name }}
         </router-link>
 
+        <!-- Приглашения -->
+        <router-link
+            v-if="currentUser && !currentUser.team"
+            to="/invitations"
+            class="ml-2 text-base font-semibold text-[var(--color-accent)] hover:text-white transition-colors"
+        >
+          Приглашения в команду
+        </router-link>
       </div>
 
-      <!-- Logout кнопка -->
+      <!-- Logout -->
       <div v-if="currentUser">
-        <button @click="logout"
-                class="text-[var(--color-text)] text-xs hover:text-[var(--color-accent)] transition-colors font-semibold">
+        <button
+            @click="logout"
+            class="text-[var(--color-text)] text-xs hover:text-[var(--color-accent)] transition-colors font-semibold"
+        >
           Logout
         </button>
       </div>
     </div>
 
-    <!-- Нижняя строка: навигационные кнопки -->
+    <!-- Нижняя строка -->
     <div class="flex flex-wrap gap-3 mt-3 justify-center">
-      <router-link v-if="!currentUser" to="/login"
-                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+      <router-link v-if="!currentUser" to="/login" class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Login
       </router-link>
-      <router-link v-if="!currentUser" to="/register"
-                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+      <router-link v-if="!currentUser" to="/register" class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Register
       </router-link>
-      <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users/manage"
-                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+      <router-link v-if="currentUser?.role === 'ADMIN'" to="/admin/users/manage" class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Manage Users
       </router-link>
-      <router-link v-if="currentUser?.role === 'PLAYER'"
-                   to="/teams/create"
-                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+      <router-link v-if="currentUser?.role === 'PLAYER'" to="/teams/create" class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Создать команду
       </router-link>
-      <router-link v-if="currentUser?.role === 'AUTHOR'"
-                   to="/quests/create"
-                   class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
+      <router-link v-if="currentUser?.role === 'AUTHOR'" to="/quests/create" class="btn-accent text-lg font-semibold px-6 py-3 rounded-xl hover:text-white transition-colors">
         Создать квест
       </router-link>
     </div>
@@ -65,35 +66,27 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from "vue";
-  import { useRouter } from "vue-router";
-  import { fetchCurrentUser, logout as authLogout } from "@/services/auth";
+import { useRouter } from "vue-router";
+import { logout as authLogout } from "@/services/auth";
 
-  const router = useRouter();
-  const currentUser = ref(null);
-  const roleEmojis = {
-    ADMIN: "🤴",
-    AUTHOR: "👩‍🍳",
-    PLAYER: "🕵️‍♂️"
-  };
+defineProps({
+  currentUser: Object
+});
 
-  async function loadUser() {
-    currentUser.value = await fetchCurrentUser();
-    console.log(currentUser.value)
-  }
+const router = useRouter();
+const roleEmojis = {
+  ADMIN: "🤴",
+  AUTHOR: "👩‍🍳",
+  PLAYER: "🕵️‍♂️"
+};
 
-  onMounted(() => {
-    loadUser();
-    window.addEventListener("user-changed", loadUser);
-  });
+function logout() {
+  authLogout();
+  window.dispatchEvent(new Event("user-changed")); // триггерим обновление
+  router.push("/login");
+}
 
-  function logout() {
-    authLogout();
-    currentUser.value = null;
-    router.push("/login");
-  }
-
-  function getUserEmoji(role) {
-    return roleEmojis[role] || "🧑";
-  }
+function getUserEmoji(role) {
+  return roleEmojis[role] || "🧑";
+}
 </script>

@@ -1,6 +1,7 @@
 package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.RegisterDTO;
+import dn.quest.model.dto.TeamInvitationDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
 
@@ -27,4 +28,7 @@ public interface UserService {
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
+
+    List<TeamInvitationDTO> getPendingInvitations(Long userId);
+
 }

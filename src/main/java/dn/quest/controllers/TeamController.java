@@ -1,12 +1,17 @@
 package dn.quest.controllers;
 
 import dn.quest.model.dto.TeamDTO;
+import dn.quest.model.dto.TeamInvitationDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.services.interfaces.TeamService;
+import dn.quest.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -15,6 +20,7 @@ import java.util.Set;
 public class TeamController implements Routes {
 
     private final TeamService teamService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<TeamDTO> createTeam(
@@ -65,6 +71,21 @@ public class TeamController implements Routes {
     public ResponseEntity<Void> deleteTeam(@PathVariable Long id) {
         teamService.deleteTeam(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(TEAM_INVITE_USER)
+    public ResponseEntity<Void> inviteUser(@PathVariable Long teamId,
+                                           @PathVariable String username) {
+        teamService.inviteUser(teamId, username);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(TEAM_INVITE_RESPONSE)
+    public ResponseEntity<Void> respond(@PathVariable Long id,
+                                        @PathVariable String action) {
+        boolean accept = action.equalsIgnoreCase("accept");
+        teamService.respondToInvite(id, accept);
+        return ResponseEntity.ok().build();
     }
 
 }
