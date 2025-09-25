@@ -13,6 +13,7 @@
             :key="quest.id"
             :quest="quest"
             :can-edit="canEdit(quest)"
+            :currentUser="props.currentUser"
             @play="openQuest"
             @edit="editQuest"
         />

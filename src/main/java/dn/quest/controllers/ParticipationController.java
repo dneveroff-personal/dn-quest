@@ -50,14 +50,25 @@ public class ParticipationController implements Routes {
         return ResponseEntity.ok(list);
     }
 
+    // ========== новый endpoint: отозвать свою заявку (DELETE) ==========
+    @DeleteMapping(ID)
+    public ResponseEntity<Void> withdraw(@PathVariable Long id) {
+        participationService.withdrawRequest(id);
+        return ResponseEntity.noContent().build();
+    }
+
     private ParticipationRequestDTO toDTO(dn.quest.model.entities.quest.ParticipationRequest request) {
         return ParticipationRequestDTO.builder()
                 .id(request.getId())
                 .questId(request.getQuest().getId())
                 .userId(request.getUser() != null ? request.getUser().getId() : null)
                 .teamId(request.getTeam() != null ? request.getTeam().getId() : null)
+                // заполнение новых полей
+                .userName(request.getUser() != null ? request.getUser().getPublicName() : null)
+                .teamName(request.getTeam() != null ? request.getTeam().getName() : null)
                 .type(request.getApplicantType())
                 .status(request.getStatus())
+                .createdAt(request.getCreatedAt())
                 .build();
     }
 }

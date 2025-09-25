@@ -96,6 +96,48 @@
         <n-tab-pane name="levels" tab="Уровни">
           <LevelsManager ref="levelsManagerRef" :quest-id="questId" />
         </n-tab-pane>
+
+        <!-- Участники / заявки (видна только в режиме редактирования) -->
+        <n-tab-pane v-if="isEditMode" name="participants" tab="Участники / Заявки">
+          <div class="py-4">
+            <n-button size="small" @click="loadParticipationRequests">Обновить</n-button>
+            <div class="mt-4">
+              <h4 class="font-semibold mb-2">Ожидают</h4>
+              <div v-if="requestsPending.length">
+                <ul class="list-disc list-inside">
+                  <li v-for="r in requestsPending" :key="r.id" class="flex justify-between items-center py-1">
+                    <div>
+                      <strong>{{ r.teamName || ('Команда #' + r.teamId) }}</strong>
+                      <span class="text-xs text-gray-400 ml-2">({{ r.createdAt ? new Date(r.createdAt).toLocaleString() : '' }})</span>
+                    </div>
+                    <div class="flex gap-2">
+                      <n-button size="small" type="success" @click="changeParticipationStatus(r.id, 'ACCEPTED')">Принять</n-button>
+                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'DECLINED')">Отклонить</n-button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div v-else class="text-gray-400">Нет ожидающих заявок</div>
+
+              <h4 class="font-semibold mt-4 mb-2">Приняты</h4>
+              <div v-if="requestsAccepted.length">
+                <ul class="list-disc list-inside">
+                  <li v-for="r in requestsAccepted" :key="r.id" class="flex justify-between items-center py-1">
+                    <div>
+                      <strong>{{ r.teamName || ('Команда #' + r.teamId) }}</strong>
+                    </div>
+                    <div class="flex gap-2">
+                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'REJECTED')">
+                        Исключить
+                      </n-button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div v-else class="text-gray-400">Пока нет принятых команд</div>
+            </div>
+          </div>
+        </n-tab-pane>
       </n-tabs>
 
       <!-- Кнопки -->
@@ -129,6 +171,7 @@ const route = useRoute();
 const message = useMessage();
 const isEditMode = computed(() => !!route.params.id);
 const questId = route.params.id;
+const participationRequests = ref([]);
 
 const form = ref({
   title: "",
@@ -152,6 +195,34 @@ const typeOptions = [
   { label: "Одиночный", value: "SINGLE" },
   { label: "Командный", value: "TEAM" },
 ];
+
+const requestsPending = computed(() =>
+    participationRequests.value.filter(r => r.status === "PENDING")
+);
+const requestsAccepted = computed(() =>
+    participationRequests.value.filter(r => r.status === "ACCEPTED")
+);
+
+async function loadParticipationRequests() {
+  if (!isEditMode.value) return;
+  try {
+    const { data } = await api.get(`/participation/by-quest/${questId}`);
+    participationRequests.value = data || [];
+  } catch (err) {
+    console.error("Ошибка загрузки заявок", err);
+  }
+}
+
+async function changeParticipationStatus(id, status) {
+  try {
+    await api.post(`/participation/${id}/status`, null, { params: { status } });
+    message.success(status === "ACCEPTED" ? "Принято" : "Отклонено");
+    await loadParticipationRequests();
+  } catch (err) {
+    console.error("Ошибка изменения статуса", err);
+    message.error("Не удалось изменить статус заявки");
+  }
+}
 
 async function loadAuthors() {
   try {
@@ -254,5 +325,6 @@ async function deleteQuest() {
 onMounted(async () => {
   await loadAuthors();
   await loadQuest();
+  await loadParticipationRequests();
 });
 </script>

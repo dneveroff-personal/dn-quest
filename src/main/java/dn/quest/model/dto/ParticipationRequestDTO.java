@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,10 +25,15 @@ public class ParticipationRequestDTO {
 
     private Long teamId;
 
+    // Новые поля для отображения на фронте
+    private String userName;
+    private String teamName;
+
     @NotNull
     private ApplicantType type;
 
     @NotNull
     private ParticipationStatus status;
 
+    private Instant createdAt;
 }

@@ -11,5 +11,6 @@ public interface ParticipationService {
     ParticipationRequest createRequest(Long questId, ApplicantType type, Long userIdOrNull, Long teamIdOrNull);
     ParticipationRequest changeStatus(Long requestId, ParticipationStatus newStatus);
     List<ParticipationRequest> listByQuest(Long questId, ParticipationStatus status);
+    void withdrawRequest(Long requestId);
 
 }
