@@ -1,7 +1,7 @@
 package dn.quest.model.entities.quest;
 
-import dn.quest.model.entities.enums.QuestType;
 import dn.quest.model.entities.enums.SessionStatus;
+import dn.quest.model.entities.quest.level.Level;
 import dn.quest.model.entities.team.Team;
 import dn.quest.model.entities.user.User;
 import jakarta.persistence.*;
@@ -18,12 +18,13 @@ import java.time.Instant;
         })
 public class GameSession {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="quest_id", nullable=false)
-    private Quest quest;                   // фиксируем квест (версионирование добавим при необходимости)
+    private Quest quest;                   // квест
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="team_id")
@@ -45,4 +46,9 @@ public class GameSession {
 
     @Column(nullable=false)
     private int penaltyTimeSumSec = 0;
+
+    // 🆕 связь на текущий уровень
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_level_id")
+    private Level currentLevel; // текущий активный уровень
 }

@@ -20,6 +20,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   ├── QuestCard.vue
 │   └── quests
 │       ├── LevelCodes.vue
+│       ├── LevelHintsEditor.vue
 │       └── LevelsManager.vue
 ├── main.js
 ├── pages
@@ -27,6 +28,7 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 │   ├── InvitationsPage.vue
 │   ├── Login.vue
 │   ├── ManageUsers.vue
+│   ├── Play.vue
 │   ├── QuestForm.vue
 │   ├── Register.vue
 │   ├── TeamForm.vue
@@ -40,134 +42,146 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 
 
 
+
 В корне так же имеются файлы vite.config, index.html, Dockerfile, package.json и т.д.
 
-содержимое папки src:
+содержимое папки src/main:
 .
-├── main
-│   ├── java
-│   │   └── dn
-│   │       └── quest
-│   │           ├── bot
-│   │           │   ├── config
-│   │           │   │   └── TelegramBotConfig.java
-│   │           │   └── QuestTelegramBot.java
-│   │           ├── cmd
-│   │           │   └── QuestConsole.java
-│   │           ├── config
-│   │           │   ├── DataInitializer.java
-│   │           │   ├── Helpers.java
-│   │           │   ├── JwtAuthenticationFilter.java
-│   │           │   ├── JwtUtil.java
-│   │           │   └── SecurityConfig.java
-│   │           ├── controllers
-│   │           │   ├── AttemptController.java
-│   │           │   ├── AuthController.java
-│   │           │   ├── CodeController.java
-│   │           │   ├── LevelController.java
-│   │           │   ├── ParticipationController.java
-│   │           │   ├── QuestController.java
-│   │           │   ├── RegistrationController.java
-│   │           │   ├── Routes.java
-│   │           │   ├── TeamController.java
-│   │           │   └── UserController.java
-│   │           ├── exceptions
-│   │           │   └── GlobalExceptionHandler.java
-│   │           ├── model
-│   │           │   ├── dto
-│   │           │   │   ├── CodeAttemptDTO.java
-│   │           │   │   ├── CodeDTO.java
-│   │           │   │   ├── GameSessionDTO.java
-│   │           │   │   ├── LevelCompletionDTO.java
-│   │           │   │   ├── LevelDTO.java
-│   │           │   │   ├── LoginRequestDTO.java
-│   │           │   │   ├── LoginResponseDTO.java
-│   │           │   │   ├── ParticipationRequestDTO.java
-│   │           │   │   ├── QuestCreateUpdateDTO.java
-│   │           │   │   ├── QuestDTO.java
-│   │           │   │   ├── RegisterDTO.java
-│   │           │   │   ├── TeamDTO.java
-│   │           │   │   ├── UserAdminDTO.java
-│   │           │   │   └── UserDTO.java
-│   │           │   └── entities
-│   │           │       ├── enums
-│   │           │       │   ├── ApplicantType.java
-│   │           │       │   ├── AttemptResult.java
-│   │           │       │   ├── CodeType.java
-│   │           │       │   ├── Difficulty.java
-│   │           │       │   ├── ParticipationStatus.java
-│   │           │       │   ├── QuestType.java
-│   │           │       │   ├── SessionStatus.java
-│   │           │       │   ├── TeamRole.java
-│   │           │       │   └── UserRole.java
-│   │           │       ├── quest
-│   │           │       │   ├── GameSession.java
-│   │           │       │   ├── level
-│   │           │       │   │   ├── CodeAttempt.java
-│   │           │       │   │   ├── Code.java
-│   │           │       │   │   ├── LevelCompletion.java
-│   │           │       │   │   ├── Level.java
-│   │           │       │   │   └── LevelProgress.java
-│   │           │       │   ├── ParticipationRequest.java
-│   │           │       │   └── Quest.java
-│   │           │       ├── team
-│   │           │       │   ├── Team.java
-│   │           │       │   └── TeamMember.java
-│   │           │       └── user
-│   │           │           └── User.java
-│   │           ├── QuestEngineApplication.java
-│   │           ├── repositories
-│   │           │   ├── CodeAttemptRepository.java
-│   │           │   ├── CodeRepository.java
-│   │           │   ├── GameSessionRepository.java
-│   │           │   ├── LevelCompletionRepository.java
-│   │           │   ├── LevelProgressRepository.java
-│   │           │   ├── LevelRepository.java
-│   │           │   ├── ParticipationRequestRepository.java
-│   │           │   ├── QuestRepository.java
-│   │           │   ├── TeamMemberRepository.java
-│   │           │   ├── TeamRepository.java
-│   │           │   └── UserRepository.java
-│   │           └── services
-│   │               ├── impl
-│   │               │   ├── AttemptServiceImpl.java
-│   │               │   ├── AuthServiceImpl.java
-│   │               │   ├── CodeServiceImpl.java
-│   │               │   ├── GameSessionServiceImpl.java
-│   │               │   ├── LevelServiceImpl.java
-│   │               │   ├── ParticipationServiceImpl.java
-│   │               │   ├── QuestServiceImpl.java
-│   │               │   ├── TeamServiceImpl.java
-│   │               │   └── UserServiceImpl.java
-│   │               └── interfaces
-│   │                   ├── AttemptService.java
-│   │                   ├── AuthService.java
-│   │                   ├── CodeService.java
-│   │                   ├── GameSessionService.java
-│   │                   ├── LevelService.java
-│   │                   ├── ParticipationService.java
-│   │                   ├── QuestService.java
-│   │                   ├── TeamService.java
-│   │                   └── UserService.java
-│   └── resources
-│       ├── application.properties
-│       ├── banner.txt
-│       ├── static
-│       │   ├── assets
-│       │   │   ├── FiraCode-Regular-CRwVj4V2.woff2
-│       │   │   ├── index-Br6wRpTA.js
-│       │   │   ├── index-BS6ytk4o.css
-│       │   │   ├── LatoLatin-Regular-Dmlz1U0B.woff2
-│       │   │   ├── LatoLatin-Semibold-Dbk81p2D.woff2
-│       │   │   └── QuestForm-BIqjnpmc.js
-│       │   ├── favicon.ico
-│       │   ├── index.html
-│       │   └── vite.svg
-│       └── templates
-└── test
-└── java
-└── service
-
+├── java
+│   └── dn
+│       └── quest
+│           ├── bot
+│           │   ├── config
+│           │   │   └── TelegramBotConfig.java
+│           │   └── QuestTelegramBot.java
+│           ├── cmd
+│           │   └── QuestConsole.java
+│           ├── config
+│           │   ├── DataInitializer.java
+│           │   ├── Helpers.java
+│           │   ├── JwtAuthenticationFilter.java
+│           │   ├── JwtUtil.java
+│           │   └── SecurityConfig.java
+│           ├── controllers
+│           │   ├── AttemptController.java
+│           │   ├── AuthController.java
+│           │   ├── CodeController.java
+│           │   ├── GameSessionController.java
+│           │   ├── LevelController.java
+│           │   ├── LevelHintController.java
+│           │   ├── ParticipationController.java
+│           │   ├── QuestController.java
+│           │   ├── RegistrationController.java
+│           │   ├── Routes.java
+│           │   ├── TeamController.java
+│           │   └── UserController.java
+│           ├── exceptions
+│           │   └── GlobalExceptionHandler.java
+│           ├── model
+│           │   ├── dto
+│           │   │   ├── CodeAttemptDTO.java
+│           │   │   ├── CodeDTO.java
+│           │   │   ├── GameSessionDTO.java
+│           │   │   ├── LevelCompletionDTO.java
+│           │   │   ├── LevelDTO.java
+│           │   │   ├── LevelHintDTO.java
+│           │   │   ├── LevelProgressDTO.java
+│           │   │   ├── LevelViewDTO.java
+│           │   │   ├── LoginRequestDTO.java
+│           │   │   ├── LoginResponseDTO.java
+│           │   │   ├── ParticipationRequestDTO.java
+│           │   │   ├── QuestCreateUpdateDTO.java
+│           │   │   ├── QuestDTO.java
+│           │   │   ├── RegisterDTO.java
+│           │   │   ├── TeamDTO.java
+│           │   │   ├── TeamInvitationDTO.java
+│           │   │   └── UserDTO.java
+│           │   └── entities
+│           │       ├── enums
+│           │       │   ├── ApplicantType.java
+│           │       │   ├── AttemptResult.java
+│           │       │   ├── CodeType.java
+│           │       │   ├── Difficulty.java
+│           │       │   ├── InvitationStatus.java
+│           │       │   ├── ParticipationStatus.java
+│           │       │   ├── QuestType.java
+│           │       │   ├── SessionStatus.java
+│           │       │   ├── TeamRole.java
+│           │       │   └── UserRole.java
+│           │       ├── quest
+│           │       │   ├── GameSession.java
+│           │       │   ├── level
+│           │       │   │   ├── CodeAttempt.java
+│           │       │   │   ├── Code.java
+│           │       │   │   ├── LevelCompletion.java
+│           │       │   │   ├── LevelHint.java
+│           │       │   │   ├── Level.java
+│           │       │   │   └── LevelProgress.java
+│           │       │   ├── ParticipationRequest.java
+│           │       │   └── Quest.java
+│           │       ├── team
+│           │       │   ├── TeamInvitation.java
+│           │       │   ├── Team.java
+│           │       │   └── TeamMember.java
+│           │       └── user
+│           │           └── User.java
+│           ├── QuestEngineApplication.java
+│           ├── repositories
+│           │   ├── CodeAttemptRepository.java
+│           │   ├── CodeRepository.java
+│           │   ├── GameSessionRepository.java
+│           │   ├── LevelCompletionRepository.java
+│           │   ├── LevelHintRepository.java
+│           │   ├── LevelProgressRepository.java
+│           │   ├── LevelRepository.java
+│           │   ├── ParticipationRequestRepository.java
+│           │   ├── QuestRepository.java
+│           │   ├── TeamInvitationRepository.java
+│           │   ├── TeamMemberRepository.java
+│           │   ├── TeamRepository.java
+│           │   └── UserRepository.java
+│           └── services
+│               ├── impl
+│               │   ├── AttemptServiceImpl.java
+│               │   ├── AuthServiceImpl.java
+│               │   ├── CodeServiceImpl.java
+│               │   ├── GameSessionServiceImpl.java
+│               │   ├── LevelHintServiceImpl.java
+│               │   ├── LevelServiceImpl.java
+│               │   ├── ParticipationServiceImpl.java
+│               │   ├── QuestServiceImpl.java
+│               │   ├── TeamServiceImpl.java
+│               │   └── UserServiceImpl.java
+│               └── interfaces
+│                   ├── AttemptService.java
+│                   ├── AuthService.java
+│                   ├── CodeService.java
+│                   ├── GameSessionService.java
+│                   ├── LevelHintService.java
+│                   ├── LevelService.java
+│                   ├── ParticipationService.java
+│                   ├── QuestService.java
+│                   ├── TeamService.java
+│                   └── UserService.java
+└── resources
+├── application.properties
+├── banner.txt
+├── static
+│   ├── assets
+│   │   ├── FiraCode-Regular-CRwVj4V2.woff2
+│   │   ├── index-BcpWke4W.js
+│   │   ├── index-BJYXivGY.css
+│   │   ├── InvitationsList-B7OSNeCn.js
+│   │   ├── InvitationsPage-Bh51fBHG.js
+│   │   ├── LatoLatin-Regular-Dmlz1U0B.woff2
+│   │   ├── LatoLatin-Semibold-Dbk81p2D.woff2
+│   │   ├── QuestForm-BJsiQ66_.js
+│   │   ├── TeamForm-CCzlGZEH.js
+│   │   └── TeamPage-VCOppWYW.js
+│   ├── favicon.ico
+│   ├── index.html
+│   └── vite.svg
+└── templates
 
 
 Мы уже многое написали. Ты можешь не помнить, но мы все это уже обговаривали с тобой в этом чате.
@@ -298,27 +312,6 @@ PostgreSQL + Фронт на Vue+Vite + Docker и Docker composer.
 Готово создание команды и назначение капитаном.
 Готово обработка подачи заявки на игру команд и принятие команд в игру автором.
 
-Делаем:
-На фронте в QuestCard.vue
-Переименовать кнопку Играть → Войти в игру.
-Отображать её только если:
-quest.startAt < now и у текущей команды (или пользователя) есть заявка со статусом ACCEPTED.
-
-Для капитанов команд:
-показывать кнопку Подать заявку на участие (если ещё нет заявки).
-показывать кнопку Отозвать заявку (если заявка есть и PENDING).
-если заявка ACCEPTED, отозвать уже нельзя.
-
-Добавить списки:
-"Подали заявки" (status=PENDING)
-"Приняты к участию" (status=ACCEPTED).
-
-На фронте в QuestForm.vue (только для авторов)
-В отдельной вкладке (например "Заявки") показать список заявок на игру.
-Для каждой заявки: имя команды/пользователя + кнопки Принять / Отклонить.
-Эти кнопки будут бить в POST /participation/{id}/status?status=ACCEPTED или REJECTED.
-
-
 ### Далее
 # Обработка нажатия командой - Войти в игру
 Когда наступает время начала игры и для команд появляется кнопка "Войти в игру". При нажатии любым членом,
@@ -326,14 +319,15 @@ quest.startAt < now и у текущей команды (или пользова
 для прохождения
 
 # Выдача уровня команде
-Когдма игрок команды входит в игру - ему отображается игровой уровень в режиме игры:
+Когда игрок команды входит в игру - ему отображается игровой уровень в режиме игры:
 Номер, название, секторы для кодов (надо придумать плейсхолдеры userfriendly и потом при вводе правильных кодов 
 они будут отображаться на месте плейсхолдеров), далее счетчик до автоперехода (АП: MM:MM:MM или -- если автоперехода нет),
 текст описания, ниже счетчики времени до отображения подсказок, а когда счетчик до 0 дойдет - то отобразится подсказка.
 Внимание - подсказка начинает считаться от времени первого входа любого игрока команды на уровень. 
 А если игрок вышел/разлогинился и снова зашел, он долден увидеть, Состояние уровня текущее. Напрммер если до АПы было 5 мин а до подсказки 2, 
 а игрок вышел из игры на 3 минуты, то после того как он вернется в игру - он уже увидит подсказку, а до автоперехода 
-останется 2 минуты. Ясно?
+останется 2 минуты.
+Также вверху в самом удобном месте отображается поле для ввода кодов.
 
 - апдейт роутов, чтобы аутентифицированный мог просто по ссылке открывать
 - дизайн как на krasnodar en cx

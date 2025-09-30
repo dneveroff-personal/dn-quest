@@ -1,3 +1,4 @@
+<!-- src/components/QuestCard.vue -->
 <template>
   <n-card
       hoverable
@@ -54,11 +55,12 @@
     <!-- кнопки и списки -->
     <div class="p-4 border-t border-white/6 bg-[var(--color-bg-card)]">
       <div class="flex gap-3 items-center mb-3">
-        <!-- Войти в игру: показываем только если старт прошёл и команда текущего пользователя принята -->
+        <!-- Войти в игру -->
         <n-button
             v-if="canEnter"
             class="btn-accent rounded-xl py-3 text-lg font-semibold flex-1"
-            @click="$emit('play', quest.id)"
+            :loading="starting"
+            @click="startGame"
         >
           Войти в игру
         </n-button>
@@ -84,7 +86,9 @@
         <n-button
             v-if="canEdit"
             type="warning"
-            class="rounded-xl py-3 font-semibold flex-1 text-lg" @click="$emit('edit', quest.id)">
+            class="rounded-xl py-3 font-semibold flex-1 text-lg"
+            @click="$emit('edit', quest.id)"
+        >
           Редактировать
         </n-button>
       </div>
@@ -131,28 +135,30 @@ import { ref, computed, onMounted, watch } from "vue";
 import { NCard, NButton, NTag } from "naive-ui";
 import api from "@/services/api";
 import { useMessage } from "naive-ui";
-import { fetchCurrentUser } from "@/services/auth"; // <- добавлено
+import { fetchCurrentUser } from "@/services/auth";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   quest: { type: Object, required: true },
   canEdit: { type: Boolean, default: false },
-  currentUser: { type: Object, default: null } // опционально прокидываем
+  currentUser: { type: Object, default: null }
 });
-const emit = defineEmits(["play", "edit"]);
+const emit = defineEmits(["edit"]);
 
 const message = useMessage();
+const router = useRouter();
 const currentUser = ref(props.currentUser || null);
 watch(() => props.currentUser, (v) => { currentUser.value = v; });
 
 const applications = ref([]);
 const loading = ref(false);
+const starting = ref(false);
 
 async function ensureUser() {
   if (!currentUser.value) {
     try {
       currentUser.value = await fetchCurrentUser();
     } catch (e) {
-      // silent: не критично — тогда функционал капитана будет скрыт
       console.warn("Не удалось подгрузить currentUser в QuestCard", e);
     }
   }
@@ -175,15 +181,11 @@ onMounted(async () => {
   await ensureUser();
   await loadApplications();
 });
-
-// реактивно перезагружаем если сменился квест / пользователь
 watch(() => props.quest?.id, () => loadApplications());
 
 const pending = computed(() => applications.value.filter(a => String(a.status).toUpperCase().includes("PENDING")));
 const accepted = computed(() => applications.value.filter(a => String(a.status).toUpperCase().includes("ACCEPTED")));
-
 const isCaptain = computed(() => !!currentUser.value?.captain && !!currentUser.value?.team);
-// автор/админ, которому передали canEdit=true, видит все заявки
 const canSeeApplications = computed(() => props.canEdit);
 
 const myApplication = computed(() => {
@@ -199,6 +201,37 @@ const canEnter = computed(() => {
   if (!questStarted.value || !currentUser.value?.team) return false;
   return accepted.value.some(a => Number(a.teamId) === Number(currentUser.value.team.id));
 });
+
+async function startGame() {
+  if (!currentUser.value) {
+    message.error("Неизвестный пользователь");
+    return;
+  }
+  if (!currentUser.value.team?.id) {
+    message.error("Вы должны быть в команде");
+    return;
+  }
+  try {
+    starting.value = true;
+    const resp = await api.post("/sessions/start", {
+      questId: props.quest.id,
+      userId: currentUser.value.id,
+      teamId: currentUser.value.team.id
+    });
+    const sessionId = resp.data.id;
+    if (sessionId) {
+      router.push(`/play/${sessionId}`);
+    } else {
+      message.error("Не удалось получить id сессии");
+    }
+  } catch (err) {
+    console.error("Ошибка старта игры:", err);
+    const text = err?.response?.data?.message || "Не удалось начать игру";
+    message.error(text);
+  } finally {
+    starting.value = false;
+  }
+}
 
 async function applyToQuest() {
   if (!currentUser.value?.team?.id) {

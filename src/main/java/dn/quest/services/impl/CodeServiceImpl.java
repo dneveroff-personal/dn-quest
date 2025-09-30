@@ -33,8 +33,6 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     public List<CodeDTO> getAllByLevelId(Long levelId) {
-        System.out.println("ENTER in getAllByLevelId, levelID = " + levelId);
-
         Level level = levelRepo.findById(levelId)
                 .orElseThrow(() -> new EntityNotFoundException("Level not found: " + levelId));
 
@@ -78,8 +76,6 @@ public class CodeServiceImpl implements CodeService {
 
     // ---------------- Mapping ----------------
     private CodeDTO toDto(Code code) {
-        System.out.println("ENTER into  CodeDTO toDto(Code code)");
-
         return CodeDTO.builder()
                 .id(code.getId())
                 .levelId(code.getLevel().getId())

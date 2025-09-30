@@ -4,15 +4,19 @@ public interface Routes {
     // COMMON
     String API = "/api";
     String ATTEMPT = "/attempt";
+    String CODE = "/code";
+    String CURRENT = "/current";
     String EMAIL = "/{email}";
+    String HINTS = "/hints";
     String ID = "/{id:\\d+}";
     String LEADERBOARD = "/leaderboard";
-    String LEVEL = "/level";
+    String LEVELS = "/levels";
     String LOGIN = "/login";
     String ME = "/me";
     String USER_ID = "/{userId}";
     String USER_NAME = "/{username}";
     String PUBLISHED = "/published";
+    String REORDER = "/reorder";
     String ROLE = "/role";
     String SEARCH = "/search";
     String STATUS = "/status";
@@ -35,8 +39,8 @@ public interface Routes {
     // Session
     String SESSIONS = API + "/sessions";
     String SESSION_ID = "/{sessionId}";
-    String SESSION_ATTEMPT = SESSION_ID + ATTEMPT;
-    String SESSION_LEVEL = SESSION_ID + LEVEL;
+    String SESSION_CURRENT = SESSION_ID + CURRENT;
+    String SESSION_CODE = SESSION_ID + CODE;
     String SESSION_STATUS = "/sessions" + SESSION_ID + STATUS;
 
     // Team
@@ -56,7 +60,7 @@ public interface Routes {
     String MY_INVITATIONS = ME + "/invitations";
 
     // Level
-    String LEVELS = API + "/levels";
+    String API_LEVELS = API + LEVELS;
     String LEVEL_ID = "/{levelId}";
     String LEVELS_BY_QUEST = "/by-quest" + QUEST_ID;
     String LEVELS_REORDER = "/reorder";
@@ -64,6 +68,9 @@ public interface Routes {
     // Level codes
     String LEVEL_CODES = API + "/codes";
     String CODES_BY_LEVEL = "/by-level" + LEVEL_ID;
+
+    // Hints
+    String API_HINTS = API + LEVELS + LEVEL_ID + HINTS;
 
     // Participations
     String PARTICIPATION = API + "/participation";

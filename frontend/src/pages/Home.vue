@@ -73,7 +73,7 @@ function canEdit(quest) {
 }
 
 function openQuest(id) {
-  router.push(`/quests/${id}`);
+  router.push(`/quests/${id}/play`);
 }
 
 function editQuest(id) {

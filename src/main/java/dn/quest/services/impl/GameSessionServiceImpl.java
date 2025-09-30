@@ -1,6 +1,6 @@
 package dn.quest.services.impl;
 
-import dn.quest.model.dto.GameSessionDTO;
+import dn.quest.model.dto.*;
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.enums.CodeType;
 import dn.quest.model.entities.enums.QuestType;
@@ -32,19 +32,19 @@ public class GameSessionServiceImpl implements GameSessionService {
     private final QuestRepository questRepository;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
-
     private final LevelRepository levelRepository;
     private final CodeRepository codeRepository;
     private final CodeAttemptRepository codeAttemptRepository;
     private final LevelProgressRepository levelProgressRepository;
     private final LevelCompletionRepository levelCompletionRepository;
+    private final LevelHintRepository levelHintRepository;
 
     @Override
     public GameSession start(Long questId, Integer userId, Long teamId) {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
 
-        // Проверяем, не существует ли уже активная сессия
+        // Проверка на существующую активную сессию
         if (quest.getType() == QuestType.SOLO && userId != null) {
             User user = userRepository.findById(userId.longValue())
                     .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
@@ -59,26 +59,27 @@ public class GameSessionServiceImpl implements GameSessionService {
             if (existing.isPresent()) return existing.get();
         }
 
+        // Создание новой сессии
         GameSession session = new GameSession();
         session.setQuest(quest);
 
         if (quest.getType() == QuestType.SOLO) {
             if (userId == null) throw new IllegalArgumentException("userId required for SOLO quest");
-            User user = userRepository.findById(userId.longValue())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-            session.setUser(user);
-        } else { // TEAM
+            session.setUser(userRepository.findById(userId.longValue())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId)));
+        } else {
             if (teamId == null) throw new IllegalArgumentException("teamId required for TEAM quest");
-            Team team = teamRepository.findById(teamId)
-                    .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
-            session.setTeam(team);
+            session.setTeam(teamRepository.findById(teamId)
+                    .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId)));
         }
 
         session.setStatus(SessionStatus.ACTIVE);
         session.setStartedAt(Instant.now());
+
+        // Сохраняем сессию перед зависимыми сущностями
         session = gameSessionRepository.save(session);
 
-        // создать прогресс по первому уровню
+        // Создание первого уровня
         Level first = levelRepository.findFirstInQuest(quest);
         if (first != null) {
             LevelProgress lp = new LevelProgress();
@@ -86,7 +87,11 @@ public class GameSessionServiceImpl implements GameSessionService {
             lp.setLevel(first);
             lp.setStartedAt(Instant.now());
             levelProgressRepository.save(lp);
+
+            session.setCurrentLevel(first);
+            session = gameSessionRepository.save(session);
         }
+
         return session;
     }
 
@@ -94,30 +99,28 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Transactional(readOnly = true)
     public Level getCurrentLevel(Long sessionId) {
         GameSession session = findSession(sessionId);
-        return levelProgressRepository.findCurrentBySession(session)
-                .map(LevelProgress::getLevel)
-                .orElseThrow(() -> new EntityNotFoundException("No active level for session " + sessionId));
+        Level level = session.getCurrentLevel();
+        if (level == null) {
+            throw new EntityNotFoundException("No active level for session " + sessionId);
+        }
+        return level;
     }
 
     @Override
     public AttemptResult submitCode(Long sessionId, String rawCode, Integer userId) {
         GameSession session = findSession(sessionId);
-        if (session.getStatus() != SessionStatus.ACTIVE) {
+        if (session.getStatus() != SessionStatus.ACTIVE)
             throw new IllegalStateException("Session status is not ACTIVE");
-        }
 
         LevelProgress progress = levelProgressRepository.findCurrentBySession(session)
                 .orElseThrow(() -> new EntityNotFoundException("No active level for session " + sessionId));
         Level level = progress.getLevel();
 
         User actor = null;
-        if (userId != null) {
-            actor = userRepository.findById(userId.longValue())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-        }
+        if (userId != null) actor = userRepository.findById(userId.longValue())
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
 
         String normalized = normalize(rawCode);
-        AttemptResult result;
         Code matched = codeRepository.findByLevelAndNormalized(level, normalized).orElse(null);
 
         CodeAttempt attempt = new CodeAttempt();
@@ -128,6 +131,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         attempt.setSubmittedNormalized(normalized);
         attempt.setCreatedAt(Instant.now());
 
+        AttemptResult result;
         if (matched == null) {
             result = AttemptResult.WRONG;
             attempt.setResult(result);
@@ -135,7 +139,6 @@ public class GameSessionServiceImpl implements GameSessionService {
             return result;
         }
 
-        // duplicate?
         boolean usedBefore = !codeAttemptRepository.findBySessionAndMatchedCode(session, matched).isEmpty();
         if (usedBefore) {
             result = AttemptResult.DUPLICATE;
@@ -146,25 +149,20 @@ public class GameSessionServiceImpl implements GameSessionService {
             return result;
         }
 
-        // accepted flow
         attempt.setMatchedCode(matched);
         attempt.setMatchedSectorNo(matched.getSectorNo());
 
         if (matched.getType() == CodeType.NORMAL) {
             result = AttemptResult.ACCEPTED_NORMAL;
-
-            // увеличим счётчик уникальных закрытых секторов (факт считаем через репозиторий)
             long closedBefore = codeAttemptRepository.countDistinctClosedSectors(session, level);
             long closedAfter = (matched.getSectorNo() == null) ? closedBefore : closedBefore + 1;
             progress.setSectorsClosed((int) closedAfter);
-
         } else if (matched.getType() == CodeType.BONUS) {
             result = AttemptResult.ACCEPTED_BONUS;
             int shift = Math.max(0, matched.getShiftSeconds());
             session.setBonusTimeSumSec(session.getBonusTimeSumSec() + shift);
             progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + shift);
-
-        } else { // PENALTY
+        } else {
             result = AttemptResult.ACCEPTED_PENALTY;
             int penalty = Math.abs(Math.min(0, matched.getShiftSeconds()));
             session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
@@ -176,9 +174,8 @@ public class GameSessionServiceImpl implements GameSessionService {
         levelProgressRepository.save(progress);
         gameSessionRepository.save(session);
 
-        // проверка завершения уровня (только по NORMAL-секторам)
-        if (level.getRequiredSectors() != null
-                && level.getRequiredSectors() > 0
+        // Переход к следующему уровню, если закрыты все requiredSectors
+        if (level.getRequiredSectors() != null && level.getRequiredSectors() > 0
                 && progress.getSectorsClosed() >= level.getRequiredSectors()) {
             closeLevelAndAdvance(session, progress, actor);
         }
@@ -203,62 +200,113 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Override
     public GameSession setStatus(Long sessionId, SessionStatus status) {
         GameSession session = findSession(sessionId);
-        session.setStatus(status);
         Instant now = Instant.now();
-        if (status == SessionStatus.ACTIVE && session.getStartedAt() == null) {
+        session.setStatus(status);
+        if (status == SessionStatus.ACTIVE && session.getStartedAt() == null)
             session.setStartedAt(now);
-        }
-        if ((status == SessionStatus.ABORTED || status == SessionStatus.FINISHED) && session.getFinishedAt() == null) {
+        if ((status == SessionStatus.ABORTED || status == SessionStatus.FINISHED) && session.getFinishedAt() == null)
             session.setFinishedAt(now);
-        }
         return gameSessionRepository.save(session);
     }
 
-    public List<GameSessionDTO> getSessionsByQuest(Long questId) {
-        Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
-        List<GameSession> sessions = gameSessionRepository.findByQuest(quest);
-        return toDTO(sessions);
+    @Override
+    @Transactional(readOnly = true)
+    public LevelViewDTO getCurrentLevelView(Long sessionId) {
+        GameSession session = findSession(sessionId);
+        Level level = session.getCurrentLevel();
+        if (level == null)
+            throw new EntityNotFoundException("No active level for session " + sessionId);
+
+        LevelProgress progress = levelProgressRepository.findCurrentBySessionAndLevel(session, level)
+                .orElseThrow(() -> new EntityNotFoundException("No progress found for current level"));
+
+        LevelDTO levelDto = new LevelDTO(
+                level.getId(),
+                level.getQuest().getId(),
+                level.getOrderIndex(),
+                level.getTitle(),
+                level.getDescriptionHtml(),
+                level.getRequiredSectors(),
+                level.getApTime()
+        );
+
+        LevelProgressDTO progressDto = LevelProgressDTO.builder()
+                .id(progress.getId())
+                .sessionId(session.getId())
+                .levelId(level.getId())
+                .startedAt(progress.getStartedAt())
+                .closedAt(progress.getClosedAt())
+                .sectorsClosed(progress.getSectorsClosed())
+                .bonusOnLevelSec(progress.getBonusOnLevelSec())
+                .penaltyOnLevelSec(progress.getPenaltyOnLevelSec())
+                .build();
+
+        List<LevelHintDTO> hints = levelHintRepository.findByLevelOrderByOrderIndexAsc(level)
+                .stream().map(h -> LevelHintDTO.builder()
+                        .id(h.getId())
+                        .levelId(level.getId())
+                        .offsetSec(h.getOffsetSec())
+                        .text(h.getText())
+                        .orderIndex(h.getOrderIndex())
+                        .build())
+                .toList();
+
+        return LevelViewDTO.builder()
+                .level(levelDto)
+                .progress(progressDto)
+                .sessionId(session.getId())
+                .hints(hints)
+                .build();
     }
 
-    // --------- helpers ---------
+    @Override
+    @Transactional(readOnly = true)
+    public List<GameSession> getSessionsByQuest(Long questId) {
+        Quest quest = questRepository.findById(questId)
+                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+        return gameSessionRepository.findByQuest(quest);
+    }
 
+    // --- Вспомогательные методы ---
     private GameSession findSession(Long id) {
         return gameSessionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Session not found: " + id));
     }
 
     private String normalize(String raw) {
-        if (raw == null) return "";
-        return raw.trim().toLowerCase();
+        return raw == null ? "" : raw.trim().toLowerCase();
     }
 
     private void closeLevelAndAdvance(GameSession session, LevelProgress progress, User passedBy) {
         Instant now = Instant.now();
+
+        // Закрываем текущий прогресс
         progress.setClosedAt(now);
         levelProgressRepository.save(progress);
 
+        // Создаём LevelCompletion
         Level level = progress.getLevel();
-
-        // фиксация завершения уровня
         LevelCompletion lc = new LevelCompletion();
         lc.setSession(session);
         lc.setLevel(level);
         lc.setPassedByUser(passedBy);
         lc.setPassTime(now);
-        long raw = Duration.between(progress.getStartedAt(), now).getSeconds();
-        lc.setDurationSec(raw);
+        lc.setDurationSec(Duration.between(progress.getStartedAt(), now).getSeconds());
         lc.setBonusOnLevelSec(progress.getBonusOnLevelSec());
         lc.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec());
         levelCompletionRepository.save(lc);
 
-        // следующий уровень
+        // Определяем следующий уровень
         Level next = levelRepository.findNext(session.getQuest(), level.getOrderIndex());
         if (next == null) {
             session.setStatus(SessionStatus.FINISHED);
             session.setFinishedAt(now);
+            session.setCurrentLevel(null);
             gameSessionRepository.save(session);
         } else {
+            session.setCurrentLevel(next);
+            session = gameSessionRepository.save(session);
+
             LevelProgress nextProgress = new LevelProgress();
             nextProgress.setSession(session);
             nextProgress.setLevel(next);
@@ -266,25 +314,4 @@ public class GameSessionServiceImpl implements GameSessionService {
             levelProgressRepository.save(nextProgress);
         }
     }
-
-    // ---------------- Mapping ----------------
-    private GameSessionDTO toDTO(GameSession session) {
-        return GameSessionDTO.builder()
-                .id(session.getId())
-                .questId(session.getQuest() != null ? session.getQuest().getId() : null)
-                .userId(session.getUser() != null ? session.getUser().getId() : null)
-                .teamId(session.getTeam() != null ? session.getTeam().getId() : null)
-                .startedAt(session.getStartedAt())
-                .finishedAt(session.getFinishedAt())
-                .status(session.getStatus() != null ? session.getStatus().name() : null)
-                .build();
-    }
-
-    // Optional: из списка
-    private List<GameSessionDTO> toDTO(List<GameSession> sessions) {
-        return sessions.stream()
-                .map(this::toDTO)
-                .toList();
-    }
-
 }

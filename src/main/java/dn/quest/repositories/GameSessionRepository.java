@@ -1,5 +1,6 @@
 package dn.quest.repositories;
 
+import dn.quest.model.entities.enums.SessionStatus;
 import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.team.Team;
@@ -20,4 +21,8 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
     Optional<GameSession> findByQuestAndUser(Quest quest, User user);
 
     Optional<GameSession> findByQuestAndTeam(Quest quest, Team team);
+
+    // ----- новые методы: поиск именно ACTIVE сессии
+    Optional<GameSession> findByQuestAndTeamAndStatus(Quest quest, Team team, SessionStatus status);
+    Optional<GameSession> findByQuestAndUserAndStatus(Quest quest, User user, SessionStatus status);
 }

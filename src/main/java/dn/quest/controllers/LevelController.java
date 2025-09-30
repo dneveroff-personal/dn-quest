@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(Routes.LEVELS)
+@RequestMapping(Routes.API_LEVELS)
 @RequiredArgsConstructor
 public class LevelController implements Routes {
 

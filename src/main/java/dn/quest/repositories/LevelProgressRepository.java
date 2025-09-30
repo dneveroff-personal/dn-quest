@@ -20,4 +20,6 @@ public interface LevelProgressRepository extends JpaRepository<LevelProgress, Lo
             "where lp.session = :session and lp.closedAt is null")
     Optional<LevelProgress> findCurrentBySession(@Param("session") GameSession session);
 
+    Optional<LevelProgress> findCurrentBySessionAndLevel(GameSession session, Level level);
+
 }

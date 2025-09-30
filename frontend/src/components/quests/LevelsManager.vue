@@ -55,6 +55,7 @@
           </n-form-item>
 
           <LevelCodes v-if="editingLevelId" :level-id="editingLevelId" />
+          <LevelHintsEditor v-if="editingLevelId" :level-id="editingLevelId" />
         </n-form>
 
         <template #footer>
@@ -74,6 +75,7 @@ import api from "@/services/api";
 import { NButton, NInput, NInputNumber, NCard, NModal, NForm, NFormItem } from "naive-ui";
 import draggable from "vuedraggable";
 import LevelCodes from "./LevelCodes.vue";
+import LevelHintsEditor from "./LevelHintsEditor.vue";
 
 const props = defineProps({
   questId: { type: String, required: true }

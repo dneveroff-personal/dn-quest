@@ -5,6 +5,7 @@ import Home from "@/pages/Home.vue";
 import Login from "@/pages/Login.vue";
 import Register from "@/pages/Register.vue";
 import ManageUsers from "@/pages/ManageUsers.vue";
+import Play from "@/pages/Play.vue";
 
 const routes = [
     { path: "/", component: Home },
@@ -52,6 +53,12 @@ const routes = [
         path: "/invitations",
         name: "InvitationsPage",
         component: () => import("@/pages/InvitationsPage.vue"),
+    },
+    {
+        path: "/play/:sessionId",
+        name: "Play",
+        component: Play,
+        props: true
     }
 ];
 
