@@ -31,18 +31,16 @@ public class AttemptServiceImpl implements AttemptService {
         if (attemptDTO.getSessionId() == null) {
             throw new IllegalArgumentException("sessionId is required");
         }
-        // вызов логики из GameSessionService
+
         var result = gameSessionService.submitCode(
                 attemptDTO.getSessionId(),
                 attemptDTO.getSubmittedRaw(),
                 attemptDTO.getUserId() != null ? attemptDTO.getUserId().intValue() : null
         );
 
-        // создаём CodeAttemptDTO для ответа
         var session = gameSessionRepository.findById(attemptDTO.getSessionId())
                 .orElseThrow(() -> new EntityNotFoundException("Session not found"));
-        Level level = levelRepository.findById(attemptDTO.getLevelId())
-                .orElse(null);
+        Level level = levelRepository.findById(attemptDTO.getLevelId()).orElse(null);
 
         return CodeAttemptDTO.builder()
                 .sessionId(session.getId())
@@ -73,7 +71,6 @@ public class AttemptServiceImpl implements AttemptService {
     @Override
     @Transactional(readOnly = true)
     public List<CodeAttemptDTO> getLastAttempts(Long sessionId, Long levelId, int limit) {
-
         return codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(0, limit))
                 .stream()
                 .map(this::toDTO)

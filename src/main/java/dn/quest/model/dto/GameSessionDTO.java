@@ -12,11 +12,13 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class GameSessionDTO {
+
     private Long id;
     private Long questId;
     private Long userId;
     private Long teamId;
     private Instant startedAt;
     private Instant finishedAt;
-    private String status; // STRING representation of SessionStatus
+    private String status;
+
 }

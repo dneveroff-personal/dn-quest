@@ -21,7 +21,7 @@
             <div>
               <strong>{{ level.orderIndex }}.</strong> {{ level.title }}
               <span class="ml-4 text-sm text-gray-500">
-            | Секторов для прохождения уровня: {{ level.requiredSectors }} | Авто-проход: {{ level.apTime || 0 }} сек
+            | Секторов для прохождения уровня: {{ level.requiredSectors }} | Авто-переход: {{ level.apTime || 0 }} сек
           </span>
             </div>
             <div class="flex gap-2">
@@ -50,7 +50,7 @@
               <n-input-number v-model:value="levelForm.requiredSectors" min="0" />
             </n-form-item>
           </div>
-          <n-form-item label="Авто-проход (сек)">
+          <n-form-item label="Авто-переход (сек)">
             <n-input-number v-model:value="levelForm.apTime" min="0" />
           </n-form-item>
 

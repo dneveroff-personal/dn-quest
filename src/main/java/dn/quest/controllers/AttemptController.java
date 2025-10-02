@@ -15,11 +15,6 @@ public class AttemptController implements Routes {
 
     private final AttemptService attemptService;
 
-    @PostMapping
-    public ResponseEntity<CodeAttemptDTO> submit(@RequestBody CodeAttemptDTO attemptDTO) {
-        return ResponseEntity.ok(attemptService.submit(attemptDTO));
-    }
-
     @GetMapping(ID)
     public ResponseEntity<CodeAttemptDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(attemptService.getById(id));
@@ -30,12 +25,14 @@ public class AttemptController implements Routes {
         return ResponseEntity.ok(attemptService.getAll());
     }
 
-    @GetMapping("/last")
+    @GetMapping(LAST_ATTEMPTS)
     public ResponseEntity<List<CodeAttemptDTO>> getLastAttempts(
             @RequestParam Long sessionId,
             @RequestParam Long levelId,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        return ResponseEntity.ok(attemptService.getLastAttempts(sessionId, levelId, limit));
+        return ResponseEntity.ok(
+                attemptService.getLastAttempts(sessionId, levelId, limit)
+        );
     }
 }

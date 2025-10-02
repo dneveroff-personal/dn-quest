@@ -131,42 +131,37 @@ public class GameSessionServiceImpl implements GameSessionService {
         attempt.setSubmittedNormalized(normalized);
         attempt.setCreatedAt(Instant.now());
 
-        AttemptResult result;
+        AttemptResult result = null;
         if (matched == null) {
             result = AttemptResult.WRONG;
-            attempt.setResult(result);
-            codeAttemptRepository.save(attempt);
-            return result;
-        }
-
-        boolean usedBefore = !codeAttemptRepository.findBySessionAndMatchedCode(session, matched).isEmpty();
-        if (usedBefore) {
-            result = AttemptResult.DUPLICATE;
-            attempt.setResult(result);
-            attempt.setMatchedCode(matched);
-            attempt.setMatchedSectorNo(matched.getSectorNo());
-            codeAttemptRepository.save(attempt);
-            return result;
-        }
-
-        attempt.setMatchedCode(matched);
-        attempt.setMatchedSectorNo(matched.getSectorNo());
-
-        if (matched.getType() == CodeType.NORMAL) {
-            result = AttemptResult.ACCEPTED_NORMAL;
-            long closedBefore = codeAttemptRepository.countDistinctClosedSectors(session, level);
-            long closedAfter = (matched.getSectorNo() == null) ? closedBefore : closedBefore + 1;
-            progress.setSectorsClosed((int) closedAfter);
-        } else if (matched.getType() == CodeType.BONUS) {
-            result = AttemptResult.ACCEPTED_BONUS;
-            int shift = Math.max(0, matched.getShiftSeconds());
-            session.setBonusTimeSumSec(session.getBonusTimeSumSec() + shift);
-            progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + shift);
         } else {
-            result = AttemptResult.ACCEPTED_PENALTY;
-            int penalty = Math.abs(Math.min(0, matched.getShiftSeconds()));
-            session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
-            progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + penalty);
+            boolean usedBefore = !codeAttemptRepository.findBySessionAndMatchedCode(session, matched).isEmpty();
+            if (usedBefore) {
+                result = AttemptResult.DUPLICATE;
+            } else {
+                attempt.setMatchedCode(matched);
+                attempt.setMatchedSectorNo(matched.getSectorNo());
+
+                switch (matched.getType()) {
+                    case NORMAL -> {
+                        result = AttemptResult.ACCEPTED_NORMAL;
+                        long closedBefore = codeAttemptRepository.countDistinctClosedSectors(session, level);
+                        progress.setSectorsClosed((int) (matched.getSectorNo() == null ? closedBefore : closedBefore + 1));
+                    }
+                    case BONUS -> {
+                        result = AttemptResult.ACCEPTED_BONUS;
+                        int shift = Math.max(0, matched.getShiftSeconds());
+                        session.setBonusTimeSumSec(session.getBonusTimeSumSec() + shift);
+                        progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + shift);
+                    }
+                    case PENALTY -> {
+                        result = AttemptResult.ACCEPTED_PENALTY;
+                        int penalty = Math.abs(Math.min(0, matched.getShiftSeconds()));
+                        session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
+                        progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + penalty);
+                    }
+                }
+            }
         }
 
         attempt.setResult(result);
@@ -174,14 +169,14 @@ public class GameSessionServiceImpl implements GameSessionService {
         levelProgressRepository.save(progress);
         gameSessionRepository.save(session);
 
-        // Переход к следующему уровню, если закрыты все requiredSectors
-        if (level.getRequiredSectors() != null && level.getRequiredSectors() > 0
+        if (level.getRequiredSectors() != null
                 && progress.getSectorsClosed() >= level.getRequiredSectors()) {
             closeLevelAndAdvance(session, progress, actor);
         }
 
         return result;
     }
+
 
     @Override
     @Transactional(readOnly = true)

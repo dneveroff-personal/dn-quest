@@ -13,16 +13,13 @@ import java.util.Optional;
 public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
 
     List<GameSession> findByQuest(Quest quest);
-
     List<GameSession> findByUser(User user);
-
     List<GameSession> findByTeam(Team team);
 
     Optional<GameSession> findByQuestAndUser(Quest quest, User user);
-
     Optional<GameSession> findByQuestAndTeam(Quest quest, Team team);
 
-    // ----- новые методы: поиск именно ACTIVE сессии
     Optional<GameSession> findByQuestAndTeamAndStatus(Quest quest, Team team, SessionStatus status);
     Optional<GameSession> findByQuestAndUserAndStatus(Quest quest, User user, SessionStatus status);
+
 }

@@ -9,8 +9,10 @@ public interface Routes {
     String EMAIL = "/{email}";
     String HINTS = "/hints";
     String ID = "/{id:\\d+}";
+    String LAST = "/last";
     String LEADERBOARD = "/leaderboard";
     String LEVELS = "/levels";
+    String LEVEL = "/level";
     String LOGIN = "/login";
     String ME = "/me";
     String USER_ID = "/{userId}";
@@ -21,9 +23,6 @@ public interface Routes {
     String SEARCH = "/search";
     String STATUS = "/status";
     String SUBMIT = "/submit";
-
-    // Attempts
-    String ATTEMPTS = API + "/attempts";
 
     // Quest
     String QUESTS = API + "/quests";
@@ -42,6 +41,7 @@ public interface Routes {
     String SESSION_CURRENT = SESSION_ID + CURRENT;
     String SESSION_CODE = SESSION_ID + CODE;
     String SESSION_STATUS = "/sessions" + SESSION_ID + STATUS;
+    String LAST_ATTEMPTS = SESSION_ID + "/last-attempts";
 
     // Team
     String TEAMS = API + "/teams";
@@ -77,4 +77,8 @@ public interface Routes {
     String PARTICIPATION_STATUS = ID + STATUS;
     String PARTICIPATORS = "/by-quest" + QUEST_ID;
 
+    // Attempts
+    String ATTEMPTS = API + "/attempts";
+    String ATTEMPTS_BY_LEVEL = LEVEL + LEVEL_ID;
+    String LAST_ATTEMPTS_BY_LEVEL = LEVEL + LEVEL_ID + LAST;
 }
