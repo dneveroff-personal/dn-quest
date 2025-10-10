@@ -33,7 +33,8 @@ public class GameSessionController implements Routes {
     @PostMapping(SESSION_CODE)
     public ResponseEntity<SubmitCodeResponse> submitCode(
             @PathVariable Long sessionId,
-            @RequestBody SubmitCodeRequest req) {
+            @RequestBody SubmitCodeRequest req
+    ) {
         var result = gameSessionService.submitCode(sessionId, req.rawCode(), req.userId());
         return ResponseEntity.ok(new SubmitCodeResponse(result.name()));
     }
@@ -42,23 +43,10 @@ public class GameSessionController implements Routes {
     public ResponseEntity<List<CodeAttemptDTO>> getLastAttempts(
             @PathVariable Long sessionId,
             @RequestParam Long levelId,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "25") int limit,
+            @RequestParam(defaultValue = "0") int offset
     ) {
-        return ResponseEntity.ok(
-                gameSessionService.lastAttempts(sessionId, levelId, limit)
-                        .stream()
-                        .map(a -> CodeAttemptDTO.builder()
-                                .id(a.getId())
-                                .sessionId(a.getSession() != null ? a.getSession().getId() : null)
-                                .levelId(a.getLevel() != null ? a.getLevel().getId() : null)
-                                .userId(a.getUser() != null ? a.getUser().getId() : null)
-                                .submittedRaw(a.getSubmittedRaw())
-                                .submittedNormalized(a.getSubmittedNormalized())
-                                .result(a.getResult())
-                                .createdAt(a.getCreatedAt())
-                                .build())
-                        .toList()
-        );
+        return ResponseEntity.ok(gameSessionService.lastAttempts(sessionId, levelId, limit, offset));
     }
 
     private GameSessionDTO toDTO(GameSession s) {
@@ -82,7 +70,5 @@ public class GameSessionController implements Routes {
         private String result;
         public SubmitCodeResponse() {}
         public SubmitCodeResponse(String result) { this.result = result; }
-
     }
 }
-

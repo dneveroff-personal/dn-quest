@@ -30,24 +30,34 @@
           {{ data.progress.sectorsClosed }} из {{ data.level.requiredSectors }}
         </div>
 
+        <!-- Автопереход -->
+        <div class="text-left rounded-xl mb-2 text-yellow-500">
+          {{ data.level.autoTransition > 0
+            ? `Автопереход: ${data.level.autoTransition} сек.`
+            :  "Автоперехода  нет" }}
+        </div>
+
         <!-- История кодов -->
-        <div v-if="attempts.length" class="p-2 max-h-32 overflow-y-auto w-full">
+        <div
+            class="overflow-y-auto max-h-[9rem] mt-4 border-t pt-2"
+            @scroll="onScroll"
+            ref="attemptsContainer"
+        >
           <ul>
-            <li v-for="(a, idx) in attempts" :key="idx" :class="a.color">
-              {{ a.code }} <span class="ml-2">{{ a.correct ? '✔' : '✖' }}</span>
+            <li
+                v-for="(a, idx) in attempts"
+                :key="idx"
+                :class="a.color"
+            >
+              {{ a.code }} <span class="ml-2">{{ a.symbol }}</span>
             </li>
           </ul>
+          <div v-if="loadingMore" class="text-center text-sm text-gray-500 py-2">Загрузка...</div>
         </div>
 
         <!-- Описание уровня -->
         <div class="p-6 text-justify shadow w-full">
           <div v-html="data.level.descriptionHtml" class="prose text-[var(--color-text)] text-justify"></div>
-        </div>
-
-        <!-- Автопереход -->
-        <div v-if="data.level.apTime" class="p-4 rounded-xl text-left">
-          <strong class="text-yellow-500">Авто-переход:</strong>
-          <span>{{ apTimer }} сек.</span>
         </div>
 
         <!-- Подсказки -->
@@ -86,7 +96,9 @@ const submitting = ref(false);
 const data = ref(null);
 const code = ref("");
 const attempts = ref([]);
-
+const attemptsLimit = ref(25);
+const loadingMore = ref(false);
+const hasMore = ref(true);
 const currentUser = ref(props.currentUser || null);
 watch(() => props.currentUser, (v) => { currentUser.value = v; });
 
@@ -103,6 +115,56 @@ async function ensureCurrentUser() {
     } catch (err) {
       console.warn("Не удалось подгрузить currentUser", err);
     }
+  }
+}
+
+async function loadAttempts(reset = false) {
+  if (reset) {
+    attempts.value = [];
+    hasMore.value = true;
+  }
+  if (!hasMore.value) return;
+  loadingMore.value = true;
+  try {
+    const resp = await api.get(`/sessions/${sessionId}/last-attempts`, {
+      params: {
+        levelId: data.value.level.id,
+        limit: attemptsLimit.value
+      }
+    });
+    if (resp.data.length < attemptsLimit.value) hasMore.value = false;
+    const mapped = resp.data.map(a => ({
+      code: a.submittedRaw,
+      color: mapColor(a.result),
+      symbol: mapSymbol(a.result)
+    }));
+    attempts.value.push(...mapped);
+  } finally {
+    loadingMore.value = false;
+  }
+}
+
+function onScroll(e) {
+  const bottom = e.target.scrollHeight - e.target.scrollTop <= e.target.clientHeight + 10;
+  if (bottom && !loadingMore.value) loadAttempts();
+}
+
+function mapColor(result) {
+  switch (result) {
+    case 'ACCEPTED_NORMAL': return 'text-green-500';
+    case 'ACCEPTED_BONUS': return 'text-blue-400';
+    case 'ACCEPTED_PENALTY': return 'text-red-500';
+    case 'DUPLICATE': return 'text-orange-400';
+    default: return 'text-gray-400';
+  }
+}
+function mapSymbol(result) {
+  switch (result) {
+    case 'ACCEPTED_NORMAL': return '✅';
+    case 'ACCEPTED_BONUS': return '🎁';
+    case 'ACCEPTED_PENALTY': return '⛔';
+    case 'DUPLICATE': return '🔁';
+    default: return '❌';
   }
 }
 
@@ -131,15 +193,8 @@ async function loadCurrentLevel() {
       timerInterval = setInterval(() => updateTimers(deadline), 1000);
     }
 
-    // История попыток
-    const { data: attemptsResp } = await api.get(`/sessions/${sessionId}/last-attempts`, {
-      params: { limit: 5, levelId: data.value.level.id }
-    });
-    attempts.value = attemptsResp.map(a => ({
-      code: a.submittedRaw,
-      color: a.result.startsWith('ACCEPTED') ? 'text-green-500' : 'text-red-500',
-      correct: a.result.startsWith('ACCEPTED')
-    }));
+// История попыток (загружаем первые 25 и включаем скролл)
+    await loadAttempts(true);
 
   } catch (err) {
     message.error("Ошибка загрузки уровня");

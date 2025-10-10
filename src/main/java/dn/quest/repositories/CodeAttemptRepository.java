@@ -17,8 +17,9 @@ public interface CodeAttemptRepository extends JpaRepository<CodeAttempt, Long> 
             "ORDER BY ca.createdAt DESC")
     List<CodeAttempt> findLastAttempts(Long sessionId, Long levelId, Pageable pageable);
 
-    @Query("SELECT ca FROM CodeAttempt ca WHERE ca.session = :session AND ca.matchedCode = :code")
-    List<CodeAttempt> findBySessionAndMatchedCode(GameSession session, Code code);
+    @Query("SELECT COUNT(ca) > 0 FROM CodeAttempt ca " +
+            "WHERE ca.session.id = :sessionId AND ca.submittedNormalized = :normalized")
+    boolean existsBySessionAndSubmittedNormalized(Long sessionId, String normalized);
 
     @Query("SELECT COUNT(DISTINCT ca.matchedSectorNo) FROM CodeAttempt ca " +
             "WHERE ca.session = :session AND ca.level = :level AND ca.result IN ('ACCEPTED_NORMAL', 'ACCEPTED_BONUS', 'ACCEPTED_PENALTY')")

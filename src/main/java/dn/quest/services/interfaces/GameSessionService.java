@@ -1,10 +1,10 @@
 package dn.quest.services.interfaces;
 
+import dn.quest.model.dto.CodeAttemptDTO;
 import dn.quest.model.dto.LevelViewDTO;
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.enums.SessionStatus;
 import dn.quest.model.entities.quest.GameSession;
-import dn.quest.model.entities.quest.level.CodeAttempt;
 import dn.quest.model.entities.quest.level.Level;
 import dn.quest.model.entities.quest.level.LevelCompletion;
 
@@ -19,7 +19,8 @@ public interface GameSessionService {
 
     LevelViewDTO getCurrentLevelView(Long sessionId);
 
-    List<CodeAttempt> lastAttempts(Long sessionId, Long levelId, int limit);
+    // changed: возвращаем DTO и поддерживаем offset (для скролла)
+    List<CodeAttemptDTO> lastAttempts(Long sessionId, Long levelId, int limit, int offset);
 
     List<LevelCompletion> leaderboard(Long questId);
 

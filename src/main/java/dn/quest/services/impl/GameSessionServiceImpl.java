@@ -1,12 +1,8 @@
 package dn.quest.services.impl;
 
 import dn.quest.model.dto.*;
-import dn.quest.model.entities.enums.AttemptResult;
-import dn.quest.model.entities.enums.CodeType;
-import dn.quest.model.entities.enums.QuestType;
-import dn.quest.model.entities.enums.SessionStatus;
-import dn.quest.model.entities.quest.GameSession;
-import dn.quest.model.entities.quest.Quest;
+import dn.quest.model.entities.enums.*;
+import dn.quest.model.entities.quest.*;
 import dn.quest.model.entities.quest.level.*;
 import dn.quest.model.entities.team.Team;
 import dn.quest.model.entities.user.User;
@@ -39,47 +35,40 @@ public class GameSessionServiceImpl implements GameSessionService {
     private final LevelCompletionRepository levelCompletionRepository;
     private final LevelHintRepository levelHintRepository;
 
+    // --- Основная логика ---
+
     @Override
     public GameSession start(Long questId, Integer userId, Long teamId) {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
 
-        // Проверка на существующую активную сессию
+        // Проверка на активную сессию
         if (quest.getType() == QuestType.SOLO && userId != null) {
             User user = userRepository.findById(userId.longValue())
                     .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-            Optional<GameSession> existing = gameSessionRepository.findByQuestAndUser(quest, user)
-                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
-            if (existing.isPresent()) return existing.get();
+            return gameSessionRepository.findByQuestAndUser(quest, user)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE)
+                    .orElseGet(() -> createNewSession(quest, user, null));
         } else if (quest.getType() == QuestType.TEAM && teamId != null) {
             Team team = teamRepository.findById(teamId)
                     .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
-            Optional<GameSession> existing = gameSessionRepository.findByQuestAndTeam(quest, team)
-                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
-            if (existing.isPresent()) return existing.get();
+            return gameSessionRepository.findByQuestAndTeam(quest, team)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE)
+                    .orElseGet(() -> createNewSession(quest, null, team));
+        } else {
+            throw new IllegalArgumentException("Invalid quest type or missing identifiers");
         }
+    }
 
-        // Создание новой сессии
+    private GameSession createNewSession(Quest quest, User user, Team team) {
         GameSession session = new GameSession();
         session.setQuest(quest);
-
-        if (quest.getType() == QuestType.SOLO) {
-            if (userId == null) throw new IllegalArgumentException("userId required for SOLO quest");
-            session.setUser(userRepository.findById(userId.longValue())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId)));
-        } else {
-            if (teamId == null) throw new IllegalArgumentException("teamId required for TEAM quest");
-            session.setTeam(teamRepository.findById(teamId)
-                    .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId)));
-        }
-
+        session.setUser(user);
+        session.setTeam(team);
         session.setStatus(SessionStatus.ACTIVE);
         session.setStartedAt(Instant.now());
-
-        // Сохраняем сессию перед зависимыми сущностями
         session = gameSessionRepository.save(session);
 
-        // Создание первого уровня
         Level first = levelRepository.findFirstInQuest(quest);
         if (first != null) {
             LevelProgress lp = new LevelProgress();
@@ -87,7 +76,6 @@ public class GameSessionServiceImpl implements GameSessionService {
             lp.setLevel(first);
             lp.setStartedAt(Instant.now());
             levelProgressRepository.save(lp);
-
             session.setCurrentLevel(first);
             session = gameSessionRepository.save(session);
         }
@@ -96,29 +84,19 @@ public class GameSessionServiceImpl implements GameSessionService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Level getCurrentLevel(Long sessionId) {
-        GameSession session = findSession(sessionId);
-        Level level = session.getCurrentLevel();
-        if (level == null) {
-            throw new EntityNotFoundException("No active level for session " + sessionId);
-        }
-        return level;
-    }
-
-    @Override
     public AttemptResult submitCode(Long sessionId, String rawCode, Integer userId) {
         GameSession session = findSession(sessionId);
         if (session.getStatus() != SessionStatus.ACTIVE)
-            throw new IllegalStateException("Session status is not ACTIVE");
+            throw new IllegalStateException("Session is not ACTIVE");
 
         LevelProgress progress = levelProgressRepository.findCurrentBySession(session)
                 .orElseThrow(() -> new EntityNotFoundException("No active level for session " + sessionId));
         Level level = progress.getLevel();
 
-        User actor = null;
-        if (userId != null) actor = userRepository.findById(userId.longValue())
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+        User actor = (userId != null)
+                ? userRepository.findById(userId.longValue())
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId))
+                : null;
 
         String normalized = normalize(rawCode);
         Code matched = codeRepository.findByLevelAndNormalized(level, normalized).orElse(null);
@@ -131,36 +109,33 @@ public class GameSessionServiceImpl implements GameSessionService {
         attempt.setSubmittedNormalized(normalized);
         attempt.setCreatedAt(Instant.now());
 
-        AttemptResult result = null;
+        AttemptResult result;
         if (matched == null) {
-            result = AttemptResult.WRONG;
+            boolean usedBefore = codeAttemptRepository.existsBySessionAndSubmittedNormalized(sessionId, normalized);
+            result = usedBefore ? AttemptResult.DUPLICATE : AttemptResult.WRONG;
         } else {
-            boolean usedBefore = !codeAttemptRepository.findBySessionAndMatchedCode(session, matched).isEmpty();
-            if (usedBefore) {
-                result = AttemptResult.DUPLICATE;
-            } else {
-                attempt.setMatchedCode(matched);
-                attempt.setMatchedSectorNo(matched.getSectorNo());
+            attempt.setMatchedCode(matched);
+            attempt.setMatchedSectorNo(matched.getSectorNo());
 
-                switch (matched.getType()) {
-                    case NORMAL -> {
-                        result = AttemptResult.ACCEPTED_NORMAL;
-                        long closedBefore = codeAttemptRepository.countDistinctClosedSectors(session, level);
-                        progress.setSectorsClosed((int) (matched.getSectorNo() == null ? closedBefore : closedBefore + 1));
-                    }
-                    case BONUS -> {
-                        result = AttemptResult.ACCEPTED_BONUS;
-                        int shift = Math.max(0, matched.getShiftSeconds());
-                        session.setBonusTimeSumSec(session.getBonusTimeSumSec() + shift);
-                        progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + shift);
-                    }
-                    case PENALTY -> {
-                        result = AttemptResult.ACCEPTED_PENALTY;
-                        int penalty = Math.abs(Math.min(0, matched.getShiftSeconds()));
-                        session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
-                        progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + penalty);
-                    }
+            switch (matched.getType()) {
+                case NORMAL -> {
+                    result = AttemptResult.ACCEPTED_NORMAL;
+                    long closedBefore = codeAttemptRepository.countDistinctClosedSectors(session, level);
+                    progress.setSectorsClosed((int) (matched.getSectorNo() == null ? closedBefore : closedBefore + 1));
                 }
+                case BONUS -> {
+                    result = AttemptResult.ACCEPTED_BONUS;
+                    int shift = Math.max(0, matched.getShiftSeconds());
+                    session.setBonusTimeSumSec(session.getBonusTimeSumSec() + shift);
+                    progress.setBonusOnLevelSec(progress.getBonusOnLevelSec() + shift);
+                }
+                case PENALTY -> {
+                    result = AttemptResult.ACCEPTED_PENALTY;
+                    int penalty = Math.abs(Math.min(0, matched.getShiftSeconds()));
+                    session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
+                    progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + penalty);
+                }
+                default -> result = AttemptResult.WRONG;
             }
         }
 
@@ -177,11 +152,87 @@ public class GameSessionServiceImpl implements GameSessionService {
         return result;
     }
 
+    // --- Возвращаем DTO и поддерживаем offset (для подгрузки истории) ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<CodeAttemptDTO> lastAttempts(Long sessionId, Long levelId, int limit, int offset) {
+        int safeLimit = Math.max(1, limit);
+        int page = Math.max(0, offset / safeLimit);
+        List<CodeAttempt> attempts = codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(page, safeLimit));
+        return attempts.stream()
+                .map(a -> CodeAttemptDTO.builder()
+                        .id(a.getId())
+                        .sessionId(a.getSession() != null ? a.getSession().getId() : null)
+                        .levelId(a.getLevel() != null ? a.getLevel().getId() : null)
+                        .userId(a.getUser() != null ? a.getUser().getId() : null)
+                        .submittedRaw(a.getSubmittedRaw())
+                        .submittedNormalized(a.getSubmittedNormalized())
+                        .result(a.getResult())
+                        .createdAt(a.getCreatedAt())
+                        .build())
+                .toList();
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CodeAttempt> lastAttempts(Long sessionId, Long levelId, int limit) {
-        return codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(0, Math.max(1, limit)));
+    public LevelViewDTO getCurrentLevelView(Long sessionId) {
+        GameSession session = findSession(sessionId);
+        Level level = session.getCurrentLevel();
+        if (level == null)
+            throw new EntityNotFoundException("No active level for session " + sessionId);
+
+        LevelProgress progress = levelProgressRepository.findCurrentBySessionAndLevel(session, level)
+                .orElseThrow(() -> new EntityNotFoundException("No progress found for current level"));
+
+        LevelDTO levelDto = LevelDTO.builder()
+                .id(level.getId())
+                .questId(level.getQuest().getId())
+                .orderIndex(level.getOrderIndex())
+                .title(level.getTitle())
+                .descriptionHtml(level.getDescriptionHtml())
+                .apTime(level.getApTime())
+                .requiredSectors(level.getRequiredSectors())
+                .build();
+
+        LevelProgressDTO progressDto = LevelProgressDTO.builder()
+                .id(progress.getId())
+                .sessionId(session.getId())
+                .levelId(level.getId())
+                .startedAt(progress.getStartedAt())
+                .closedAt(progress.getClosedAt())
+                .sectorsClosed(progress.getSectorsClosed())
+                .bonusOnLevelSec(progress.getBonusOnLevelSec())
+                .penaltyOnLevelSec(progress.getPenaltyOnLevelSec())
+                .build();
+
+        List<LevelHintDTO> hints = levelHintRepository.findByLevelOrderByOrderIndexAsc(level)
+                .stream()
+                .map(h -> LevelHintDTO.builder()
+                        .id(h.getId())
+                        .levelId(level.getId())
+                        .offsetSec(h.getOffsetSec())
+                        .text(h.getText())
+                        .orderIndex(h.getOrderIndex())
+                        .build())
+                .toList();
+
+        return LevelViewDTO.builder()
+                .level(levelDto)
+                .progress(progressDto)
+                .sessionId(session.getId())
+                .hints(hints)
+                .build();
+    }
+
+    // --- Доп. методы интерфейса, которые были не реализованы в файле ранее ---
+
+    @Override
+    @Transactional(readOnly = true)
+    public Level getCurrentLevel(Long sessionId) {
+        GameSession session = findSession(sessionId);
+        Level level = session.getCurrentLevel();
+        if (level == null) throw new EntityNotFoundException("No active level for session " + sessionId);
+        return level;
     }
 
     @Override
@@ -197,61 +248,10 @@ public class GameSessionServiceImpl implements GameSessionService {
         GameSession session = findSession(sessionId);
         Instant now = Instant.now();
         session.setStatus(status);
-        if (status == SessionStatus.ACTIVE && session.getStartedAt() == null)
-            session.setStartedAt(now);
+        if (status == SessionStatus.ACTIVE && session.getStartedAt() == null) session.setStartedAt(now);
         if ((status == SessionStatus.ABORTED || status == SessionStatus.FINISHED) && session.getFinishedAt() == null)
             session.setFinishedAt(now);
         return gameSessionRepository.save(session);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public LevelViewDTO getCurrentLevelView(Long sessionId) {
-        GameSession session = findSession(sessionId);
-        Level level = session.getCurrentLevel();
-        if (level == null)
-            throw new EntityNotFoundException("No active level for session " + sessionId);
-
-        LevelProgress progress = levelProgressRepository.findCurrentBySessionAndLevel(session, level)
-                .orElseThrow(() -> new EntityNotFoundException("No progress found for current level"));
-
-        LevelDTO levelDto = new LevelDTO(
-                level.getId(),
-                level.getQuest().getId(),
-                level.getOrderIndex(),
-                level.getTitle(),
-                level.getDescriptionHtml(),
-                level.getRequiredSectors(),
-                level.getApTime()
-        );
-
-        LevelProgressDTO progressDto = LevelProgressDTO.builder()
-                .id(progress.getId())
-                .sessionId(session.getId())
-                .levelId(level.getId())
-                .startedAt(progress.getStartedAt())
-                .closedAt(progress.getClosedAt())
-                .sectorsClosed(progress.getSectorsClosed())
-                .bonusOnLevelSec(progress.getBonusOnLevelSec())
-                .penaltyOnLevelSec(progress.getPenaltyOnLevelSec())
-                .build();
-
-        List<LevelHintDTO> hints = levelHintRepository.findByLevelOrderByOrderIndexAsc(level)
-                .stream().map(h -> LevelHintDTO.builder()
-                        .id(h.getId())
-                        .levelId(level.getId())
-                        .offsetSec(h.getOffsetSec())
-                        .text(h.getText())
-                        .orderIndex(h.getOrderIndex())
-                        .build())
-                .toList();
-
-        return LevelViewDTO.builder()
-                .level(levelDto)
-                .progress(progressDto)
-                .sessionId(session.getId())
-                .hints(hints)
-                .build();
     }
 
     @Override
@@ -275,11 +275,9 @@ public class GameSessionServiceImpl implements GameSessionService {
     private void closeLevelAndAdvance(GameSession session, LevelProgress progress, User passedBy) {
         Instant now = Instant.now();
 
-        // Закрываем текущий прогресс
         progress.setClosedAt(now);
         levelProgressRepository.save(progress);
 
-        // Создаём LevelCompletion
         Level level = progress.getLevel();
         LevelCompletion lc = new LevelCompletion();
         lc.setSession(session);
@@ -291,22 +289,19 @@ public class GameSessionServiceImpl implements GameSessionService {
         lc.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec());
         levelCompletionRepository.save(lc);
 
-        // Определяем следующий уровень
         Level next = levelRepository.findNext(session.getQuest(), level.getOrderIndex());
         if (next == null) {
             session.setStatus(SessionStatus.FINISHED);
             session.setFinishedAt(now);
             session.setCurrentLevel(null);
-            gameSessionRepository.save(session);
         } else {
             session.setCurrentLevel(next);
-            session = gameSessionRepository.save(session);
-
             LevelProgress nextProgress = new LevelProgress();
             nextProgress.setSession(session);
             nextProgress.setLevel(next);
             nextProgress.setStartedAt(now);
             levelProgressRepository.save(nextProgress);
         }
+        gameSessionRepository.save(session);
     }
 }
