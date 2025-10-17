@@ -49,6 +49,12 @@ public class GameSessionController implements Routes {
         return ResponseEntity.ok(gameSessionService.lastAttempts(sessionId, levelId, limit, offset));
     }
 
+    @PostMapping(SESSION_AUTOPASS)
+    public ResponseEntity<LevelViewDTO> autoPassLevel(@PathVariable Long sessionId) {
+        LevelViewDTO view = gameSessionService.autoPassLevelAndGetView(sessionId);
+        return ResponseEntity.ok(view);
+    }
+
     private GameSessionDTO toDTO(GameSession s) {
         return GameSessionDTO.builder()
                 .id(s.getId())

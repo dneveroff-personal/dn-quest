@@ -59,6 +59,11 @@ const routes = [
         name: "Play",
         component: Play,
         props: true
+    },
+    {
+        path: '/sessions/:sessionId/finish',
+        name: 'Finish',
+        component: () => import('@/pages/Finish.vue'),
     }
 ];
 

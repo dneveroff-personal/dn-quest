@@ -11,7 +11,7 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name="level_completions",
+@Table(name="game_level_completions",
         uniqueConstraints = @UniqueConstraint(name="uk_session_level_complete", columnNames={"session_id","level_id"}))
 public class LevelCompletion {
 
