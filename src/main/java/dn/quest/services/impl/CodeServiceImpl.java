@@ -37,7 +37,6 @@ public class CodeServiceImpl implements CodeService {
                 .orElseThrow(() -> new EntityNotFoundException("Level not found: " + levelId));
 
         List<CodeDTO> resultList = getAllByLevel(level);
-        System.out.println("resultList = " + resultList);
 
         return getAllByLevel(level);
     }

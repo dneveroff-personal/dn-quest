@@ -27,4 +27,8 @@ public interface GameSessionService {
     GameSession setStatus(Long sessionId, SessionStatus status);
 
     List<GameSession> getSessionsByQuest(Long questId);
+
+    boolean autoPassLevel(Long sessionId);
+
+    LevelViewDTO autoPassLevelAndGetView(Long sessionId);
 }

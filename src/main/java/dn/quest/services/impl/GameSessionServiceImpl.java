@@ -8,7 +8,9 @@ import dn.quest.model.entities.team.Team;
 import dn.quest.model.entities.user.User;
 import dn.quest.repositories.*;
 import dn.quest.services.interfaces.GameSessionService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,31 +38,51 @@ public class GameSessionServiceImpl implements GameSessionService {
     private final LevelProgressRepository levelProgressRepository;
     private final LevelCompletionRepository levelCompletionRepository;
     private final LevelHintRepository levelHintRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     // --- Основная логика ---
-
     @Override
     public GameSession start(Long questId, Integer userId, Long teamId) {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
 
-        // Проверка на активную сессию
         if (quest.getType() == QuestType.SOLO && userId != null) {
             User user = userRepository.findById(userId.longValue())
                     .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-            return gameSessionRepository.findByQuestAndUser(quest, user)
-                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE)
-                    .orElseGet(() -> createNewSession(quest, user, null));
+
+            Optional<GameSession> active = gameSessionRepository.findByQuestAndUser(quest, user)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
+            if (active.isPresent()) return active.get();
+
+            // 🚫 запрет повторного участия
+            boolean finished = gameSessionRepository.findByQuestAndUser(quest, user).stream()
+                    .anyMatch(s -> s.getStatus() == SessionStatus.FINISHED);
+            if (finished)
+                throw new IllegalStateException("Вы уже закончили эту игру");
+
+            return createNewSession(quest, user, null);
+
         } else if (quest.getType() == QuestType.TEAM && teamId != null) {
             Team team = teamRepository.findById(teamId)
                     .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
-            return gameSessionRepository.findByQuestAndTeam(quest, team)
-                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE)
-                    .orElseGet(() -> createNewSession(quest, null, team));
+
+            Optional<GameSession> active = gameSessionRepository.findByQuestAndTeam(quest, team)
+                    .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
+            if (active.isPresent()) return active.get();
+
+            // 🚫 запрет повторного участия
+            boolean finishedTeam = gameSessionRepository.findByQuestAndTeam(quest, team).stream()
+                    .anyMatch(s -> s.getStatus() == SessionStatus.FINISHED);
+            if (finishedTeam)
+                throw new IllegalStateException("Ваша команда уже закончила эту игру");
+
+            return createNewSession(quest, null, team);
         } else {
             throw new IllegalArgumentException("Invalid quest type or missing identifiers");
         }
     }
+
 
     private GameSession createNewSession(Quest quest, User user, Team team) {
         GameSession session = new GameSession();
@@ -109,11 +133,31 @@ public class GameSessionServiceImpl implements GameSessionService {
         attempt.setSubmittedNormalized(normalized);
         attempt.setCreatedAt(Instant.now());
 
+        AttemptResult result = getAttemptResult(sessionId, matched, level, normalized, attempt, session, progress);
+
+        attempt.setResult(result);
+        codeAttemptRepository.save(attempt);
+        levelProgressRepository.save(progress);
+        gameSessionRepository.save(session);
+
+        if (level.getRequiredSectors() != null
+                && progress.getSectorsClosed() >= level.getRequiredSectors()) {
+            closeLevelAndAdvance(session, progress, actor);
+        }
+
+        return result;
+    }
+
+    private AttemptResult getAttemptResult(Long sessionId, Code matched, Level level, String normalized, CodeAttempt attempt, GameSession session, LevelProgress progress) {
         AttemptResult result;
         if (matched == null) {
-            boolean usedBefore = codeAttemptRepository.existsBySessionAndSubmittedNormalized(sessionId, normalized);
-            result = usedBefore ? AttemptResult.DUPLICATE : AttemptResult.WRONG;
+            return AttemptResult.WRONG;
         } else {
+            boolean usedBefore = codeAttemptRepository.existsBySessionAndSubmittedNormalized(sessionId, level, normalized);
+            if (usedBefore) {
+              return AttemptResult.DUPLICATE;
+            }
+
             attempt.setMatchedCode(matched);
             attempt.setMatchedSectorNo(matched.getSectorNo());
 
@@ -135,20 +179,11 @@ public class GameSessionServiceImpl implements GameSessionService {
                     session.setPenaltyTimeSumSec(session.getPenaltyTimeSumSec() + penalty);
                     progress.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec() + penalty);
                 }
-                default -> result = AttemptResult.WRONG;
+                default -> {
+                    return AttemptResult.WRONG;
+                }
             }
         }
-
-        attempt.setResult(result);
-        codeAttemptRepository.save(attempt);
-        levelProgressRepository.save(progress);
-        gameSessionRepository.save(session);
-
-        if (level.getRequiredSectors() != null
-                && progress.getSectorsClosed() >= level.getRequiredSectors()) {
-            closeLevelAndAdvance(session, progress, actor);
-        }
-
         return result;
     }
 
@@ -177,6 +212,13 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Transactional(readOnly = true)
     public LevelViewDTO getCurrentLevelView(Long sessionId) {
         GameSession session = findSession(sessionId);
+        if (session.getStatus() == SessionStatus.FINISHED) {
+            return LevelViewDTO.builder()
+                    .sessionId(session.getId())
+                    .finished(true)
+                    .build();
+        }
+
         Level level = session.getCurrentLevel();
         if (level == null)
             throw new EntityNotFoundException("No active level for session " + sessionId);
@@ -216,14 +258,141 @@ public class GameSessionServiceImpl implements GameSessionService {
                         .build())
                 .toList();
 
+        // --- собираем коды уровня ---
+        List<Code> codes = codeRepository.findByLevel(level);
+
+        // вычисляем количество секторов (максимальный sectorNo среди NORMAL-кодов или requiredSectors как запас)
+        int maxSectorNo = codes.stream()
+                .filter(c -> c.getType() == CodeType.NORMAL && c.getSectorNo() != null)
+                .mapToInt(Code::getSectorNo)
+                .max()
+                .orElse(0);
+
+        if (maxSectorNo == 0 && level.getRequiredSectors() != null) {
+            maxSectorNo = Math.max(maxSectorNo, level.getRequiredSectors());
+        }
+
+        // Получаем все принятые попытки (NORMAL/BONUS/PENALTY) для данной сессии+уровня, упорядоченные по createdAt desc
+        List<CodeAttempt> acceptedAttempts = codeAttemptRepository
+                .findAcceptedAttempts(session, level,
+                        List.of(AttemptResult.ACCEPTED_NORMAL, AttemptResult.ACCEPTED_BONUS, AttemptResult.ACCEPTED_PENALTY));
+
+        Set<Long> enteredCodeIds = acceptedAttempts.stream()
+                .filter(a -> a.getMatchedCode() != null)
+                .map(a -> a.getMatchedCode().getId())
+                .collect(Collectors.toSet());
+
+        // Map: sectorNo -> latest accepted CodeAttempt (новые записи идут первыми, поэтому first wins)
+        java.util.Map<Integer, CodeAttempt> latestAcceptedPerSector = new java.util.HashMap<>();
+        for (CodeAttempt a : acceptedAttempts) {
+            if (a.getResult() == AttemptResult.ACCEPTED_NORMAL && a.getMatchedSectorNo() != null) {
+                latestAcceptedPerSector.computeIfAbsent(a.getMatchedSectorNo(), k -> a);
+            }
+        }
+
+        // --- собираем NORMAL ---
+        List<CodeViewDTO> sectors = codes.stream()
+                .filter(c -> c.getType() == CodeType.NORMAL)
+                .map(c -> CodeViewDTO.builder()
+                        .id(c.getId())
+                        .levelId(level.getId())
+                        .type(CodeType.NORMAL)
+                        .sectorNo(c.getSectorNo())
+                        .value(c.getValue())
+                        .shiftSeconds(0)
+                        .closed(enteredCodeIds.contains(c.getId()))
+                        .matchedCodeValue(enteredCodeIds.contains(c.getId()) ? c.getValue() : null)
+                        .build())
+                .toList();
+
+        // --- BONUS ---
+        List<CodeViewDTO> bonusCodes = codes.stream()
+                .filter(c -> c.getType() == CodeType.BONUS)
+                .map(c -> CodeViewDTO.builder()
+                        .id(c.getId())
+                        .levelId(level.getId())
+                        .type(CodeType.BONUS)
+                        .value(c.getValue())
+                        .shiftSeconds(c.getShiftSeconds())
+                        .closed(enteredCodeIds.contains(c.getId()))
+                        .matchedCodeValue(enteredCodeIds.contains(c.getId()) ? c.getValue() : null)
+                        .build())
+                .toList();
+
+        // --- PENALTY ---
+        List<CodeViewDTO> penaltyCodes = codes.stream()
+                .filter(c -> c.getType() == CodeType.PENALTY)
+                .map(c -> CodeViewDTO.builder()
+                        .id(c.getId())
+                        .levelId(level.getId())
+                        .type(CodeType.PENALTY)
+                        .value(c.getValue())
+                        .shiftSeconds(c.getShiftSeconds())
+                        .closed(enteredCodeIds.contains(c.getId()))
+                        .matchedCodeValue(enteredCodeIds.contains(c.getId()) ? c.getValue() : null)
+                        .build())
+                .toList();
+
+        System.out.println("Before return getCurrentLevelView");
+
         return LevelViewDTO.builder()
                 .level(levelDto)
                 .progress(progressDto)
                 .sessionId(session.getId())
                 .hints(hints)
+                .sectors(sectors)
+                .bonusCodes(bonusCodes)
+                .penaltyCodes(penaltyCodes)
                 .build();
     }
 
+    @Override
+    @Transactional
+    public boolean autoPassLevel(Long sessionId) {
+        GameSession session = findSession(sessionId);
+
+        if (session.getStatus() != SessionStatus.ACTIVE) return false;
+
+        // Получаем прогресс текущего уровня
+        Optional<LevelProgress> optProgress = levelProgressRepository.findCurrentBySession(session);
+        if (optProgress.isEmpty()) return false;
+
+        LevelProgress progress = optProgress.get();
+        if (progress.getClosedAt() != null) return false; // уже закрыт
+
+        Level level = progress.getLevel();
+        if (level == null || level.getApTime() == null || level.getApTime() <= 0) return false;
+
+        Instant startedAt = progress.getStartedAt();
+        if (startedAt == null) return false;
+
+        long elapsedSec = Duration.between(startedAt, Instant.now()).getSeconds();
+
+        System.out.println("elapsedSec = " + elapsedSec);
+        System.out.println("level.getApTime() = " + level.getApTime());
+
+        // Если время автоперехода вышло
+        if (elapsedSec >= level.getApTime()) {
+            closeLevelAndAdvance(session, progress, null);
+            // 💥 вот это ключ:
+            gameSessionRepository.flush(); // чтобы изменения реально записались
+            return true;
+        }
+
+        return false;
+    }
+
+    // --- небольшая маппер-функция ---
+    private CodeDTO mapCodeToDto(Code c) {
+        return CodeDTO.builder()
+                .id(c.getId())
+                .levelId(c.getLevel() != null ? c.getLevel().getId() : null)
+                .type(c.getType())
+                .sectorNo(c.getSectorNo())
+                .value(c.getValue())
+                .shiftSeconds(c.getShiftSeconds())
+                .build();
+    }
     // --- Доп. методы интерфейса, которые были не реализованы в файле ранее ---
 
     @Override
@@ -274,7 +443,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     private void closeLevelAndAdvance(GameSession session, LevelProgress progress, User passedBy) {
         Instant now = Instant.now();
-
+        System.out.println("ENTER closeLevelAndAdvance");
         progress.setClosedAt(now);
         levelProgressRepository.save(progress);
 
@@ -304,4 +473,26 @@ public class GameSessionServiceImpl implements GameSessionService {
         }
         gameSessionRepository.save(session);
     }
+
+    /**
+     * Выполняет авто-переход (если можно) и возвращает актуальный view текущего уровня/сессии.
+     * Это поможет клиенту получить свежие данные в одном ответе.
+     */
+    @Override
+    @Transactional
+    public LevelViewDTO autoPassLevelAndGetView(Long sessionId) {
+        // Выполняем автопереход
+        autoPassLevel(sessionId);
+
+        // Сохраняем изменения и очищаем кэш, чтобы загрузить свежие данные
+        entityManager.flush();
+        entityManager.clear();
+
+        // Загружаем актуальную сессию заново
+        GameSession refreshed = findSession(sessionId);
+
+        // Возвращаем текущее состояние уровня после перехода
+        return getCurrentLevelView(refreshed.getId());
+    }
+
 }

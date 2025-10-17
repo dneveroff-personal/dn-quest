@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name = "level_progress",
+@Table(name = "game_level_progress",
         uniqueConstraints = @UniqueConstraint(name = "uk_progress_session_level",
                 columnNames = {"session_id","level_id"}))
 public class LevelProgress {

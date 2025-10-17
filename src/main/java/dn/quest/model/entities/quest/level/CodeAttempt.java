@@ -10,7 +10,7 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name="code_attempts",
+@Table(name="game_code_attempts",
         indexes = {
                 @Index(name="idx_attempt_session_level_time", columnList="session_id,level_id,created_at")
         })

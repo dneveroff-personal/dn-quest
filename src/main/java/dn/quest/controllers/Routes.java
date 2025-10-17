@@ -42,6 +42,7 @@ public interface Routes {
     String SESSION_CODE = SESSION_ID + CODE;
     String SESSION_STATUS = "/sessions" + SESSION_ID + STATUS;
     String LAST_ATTEMPTS = SESSION_ID + "/last-attempts";
+    String SESSION_AUTOPASS = SESSION_ID + "/auto-pass";
 
     // Team
     String TEAMS = API + "/teams";
