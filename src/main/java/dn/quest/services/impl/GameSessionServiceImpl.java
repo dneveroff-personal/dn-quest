@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -333,8 +334,6 @@ public class GameSessionServiceImpl implements GameSessionService {
                         .build())
                 .toList();
 
-        System.out.println("Before return getCurrentLevelView");
-
         return LevelViewDTO.builder()
                 .level(levelDto)
                 .progress(progressDto)
@@ -432,7 +431,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     }
 
     // --- Вспомогательные методы ---
-    private GameSession findSession(Long id) {
+    public GameSession findSession(Long id) {
         return gameSessionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Session not found: " + id));
     }

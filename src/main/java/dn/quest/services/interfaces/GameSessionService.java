@@ -2,6 +2,7 @@ package dn.quest.services.interfaces;
 
 import dn.quest.model.dto.CodeAttemptDTO;
 import dn.quest.model.dto.LevelViewDTO;
+import dn.quest.model.dto.QuestDTO;
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.enums.SessionStatus;
 import dn.quest.model.entities.quest.GameSession;
@@ -31,4 +32,6 @@ public interface GameSessionService {
     boolean autoPassLevel(Long sessionId);
 
     LevelViewDTO autoPassLevelAndGetView(Long sessionId);
+
+    GameSession findSession(Long id);
 }

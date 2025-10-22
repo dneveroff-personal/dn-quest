@@ -64,6 +64,12 @@ const routes = [
         path: '/sessions/:sessionId/finish',
         name: 'Finish',
         component: () => import('@/pages/Finish.vue'),
+    },
+    {
+        path: "/quests/:id/stats",
+        name: "QuestStats",
+        component: () => import("@/pages/QuestStats.vue"),
+        meta: { requiresAuth: true }
     }
 ];
 

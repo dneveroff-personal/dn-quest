@@ -1,10 +1,13 @@
 package dn.quest.controllers;
 
+import dn.quest.model.dto.LevelCompletionDTO;
 import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
+import dn.quest.model.dto.QuestStatsDTO;
 import dn.quest.model.entities.enums.SessionStatus;
 import dn.quest.model.entities.quest.GameSession;
 import dn.quest.services.interfaces.GameSessionService;
+import dn.quest.services.interfaces.LeaderboardService;
 import dn.quest.services.interfaces.QuestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ public class QuestController implements Routes {
 
     private final QuestService questService;
     private final GameSessionService gameSessionService;
+    private final LeaderboardService leaderboardService;
 
     // ---------- Quest CRUD ----------
     @PostMapping
@@ -72,8 +76,14 @@ public class QuestController implements Routes {
     }
 
     @GetMapping(QUEST_LEADERBOARD)
-    public ResponseEntity<List<?>> leaderboard(@PathVariable Long questId) {
-        return ResponseEntity.ok(gameSessionService.leaderboard(questId));
+    public List<LevelCompletionDTO> leaderboard(@PathVariable Long questId) {
+        try {
+            return leaderboardService.getLeaderboardByQuest(questId);
+        } catch (Exception e) {
+            System.out.println("QUEST_LEADERBOARD Error ---");
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @PostMapping(SESSION_STATUS)
@@ -82,5 +92,26 @@ public class QuestController implements Routes {
             @RequestParam SessionStatus status
     ) {
         return ResponseEntity.ok(gameSessionService.setStatus(sessionId, status));
+    }
+
+    /**
+     * Возвращает квест, связанный с игровой сессией
+     */
+    @GetMapping(GET_QUEST_ID)
+    public ResponseEntity<QuestDTO> getQuestBySession(@PathVariable Long sessionId) {
+        GameSession session = gameSessionService.findSession(sessionId);
+
+        if (session == null || session.getQuest() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        QuestDTO questDto = questService.getById(session.getQuest().getId());
+        return ResponseEntity.ok(questDto);
+    }
+
+    @GetMapping(QUEST_STATS)
+    public ResponseEntity<QuestStatsDTO> getQuestStats(@PathVariable Long questId) {
+        QuestStatsDTO stats = leaderboardService.getQuestStats(questId);
+        return ResponseEntity.ok(stats);
     }
 }
