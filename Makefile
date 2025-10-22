@@ -10,7 +10,9 @@ clean:
 	cd $(FRONT_DIR) && rm -rf node_modules package-lock.json
 
 build-static:
-	$(NODE_CMD) npm install && npm run build
+	# Устанавливаем зависимости и билдим фронт локально (npm ci)
+	$(NODE_CMD) npm ci --prefer-offline --no-audit --silent
+	$(NODE_CMD) npm run build
 	rm -rf $(STATIC_DIR)
 	mkdir -p $(STATIC_DIR)
 	cp -r $(FRONT_DIR)/dist/* $(STATIC_DIR)/

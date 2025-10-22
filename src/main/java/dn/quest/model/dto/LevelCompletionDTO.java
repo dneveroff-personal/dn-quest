@@ -1,6 +1,5 @@
 package dn.quest.model.dto;
 
-import dn.quest.model.entities.enums.AttemptResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +14,7 @@ import java.time.Instant;
 public class LevelCompletionDTO {
 
     private Long levelId;
+    private String levelTitle;
     private Long teamId;                // или null если соло
     private String teamName;
     private Long passedByUserId;

@@ -4,6 +4,7 @@ import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
+import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.user.User;
 import dn.quest.repositories.QuestRepository;
@@ -11,6 +12,7 @@ import dn.quest.repositories.UserRepository;
 import dn.quest.services.interfaces.QuestService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

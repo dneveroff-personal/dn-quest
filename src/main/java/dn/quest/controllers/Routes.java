@@ -3,7 +3,6 @@ package dn.quest.controllers;
 public interface Routes {
     // COMMON
     String API = "/api";
-    String ATTEMPT = "/attempt";
     String CODE = "/code";
     String CURRENT = "/current";
     String EMAIL = "/{email}";
@@ -20,9 +19,7 @@ public interface Routes {
     String PUBLISHED = "/published";
     String REORDER = "/reorder";
     String ROLE = "/role";
-    String SEARCH = "/search";
     String STATUS = "/status";
-    String SUBMIT = "/submit";
 
     // Quest
     String QUESTS = API + "/quests";
@@ -30,6 +27,7 @@ public interface Routes {
     String START = "/start";
     String QUEST_START = QUEST_ID + START;
     String QUEST_LEADERBOARD = QUEST_ID + LEADERBOARD;
+    String QUEST_STATS = QUEST_ID + "/stats";
 
     // Registration
     String PING = "/ping";
@@ -43,6 +41,7 @@ public interface Routes {
     String SESSION_STATUS = "/sessions" + SESSION_ID + STATUS;
     String LAST_ATTEMPTS = SESSION_ID + "/last-attempts";
     String SESSION_AUTOPASS = SESSION_ID + "/auto-pass";
+    String GET_QUEST_ID = SESSION_ID + "/quest";
 
     // Team
     String TEAMS = API + "/teams";
@@ -80,6 +79,4 @@ public interface Routes {
 
     // Attempts
     String ATTEMPTS = API + "/attempts";
-    String ATTEMPTS_BY_LEVEL = LEVEL + LEVEL_ID;
-    String LAST_ATTEMPTS_BY_LEVEL = LEVEL + LEVEL_ID + LAST;
 }

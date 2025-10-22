@@ -5,8 +5,14 @@
 
         <!-- GAME MODE -->
         <template v-if="isGameMode">
-          <GameHeader :currentUser="currentUser" :theme="theme" @exit="exitGame" />
-          <n-layout-content content-style="padding: 0;">
+          <GameHeader
+              :currentUser="currentUser"
+              :theme="theme"
+              :questId="questId"
+              @exit="exitGame"
+              @viewStats="goToStats"
+          />
+          <n-layout-content>
             <router-view :currentUser="currentUser" />
           </n-layout-content>
         </template>
@@ -53,31 +59,62 @@
   import { darkTheme, NButton } from "naive-ui";
   import AppHeader from "@/components/AppHeader.vue";
   import GameHeader from "@/components/GameHeader.vue";
-  import { ref, onMounted, computed } from "vue";
+  import { ref, onMounted, computed, watch } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import { fetchCurrentUser } from "@/services/auth";
+  import api from "@/services/api";
 
   const route = useRoute();
   const router = useRouter();
   const theme = ref(localStorage.getItem("theme") || "indigo");
   const currentUser = ref(null);
+  const questId = ref(null);
 
-  // Определяем, игровой ли это режим
-  const isGameMode = computed(() => route.path.includes("/play"));
+  // Определяем игровой режим
+  const isGameMode = computed(() => route.path.startsWith("/play/"));
+
+  // Загружаем текущего юзера
+  async function loadUser() {
+    currentUser.value = await fetchCurrentUser();
+  }
+
+  // Загружаем квест по sessionId, когда входим в режим игры
+  async function loadQuestForSession() {
+    if (!isGameMode.value) return;
+
+    const sessionId = route.params.sessionId;
+    if (!sessionId) return;
+
+    try {
+      const resp = await api.get(`/quests/${sessionId}/quest`);
+      questId.value = resp.data.id;
+    } catch (e) {
+      console.error("Ошибка загрузки сессии 1:", e);
+    }
+  }
+
+  function goToStats() {
+    if (!questId.value) return;
+    router.push(`/quests/${questId.value}/stats`);
+  }
+
+  function exitGame() {
+    router.push("/");
+  }
 
   function applyTheme() {
     document.documentElement.setAttribute("data-theme", theme.value);
     localStorage.setItem("theme", theme.value);
   }
 
-  function exitGame() {
-    router.push("/"); // редирект на главную
-  }
-
-  // грузим юзера
-  async function loadUser() {
-    currentUser.value = await fetchCurrentUser();
-  }
+  // Следим за сменой роутов — если вошли в игру, подгружаем квест
+  watch(
+      () => route.fullPath,
+      async () => {
+        await loadQuestForSession();
+      },
+      { immediate: true }
+  );
 
   onMounted(() => {
     applyTheme();

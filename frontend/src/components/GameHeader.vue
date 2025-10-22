@@ -7,17 +7,37 @@
     <div class="text-white font-semibold">
       {{ currentUser?.publicName || "Игрок" }}
     </div>
-    <n-button size="small" ghost type="error" @click="$emit('exit')">
-      ⤤
-    </n-button>
+
+    <div class="flex gap-2">
+      <n-button size="small" ghost @click="goToStats">
+        📊 Статистика
+      </n-button>
+      <n-button size="small" ghost type="error" @click="$emit('exit')">
+        ⤤
+      </n-button>
+    </div>
   </n-layout-header>
 </template>
 
 <script setup>
 import { NButton } from "naive-ui";
-defineProps({
+import { useRouter } from "vue-router";
+
+// Пробрасываем questId из App.vue или родителя
+const props = defineProps({
   currentUser: Object,
-  theme: String
+  theme: String,
+  questId: [String, Number]
 });
+
 defineEmits(["exit"]);
+
+// router для перехода
+const router = useRouter();
+
+// Метод для перехода на страницу статистики
+function goToStats() {
+  if (!props.questId) return;
+  router.push(`/quests/${props.questId}/stats`);
+}
 </script>
