@@ -1,66 +1,165 @@
-#TODO: перенести все пароли в env файл
+version: '3.8'
+
 services:
+  # PostgreSQL база данных
   db:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: quest-db
     environment:
-      POSTGRES_USER: dn
-      POSTGRES_PASSWORD: dn
-      POSTGRES_DB: dnqdb
+      POSTGRES_USER: ${POSTGRES_USER:-dn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      POSTGRES_DB: ${POSTGRES_DB:-dnqdb}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn} -d ${POSTGRES_DB:-dnqdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
+  # Backend приложение
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ${DOCKERFILE:-Dockerfile}
     container_name: quest-backend
     ports:
-      - "8080:8080"
-      - "5004:5004"   # <-- порт для работы дебага
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${DEBUG_PORT:-5004}:5004"   # Порт для debug (только в dev)
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dnqdb
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DB_PASS}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-dnqdb}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-dn}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      BOT_TOKEN: ${BOT_TOKEN}
+      SPRING_JPA_SHOW_SQL: ${SHOW_SQL:-false}
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: ${FORMAT_SQL:-true}
+      # JWT настройки
+      JWT_SECRET: ${JWT_SECRET:-}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      # Telegram бот
+      BOT_TOKEN: ${BOT_TOKEN:-}
+      # Логирование
+      LOGGING_LEVEL_ROOT: ${LOG_LEVEL:-INFO}
+      LOGGING_LEVEL_DN_QUEST: ${LOG_LEVEL_APP:-DEBUG}
+      # Actuator
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ${ACTUATOR_ENDPOINTS:-health,info,metrics}
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: ${HEALTH_SHOW_DETAILS:-when-authorized}
     env_file:
       - ${PWD}/.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
+  # Frontend приложение
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
+      target: ${FRONTEND_TARGET:-development}
     container_name: quest-frontend
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-5173}:5173"
     environment:
-      - NODE_ENV=production
-      - VITE_API_BASE_URL=http://backend:8080/api
+      NODE_ENV: ${NODE_ENV:-development}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api}
+      VITE_APP_TITLE: ${VITE_APP_TITLE:-DN Quest}
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
       - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
+  # PgAdmin для управления базой данных (опционально)
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     container_name: quest-pgadmin
+    profiles:
+      - admin
     depends_on:
       - db
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@localhost.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
-      - "5050:80"
+      - "${PGADMIN_PORT:-5050}:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+    restart: unless-stopped
+
+  # Qdrant векторная база данных (для будущих AI-фич)
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: quest-qdrant
+    profiles:
+      - ai
+    ports:
+      - "${QDRANT_HTTP_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis для кэширования (опционально)
+  redis:
+    image: redis:7-alpine
+    container_name: quest-redis
+    profiles:
+      - cache
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   pgdata:
+    driver: local
   pgadmin_data:
+    driver: local
+  qdrant_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: quest-network
+    driver: bridge

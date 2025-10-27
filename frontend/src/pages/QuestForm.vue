@@ -112,7 +112,7 @@
                     </div>
                     <div class="flex gap-2">
                       <n-button size="small" type="success" @click="changeParticipationStatus(r.id, 'ACCEPTED')">Принять</n-button>
-                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'DECLINED')">Отклонить</n-button>
+                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'REJECTED')">Отклонить</n-button>
                     </div>
                   </li>
                 </ul>
@@ -192,7 +192,7 @@ const difficultyOptions = [
   { label: "Сложно", value: "HARD" },
 ];
 const typeOptions = [
-  { label: "Одиночный", value: "SINGLE" },
+  { label: "Одиночный", value: "SOLO" },
   { label: "Командный", value: "TEAM" },
 ];
 

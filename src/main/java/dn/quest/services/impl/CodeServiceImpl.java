@@ -1,8 +1,6 @@
 package dn.quest.services.impl;
 
 import dn.quest.model.dto.CodeDTO;
-import dn.quest.model.dto.LevelDTO;
-import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.quest.level.Code;
 import dn.quest.model.entities.quest.level.Level;
 import dn.quest.repositories.CodeRepository;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,15 +25,13 @@ public class CodeServiceImpl implements CodeService {
     public List<CodeDTO> getAllByLevel(Level level) {
         return codeRepo.findByLevel(level).stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public List<CodeDTO> getAllByLevelId(Long levelId) {
         Level level = levelRepo.findById(levelId)
                 .orElseThrow(() -> new EntityNotFoundException("Level not found: " + levelId));
-
-        List<CodeDTO> resultList = getAllByLevel(level);
 
         return getAllByLevel(level);
     }

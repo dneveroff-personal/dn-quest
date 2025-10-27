@@ -1,6 +1,7 @@
 package dn.quest.config;
 
 import dn.quest.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,9 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
+@Slf4j
 public class SecurityConfig {
 
     private final UserRepository userRepository;
@@ -28,13 +31,23 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // Используем более сильный BCrypt с силой 12
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers
+                        .frameOptions().deny()
+                        .contentTypeOptions().and()
+                        .httpStrictTransportSecurity(hstsConfig -> hstsConfig
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000)
+                        )
+                        .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
@@ -49,19 +62,27 @@ public class SecurityConfig {
                         ).permitAll()
                         // только AUTHOR может создавать квесты
                         .requestMatchers(HttpMethod.POST, "/api/quests").hasRole("AUTHOR")
+                        // только ADMIN может управлять пользователями
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         // остальные запросы — авторизованным
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        log.info("Security configuration initialized with enhanced security settings");
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
+            log.debug("Loading user details for username: {}", username);
             dn.quest.model.entities.user.User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                    .orElseThrow(() -> {
+                        log.warn("User not found: {}", username);
+                        return new UsernameNotFoundException("User not found: " + username);
+                    });
 
             return User.builder()
                     .username(user.getUsername())

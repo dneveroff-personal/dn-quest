@@ -1,17 +1,12 @@
 package dn.quest.controllers;
 
 import dn.quest.model.dto.TeamDTO;
-import dn.quest.model.dto.TeamInvitationDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.services.interfaces.TeamService;
-import dn.quest.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -20,7 +15,6 @@ import java.util.Set;
 public class TeamController implements Routes {
 
     private final TeamService teamService;
-    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<TeamDTO> createTeam(

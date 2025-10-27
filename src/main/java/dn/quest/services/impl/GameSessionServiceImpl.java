@@ -1,5 +1,8 @@
 package dn.quest.services.impl;
 
+import dn.quest.config.ApplicationConstants;
+import dn.quest.config.DateTimeUtils;
+import dn.quest.config.DtoMapper;
 import dn.quest.model.dto.*;
 import dn.quest.model.entities.enums.*;
 import dn.quest.model.entities.quest.*;
@@ -12,8 +15,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -39,6 +43,8 @@ public class GameSessionServiceImpl implements GameSessionService {
     private final LevelProgressRepository levelProgressRepository;
     private final LevelCompletionRepository levelCompletionRepository;
     private final LevelHintRepository levelHintRepository;
+    private final DtoMapper dtoMapper;
+    private final DateTimeUtils dateTimeUtils;
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -46,11 +52,11 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Override
     public GameSession start(Long questId, Integer userId, Long teamId) {
         Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+                .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + questId));
 
         if (quest.getType() == QuestType.SOLO && userId != null) {
             User user = userRepository.findById(userId.longValue())
-                    .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+                    .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.USER_NOT_FOUND + ": " + userId));
 
             Optional<GameSession> active = gameSessionRepository.findByQuestAndUser(quest, user)
                     .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
@@ -66,7 +72,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
         } else if (quest.getType() == QuestType.TEAM && teamId != null) {
             Team team = teamRepository.findById(teamId)
-                    .orElseThrow(() -> new EntityNotFoundException("Team not found: " + teamId));
+                    .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.TEAM_NOT_FOUND + ": " + teamId));
 
             Optional<GameSession> active = gameSessionRepository.findByQuestAndTeam(quest, team)
                     .filter(s -> s.getStatus() == SessionStatus.ACTIVE);
@@ -120,10 +126,10 @@ public class GameSessionServiceImpl implements GameSessionService {
 
         User actor = (userId != null)
                 ? userRepository.findById(userId.longValue())
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId))
+                .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.USER_NOT_FOUND + ": " + userId))
                 : null;
 
-        String normalized = normalize(rawCode);
+        String normalized = dtoMapper.normalizeCode(rawCode);
         Code matched = codeRepository.findByLevelAndNormalized(level, normalized).orElse(null);
 
         CodeAttempt attempt = new CodeAttempt();
@@ -156,7 +162,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         } else {
             boolean usedBefore = codeAttemptRepository.existsBySessionAndSubmittedNormalized(sessionId, level, normalized);
             if (usedBefore) {
-              return AttemptResult.DUPLICATE;
+                return AttemptResult.DUPLICATE;
             }
 
             attempt.setMatchedCode(matched);
@@ -192,7 +198,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Override
     @Transactional(readOnly = true)
     public List<CodeAttemptDTO> lastAttempts(Long sessionId, Long levelId, int limit, int offset) {
-        int safeLimit = Math.max(1, limit);
+        int safeLimit = Math.max(1, Math.min(limit, ApplicationConstants.MAX_ATTEMPTS_LIMIT));
         int page = Math.max(0, offset / safeLimit);
         List<CodeAttempt> attempts = codeAttemptRepository.findLastAttempts(sessionId, levelId, PageRequest.of(page, safeLimit));
         return attempts.stream()
@@ -222,7 +228,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
         Level level = session.getCurrentLevel();
         if (level == null)
-            throw new EntityNotFoundException("No active level for session " + sessionId);
+            throw new EntityNotFoundException(ApplicationConstants.LEVEL_NOT_FOUND + " for session " + sessionId);
 
         LevelProgress progress = levelProgressRepository.findCurrentBySessionAndLevel(session, level)
                 .orElseThrow(() -> new EntityNotFoundException("No progress found for current level"));
@@ -365,10 +371,9 @@ public class GameSessionServiceImpl implements GameSessionService {
         Instant startedAt = progress.getStartedAt();
         if (startedAt == null) return false;
 
-        long elapsedSec = Duration.between(startedAt, Instant.now()).getSeconds();
+        long elapsedSec = dateTimeUtils.getSecondsBetween(startedAt, Instant.now());
 
-        System.out.println("elapsedSec = " + elapsedSec);
-        System.out.println("level.getApTime() = " + level.getApTime());
+        log.debug("Auto-pass level check - elapsedSec: {}, level.getApTime(): {}", elapsedSec, level.getApTime());
 
         // Если время автоперехода вышло
         if (elapsedSec >= level.getApTime()) {
@@ -399,7 +404,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     public Level getCurrentLevel(Long sessionId) {
         GameSession session = findSession(sessionId);
         Level level = session.getCurrentLevel();
-        if (level == null) throw new EntityNotFoundException("No active level for session " + sessionId);
+        if (level == null) throw new EntityNotFoundException(ApplicationConstants.LEVEL_NOT_FOUND + " for session " + sessionId);
         return level;
     }
 
@@ -407,7 +412,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Transactional(readOnly = true)
     public List<LevelCompletion> leaderboard(Long questId) {
         Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+                .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + questId));
         return levelCompletionRepository.findByQuest(quest);
     }
 
@@ -426,23 +431,20 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Transactional(readOnly = true)
     public List<GameSession> getSessionsByQuest(Long questId) {
         Quest quest = questRepository.findById(questId)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + questId));
+                .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + questId));
         return gameSessionRepository.findByQuest(quest);
     }
 
     // --- Вспомогательные методы ---
     public GameSession findSession(Long id) {
         return gameSessionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Session not found: " + id));
-    }
-
-    private String normalize(String raw) {
-        return raw == null ? "" : raw.trim().toLowerCase();
+                .orElseThrow(() -> new EntityNotFoundException(ApplicationConstants.SESSION_NOT_FOUND + ": " + id));
     }
 
     private void closeLevelAndAdvance(GameSession session, LevelProgress progress, User passedBy) {
         Instant now = Instant.now();
-        System.out.println("ENTER closeLevelAndAdvance");
+        log.debug("Entering closeLevelAndAdvance for session: {}, level: {}",
+                session.getId(), progress.getLevel() != null ? progress.getLevel().getId() : "null");
         progress.setClosedAt(now);
         levelProgressRepository.save(progress);
 
@@ -452,7 +454,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         lc.setLevel(level);
         lc.setPassedByUser(passedBy);
         lc.setPassTime(now);
-        lc.setDurationSec(Duration.between(progress.getStartedAt(), now).getSeconds());
+        lc.setDurationSec(dateTimeUtils.getSecondsBetween(progress.getStartedAt(), now));
         lc.setBonusOnLevelSec(progress.getBonusOnLevelSec());
         lc.setPenaltyOnLevelSec(progress.getPenaltyOnLevelSec());
         levelCompletionRepository.save(lc);

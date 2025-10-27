@@ -3,16 +3,18 @@ package dn.quest.config;
 import dn.quest.model.entities.user.User;
 import dn.quest.model.entities.enums.UserRole;
 import dn.quest.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Set;
-
 @Configuration
 public class DataInitializer {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     @Value("${ADMIN_USERNAME:admin}")
     private String adminUsername;
@@ -31,7 +33,7 @@ public class DataInitializer {
                 admin.setPublicName("Administrator");
                 admin.setRole(UserRole.ADMIN);
                 userRepository.save(admin);
-                System.out.println("Admin user created: " + adminUsername);
+                logger.info("Admin user created: {}", adminUsername);
             }
         };
     }
