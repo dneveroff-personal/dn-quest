@@ -267,6 +267,103 @@ services:
     networks:
       - dn-quest-network
 
+  # Kafka Topics Initialization
+  kafka-topics-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: dn-quest-kafka-topics-init
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      # Ожидание готовности Kafka
+      echo 'Waiting for Kafka to be ready...'
+      cub kafka-ready -b kafka-1:29092,kafka-2:29093,kafka-3:29094 1 40
+      
+      # Создание топиков с конфигурацией
+      echo 'Creating topics...'
+      
+      # Пользовательские события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic user-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # События квестов
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic quest-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Игровые события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic game-events --partitions 12 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Командные события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic team-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Файловые события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic file-events --partitions 4 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # События уведомлений
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic notification-events --partitions 8 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Статистические события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic statistics-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Dead Letter Queue для ошибок обработки
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic dlq-events --partitions 3 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=1209600000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Retry топик для повторной обработки
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic retry-events --partitions 3 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      echo 'Topics created successfully!'
+      echo 'Listing all topics:'
+      kafka-topics --list --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094
+      "
+    networks:
+      - dn-quest-network
+
 volumes:
   zookeeper-data:
   zookeeper-logs:

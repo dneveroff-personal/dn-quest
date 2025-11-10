@@ -121,7 +121,8 @@ import {
   NPagination,
   useMessage
 } from "naive-ui";
-import api from "@/services/api";
+import { questService } from "@/services/api";
+import { handleError } from "@/services/errorHandler";
 import QuestCard from "@/components/QuestCard.vue";
 
 const props = defineProps({
@@ -203,22 +204,24 @@ async function loadQuests() {
   try {
     let response;
     if (props.currentUser.role === "ADMIN") {
-      response = await api.get("/quests");
+      response = await questService.getQuests();
       quests.value = response.data || [];
     } else if (props.currentUser.role === "AUTHOR") {
-      response = await api.get("/quests");
+      response = await questService.getQuests();
       quests.value = (response.data || []).filter(
           (q) =>
               q.published ||
               q.authors?.some((a) => Number(a.id) === Number(props.currentUser.id))
       );
     } else {
-      response = await api.get("/quests/published");
+      response = await questService.getPublishedQuests();
       quests.value = response.data || [];
     }
   } catch (err) {
-    console.error("Ошибка загрузки квестов:", err);
-    message.error("Не удалось загрузить квесты");
+    handleError(err, {
+      context: 'Loading quests',
+      customMessage: 'Не удалось загрузить квесты',
+    });
     quests.value = [];
   } finally {
     loading.value = false;

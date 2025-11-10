@@ -1,0 +1,391 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  
+  profiles:
+    active: dev
+  
+  cloud:
+    gateway:
+      # Global CORS configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      
+      # Circuit breaker configuration
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: default
+            fallbackUri: forward:/fallback/general
+        - name: Retry
+          args:
+            retries: 3
+            backoff:
+              firstBackoff: 50ms
+              maxBackoff: 500ms
+              factor: 2
+            statuses:
+              - BAD_GATEWAY
+              - GATEWAY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
+      
+      # Load balancer configuration
+      loadbalancer:
+        configs:
+          - default:
+              retry:
+                enabled: true
+                retries: 3
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - GATEWAY_TIMEOUT
+  
+  # Redis configuration for rate limiting
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+
+# Services Configuration
+services:
+  authentication:
+    url: ${AUTHENTICATION_SERVICE_URL:http://localhost:8081}
+    timeout: 5000
+  user-management:
+    url: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8082}
+    timeout: 5000
+  quest-management:
+    url: ${QUEST_MANAGEMENT_SERVICE_URL:http://localhost:8083}
+    timeout: 5000
+  game-engine:
+    url: ${GAME_ENGINE_SERVICE_URL:http://localhost:8084}
+    timeout: 5000
+  team-management:
+    url: ${TEAM_MANAGEMENT_SERVICE_URL:http://localhost:8085}
+    timeout: 5000
+  notification:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8086}
+    timeout: 5000
+  statistics:
+    url: ${STATISTICS_SERVICE_URL:http://localhost:8087}
+    timeout: 5000
+  file-storage:
+    url: ${FILE_STORAGE_SERVICE_URL:http://localhost:8088}
+    timeout: 5000
+
+# Rate Limiting Configuration
+rate-limiting:
+  default:
+    replenish-rate: 10
+    burst-capacity: 20
+  authentication:
+    replenish-rate: 20
+    burst-capacity: 40
+  user-management:
+    replenish-rate: 15
+    burst-capacity: 30
+  quest-management:
+    replenish-rate: 25
+    burst-capacity: 50
+  game-engine:
+    replenish-rate: 50
+    burst-capacity: 100
+  team-management:
+    replenish-rate: 10
+    burst-capacity: 20
+  notification:
+    replenish-rate: 100
+    burst-capacity: 200
+  statistics:
+    replenish-rate: 5
+    burst-capacity: 10
+  file-storage:
+    replenish-rate: 20
+    burst-capacity: 40
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: when-authorized
+    gateway:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging configuration
+logging:
+  level:
+    dn.quest.gateway: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# OpenAPI documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  gateway:
+    code-config:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  cloud:
+    gateway:
+      routes:
+        # Development routes with local services
+        - id: authentication-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+        
+        - id: user-management-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+        
+        - id: quest-management-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/quests/**
+          filters:
+            - StripPrefix=1
+        
+        - id: game-engine-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/game/**
+          filters:
+            - StripPrefix=1
+        
+        - id: team-management-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/teams/**
+          filters:
+            - StripPrefix=1
+        
+        - id: notification-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+        
+        - id: statistics-service
+          uri: http://localhost:8087
+          predicates:
+            - Path=/api/statistics/**
+          filters:
+            - StripPrefix=1
+        
+        - id: file-storage-service
+          uri: http://localhost:8088
+          predicates:
+            - Path=/api/files/**
+          filters:
+            - StripPrefix=1
+
+logging:
+  level:
+    dn.quest.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  cloud:
+    gateway:
+      routes:
+        # Production routes with service discovery
+        - id: authentication-service
+          uri: lb://authentication-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: user-management-service
+          uri: lb://user-management-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: quest-management-service
+          uri: lb://quest-management-service
+          predicates:
+            - Path=/api/quests/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: game-engine-service
+          uri: lb://game-engine-service
+          predicates:
+            - Path=/api/game/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 100
+                redis-rate-limiter.burstCapacity: 200
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: team-management-service
+          uri: lb://team-management-service
+          predicates:
+            - Path=/api/teams/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 30
+                redis-rate-limiter.burstCapacity: 60
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 200
+                redis-rate-limiter.burstCapacity: 400
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: statistics-service
+          uri: lb://statistics-service
+          predicates:
+            - Path=/api/statistics/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 20
+                redis-rate-limiter.burstCapacity: 40
+                key-resolver: "#{@userKeyResolver}"
+        
+        - id: file-storage-service
+          uri: lb://file-storage-service
+          predicates:
+            - Path=/api/files/**
+          filters:
+            - StripPrefix=1
+            - name: AuthenticationFilter
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 50
+                redis-rate-limiter.burstCapacity: 100
+                key-resolver: "#{@userKeyResolver}"
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+logging:
+  level:
+    dn.quest.gateway: INFO
+  file:
+    name: /var/log/dn-quest/api-gateway.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  cloud:
+    gateway:
+      routes:
+        # Test routes with mock services
+        - id: authentication-service
+          uri: http://test-auth-service:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+
+logging:
+  level:
+    dn.quest.gateway: DEBUG

@@ -1,0 +1,143 @@
+# Тестовая конфигурация для микросервисов DN Quest
+spring:
+  profiles:
+    active: test
+  
+  # Конфигурация базы данных
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+  # Конфигурация JPA
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        
+  # Конфигурация Flyway (отключена для тестов)
+  flyway:
+    enabled: false
+    
+  # Конфигурация Kafka для тестов
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: test-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: dn.quest.shared.events
+        spring.json.value.default.type: dn.quest.shared.events.BaseEvent
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      ack-mode: manual_immediate
+      concurrency: 1
+      
+  # Конфигурация Redis для тестов
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          
+  # Конфигурация кэширования
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=5m
+      
+  # Конфигурация безопасности
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080
+          
+# Конфигурация логирования для тестов
+logging:
+  level:
+    dn.quest: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.kafka: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    
+# Конфигурация Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      
+# Конфигурация тестовых данных
+test:
+  data:
+    cleanup: true
+    init: true
+    
+# Конфигурация JWT для тестов
+jwt:
+  secret: test-secret-key-for-jwt-token-generation-and-validation
+  access-expiration: 900000  # 15 минут
+  refresh-expiration: 604800000  # 7 дней
+  issuer: dn-quest-test-service
+  
+# Конфигурация Circuit Breaker для тестов
+resilience4j:
+  circuitbreaker:
+    instances:
+      default:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        
+# Конфигурация Rate Limiting для тестов
+rate-limit:
+  enabled: true
+  requests-per-minute: 100
+  
+# Конфигурация S3 для тестов
+s3:
+  endpoint: http://localhost:4566
+  region: us-east-1
+  access-key: test-access-key
+  secret-key: test-secret-key
+  bucket-name: dn-quest-test-files
+  
+# Конфигурация WebSocket для тестов
+websocket:
+  allowed-origins: http://localhost:3000,http://localhost:8080
+  message-broker: /topic
+  application-destination-prefix: /app
+  
+# Конфигурация email для тестов (отключена)
+email:
+  enabled: false
+  mock: true
+  
+# Конфигурация Telegram для тестов (отключена)
+telegram:
+  enabled: false
+  mock: true

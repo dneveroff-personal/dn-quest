@@ -1,0 +1,206 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: team-management-service
+  
+  profiles:
+    active: dev
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/team_management_db
+    username: ${DB_USERNAME:team_management_user}
+    password: ${DB_PASSWORD:team_management_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.teammanagement.event"
+    consumer:
+      group-id: team-management-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.teammanagement.event"
+        spring.json.value.default.type: "dn.quest.shared.events.BaseEvent"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 100
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 10000
+    listener:
+      ack-mode: manual_immediate
+      poll-timeout: 3000
+      concurrency: 3
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+    cache-names:
+      - teams
+      - users
+      - invitations
+      - team-members
+      - team-statistics
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# Приложение специфичные настройки
+app:
+  services:
+    authentication-service:
+      url: ${AUTHENTICATION_SERVICE_URL:http://localhost:8081}
+    user-management-service:
+      url: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8082}
+    game-engine-service:
+      url: ${GAME_ENGINE_SERVICE_URL:http://localhost:8084}
+    statistics-service:
+      url: ${STATISTICS_SERVICE_URL:http://localhost:8085}
+    notification-service:
+      url: ${NOTIFICATION_SERVICE_URL:http://localhost:8086}
+    file-storage-service:
+      url: ${FILE_STORAGE_SERVICE_URL:http://localhost:8087}
+  
+  kafka:
+    topics:
+      team-events: team-events
+      user-events: user-events
+      quest-events: quest-events
+      game-events: game-events
+      file-events: file-events
+      notification-events: notification-events
+      statistics-events: statistics-events
+      dead-letter-queue: team-management-dlq
+  
+  security:
+    jwt:
+      secret: ${JWT_SECRET:team-management-secret-key}
+      expiration: ${JWT_EXPIRATION:86400000}
+  
+  limits:
+    max-teams-per-user: ${MAX_TEAMS_PER_USER:5}
+    max-members-per-team: ${MAX_MEMBERS_PER_TEAM:10}
+    max-invitations-per-team: ${MAX_INVITATIONS_PER_TEAM:20}
+    max-daily-invitations-per-user: ${MAX_DAILY_INVITATIONS_PER_USER:10}
+    invitation-expiration-hours: ${INVITATION_EXPIRATION_HOURS:72}
+  
+  caching:
+    teams-ttl: ${TEAMS_CACHE_TTL:300}
+    users-ttl: ${USERS_CACHE_TTL:600}
+    invitations-ttl: ${INVITATIONS_CACHE_TTL:180}
+    team-members-ttl: ${TEAM_MEMBERS_CACHE_TTL:240}
+    team-statistics-ttl: ${TEAM_STATISTICS_CACHE_TTL:360}
+
+# Логирование
+logging:
+  level:
+    dn.quest.teammanagement: ${LOG_LEVEL:INFO}
+    org.springframework.kafka: ${KAFKA_LOG_LEVEL:WARN}
+    org.hibernate.SQL: ${SQL_LOG_LEVEL:WARN}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${SQL_BINDER_LOG_LEVEL:WARN}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/team-management-service.log
+    max-size: 10MB
+    max-history: 30
+
+# Метрики и мониторинг
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Feign настройки
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+  httpclient:
+    enabled: true
+    max-connections: 200
+    max-connections-per-route: 50
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 2048
+    response:
+      enabled: true
+
+# Асинхронные задачи
+async:
+  executor:
+    thread:
+      core-pool-size: 5
+      max-pool-size: 10
+      queue-capacity: 100
+      keep-alive-seconds: 60
+
+# Планировщик задач
+scheduling:
+  pool:
+    size: 3

@@ -31,8 +31,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage } from "naive-ui";
-import api from "@/services/api";
-import { fetchCurrentUser, setToken } from "@/services/auth";
+import { authService } from "@/services/api";
+import { login } from "@/services/auth";
+import { handleError } from "@/services/errorHandler";
 
 const router = useRouter();
 const message = useMessage();
@@ -51,20 +52,33 @@ async function doRegister() {
 
   loading.value = true;
   try {
-    await api.post("/register", { username: username.value, email: email.value, publicName: publicName.value, password: password.value });
+    // Регистрация через новый API сервис
+    await authService.register({
+      username: username.value,
+      email: email.value,
+      publicName: publicName.value,
+      password: password.value,
+    });
+    
     message.success("Аккаунт создан! Выполняем вход...");
 
-    const resp = await api.post("/login", { username: username.value, password: password.value });
-    setToken(resp.data.token);
-
-    const user = await fetchCurrentUser();
+    // Автоматический вход после регистрации
+    const { user } = await login({
+      username: username.value,
+      password: password.value,
+    });
+    
     message.success(`Добро пожаловать, ${user.publicName}`);
 
     router.push("/");
   } catch (err) {
-    if (err.response?.status === 409) message.error("Пользователь с таким именем или email уже существует");
-    else message.error("Ошибка регистрации");
-    console.error("Ошибка регистрации", err);
+    // Используем централизованную обработку ошибок
+    handleError(err, {
+      context: 'User registration',
+      customMessage: err.response?.status === 409
+        ? "Пользователь с таким именем или email уже существует"
+        : null,
+    });
   } finally {
     loading.value = false;
   }

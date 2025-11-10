@@ -1,0 +1,356 @@
+# Enhanced Prometheus configuration for DN Quest microservices
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'dn-quest'
+    environment: '${ENVIRONMENT:-development}'
+    region: '${REGION:-local}'
+    
+# Rule files
+rule_files:
+  - "rules/*.yml"
+  - "rules/alerts/*.yml"
+  - "rules/recording/*.yml"
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+      timeout: 10s
+      api_version: v2
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "http://prometheus-longterm:9090/api/v1/write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'go_.*|process_.*|prometheus_.*'
+        action: drop
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'prometheus-server'
+
+  # API Gateway
+  - job_name: 'api-gateway'
+    static_configs:
+      - targets: ['api-gateway:8080']
+    scrape_interval: 15s
+    metrics_path: '/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'api-gateway'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'api-gateway'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'http_server_requests_seconds.*'
+        target_label: __name__
+        replacement: 'http_request_duration_seconds'
+
+  # Authentication Service
+  - job_name: 'authentication-service'
+    static_configs:
+      - targets: ['authentication-service:8081']
+    scrape_interval: 15s
+    metrics_path: '/api/auth/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'authentication-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'authentication-service'
+
+  # User Management Service
+  - job_name: 'user-management-service'
+    static_configs:
+      - targets: ['user-management-service:8082']
+    scrape_interval: 15s
+    metrics_path: '/api/users/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'user-management-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'user-management-service'
+
+  # Quest Management Service
+  - job_name: 'quest-management-service'
+    static_configs:
+      - targets: ['quest-management-service:8083']
+    scrape_interval: 15s
+    metrics_path: '/api/quests/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'quest-management-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'quest-management-service'
+
+  # Game Engine Service
+  - job_name: 'game-engine-service'
+    static_configs:
+      - targets: ['game-engine-service:8084']
+    scrape_interval: 15s
+    metrics_path: '/api/game/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'game-engine-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'game-engine-service'
+
+  # Team Management Service
+  - job_name: 'team-management-service'
+    static_configs:
+      - targets: ['team-management-service:8085']
+    scrape_interval: 15s
+    metrics_path: '/api/teams/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'team-management-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'team-management-service'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    static_configs:
+      - targets: ['notification-service:8086']
+    scrape_interval: 15s
+    metrics_path: '/api/notifications/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'notification-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'notification-service'
+
+  # Statistics Service
+  - job_name: 'statistics-service'
+    static_configs:
+      - targets: ['statistics-service:8087']
+    scrape_interval: 15s
+    metrics_path: '/api/statistics/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'statistics-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'statistics-service'
+
+  # File Storage Service
+  - job_name: 'file-storage-service'
+    static_configs:
+      - targets: ['file-storage-service:8088']
+    scrape_interval: 15s
+    metrics_path: '/api/files/actuator/prometheus'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'file-storage-service'
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'file-storage-service'
+
+  # Node Exporter - System metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'docker-host'
+
+  # cAdvisor - Container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'docker-cadvisor'
+
+  # Redis Exporter
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'redis'
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: 
+        - 'postgres-auth-exporter:9187'
+        - 'postgres-users-exporter:9187'
+        - 'postgres-quests-exporter:9187'
+        - 'postgres-game-exporter:9187'
+        - 'postgres-teams-exporter:9187'
+        - 'postgres-notifications-exporter:9187'
+        - 'postgres-statistics-exporter:9187'
+        - 'postgres-files-exporter:9187'
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        regex: '([^:]+):.*'
+        replacement: '${1}'
+
+  # Kafka Exporter
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'kafka'
+
+  # MinIO Exporter
+  - job_name: 'minio-exporter'
+    static_configs:
+      - targets: ['minio:9000']
+    scrape_interval: 30s
+    metrics_path: '/minio/v2/metrics/cluster'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'minio'
+
+  # Nginx Exporter
+  - job_name: 'nginx-exporter'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'nginx'
+
+  # Elasticsearch Exporter
+  - job_name: 'elasticsearch-exporter'
+    static_configs:
+      - targets: ['elasticsearch-exporter:9114']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'elasticsearch'
+
+  # Jaeger Collector
+  - job_name: 'jaeger'
+    static_configs:
+      - targets: ['jaeger:14269']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'jaeger-collector'
+
+  # Kubernetes (if applicable)
+  - job_name: 'kubernetes-apiservers'
+    kubernetes_sd_configs:
+      - role: endpoints
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+
+  # Kubernetes nodes
+  - job_name: 'kubernetes-nodes'
+    kubernetes_sd_configs:
+      - role: node
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+
+  # Kubernetes pods
+  - job_name: 'kubernetes-pods'
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+# Storage configuration
+storage:
+  tsdb:
+    path: /prometheus
+    retention.time: 15d
+    retention.size: 10GB
+    wal-compression: true
+
+# Compression configuration
+compression:
+  enabled: true
+
+# Web configuration
+web:
+  enable_admin_api: true
+  page_title: "DN Quest Prometheus"
+  external_url: "http://prometheus:9090"

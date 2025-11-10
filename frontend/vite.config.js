@@ -22,7 +22,13 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://backend:8080', // backend — имя контейнера в docker-compose
+        target: 'http://localhost:8080', // API Gateway
+        changeOrigin: true,
+        secure: false
+      },
+      '/ws': {
+        target: 'ws://localhost:8080', // WebSocket Gateway
+        ws: true,
         changeOrigin: true
       }
     }

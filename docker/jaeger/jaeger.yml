@@ -1,0 +1,56 @@
+# Jaeger configuration for DN Quest distributed tracing
+
+# Collector configuration
+collector:
+  zipkin:
+    host-port: :9411
+  otlp:
+    grpc:
+      host-port: :14250
+    http:
+      host-port: :14268
+  http:
+    host-port: :14269
+
+# Query service configuration
+query:
+  base-path: /
+  static-files: /go/src/github.com/jaegertracing/jaeger-ui/build/
+
+# Storage configuration
+storage:
+  type: elasticsearch
+  elasticsearch:
+    username: ""
+    password: ""
+    node-urls: http://elasticsearch:9200
+    index-prefix: dn-quest-jaeger
+    tags-as-fields:
+      all: true
+    timeout: 5s
+    num-shards: 1
+    num-replicas: 0
+    bulk:
+      size: 5242880
+      workers: 1
+      flush-interval: 200ms
+
+# Sampling configuration
+sampling:
+  default-strategy:
+    type: probabilistic
+    param: 0.1
+
+# UI configuration
+ui:
+  config-file: /etc/jaeger/ui.json
+
+# Metrics configuration
+metrics-backend: prometheus
+metrics-http-route: /metrics
+
+# Logging configuration
+log-level: info
+
+# Health check configuration
+health-check-http-port: 14269

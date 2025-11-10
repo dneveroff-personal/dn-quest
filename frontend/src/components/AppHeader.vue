@@ -168,7 +168,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   NButton,
@@ -179,7 +179,9 @@ import {
   useMessage
 } from "naive-ui";
 import { logout as authLogout } from "@/services/auth";
-import api from "@/services/api";
+import { teamService } from "@/services/api";
+import { handleError } from "@/services/errorHandler";
+import { useTeamEvents } from "@/services/websocket";
 
 const props = defineProps({
   currentUser: { type: Object, default: null }
@@ -224,15 +226,31 @@ const userMenuOptions = computed(() => [
   }
 ]);
 
+// WebSocket события для реального обновления приглашений
+const { unsubscribeAll } = useTeamEvents({
+  onInvitationReceived: () => {
+    loadInvitationCount();
+  },
+  onInvitationAccepted: () => {
+    loadInvitationCount();
+  },
+  onInvitationRejected: () => {
+    loadInvitationCount();
+  },
+});
+
 // Загрузка количества приглашений
 async function loadInvitationCount() {
   if (!props.currentUser || props.currentUser.team) return;
   
   try {
-    const response = await api.get('/invitations/count');
+    const response = await teamService.getInvitationCount();
     invitationCount.value = response.data || 0;
   } catch (error) {
-    console.warn('Не удалось загрузить количество приглашений:', error);
+    handleError(error, {
+      context: 'Loading invitation count',
+      showMessage: false,
+    });
   }
 }
 
@@ -266,10 +284,25 @@ function getUserEmoji(role) {
   return roleEmojis[role] || "👤";
 }
 
-// Загружаем приглашения при монтировании
-if (props.currentUser) {
-  loadInvitationCount();
-}
+// Загружаем приглашения при монтировании и при изменении пользователя
+onMounted(() => {
+  if (props.currentUser) {
+    loadInvitationCount();
+  }
+});
+
+watch(() => props.currentUser, (newUser) => {
+  if (newUser) {
+    loadInvitationCount();
+  } else {
+    invitationCount.value = 0;
+  }
+});
+
+// Очищаем подписки при уничтожении компонента
+onUnmounted(() => {
+  unsubscribeAll();
+});
 </script>
 
 <style scoped>

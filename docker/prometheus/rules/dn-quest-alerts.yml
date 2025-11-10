@@ -1,0 +1,254 @@
+# DN Quest Alert Rules
+groups:
+  - name: dn-quest.rules
+    rules:
+      # Service Health Alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute."
+
+      # High CPU Usage Alerts
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 80% for more than 5 minutes on {{ $labels.instance }}."
+
+      # High Memory Usage Alerts
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for more than 5 minutes on {{ $labels.instance }}."
+
+      # Disk Space Alerts
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk usage is above 90% on {{ $labels.device }} at {{ $labels.instance }}."
+
+      # JVM Memory Alerts
+      - alert: HighJVMMemoryUsage
+        expr: (jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High JVM memory usage in {{ $labels.job }}"
+          description: "JVM heap memory usage is above 85% for more than 5 minutes in {{ $labels.job }}."
+
+      # JVM GC Alerts
+      - alert: HighGCTime
+        expr: rate(jvm_gc_collection_seconds_sum[5m]) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High GC time in {{ $labels.job }}"
+          description: "GC time is above 10% for more than 5 minutes in {{ $labels.job }}."
+
+      # HTTP Request Error Rate
+      - alert: HighHTTPErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High HTTP error rate in {{ $labels.job }}"
+          description: "HTTP 5xx error rate is above 5% for more than 5 minutes in {{ $labels.job }}."
+
+      # HTTP Response Time
+      - alert: HighHTTPResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High HTTP response time in {{ $labels.job }}"
+          description: "95th percentile response time is above 1 second for more than 5 minutes in {{ $labels.job }}."
+
+      # Database Connection Pool Usage
+      - alert: HighDatabaseConnectionPoolUsage
+        expr: (hikaricp_connections_active / hikaricp_connections_max) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High database connection pool usage in {{ $labels.job }}"
+          description: "Database connection pool usage is above 80% for more than 5 minutes in {{ $labels.job }}."
+
+      # Kafka Consumer Lag
+      - alert: HighKafkaConsumerLag
+        expr: kafka_consumer_lag_sum > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: kafka
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Kafka consumer lag is above 1000 messages for more than 5 minutes."
+
+      # Redis Memory Usage
+      - alert: HighRedisMemoryUsage
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is above 85% for more than 5 minutes."
+
+      # PostgreSQL Connection Usage
+      - alert: HighPostgreSQLConnectionUsage
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: postgresql
+        annotations:
+          summary: "High PostgreSQL connection usage"
+          description: "PostgreSQL connection usage is above 80% for more than 5 minutes."
+
+      # Container Restart Alerts
+      - alert: ContainerRestarting
+        expr: increase(container_start_time_seconds[1h]) > 3
+        for: 0m
+        labels:
+          severity: warning
+          service: docker
+        annotations:
+          summary: "Container {{ $labels.name }} is restarting frequently"
+          description: "Container {{ $labels.name }} has restarted more than 3 times in the last hour."
+
+      # MinIO Disk Usage
+      - alert: HighMinIODiskUsage
+        expr: (minio_disk_free_bytes / minio_disk_total_bytes) * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          service: minio
+        annotations:
+          summary: "Low disk space in MinIO"
+          description: "MinIO disk space is below 10% for more than 5 minutes."
+
+      # Elasticsearch Cluster Health
+      - alert: ElasticsearchClusterRed
+        expr: elasticsearch_cluster_health_status{color="red"} == 1
+        for: 1m
+        labels:
+          severity: critical
+          service: elasticsearch
+        annotations:
+          summary: "Elasticsearch cluster status is red"
+          description: "Elasticsearch cluster status is red, indicating serious issues."
+
+      - alert: ElasticsearchClusterYellow
+        expr: elasticsearch_cluster_health_status{color="yellow"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          service: elasticsearch
+        annotations:
+          summary: "Elasticsearch cluster status is yellow"
+          description: "Elasticsearch cluster status is yellow, indicating some issues."
+
+  - name: dn-quest-business.rules
+    rules:
+      # Business Metrics Alerts
+      - alert: LowUserActivity
+        expr: rate(http_requests_total{job="api-gateway",handler=~"/api/(auth|users)/.*"}[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: info
+          service: business
+        annotations:
+          summary: "Low user activity detected"
+          description: "User activity rate is below 0.1 requests per second for more than 10 minutes."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job=~".*",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*"}[5m]) * 100 > 10
+        for: 5m
+        labels:
+          severity: critical
+          service: business
+        annotations:
+          summary: "High error rate across services"
+          description: "Overall error rate is above 10% for more than 5 minutes."
+
+      - alert: GameSessionIssues
+        expr: rate(http_requests_total{job="game-engine-service",handler=~"/api/game/.*",status=~"5.."}[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Game engine service experiencing issues"
+          description: "Game engine service error rate is above 5% for more than 3 minutes."
+
+      - alert: NotificationFailures
+        expr: rate(http_requests_total{job="notification-service",handler=~"/api/notifications/.*",status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Notification service experiencing failures"
+          description: "Notification service error rate is above 10% for more than 5 minutes."
+
+  - name: dn-quest-security.rules
+    rules:
+      # Security Alerts
+      - alert: HighAuthenticationFailures
+        expr: rate(http_requests_total{job="authentication-service",handler=~"/api/auth/login",status="401"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is above 10 per second for more than 2 minutes."
+
+      - alert: SuspiciousActivity
+        expr: rate(http_requests_total{job="api-gateway",status="429"}[5m]) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High rate limiting activity detected"
+          description: "Rate limiting is triggered frequently, possible suspicious activity."
+
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(http_requests_total{job=~".*",status="403"}[5m]) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High unauthorized access attempts"
+          description: "Unauthorized access attempts are above 5 per second for more than 3 minutes."

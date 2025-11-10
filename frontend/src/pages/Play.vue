@@ -168,8 +168,10 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useMessage, NSpin, NButton, NInput } from "naive-ui";
-import api from "@/services/api";
+import { gameService } from "@/services/api";
 import { fetchCurrentUser } from "@/services/auth";
+import { handleError } from "@/services/errorHandler";
+import { useGameEvents } from "@/services/websocket";
 import Finish from "@/pages/Finish.vue";
 
 const props = defineProps({
@@ -202,6 +204,29 @@ const apTimer = ref(null);
 const hintTimers = ref([]);
 let timerInterval = null;
 
+// WebSocket события
+const { unsubscribeAll } = useGameEvents({
+  onCodeSubmitted: (codeData) => {
+    // Обновляем данные в реальном времени при отправке кода
+    if (codeData.sessionId === sessionId) {
+      loadCurrentLevel();
+    }
+  },
+  onLevelCompleted: (levelData) => {
+    // Показываем уведомление о завершении уровня
+    if (levelData.sessionId === sessionId) {
+      message.success(`Уровень ${levelData.levelOrder} завершен!`);
+      playFlash();
+    }
+  },
+  onSessionFinished: (sessionData) => {
+    // Обновляем данные при завершении сессии
+    if (sessionData.sessionId === sessionId) {
+      loadCurrentLevel();
+    }
+  },
+});
+
 function playFlash() {
   flashVisible.value = true;
   setTimeout(() => { flashVisible.value = false; }, 350);
@@ -226,11 +251,9 @@ async function loadAttempts(reset = false) {
   if (!hasMore.value) return;
   loadingMore.value = true;
   try {
-    const resp = await api.get(`/sessions/${sessionId}/last-attempts`, {
-      params: {
-        levelId: data.value.level.id,
-        limit: attemptsLimit.value
-      }
+    const resp = await gameService.getSessionAttempts(sessionId, {
+      levelId: data.value.level.id,
+      limit: attemptsLimit.value
     });
     if (resp.data.length < attemptsLimit.value) hasMore.value = false;
     const mapped = resp.data.map(a => ({
@@ -239,6 +262,11 @@ async function loadAttempts(reset = false) {
       symbol: mapSymbol(a.result)
     }));
     attempts.value.push(...mapped);
+  } catch (error) {
+    handleError(error, {
+      context: 'Loading session attempts',
+      showMessage: false,
+    });
   } finally {
     loadingMore.value = false;
   }
@@ -335,11 +363,13 @@ function awaitLoadAttemptsReset() {
 async function loadCurrentLevel() {
   loading.value = true;
   try {
-    const { data: resp } = await api.get(`/sessions/${sessionId}/current`);
+    const { data: resp } = await gameService.getCurrentLevel(sessionId);
     applyLevelView(resp);
   } catch (err) {
-    message.error("Ошибка загрузки уровня");
-    console.log("Ошибка загрузки уровня 1" + err);
+    handleError(err, {
+      context: 'Loading current level',
+      customMessage: 'Ошибка загрузки уровня',
+    });
   } finally {
     loading.value = false;
   }
@@ -375,7 +405,7 @@ async function triggerAutoPass() {
 
   try {
     // POST возвращает LevelViewDTO (или текущий view, если ничего не изменилось)
-    const { data: resp } = await api.post(`/sessions/${sessionId}/auto-pass`);
+    const { data: resp } = await gameService.autoPass(sessionId);
     if (!resp) {
       message.error("Пустой ответ от сервера при автопереходе");
       return;
@@ -394,11 +424,10 @@ async function triggerAutoPass() {
       playFlash();
     }
   } catch (err) {
-    console.log("Ошибка автоперехода:", err);
-    if (err?.response?.data) {
-      console.log("server response:", err.response.data);
-    }
-    message.error("Ошибка при автопереходе");
+    handleError(err, {
+      context: 'Auto pass level',
+      customMessage: 'Ошибка при автопереходе',
+    });
     autoPassed.value = false;
   } finally {
     autoPassInProgress.value = false;
@@ -430,24 +459,31 @@ async function submitCode() {
   submitting.value = true;
   const submitted = code.value.trim();
 
-  await api.post(`/sessions/${sessionId}/code`, {
-    rawCode: submitted,
-    userId: currentUser.value.id
-  });
+  try {
+    await gameService.submitCode(sessionId, {
+      rawCode: submitted,
+      userId: currentUser.value.id
+    });
 
-  // Мгновенный отклик
-  findAndMarkClosedLive(submitted);
+    // Мгновенный отклик
+    findAndMarkClosedLive(submitted);
 
-  const prevLevelId = data.value?.level?.id;
-  // перезагрузим view с сервера (можно использовать loadCurrentLevel)
-  await loadCurrentLevel();
-  if (data.value?.level?.id !== prevLevelId) {
-    message.success(`Уровень ${data.value.level.orderIndex - 1} закрыт кодом: ${submitted}`);
-    playFlash();
+    const prevLevelId = data.value?.level?.id;
+    // перезагрузим view с сервера (можно использовать loadCurrentLevel)
+    await loadCurrentLevel();
+    if (data.value?.level?.id !== prevLevelId) {
+      message.success(`Уровень ${data.value.level.orderIndex - 1} закрыт кодом: ${submitted}`);
+      playFlash();
+    }
+  } catch (err) {
+    handleError(err, {
+      context: 'Submit code',
+      customMessage: 'Ошибка при отправке кода',
+    });
+  } finally {
+    submitting.value = false;
+    code.value = "";
   }
-
-  submitting.value = false;
-  code.value = "";
 }
 
 function isClosedByCode(codeVal) {
@@ -465,6 +501,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval);
+  unsubscribeAll();
 });
 </script>
 
