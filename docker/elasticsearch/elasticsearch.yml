@@ -1,0 +1,118 @@
+# Elasticsearch configuration for DN Quest logging
+cluster.name: dn-quest-logs
+node.name: dn-quest-elasticsearch-node-1
+
+# Network configuration
+network.host: 0.0.0.0
+http.port: 9200
+transport.tcp.port: 9300
+
+# Discovery configuration
+discovery.type: single-node
+
+# Memory configuration
+bootstrap.memory_lock: false
+
+# Data storage
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Security configuration
+xpack.security.enabled: false
+xpack.monitoring.collection.enabled: true
+
+# Index settings
+index.number_of_shards: 1
+index.number_of_replicas: 0
+
+# Performance tuning
+indices.memory.index_buffer_size: 10%
+indices.queries.cache.size: 5%
+indices.fielddata.cache.size: 40%
+
+# Log rotation
+logger.level: INFO
+
+# Custom index templates for DN Quest
+index_templates:
+  - pattern: "dn-quest-*"
+    settings:
+      number_of_shards: 1
+      number_of_replicas: 0
+      index.refresh_interval: "5s"
+      index.max_result_window: 50000
+    mappings:
+      properties:
+        "@timestamp":
+          type: date
+        "level":
+          type: keyword
+        "service":
+          type: keyword
+        "trace_id":
+          type: keyword
+        "span_id":
+          type: keyword
+        "user_id":
+          type: keyword
+        "request_id":
+          type: keyword
+        "message":
+          type: text
+          analyzer: standard
+        "logger":
+          type: keyword
+        "thread":
+          type: keyword
+        "exception":
+          properties:
+            "class":
+              type: keyword
+            "message":
+              type: text
+              analyzer: standard
+            "stacktrace":
+              type: text
+              analyzer: standard
+        "http":
+          properties:
+            "method":
+              type: keyword
+            "url":
+              type: keyword
+            "status_code":
+              type: integer
+            "response_time":
+              type: float
+            "user_agent":
+              type: keyword
+            "remote_address":
+              type: ip
+        "jvm":
+          properties:
+            "heap_used":
+              type: long
+            "heap_max":
+              type: long
+            "gc_time":
+              type: float
+            "thread_count":
+              type: integer
+        "database":
+          properties:
+            "query_time":
+              type: float
+            "connection_pool_used":
+              type: integer
+            "connection_pool_max":
+              type: integer
+        "kafka":
+          properties:
+            "topic":
+              type: keyword
+            "partition":
+              type: integer
+            "offset":
+              type: long
+            "lag":
+              type: long

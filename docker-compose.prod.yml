@@ -1,0 +1,1197 @@
+version: '3.8'
+
+# DN Quest - Production конфигурация
+# Этот файл содержит production-optimized конфигурацию с security и performance enhancements
+
+services:
+  # ===========================================
+  # Production Infrastructure Services
+  # ===========================================
+
+  # PostgreSQL базы данных для каждого микросервиса с production настройками
+  postgres-auth:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-auth
+    environment:
+      POSTGRES_DB: ${POSTGRES_AUTH_DB:-dnquest_auth}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/init:/docker-entrypoint-initdb.d
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_AUTH_DB:-dnquest_auth}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-users:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-users
+    environment:
+      POSTGRES_DB: ${POSTGRES_USERS_DB:-dnquest_users}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_users_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_USERS_DB:-dnquest_users}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-quests:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-quests
+    environment:
+      POSTGRES_DB: ${POSTGRES_QUESTS_DB:-dnquest_quests}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_quests_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_QUESTS_DB:-dnquest_quests}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-game:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-game
+    environment:
+      POSTGRES_DB: ${POSTGRES_GAME_DB:-dnquest_game}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_game_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_GAME_DB:-dnquest_game}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-teams:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-teams
+    environment:
+      POSTGRES_DB: ${POSTGRES_TEAMS_DB:-dnquest_teams}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_teams_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_TEAMS_DB:-dnquest_teams}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-notifications:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-notifications
+    environment:
+      POSTGRES_DB: ${POSTGRES_NOTIFICATIONS_DB:-dnquest_notifications}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_notifications_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_NOTIFICATIONS_DB:-dnquest_notifications}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-statistics:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-statistics
+    environment:
+      POSTGRES_DB: ${POSTGRES_STATISTICS_DB:-dnquest_statistics}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_statistics_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_STATISTICS_DB:-dnquest_statistics}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  postgres-files:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-postgres-files
+    environment:
+      POSTGRES_DB: ${POSTGRES_FILES_DB:-dnquest_files}
+      POSTGRES_USER: ${POSTGRES_USER:-dn_quest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_files_data:/var/lib/postgresql/data
+      - ./docker/postgres/production/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/production/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn_quest_user} -d ${POSTGRES_FILES_DB:-dnquest_files}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  # Redis для кэширования с production настройками
+  redis:
+    image: redis:7-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-redis
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/production/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  # Kafka кластер для production
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_AUTOPURGE_SNAPRETAINCOUNT: 3
+      ZOOKEEPER_AUTOPURGE_PURGEINTERVAL: 1
+      ZOOKEEPER_AUTH_PROVIDER.1: org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+      ZOOKEEPER_REQUIRE_CLIENT_AUTH_SCHEMA: sasl
+      ZOOKEEPER_JAAS_LOGIN_RENEW: 7200000
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SSL_CLIENT_ENABLE: false
+      ZOOKEEPER_SSL_QUORUM_ENABLE: false
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_logs:/var/lib/zookeeper/log
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+      KAFKA_DELETE_TOPIC_ENABLE: true
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      KAFKA_MESSAGE_MAX_BYTES: 1000000
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 1048576
+      KAFKA_NUM_NETWORK_THREADS: 8
+      KAFKA_NUM_IO_THREADS: 16
+      KAFKA_SOCKET_SEND_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # MinIO для файлового хранилища с production настройками
+  minio:
+    image: minio/minio:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_CONSOLE_URL}
+    volumes:
+      - minio_data:/data
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+  # ===========================================
+  # Production Microservices
+  # ===========================================
+
+  # API Gateway с production настройками
+  api-gateway:
+    image: ${DOCKER_REGISTRY:-dn-quest}/api-gateway:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-api-gateway
+    ports:
+      - "${API_GATEWAY_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS_PER_MINUTE: ${RATE_LIMIT_REQUESTS_PER_MINUTE:-60}
+      AUTHENTICATION_SERVICE_URL: http://authentication-service:8081
+      USER_MANAGEMENT_SERVICE_URL: http://user-management-service:8082
+      QUEST_MANAGEMENT_SERVICE_URL: http://quest-management-service:8083
+      GAME_ENGINE_SERVICE_URL: http://game-engine-service:8084
+      TEAM_MANAGEMENT_SERVICE_URL: http://team-management-service:8085
+      NOTIFICATION_SERVICE_URL: http://notification-service:8086
+      STATISTICS_SERVICE_URL: http://statistics-service:8087
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service:8088
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus,gateway
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+      # Security
+      SERVER_TOMCAT_MAX_THREADS: 200
+      SERVER_TOMCAT_MIN_SPARE_THREADS: 10
+      SERVER_TOMCAT_MAX_CONNECTIONS: 8192
+      SERVER_TOMCAT_ACCEPT_COUNT: 100
+    depends_on:
+      redis:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Authentication Service с production настройками
+  authentication-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/authentication-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-authentication-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-auth:5432/${POSTGRES_AUTH_DB:-dnquest_auth}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      JWT_ISSUER: ${JWT_ISSUER}
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/auth/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # User Management Service с production настройками
+  user-management-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/user-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-user-management-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-users:5432/${POSTGRES_USERS_DB:-dnquest_users}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/api/users/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Quest Management Service с production настройками
+  quest-management-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/quest-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-quest-management-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-quests:5432/${POSTGRES_QUESTS_DB:-dnquest_quests}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service:8088
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-quests:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      file-storage-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/quests/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Game Engine Service с production настройками
+  game-engine-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/game-engine-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-game-engine-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-game:5432/${POSTGRES_GAME_DB:-dnquest_game}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      QUEST_SERVICE_URL: http://quest-management-service:8083
+      TEAM_SERVICE_URL: http://team-management-service:8085
+      STATISTICS_SERVICE_URL: http://statistics-service:8087
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-game:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      quest-management-service:
+        condition: service_healthy
+      team-management-service:
+        condition: service_healthy
+      statistics-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/api/game/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Team Management Service с production настройками
+  team-management-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/team-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-team-management-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-teams:5432/${POSTGRES_TEAMS_DB:-dnquest_teams}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      USER_SERVICE_URL: http://user-management-service:8082
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-teams:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      user-management-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/api/teams/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Notification Service с production настройками
+  notification-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/notification-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-notifications:5432/${POSTGRES_NOTIFICATIONS_DB:-dnquest_notifications}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-notifications:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/api/notifications/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Statistics Service с production настройками
+  statistics-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/statistics-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-statistics-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-statistics:5432/${POSTGRES_STATISTICS_DB:-dnquest_statistics}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      GAME_SERVICE_URL: http://game-engine-service:8084
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-statistics:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      game-engine-service:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8087/api/statistics/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # File Storage Service с production настройками
+  file-storage-service:
+    image: ${DOCKER_REGISTRY:-dn-quest}/file-storage-service:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-file-storage-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres-files:5432/${POSTGRES_FILES_DB:-dnquest_files}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn_quest_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-20}
+      DATABASE_MAX_POOL_SIZE: ${DATABASE_MAX_POOL_SIZE:-50}
+      # Production JVM настройки
+      JAVA_OPTS: "-Xms512m -Xmx1g -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+DisableExplicitGC -XX:+AlwaysPreTouch"
+      # Monitoring
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,prometheus
+      MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED: true
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
+    depends_on:
+      postgres-files:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/api/files/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+
+  # Frontend с production настройками
+  frontend:
+    image: ${DOCKER_REGISTRY:-dn-quest}/frontend:${DOCKER_TAG:-1.0.0}
+    container_name: ${COMPOSE_PROJECT_NAME:-dn-quest}-frontend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_HTTPS_PORT:-443}:443"
+    environment:
+      NODE_ENV: production
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+      VITE_WS_URL: ${VITE_WS_URL}
+      VITE_MINIO_URL: ${VITE_MINIO_URL}
+    volumes:
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - frontend_logs:/var/log/nginx
+    networks:
+      - ${DOCKER_NETWORK:-dn-quest-prod-network}
+    depends_on:
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+
+# ===========================================
+# Production Volumes
+# ===========================================
+volumes:
+  postgres_auth_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/auth}
+  postgres_users_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/users}
+  postgres_quests_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/quests}
+  postgres_game_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/game}
+  postgres_teams_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/teams}
+  postgres_notifications_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/notifications}
+  postgres_statistics_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/statistics}
+  postgres_files_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${POSTGRES_DATA_PATH:-/var/lib/dn-quest/data/postgres/files}
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${REDIS_DATA_PATH:-/var/lib/dn-quest/data/redis}
+  kafka_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${KAFKA_DATA_PATH:-/var/lib/dn-quest/data/kafka}
+  zookeeper_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${KAFKA_DATA_PATH:-/var/lib/dn-quest/data/zookeeper}
+  zookeeper_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${KAFKA_DATA_PATH:-/var/lib/dn-quest/data/zookeeper/logs}
+  minio_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${MINIO_DATA_PATH:-/var/lib/dn-quest/data/minio}
+  frontend_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${LOGS_PATH:-/var/log/dn-quest}/frontend
+
+# ===========================================
+# Production Networks
+# ===========================================
+networks:
+  ${DOCKER_NETWORK:-dn-quest-prod-network}:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: dn-quest-prod
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"

@@ -1,7 +1,6 @@
 package dn.quest.model.entities.quest.level;
 
 import dn.quest.model.entities.quest.GameSession;
-import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.user.User;
 import jakarta.persistence.*;
 import lombok.Data;

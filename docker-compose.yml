@@ -1,66 +1,802 @@
-#TODO: перенести все пароли в env файл
+# DN Quest - Основная конфигурация микросервисной архитектуры
+# Этот файл содержит полную конфигурацию для запуска всех сервисов
+
 services:
-  db:
-    image: postgres:16
-    container_name: quest-db
+  # ===========================================
+  # Инфраструктурные сервисы
+  # ===========================================
+
+  # PostgreSQL базы данных - консолидированная архитектура
+  # postgres-core: auth + users
+  # postgres-business: quests + game + teams + notifications
+  # postgres-analytics: statistics + files
+
+  postgres-core:
+    image: postgres:16-alpine
+    container_name: dn-quest-postgres-core
     environment:
-      POSTGRES_USER: dn
-      POSTGRES_PASSWORD: dn
-      POSTGRES_DB: dnqdb
+      POSTGRES_DB: ${POSTGRES_CORE_DB:-dnquest_core}
+      POSTGRES_USER: ${POSTGRES_USER:-dn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     ports:
-      - "5432:5432"
+      - "${POSTGRES_CORE_PORT:-5432}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_core_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn} -d ${POSTGRES_CORE_DB:-dnquest_core}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: quest-backend
-    ports:
-      - "8080:8080"
-      - "5004:5004"   # <-- порт для работы дебага
+  # postgres-business: quests + game + teams + notifications
+  postgres-business:
+    image: postgres:16-alpine
+    container_name: dn-quest-postgres-business
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dnqdb
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DB_USER}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DB_PASS}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      BOT_TOKEN: ${BOT_TOKEN}
-    env_file:
-      - ${PWD}/.env
-    depends_on:
-      - db
+      POSTGRES_DB: ${POSTGRES_BUSINESS_DB:-dnquest_business}
+      POSTGRES_USER: ${POSTGRES_USER:-dn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_BUSINESS_PORT:-5433}:5432"
+    volumes:
+      - postgres_business_data:/var/lib/postgresql/data
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn} -d ${POSTGRES_BUSINESS_DB:-dnquest_business}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
+  # postgres-analytics: statistics + files
+  postgres-analytics:
+    image: postgres:16-alpine
+    container_name: dn-quest-postgres-analytics
+    environment:
+      POSTGRES_DB: ${POSTGRES_ANALYTICS_DB:-dnquest_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-dn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_ANALYTICS_PORT:-5434}:5432"
+    volumes:
+      - postgres_analytics_data:/var/lib/postgresql/data
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn} -d ${POSTGRES_ANALYTICS_DB:-dnquest_analytics}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+
+  # Consul для Service Discovery
+  consul:
+    image: consul:1.15
+    container_name: dn-quest-consul
+    ports:
+      - "${CONSUL_HTTP_PORT:-8500}:8500"
+      - "${CONSUL_DNS_PORT:-8600}:8600/udp"
+    command: agent -server -ui -bootstrap-expect=1 -client=0.0.0.0
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Spring Cloud Config Server для централизованной конфигурации
+  config-server:
+    image: ${DOCKER_REGISTRY:-dn-quest}/config-server:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-config-server
+    ports:
+      - "${CONFIG_SERVER_PORT:-8888}:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: ${CONFIG_GIT_URI:-https://github.com/dn-quest/config.git}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL: ${CONFIG_GIT_LABEL:-main}
+      SPRING_CLOUD_CONFIG_SERVER_GIT_SEARCH_PATHS: config/{application}
+    volumes:
+      - config_server_data:/app/config
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    depends_on:
+      consul:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Redis для кэширования и управления сессиями
+  redis:
+    image: redis:7-alpine
+    container_name: dn-quest-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - dn-quest-network
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Kafka для event-driven коммуникации
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: dn-quest-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: dn-quest-kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: ${KAFKA_AUTO_CREATE_TOPICS_ENABLE:-true}
+      KAFKA_DELETE_TOPIC_ENABLE: true
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # ClickHouse для аналитики и статистики
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.8-alpine
+    container_name: dn-quest-clickhouse
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_TCP_PORT:-9000}:9000"
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-dnquest_analytics}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-dn}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-dn}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./docker/clickhouse/config.d:/etc/clickhouse-server/config.d
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # Kafka UI для управления
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: dn-quest-kafka-ui
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "${KAFKA_UI_PORT:-8089}:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # MinIO для файлового хранилища
+  minio:
+    image: minio/minio:latest
+    container_name: dn-quest-minio
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+    networks:
+      - dn-quest-network
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # ===========================================
+  # Микросервисы
+  # ===========================================
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/api-gateway:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-api-gateway
+    ports:
+      - "${API_GATEWAY_PORT:-8080}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8080}
+      AUTHENTICATION_SERVICE_URL: http://authentication-service:8081
+      USER_MANAGEMENT_SERVICE_URL: http://user-management-service:8082
+      QUEST_MANAGEMENT_SERVICE_URL: http://quest-management-service:8083
+      GAME_ENGINE_SERVICE_URL: http://game-engine-service:8084
+      TEAM_MANAGEMENT_SERVICE_URL: http://team-management-service:8085
+      NOTIFICATION_SERVICE_URL: http://notification-service:8086
+      STATISTICS_SERVICE_URL: http://statistics-service:8087
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service:8088
+    depends_on:
+      redis:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Authentication Service
+  authentication-service:
+    build:
+      context: ./authentication-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/authentication-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-authentication-service
+    ports:
+      - "${AUTHENTICATION_SERVICE_PORT:-8081}:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-core:5432/dnquest_auth
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET:-dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-900000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      JWT_ISSUER: ${JWT_ISSUER:-dn-quest-auth-service}
+    depends_on:
+      postgres-core:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # User Management Service
+  user-management-service:
+    build:
+      context: ./user-management-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/user-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-user-management-service
+    ports:
+      - "${USER_MANAGEMENT_SERVICE_PORT:-8082}:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-core:5432/dnquest_users
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+    depends_on:
+      postgres-core:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Quest Management Service
+  quest-management-service:
+    build:
+      context: ./quest-management-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/quest-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-quest-management-service
+    ports:
+      - "${QUEST_MANAGEMENT_SERVICE_PORT:-8083}:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-business:5432/dnquest_quests
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service:8088
+    depends_on:
+      postgres-business:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      file-storage-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Game Engine Service
+  game-engine-service:
+    build:
+      context: ./game-engine-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/game-engine-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-game-engine-service
+    ports:
+      - "${GAME_ENGINE_SERVICE_PORT:-8084}:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-business:5432/dnquest_game
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      QUEST_SERVICE_URL: http://quest-management-service:8083
+      TEAM_SERVICE_URL: http://team-management-service:8085
+    depends_on:
+      postgres-business:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      quest-management-service:
+        condition: service_healthy
+      team-management-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Team Management Service
+  team-management-service:
+    build:
+      context: ./team-management-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/team-management-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-team-management-service
+    ports:
+      - "${TEAM_MANAGEMENT_SERVICE_PORT:-8085}:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-business:5432/dnquest_teams
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      USER_SERVICE_URL: http://user-management-service:8082
+    depends_on:
+      postgres-business:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      user-management-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/notification-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-notification-service
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT:-8086}:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-business:5432/dnquest_notifications
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+    depends_on:
+      postgres-business:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Statistics Service
+  statistics-service:
+    build:
+      context: ./statistics-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/statistics-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-statistics-service
+    ports:
+      - "${STATISTICS_SERVICE_PORT:-8087}:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-analytics:5432/dnquest_statistics
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      AUTH_SERVICE_URL: http://authentication-service:8081
+      GAME_SERVICE_URL: http://game-engine-service:8084
+    depends_on:
+      postgres-analytics:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      authentication-service:
+        condition: service_healthy
+      game-engine-service:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8087/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # File Storage Service
+  file-storage-service:
+    build:
+      context: ./file-storage-service
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY:-dn-quest}/file-storage-service:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-file-storage-service
+    ports:
+      - "${FILE_STORAGE_SERVICE_PORT:-8088}:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_CLOUD_CONSUL_HOST: consul
+      DATABASE_URL: jdbc:postgresql://postgres-analytics:5432/dnquest_files
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-dn-quest-files}
+    depends_on:
+      postgres-analytics:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - dn-quest-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Frontend
   frontend:
     build:
       context: ./frontend
-    container_name: quest-frontend
+      dockerfile: Dockerfile
+      target: ${FRONTEND_TARGET:-development}
+    image: ${DOCKER_REGISTRY:-dn-quest}/frontend:${DOCKER_TAG:-1.0.0}
+    container_name: dn-quest-frontend
     ports:
-      - "5173:5173"
+      - "${FRONTEND_PORT:-3000}:3000"
     environment:
-      - NODE_ENV=production
-      - VITE_API_BASE_URL=http://backend:8080/api
+      NODE_ENV: ${NODE_ENV:-development}
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+      VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080}
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    networks:
+      - dn-quest-network
     depends_on:
-      - backend
+      - api-gateway
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: quest-pgadmin
-    depends_on:
-      - db
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-
+# ===========================================
+# Volumes
+# ===========================================
 volumes:
-  pgdata:
-  pgadmin_data:
+  postgres_core_data:
+    driver: local
+  postgres_business_data:
+    driver: local
+  postgres_analytics_data:
+    driver: local
+  consul_data:
+    driver: local
+  config_server_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+  redis_data:
+    driver: local
+  kafka_data:
+    driver: local
+  minio_data:
+    driver: local
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  dn-quest-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -14,6 +14,7 @@ import dn.quest.repositories.UserRepository;
 import dn.quest.services.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -107,11 +109,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO register(RegisterDTO dto) {
+        log.debug("Регистрация нового пользователя: {}", dto.getUsername());
+        
         if (existsByUsername(dto.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            log.warn("Попытка регистрации с существующим именем пользователя: {}", dto.getUsername());
+            throw new RuntimeException("Пользователь с таким именем уже существует");
         }
         if (dto.getEmail() != null && !dto.getEmail().isBlank() && existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            log.warn("Попытка регистрации с существующим email: {}", dto.getEmail());
+            throw new RuntimeException("Пользователь с таким email уже существует");
         }
 
         User user = new User();
@@ -124,6 +130,7 @@ public class UserServiceImpl implements UserService {
         user.setRole(UserRole.PLAYER);
 
         user = userRepository.save(user);
+        log.info("Пользователь {} успешно зарегистрирован с ID: {}", user.getUsername(), user.getId());
         return toDTO(user);
     }
 

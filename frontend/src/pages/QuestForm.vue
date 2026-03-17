@@ -112,7 +112,7 @@
                     </div>
                     <div class="flex gap-2">
                       <n-button size="small" type="success" @click="changeParticipationStatus(r.id, 'ACCEPTED')">Принять</n-button>
-                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'DECLINED')">Отклонить</n-button>
+                      <n-button size="small" type="error" @click="changeParticipationStatus(r.id, 'REJECTED')">Отклонить</n-button>
                     </div>
                   </li>
                 </ul>
@@ -162,7 +162,8 @@
 import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { NCard, NButton, NForm, NFormItem, NInput, NSelect, NSwitch, NDatePicker, useMessage } from "naive-ui";
-import api from "@/services/api";
+import { questService, userService } from "@/services/api";
+import { handleError } from "@/services/errorHandler";
 import LevelsManager from "@/components/quests/LevelsManager.vue";
 
 const levelsManagerRef = ref(null);
@@ -192,7 +193,7 @@ const difficultyOptions = [
   { label: "Сложно", value: "HARD" },
 ];
 const typeOptions = [
-  { label: "Одиночный", value: "SINGLE" },
+  { label: "Одиночный", value: "SOLO" },
   { label: "Командный", value: "TEAM" },
 ];
 
@@ -206,30 +207,38 @@ const requestsAccepted = computed(() =>
 async function loadParticipationRequests() {
   if (!isEditMode.value) return;
   try {
-    const { data } = await api.get(`/participation/by-quest/${questId}`);
+    const { data } = await questService.getParticipationRequests(questId);
     participationRequests.value = data || [];
   } catch (err) {
-    console.error("Ошибка загрузки заявок", err);
+    handleError(err, {
+      context: 'Loading participation requests',
+      showMessage: false,
+    });
   }
 }
 
 async function changeParticipationStatus(id, status) {
   try {
-    await api.post(`/participation/${id}/status`, null, { params: { status } });
+    await questService.updateParticipationStatus(id, status);
     message.success(status === "ACCEPTED" ? "Принято" : "Отклонено");
     await loadParticipationRequests();
   } catch (err) {
-    console.error("Ошибка изменения статуса", err);
-    message.error("Не удалось изменить статус заявки");
+    handleError(err, {
+      context: 'Changing participation status',
+      customMessage: 'Не удалось изменить статус заявки',
+    });
   }
 }
 
 async function loadAuthors() {
   try {
-    const { data } = await api.get("/users?role=AUTHOR");
+    const { data } = await userService.getAuthors();
     authorOptions.value = data.map(a => ({ label: a.publicName, value: a.id }));
   } catch (err) {
-    console.error("Ошибка загрузки авторов", err);
+    handleError(err, {
+      context: 'Loading authors',
+      showMessage: false,
+    });
   }
 }
 
@@ -249,7 +258,7 @@ function toIsoFromLocal(local) {
 async function loadQuest() {
   if (!isEditMode.value) return;
   try {
-    const { data } = await api.get(`/quests/${route.params.id}`);
+    const { data } = await questService.getQuestById(route.params.id);
 
     form.value.title = data.title || "";
     form.value.descriptionHtml = data.descriptionHtml || "";
@@ -264,7 +273,10 @@ async function loadQuest() {
     form.value.authors = (data.authors || []).map(a => a.id);
     form.value.published = !!data.published;
   } catch (err) {
-    console.error("Ошибка загрузки квеста", err);
+    handleError(err, {
+      context: 'Loading quest',
+      customMessage: 'Ошибка загрузки квеста',
+    });
   }
 }
 
@@ -283,21 +295,25 @@ async function handleSubmit() {
     };
 
     if (isEditMode.value) {
-      await api.put(`/quests/${route.params.id}`, payload);
+      await questService.updateQuest(route.params.id, payload);
 
       // 🔹 сохраняем порядок уровней
       if (levelsManagerRef.value) {
         const orderedIds = levelsManagerRef.value.getOrderedIds();
-        await api.put("/levels/reorder", orderedIds);
+        // TODO: Реализовать API для reorder уровней
+        // await questService.reorderLevels(orderedIds);
       }
 
     } else {
-      await api.post("/quests", payload);
+      await questService.createQuest(payload);
     }
 
     router.push("/");
   } catch (err) {
-    console.error("Ошибка сохранения квеста", err);
+    handleError(err, {
+      context: 'Saving quest',
+      customMessage: 'Ошибка сохранения квеста',
+    });
   }
 }
 
@@ -313,12 +329,14 @@ async function deleteQuest() {
   }
 
   try {
-    await api.delete(`/quests/${route.params.id}`);
+    await questService.deleteQuest(route.params.id);
     message.success(`Игра #${route.params.id} была удалена`);
     await router.push("/");
   } catch (err) {
-    message.error("Ошибка удаления квеста");
-    console.error("Ошибка удаления квеста", err);
+    handleError(err, {
+      context: 'Deleting quest',
+      customMessage: 'Ошибка удаления квеста',
+    });
   }
 }
 

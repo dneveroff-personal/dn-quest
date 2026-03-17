@@ -1,0 +1,150 @@
+server:
+  port: 8086
+  servlet:
+    context-path: /api/notifications
+
+spring:
+  application:
+    name: notification-service
+  
+  profiles:
+    active: dev
+  
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000, expireAfterWrite=30m
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.notification.event"
+    consumer:
+      group-id: notification-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.notification.event"
+        spring.json.value.default.type: "dn.quest.shared.events.BaseEvent"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 100
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 10000
+    listener:
+      ack-mode: manual_immediate
+      poll-timeout: 3000
+      concurrency: 3
+  
+  # Email Configuration
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Telegram Configuration
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:}
+    username: ${TELEGRAM_BOT_USERNAME:}
+
+# Application configuration
+app:
+  kafka:
+    topics:
+      user-events: user-events
+      quest-events: quest-events
+      game-events: game-events
+      team-events: team-events
+      file-events: file-events
+      notification-events: notification-events
+      statistics-events: statistics-events
+      dead-letter-queue: notification-dlq
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    dn.quest.notification: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    dn.quest.notification: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+  
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+    username: ${TELEGRAM_BOT_USERNAME}
+
+logging:
+  level:
+    dn.quest.notification: INFO
+  file:
+    name: /var/log/dn-quest/notification-service.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+logging:
+  level:
+    dn.quest.notification: DEBUG

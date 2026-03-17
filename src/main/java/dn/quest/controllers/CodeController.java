@@ -1,9 +1,7 @@
 package dn.quest.controllers;
 
 import dn.quest.model.dto.CodeDTO;
-import dn.quest.model.dto.LevelDTO;
 import dn.quest.services.interfaces.CodeService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

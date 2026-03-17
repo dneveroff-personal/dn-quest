@@ -1,0 +1,522 @@
+# Enhanced DN Quest Alert Rules
+groups:
+  - name: dn-quest.service.health
+    rules:
+      # Service Health Alerts
+      - alert: ServiceDown
+        expr: up{job=~".*-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: service
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute on instance {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/service-down"
+          
+      - alert: ServiceUnhealthy
+        expr: up{job=~".*-service"} == 1 and (probe_success{job=~".*-service"} == 0 or probe_success{job=~".*-service"} != 1)
+        for: 2m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: service
+        annotations:
+          summary: "Service {{ $labels.job }} is unhealthy"
+          description: "Service {{ $labels.job }} is responding but health checks are failing on instance {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/service-unhealthy"
+
+  - name: dn-quest.performance
+    rules:
+      # HTTP Performance Alerts
+      - alert: HighHTTPErrorRate
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: performance
+        annotations:
+          summary: "High HTTP error rate in {{ $labels.job }}"
+          description: "HTTP 5xx error rate is {{ $value }}% for more than 5 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-error-rate"
+          
+      - alert: CriticalHTTPErrorRate
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100 > 15
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: performance
+        annotations:
+          summary: "Critical HTTP error rate in {{ $labels.job }}"
+          description: "HTTP 5xx error rate is {{ $value }}% for more than 2 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-error-rate"
+          
+      - alert: HighHTTPResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: performance
+        annotations:
+          summary: "High HTTP response time in {{ $labels.job }}"
+          description: "95th percentile response time is {{ $value }}s for more than 5 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-response-time"
+          
+      - alert: CriticalHTTPResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: performance
+        annotations:
+          summary: "Critical HTTP response time in {{ $labels.job }}"
+          description: "95th percentile response time is {{ $value }}s for more than 2 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-response-time"
+          
+      - alert: LowRequestRate
+        expr: rate(http_requests_total{job=~".*-service"}[5m]) < 0.01
+        for: 10m
+        labels:
+          severity: info
+          service: "{{ $labels.job }}"
+          component: performance
+        annotations:
+          summary: "Low request rate in {{ $labels.job }}"
+          description: "Request rate is {{ $value }} req/s for more than 10 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/low-request-rate"
+
+  - name: dn-quest.jvm
+    rules:
+      # JVM Memory Alerts
+      - alert: HighJVMMemoryUsage
+        expr: (jvm_memory_used_bytes{area="heap", job=~".*-service"} / jvm_memory_max_bytes{area="heap", job=~".*-service"}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: jvm
+        annotations:
+          summary: "High JVM memory usage in {{ $labels.job }}"
+          description: "JVM heap memory usage is {{ $value }}% for more than 5 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-jvm-memory"
+          
+      - alert: CriticalJVMMemoryUsage
+        expr: (jvm_memory_used_bytes{area="heap", job=~".*-service"} / jvm_memory_max_bytes{area="heap", job=~".*-service"}) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: jvm
+        annotations:
+          summary: "Critical JVM memory usage in {{ $labels.job }}"
+          description: "JVM heap memory usage is {{ $value }}% for more than 2 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-jvm-memory"
+          
+      # JVM GC Alerts
+      - alert: HighGCTime
+        expr: rate(jvm_gc_collection_seconds_sum{job=~".*-service"}[5m]) * 100 > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: jvm
+        annotations:
+          summary: "High GC time in {{ $labels.job }}"
+          description: "GC time is {{ $value }}% for more than 5 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-gc-time"
+          
+      - alert: CriticalGCTime
+        expr: rate(jvm_gc_collection_seconds_sum{job=~".*-service"}[5m]) * 100 > 20
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: jvm
+        annotations:
+          summary: "Critical GC time in {{ $labels.job }}"
+          description: "GC time is {{ $value }}% for more than 2 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-gc-time"
+          
+      # JVM Thread Alerts
+      - alert: HighThreadCount
+        expr: jvm_threads_live_threads{job=~".*-service"} > 200
+        for: 10m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: jvm
+        annotations:
+          summary: "High thread count in {{ $labels.job }}"
+          description: "Thread count is {{ $value }} for more than 10 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-thread-count"
+
+  - name: dn-quest.database
+    rules:
+      # Database Connection Pool Alerts
+      - alert: HighDatabaseConnectionPoolUsage
+        expr: (hikaricp_connections_active{job=~".*-service"} / hikaricp_connections_max{job=~".*-service"}) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: "{{ $labels.job }}"
+          component: database
+        annotations:
+          summary: "High database connection pool usage in {{ $labels.job }}"
+          description: "Database connection pool usage is {{ $value }}% for more than 5 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-db-connections"
+          
+      - alert: CriticalDatabaseConnectionPoolUsage
+        expr: (hikaricp_connections_active{job=~".*-service"} / hikaricp_connections_max{job=~".*-service"}) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+          component: database
+        annotations:
+          summary: "Critical database connection pool usage in {{ $labels.job }}"
+          description: "Database connection pool usage is {{ $value }}% for more than 2 minutes in {{ $labels.job }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-db-connections"
+          
+      # PostgreSQL Specific Alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: database
+          component: postgresql
+        annotations:
+          summary: "PostgreSQL instance {{ $labels.instance }} is down"
+          description: "PostgreSQL instance {{ $labels.instance }} has been down for more than 1 minute."
+          runbook_url: "https://runbooks.dn-quest.com/postgresql-down"
+          
+      - alert: HighPostgreSQLConnectionUsage
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+          component: postgresql
+        annotations:
+          summary: "High PostgreSQL connection usage"
+          description: "PostgreSQL connection usage is {{ $value }}% for more than 5 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-postgres-connections"
+          
+      - alert: PostgreSQLSlowQueries
+        expr: rate(pg_stat_statements_mean_time_seconds[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: database
+          component: postgresql
+        annotations:
+          summary: "PostgreSQL slow queries detected"
+          description: "Average query time is {{ $value }}s for more than 5 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/postgres-slow-queries"
+
+  - name: dn-quest.infrastructure
+    rules:
+      # System Resource Alerts
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% for more than 5 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-cpu"
+          
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "Critical CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% for more than 2 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-cpu"
+          
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}% for more than 5 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/high-memory"
+          
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "Critical memory usage on {{ $labels.instance }}"
+          description: "Memory usage is {{ $value }}% for more than 2 minutes on {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-memory"
+          
+      - alert: LowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk usage is {{ $value }}% on {{ $labels.device }} at {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/low-disk-space"
+          
+      - alert: CriticalDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100 > 95
+        for: 1m
+        labels:
+          severity: critical
+          service: system
+          component: infrastructure
+        annotations:
+          summary: "Critical disk space on {{ $labels.instance }}"
+          description: "Disk usage is {{ $value }}% on {{ $labels.device }} at {{ $labels.instance }}."
+          runbook_url: "https://runbooks.dn-quest.com/critical-disk-space"
+
+  - name: dn-quest.kafka
+    rules:
+      # Kafka Alerts
+      - alert: KafkaDown
+        expr: up{job="kafka-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: kafka
+          component: messaging
+        annotations:
+          summary: "Kafka cluster is down"
+          description: "Kafka cluster has been down for more than 1 minute."
+          runbook_url: "https://runbooks.dn-quest.com/kafka-down"
+          
+      - alert: HighKafkaConsumerLag
+        expr: kafka_consumer_lag_sum > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: kafka
+          component: messaging
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Kafka consumer lag is {{ $value }} messages for more than 5 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/kafka-consumer-lag"
+          
+      - alert: CriticalKafkaConsumerLag
+        expr: kafka_consumer_lag_sum > 5000
+        for: 2m
+        labels:
+          severity: critical
+          service: kafka
+          component: messaging
+        annotations:
+          summary: "Critical Kafka consumer lag"
+          description: "Kafka consumer lag is {{ $value }} messages for more than 2 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/critical-kafka-lag"
+
+  - name: dn-quest.redis
+    rules:
+      # Redis Alerts
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: redis
+          component: cache
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute."
+          runbook_url: "https://runbooks.dn-quest.com/redis-down"
+          
+      - alert: HighRedisMemoryUsage
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: redis
+          component: cache
+        annotations:
+          summary: "High Redis memory usage"
+          description: "Redis memory usage is {{ $value }}% for more than 5 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/high-redis-memory"
+          
+      - alert: CriticalRedisMemoryUsage
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: redis
+          component: cache
+        annotations:
+          summary: "Critical Redis memory usage"
+          description: "Redis memory usage is {{ $value }}% for more than 2 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/critical-redis-memory"
+
+  - name: dn-quest.business
+    rules:
+      # Business Metrics Alerts
+      - alert: LowUserActivity
+        expr: rate(http_requests_total{job="api-gateway",handler=~"/api/(auth|users)/.*"}[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: info
+          service: business
+          component: user-activity
+        annotations:
+          summary: "Low user activity detected"
+          description: "User activity rate is {{ $value }} requests per second for more than 10 minutes."
+          impact: "May indicate user engagement issues or authentication problems."
+          runbook_url: "https://runbooks.dn-quest.com/low-user-activity"
+          
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{job=~".*",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*"}[5m]) * 100 > 10
+        for: 5m
+        labels:
+          severity: critical
+          service: business
+          component: error-rate
+        annotations:
+          summary: "High error rate across services"
+          description: "Overall error rate is {{ $value }}% for more than 5 minutes."
+          impact: "Users may be experiencing service disruptions."
+          runbook_url: "https://runbooks.dn-quest.com/high-error-rate"
+          
+      - alert: GameSessionIssues
+        expr: rate(http_requests_total{job="game-engine-service",handler=~"/api/game/.*",status=~"5.."}[5m]) > 0.05
+        for: 3m
+        labels:
+          severity: warning
+          service: business
+          component: game-sessions
+        annotations:
+          summary: "Game engine service experiencing issues"
+          description: "Game engine service error rate is {{ $value }}% for more than 3 minutes."
+          impact: "Users may be unable to play games or complete quests."
+          runbook_url: "https://runbooks.dn-quest.com/game-session-issues"
+          
+      - alert: NotificationFailures
+        expr: rate(http_requests_total{job="notification-service",handler=~"/api/notifications/.*",status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: business
+          component: notifications
+        annotations:
+          summary: "Notification service experiencing failures"
+          description: "Notification service error rate is {{ $value }}% for more than 5 minutes."
+          impact: "Users may not receive important notifications."
+          runbook_url: "https://runbooks.dn-quest.com/notification-failures"
+
+  - name: dn-quest.security
+    rules:
+      # Security Alerts
+      - alert: HighAuthenticationFailures
+        expr: rate(http_requests_total{job="authentication-service",handler=~"/api/auth/login",status="401"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+          component: authentication
+        annotations:
+          summary: "High authentication failure rate"
+          description: "Authentication failure rate is {{ $value }} per second for more than 2 minutes."
+          impact: "May indicate brute force attack or credential issues."
+          runbook_url: "https://runbooks.dn-quest.com/auth-failures"
+          
+      - alert: CriticalAuthenticationFailures
+        expr: rate(http_requests_total{job="authentication-service",handler=~"/api/auth/login",status="401"}[5m]) > 50
+        for: 1m
+        labels:
+          severity: critical
+          service: security
+          component: authentication
+        annotations:
+          summary: "Critical authentication failure rate"
+          description: "Authentication failure rate is {{ $value }} per second for more than 1 minute."
+          impact: "Likely brute force attack in progress."
+          runbook_url: "https://runbooks.dn-quest.com/critical-auth-failures"
+          
+      - alert: SuspiciousActivity
+        expr: rate(http_requests_total{job="api-gateway",status="429"}[5m]) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: security
+          component: rate-limiting
+        annotations:
+          summary: "High rate limiting activity detected"
+          description: "Rate limiting is triggered frequently, possible suspicious activity."
+          impact: "May indicate DDoS attempt or abusive behavior."
+          runbook_url: "https://runbooks.dn-quest.com/suspicious-activity"
+          
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(http_requests_total{job=~".*",status="403"}[5m]) > 5
+        for: 3m
+        labels:
+          severity: warning
+          service: security
+          component: authorization
+        annotations:
+          summary: "High unauthorized access attempts"
+          description: "Unauthorized access attempts are {{ $value }} per second for more than 3 minutes."
+          impact: "May indicate attempted privilege escalation or reconnaissance."
+          runbook_url: "https://runbooks.dn-quest.com/unauthorized-access"
+
+  - name: dn-quest.containers
+    rules:
+      # Container Alerts
+      - alert: ContainerRestarting
+        expr: increase(container_start_time_seconds[1h]) > 3
+        for: 0m
+        labels:
+          severity: warning
+          service: docker
+          component: containers
+        annotations:
+          summary: "Container {{ $labels.name }} is restarting frequently"
+          description: "Container {{ $labels.name }} has restarted more than 3 times in the last hour."
+          runbook_url: "https://runbooks.dn-quest.com/container-restarting"
+          
+      - alert: ContainerCPUHigh
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: docker
+          component: containers
+        annotations:
+          summary: "High CPU usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} CPU usage is {{ $value }}% for more than 5 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/container-cpu-high"
+          
+      - alert: ContainerMemoryHigh
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: docker
+          component: containers
+        annotations:
+          summary: "High memory usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} memory usage is {{ $value }}% for more than 5 minutes."
+          runbook_url: "https://runbooks.dn-quest.com/container-memory-high"

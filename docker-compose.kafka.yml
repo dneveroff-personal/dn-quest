@@ -1,0 +1,381 @@
+version: '3.8'
+
+services:
+  # Zookeeper для Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    hostname: zookeeper
+    container_name: dn-quest-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+    networks:
+      - dn-quest-network
+
+  # Kafka Broker 1
+  kafka-1:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: kafka-1
+    container_name: dn-quest-kafka-1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168  # 7 days
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824  # 1GB
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000  # 5 minutes
+    volumes:
+      - kafka-1-data:/var/lib/kafka/data
+    networks:
+      - dn-quest-network
+
+  # Kafka Broker 2
+  kafka-2:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: kafka-2
+    container_name: dn-quest-kafka-2
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+      - "9102:9102"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:29093,PLAINTEXT_HOST://localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9102
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+    volumes:
+      - kafka-2-data:/var/lib/kafka/data
+    networks:
+      - dn-quest-network
+
+  # Kafka Broker 3
+  kafka-3:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: kafka-3
+    container_name: dn-quest-kafka-3
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9094"
+      - "9103:9103"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:29094,PLAINTEXT_HOST://localhost:9094
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_JMX_PORT: 9103
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+      KAFKA_LOG_RETENTION_HOURS: 168
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+    volumes:
+      - kafka-3-data:/var/lib/kafka/data
+    networks:
+      - dn-quest-network
+
+  # Kafka UI
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: dn-quest-kafka-ui
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: dn-quest
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - dn-quest-network
+
+  # Schema Registry для Avro схем
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    hostname: schema-registry
+    container_name: dn-quest-schema-registry
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_DEBUG: 'true'
+    networks:
+      - dn-quest-network
+
+  # Kafka Connect для интеграций
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:7.5.0
+    hostname: kafka-connect
+    container_name: dn-quest-kafka-connect
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 3
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+    networks:
+      - dn-quest-network
+
+  # KSQL Server для потоковой обработки
+  ksqldb-server:
+    image: confluentinc/cp-ksqldb-server:7.5.0
+    hostname: ksqldb-server
+    container_name: dn-quest-ksqldb-server
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_CONFIG_DIR: "/etc/ksql"
+      KSQL_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      KSQL_HOST_NAME: ksqldb-server
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_CACHE_MAX_BYTES_BUFFERING: 0
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      KSQL_PRODUCER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor
+      KSQL_CONSUMER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor
+      KSQL_KSQL_CONNECT_URL: http://kafka-connect:8083
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_REPLICATION_FACTOR: 3
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: 'true'
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: 'true'
+    networks:
+      - dn-quest-network
+
+  # KSQL CLI
+  ksqldb-cli:
+    image: confluentinc/cp-ksqldb-cli:7.5.0
+    container_name: dn-quest-ksqldb-cli
+    depends_on:
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+    networks:
+      - dn-quest-network
+
+  # Prometheus для мониторинга
+  prometheus:
+    image: prom/prometheus:latest
+    hostname: prometheus
+    container_name: dn-quest-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - dn-quest-network
+
+  # Grafana для визуализации
+  grafana:
+    image: grafana/grafana:latest
+    hostname: grafana
+    container_name: dn-quest-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - dn-quest-network
+
+  # Jaeger для трейсинга
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    hostname: jaeger
+    container_name: dn-quest-jaeger
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+    networks:
+      - dn-quest-network
+
+  # Kafka Topics Initialization
+  kafka-topics-init:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: dn-quest-kafka-topics-init
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "
+      # Ожидание готовности Kafka
+      echo 'Waiting for Kafka to be ready...'
+      cub kafka-ready -b kafka-1:29092,kafka-2:29093,kafka-3:29094 1 40
+      
+      # Создание топиков с конфигурацией
+      echo 'Creating topics...'
+      
+      # Пользовательские события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic user-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # События квестов
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic quest-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Игровые события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic game-events --partitions 12 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Командные события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic team-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Файловые события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic file-events --partitions 4 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # События уведомлений
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic notification-events --partitions 8 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Статистические события
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic statistics-events --partitions 6 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Dead Letter Queue для ошибок обработки
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic dlq-events --partitions 3 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=1209600000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      # Retry топик для повторной обработки
+      kafka-topics --create --if-not-exists --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094 \
+        --topic retry-events --partitions 3 --replication-factor 3 \
+        --config cleanup.policy=delete \
+        --config retention.ms=604800000 \
+        --config segment.ms=86400000 \
+        --config compression.type=producer
+      
+      echo 'Topics created successfully!'
+      echo 'Listing all topics:'
+      kafka-topics --list --bootstrap-server kafka-1:29092,kafka-2:29093,kafka-3:29094
+      "
+    networks:
+      - dn-quest-network
+
+volumes:
+  zookeeper-data:
+  zookeeper-logs:
+  kafka-1-data:
+  kafka-2-data:
+  kafka-3-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  dn-quest-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

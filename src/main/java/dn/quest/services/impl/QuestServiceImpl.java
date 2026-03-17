@@ -1,10 +1,10 @@
 package dn.quest.services.impl;
 
+import dn.quest.config.ApplicationConstants;
 import dn.quest.model.dto.QuestCreateUpdateDTO;
 import dn.quest.model.dto.QuestDTO;
 import dn.quest.model.dto.UserDTO;
 import dn.quest.model.entities.enums.UserRole;
-import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.Quest;
 import dn.quest.model.entities.user.User;
 import dn.quest.repositories.QuestRepository;
@@ -12,7 +12,7 @@ import dn.quest.repositories.UserRepository;
 import dn.quest.services.interfaces.QuestService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class QuestServiceImpl implements QuestService {
 
     private final QuestRepository questRepository;
@@ -31,26 +32,38 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     public QuestDTO createQuest(QuestCreateUpdateDTO dto, String authorUsername) {
+        log.debug("Creating new quest by user: {}", authorUsername);
+        
         Quest quest = toEntity(dto, authorUsername);
         quest.setCreatedAt(Instant.now());
         quest.setUpdatedAt(Instant.now());
 
         Quest saved = questRepository.save(quest);
+        log.info("Quest created successfully: {} by user: {}", saved.getId(), authorUsername);
         return toDTO(saved);
     }
 
     @Override
     public QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, String username) {
+        log.debug("Updating quest: {} by user: {}", id, username);
+        
         Quest existing = questRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Quest not found for update: {}", id);
+                    return new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + id);
+                });
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+                .orElseThrow(() -> {
+                    log.warn("User not found for quest update: {}", username);
+                    return new EntityNotFoundException(ApplicationConstants.USER_NOT_FOUND + ": " + username);
+                });
 
         // Проверка прав: автор квеста или админ
         boolean isAdmin = user.getRole() == UserRole.ADMIN;
         boolean isAuthor = existing.getAuthors().contains(user);
         if (!isAdmin && !isAuthor) {
+            log.warn("Unauthorized attempt to update quest: {} by user: {}", id, username);
             throw new RuntimeException("You are not allowed to edit this quest");
         }
 
@@ -69,44 +82,72 @@ public class QuestServiceImpl implements QuestService {
         if (dto.getAuthors() != null) {
             Set<User> newAuthors = dto.getAuthors().stream()
                     .map(a -> userRepository.findById(a.getId())
-                            .orElseThrow(() -> new RuntimeException("User not found: " + a.getId())))
+                            .orElseThrow(() -> {
+                                log.warn("Author not found for quest update: {}", a.getId());
+                                return new RuntimeException(ApplicationConstants.USER_NOT_FOUND + ": " + a.getId());
+                            }))
                     .collect(Collectors.toSet());
             existing.setAuthors(newAuthors);
         }
 
-        return toDTO(questRepository.save(existing));
+        Quest updated = questRepository.save(existing);
+        log.info("Quest updated successfully: {} by user: {}", updated.getId(), username);
+        return toDTO(updated);
     }
 
     @Override
     public void delete(Long id) {
+        log.debug("Deleting quest: {}", id);
+        
         Quest quest = questRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Quest not found for deletion: {}", id);
+                    return new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + id);
+                });
+        
         questRepository.delete(quest);
+        log.info("Quest deleted successfully: {}", id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public QuestDTO getById(Long id) {
+        log.debug("Getting quest by id: {}", id);
+        
         Quest quest = questRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Quest not found: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Quest not found: {}", id);
+                    return new EntityNotFoundException(ApplicationConstants.QUEST_NOT_FOUND + ": " + id);
+                });
+        
         return toDTO(quest);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getAll() {
-        return questRepository.findAll().stream()
+        log.debug("Getting all quests");
+        
+        List<QuestDTO> quests = questRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+        
+        log.debug("Found {} quests", quests.size());
+        return quests;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getPublished() {
-        return questRepository.findAll().stream()
+        log.debug("Getting published quests");
+        
+        List<QuestDTO> quests = questRepository.findAll().stream()
                 .filter(Quest::isPublished)
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+        
+        log.debug("Found {} published quests", quests.size());
+        return quests;
     }
 
     // ===== Mapping =====
@@ -138,7 +179,10 @@ public class QuestServiceImpl implements QuestService {
         quest.setPublished(dto.getPublished() != null ? dto.getPublished() : false);
 
         User user = userRepository.findByUsername(authorUsername)
-                .orElseThrow(() -> new EntityNotFoundException("Author not found: " + authorUsername));
+                .orElseThrow(() -> {
+                    log.error("Author not found during quest creation: {}", authorUsername);
+                    return new EntityNotFoundException(ApplicationConstants.USER_NOT_FOUND + ": " + authorUsername);
+                });
         quest.getAuthors().add(user);
 
         return quest;

@@ -1,16 +1,13 @@
 package dn.quest.repositories;
 
 import dn.quest.model.dto.LevelCompletionDTO;
-import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.Quest;
-import dn.quest.model.entities.quest.level.Level;
 import dn.quest.model.entities.quest.level.LevelCompletion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LevelCompletionRepository extends JpaRepository<LevelCompletion, Long> {
 
@@ -35,7 +32,7 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
         from LevelCompletion lc
         join lc.level l
         join lc.session s
-        left join s.team t
+        left join s.team
         left join lc.passedByUser u
         where l.quest.id = :questId
         order by lc.passTime asc
@@ -43,10 +40,10 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     List<LevelCompletionDTO> findLeaderboardByQuestId(@Param("questId") Long questId);
 
 
-        @Query("select count(distinct lc.session.id) from LevelCompletion lc where lc.level.quest.id = :questId")
-        long countDistinctSessionsByQuestId(@Param("questId") Long questId);
+    @Query("select count(distinct lc.session.id) from LevelCompletion lc where lc.level.quest.id = :questId")
+    long countDistinctSessionsByQuestId(@Param("questId") Long questId);
 
-        @Query("select coalesce(avg(lc.durationSec),0) from LevelCompletion lc where lc.level.quest.id = :questId")
-        double averageDurationSecByQuestId(@Param("questId") Long questId);
+    @Query("select coalesce(avg(lc.durationSec),0) from LevelCompletion lc where lc.level.quest.id = :questId")
+    double averageDurationSecByQuestId(@Param("questId") Long questId);
 
 }

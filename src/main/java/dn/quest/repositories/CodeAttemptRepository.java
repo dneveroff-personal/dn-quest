@@ -3,7 +3,6 @@ package dn.quest.repositories;
 import dn.quest.model.entities.enums.AttemptResult;
 import dn.quest.model.entities.quest.GameSession;
 import dn.quest.model.entities.quest.level.CodeAttempt;
-import dn.quest.model.entities.quest.level.Code;
 import dn.quest.model.entities.quest.level.Level;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
