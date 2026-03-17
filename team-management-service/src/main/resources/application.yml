@@ -125,7 +125,7 @@ app:
   
   security:
     jwt:
-      secret: ${JWT_SECRET:team-management-secret-key}
+      secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
       expiration: ${JWT_EXPIRATION:86400000}
   
   limits:

@@ -38,7 +38,7 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose не установлен. Пожалуйста, установите Docker Compose."
         exit 1
     fi
@@ -152,10 +152,10 @@ deploy_monitoring() {
     log_info "Развертывание мониторинговой инфраструктуры..."
     
     # Останавливаем предыдущие контейнеры если есть
-    docker-compose -f docker-compose.monitoring.yml down --remove-orphans || true
+    docker compose -f docker-compose.monitoring.yml down --remove-orphans || true
     
     # Запускаем мониторинг
-    docker-compose -f docker-compose.monitoring.yml up -d
+    docker compose -f docker-compose.monitoring.yml up -d
     
     log_success "Мониторинговая инфраструктура развернута"
 }
@@ -288,10 +288,10 @@ show_access_info() {
     echo "  Jaeger UI: http://localhost:$JAEGER_UI_PORT"
     echo
     echo "Полезные команды:"
-    echo "  Проверка статуса: docker-compose -f docker-compose.monitoring.yml ps"
-    echo "  Просмотр логов: docker-compose -f docker-compose.monitoring.yml logs -f [service]"
-    echo "  Перезапуск: docker-compose -f docker-compose.monitoring.yml restart [service]"
-    echo "  Остановка: docker-compose -f docker-compose.monitoring.yml down"
+    echo "  Проверка статуса: docker compose -f docker-compose.monitoring.yml ps"
+    echo "  Просмотр логов: docker compose -f docker-compose.monitoring.yml logs -f [service]"
+    echo "  Перезапуск: docker compose -f docker-compose.monitoring.yml restart [service]"
+    echo "  Остановка: docker compose -f docker-compose.monitoring.yml down"
     echo
 }
 

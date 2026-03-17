@@ -146,7 +146,7 @@ INVITATION_EXPIRATION_HOURS=72
 ./gradlew bootRun
 
 # С Docker
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Docker

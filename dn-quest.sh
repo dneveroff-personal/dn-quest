@@ -154,7 +154,7 @@ init_project() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         print_error "Docker Compose is not installed. Please install Docker Compose first."
         exit 1
     fi
@@ -290,9 +290,9 @@ clean_project() {
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Stopping and removing all containers..."
-        docker-compose -f docker-compose.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
-        docker-compose -f docker-compose.prod.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
-        docker-compose -f docker-compose.full.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
+        docker compose -f docker-compose.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
+        docker compose -f docker-compose.prod.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
+        docker compose -f docker-compose.full.yml --project-name "$PROJECT_NAME" down -v --remove-orphans 2>/dev/null || true
         
         print_status "Removing project images..."
         docker images --filter "reference=$PROJECT_NAME*" -q | xargs -r docker rmi -f 2>/dev/null || true

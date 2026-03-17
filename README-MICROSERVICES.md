@@ -139,7 +139,7 @@ dn-quest/
 
 ```bash
 # Запуск только инфраструктуры
-docker-compose up -d postgres-auth redis kafka
+docker compose up -d postgres-auth redis kafka
 
 # Запуск сервиса локально
 cd authentication-service
@@ -188,12 +188,12 @@ curl http://localhost:8080/actuator/prometheus
 
 Просмотр логов всех сервисов:
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 Логи конкретного сервиса:
 ```bash
-docker-compose logs -f authentication-service
+docker compose logs -f authentication-service
 ```
 
 ## 🔒 Безопасность
@@ -339,9 +339,9 @@ JWT_EXPIRATION=86400000
 3. **Сервисы не стартуют**
    ```bash
    # Проверка логов
-   docker-compose logs service-name
+   docker compose logs service-name
    # Проверка зависимостей
-   docker-compose ps
+   docker compose ps
    ```
 
 ### Полная переустановка

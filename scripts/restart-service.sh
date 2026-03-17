@@ -198,22 +198,22 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed or not in PATH"
     exit 1
 fi
 
 # Check if service exists in compose file
-if ! docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | grep -q "^${SERVICE_NAME}$"; then
+if ! docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | grep -q "^${SERVICE_NAME}$"; then
     print_error "Service '$SERVICE_NAME' not found in compose file: $COMPOSE_FILE"
     
     print_status "Available services:"
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | sort
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | sort
     exit 1
 fi
 
 # Check if service is running
-SERVICE_STATUS=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" --format "table {{.Status}}" | tail -n +2)
+SERVICE_STATUS=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" --format "table {{.Status}}" | tail -n +2)
 
 if [[ -z "$SERVICE_STATUS" ]]; then
     print_warning "Service '$SERVICE_NAME' is not currently running"
@@ -226,18 +226,18 @@ fi
 if [[ "$REBUILD" == true ]]; then
     print_status "Rebuilding service image..."
     if [[ "$VERBOSE" == true ]]; then
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build "$SERVICE_NAME"
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build "$SERVICE_NAME"
     else
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build "$SERVICE_NAME" --quiet
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build "$SERVICE_NAME" --quiet
     fi
 fi
 
 # Restart service
 print_status "Restarting service: $SERVICE_NAME"
 if [[ "$VERBOSE" == true ]]; then
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" restart "$SERVICE_NAME"
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" restart "$SERVICE_NAME"
 else
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" restart "$SERVICE_NAME" --timeout 30
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" restart "$SERVICE_NAME" --timeout 30
 fi
 
 # Wait for service to be healthy
@@ -245,7 +245,7 @@ print_status "Waiting for service to be healthy..."
 sleep 5
 
 # Check service health
-HEALTH_STATUS=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" --format "table {{.Status}}" | tail -n +2)
+HEALTH_STATUS=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" --format "table {{.Status}}" | tail -n +2)
 
 if [[ "$HEALTH_STATUS" == *"healthy"* ]]; then
     print_success "Service '$SERVICE_NAME' is healthy!"
@@ -258,15 +258,15 @@ fi
 
 # Show service status
 print_status "Service status:"
-docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME"
+docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME"
 
 # Follow logs if requested
 if [[ "$FOLLOW_LOGS" == true ]]; then
     print_status "Following logs for service: $SERVICE_NAME"
     echo "Press Ctrl+C to stop following logs"
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" logs -f "$SERVICE_NAME"
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" logs -f "$SERVICE_NAME"
 fi
 
 print_success "Service '$SERVICE_NAME' restarted successfully!"
-print_status "To view logs: docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs -f $SERVICE_NAME"
-print_status "To view all services: docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME ps"
+print_status "To view logs: docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs -f $SERVICE_NAME"
+print_status "To view all services: docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME ps"

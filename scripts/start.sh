@@ -38,7 +38,7 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Check if Docker Compose is available
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed. Please install Docker Compose and try again."
     exit 1
 fi
@@ -104,7 +104,7 @@ done
 # Stop existing containers if requested
 if [ "$STOP_FIRST" = true ]; then
     print_status "Stopping existing containers..."
-    docker-compose down
+    docker compose down
     print_success "Existing containers stopped"
 fi
 
@@ -123,7 +123,7 @@ print_status "Starting DN Quest microservices in $ENVIRONMENT environment..."
 
 # Start infrastructure services first
 print_status "Starting infrastructure services (PostgreSQL, Redis, Kafka, MinIO)..."
-docker-compose up -d postgres-auth postgres-users postgres-quests postgres-game postgres-teams postgres-notifications postgres-statistics postgres-files redis zookeeper kafka kafka-ui minio
+docker compose up -d postgres-auth postgres-users postgres-quests postgres-game postgres-teams postgres-notifications postgres-statistics postgres-files redis zookeeper kafka kafka-ui minio
 
 # Wait for infrastructure services to be ready
 print_status "Waiting for infrastructure services to be ready..."
@@ -134,7 +134,7 @@ print_status "Checking infrastructure service health..."
 
 # Check PostgreSQL databases
 for db in postgres-auth postgres-users postgres-quests postgres-game postgres-teams postgres-notifications postgres-statistics postgres-files; do
-    if docker-compose ps $db | grep -q "Up (healthy)"; then
+    if docker compose ps $db | grep -q "Up (healthy)"; then
         print_success "$db is healthy"
     else
         print_warning "$db is not healthy yet, waiting..."
@@ -143,7 +143,7 @@ for db in postgres-auth postgres-users postgres-quests postgres-game postgres-te
 done
 
 # Check Redis
-if docker-compose ps redis | grep -q "Up (healthy)"; then
+if docker compose ps redis | grep -q "Up (healthy)"; then
     print_success "Redis is healthy"
 else
     print_warning "Redis is not healthy yet, waiting..."
@@ -151,7 +151,7 @@ else
 fi
 
 # Check Kafka
-if docker-compose ps kafka | grep -q "Up (healthy)"; then
+if docker compose ps kafka | grep -q "Up (healthy)"; then
     print_success "Kafka is healthy"
 else
     print_warning "Kafka is not healthy yet, waiting..."
@@ -161,10 +161,10 @@ fi
 # Start microservices
 if [ ${#SERVICES[@]} -eq 0 ]; then
     print_status "Starting all microservices..."
-    docker-compose up -d api-gateway authentication-service user-management-service quest-management-service game-engine-service team-management-service notification-service statistics-service file-storage-service
+    docker compose up -d api-gateway authentication-service user-management-service quest-management-service game-engine-service team-management-service notification-service statistics-service file-storage-service
 else
     print_status "Starting specific services: ${SERVICES[*]}"
-    docker-compose up -d "${SERVICES[@]}"
+    docker compose up -d "${SERVICES[@]}"
 fi
 
 # Wait for microservices to start
@@ -217,10 +217,10 @@ echo "  🗄️  Kafka UI: http://localhost:8089"
 echo "  🪣 MinIO Console: http://localhost:9001 (minioadmin/minioadmin)"
 echo ""
 print_status "Useful Commands:"
-echo "  📋 View logs: docker-compose logs -f [service-name]"
-echo "  🛑 Stop services: docker-compose down"
-echo "  🔄 Restart services: docker-compose restart [service-name]"
-echo "  📊 Check status: docker-compose ps"
+echo "  📋 View logs: docker compose logs -f [service-name]"
+echo "  🛑 Stop services: docker compose down"
+echo "  🔄 Restart services: docker compose restart [service-name]"
+echo "  📊 Check status: docker compose ps"
 echo ""
 print_status "API Documentation:"
 echo "  📚 Swagger UI: http://localhost:8080/swagger-ui.html"

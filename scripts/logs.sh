@@ -206,13 +206,13 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed or not in PATH"
     exit 1
 fi
 
 # Build logs command
-LOGS_CMD="docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs"
+LOGS_CMD="docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs"
 
 if [[ "$FOLLOW" == true ]]; then
     LOGS_CMD="$LOGS_CMD -f"
@@ -237,7 +237,7 @@ if [[ ${#SERVICE_NAMES[@]} -eq 0 ]]; then
     # Show service status first
     if [[ "$VERBOSE" == true ]]; then
         print_header "Service Status"
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps
         echo ""
     fi
     
@@ -246,11 +246,11 @@ if [[ ${#SERVICE_NAMES[@]} -eq 0 ]]; then
 else
     # Validate service names
     for SERVICE_NAME in "${SERVICE_NAMES[@]}"; do
-        if ! docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | grep -q "^${SERVICE_NAME}$"; then
+        if ! docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | grep -q "^${SERVICE_NAME}$"; then
             print_error "Service '$SERVICE_NAME' not found in compose file: $COMPOSE_FILE"
             
             print_status "Available services:"
-            docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | sort
+            docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services | sort
             exit 1
         fi
     done
@@ -262,7 +262,7 @@ else
         print_header "Service Status"
         for SERVICE_NAME in "${SERVICE_NAMES[@]}"; do
             echo -e "${CYAN}$SERVICE_NAME:${NC}"
-            docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" | tail -n +2
+            docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps "$SERVICE_NAME" | tail -n +2
         done
         echo ""
     fi
@@ -273,4 +273,4 @@ fi
 
 print_success "Log viewing completed!"
 print_status "To follow logs continuously: $0 -f [service-name]"
-print_status "To view service status: docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME ps"
+print_status "To view service status: docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME ps"

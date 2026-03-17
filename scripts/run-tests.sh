@@ -292,7 +292,7 @@ cleanup_test_data() {
     log_info "Очистка тестовых данных..."
     
     # Остановка тестовых контейнеров
-    docker-compose -f docker-compose.test.yml down -v --remove-orphans 2>/dev/null || true
+    docker compose -f docker-compose.test.yml down -v --remove-orphans 2>/dev/null || true
     
     # Очистка временных файлов
     find "$PROJECT_ROOT" -name "*.tmp" -delete 2>/dev/null || true

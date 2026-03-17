@@ -2,7 +2,8 @@
 
 ## Обзор
 
-DN Quest - это современная веб-платформа для создания и прохождения онлайн квестов, поддерживающая как одиночное, так и командное прохождение. Платформа построена на микросервисной архитектуре с использованием современных технологий.
+DN Quest - это современная веб-платформа для создания и прохождения онлайн квестов, поддерживающая как одиночное, так и командное прохождение.
+Платформа построена на микросервисной архитектуре с использованием современных технологий.
 
 ## Технологический стек
 
@@ -62,17 +63,17 @@ DN Quest - это современная веб-платформа для соз
 
 1. **Клонирование репозитория**
 ```bash
-git clone https://github.com/your-org/dn-quest.git
+git clone https://gitlab.com/dn-quest/quiz-engine
 cd dn-quest
 ```
 
 2. **Запуск инфраструктуры**
 ```bash
 # Запуск базы данных и Redis
-docker-compose up -d postgres redis
+docker compose up -d postgres redis
 
 # Запуск Kafka (опционально)
-docker-compose -f docker-compose.kafka.yml up -d
+docker compose -f docker compose.kafka.yml up -d
 ```
 
 3. **Настройка базы данных**
@@ -106,10 +107,10 @@ npm run build
 
 ```bash
 # Полный запуск всех сервисов
-docker-compose up -d
+docker compose up -d
 
 # Только основные сервисы
-docker-compose up -d postgres redis backend frontend
+docker compose up -d postgres redis backend frontend
 ```
 
 ## Структура проекта
@@ -136,8 +137,8 @@ dn-quest/
 │   ├── quest-service/               # Сервис квестов
 │   └── game-engine-service/         # Игровой движок
 ├── docs/                           # Документация
-├── docker-compose.yml              # Docker конфигурация
-├── docker-compose.kafka.yml        # Kafka конфигурация
+├── docker compose.yml              # Docker конфигурация
+├── docker compose.kafka.yml        # Kafka конфигурация
 └── Makefile                        # Сборочные скрипты
 ```
 
@@ -379,11 +380,9 @@ MIT License - см. файл [LICENSE](LICENSE)
 
 ## Авторы
 
-- [Ваше имя](https://github.com/your-username) - Lead Developer
-- [Имя команды](https://github.com/team) - Development Team
+- [DNeveroff](https://gitlab.com/denis.neverov.dev) - Developer
 
 ## Благодарности
 
-- Сообществу Spring Boot
-- Команде Vue.js
-- Всем тестировщикам и контрибьюторам
+- Самому себе, что нашел время :-)
+- ИИ за помощь в написании кода

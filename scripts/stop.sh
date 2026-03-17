@@ -38,7 +38,7 @@ if ! docker info > /dev/null 2>&1; then
 fi
 
 # Check if Docker Compose is available
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed."
     exit 1
 fi
@@ -123,7 +123,7 @@ fi
 
 # Stop all services
 print_status "Stopping all DN Quest services..."
-docker-compose down
+docker compose down
 
 if [ $? -eq 0 ]; then
     print_success "All services stopped successfully"
@@ -134,7 +134,7 @@ fi
 # Remove volumes if requested
 if [ "$REMOVE_VOLUMES" = true ]; then
     print_status "Removing all volumes..."
-    docker-compose down -v
+    docker compose down -v
     
     # Remove orphaned volumes
     print_status "Removing orphaned volumes..."

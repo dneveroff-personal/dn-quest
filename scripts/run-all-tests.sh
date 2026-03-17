@@ -119,7 +119,7 @@ run_integration_tests() {
         
         # Запуск тестовых контейнеров
         log_info "Запуск тестовых контейнеров..."
-        docker-compose -f docker-compose.test.yml up -d
+        docker compose -f docker-compose.test.yml up -d
         
         # Ожидание готовности сервисов
         log_info "Ожидание готовности сервисов..."
@@ -140,7 +140,7 @@ run_integration_tests() {
         
         # Остановка тестовых контейнеров
         log_info "Остановка тестовых контейнеров..."
-        docker-compose -f docker-compose.test.yml down
+        docker compose -f docker-compose.test.yml down
     else
         log_info "Интеграционные тесты пропущены"
     fi
@@ -155,7 +155,7 @@ run_e2e_tests() {
         
         # Запуск всех сервисов для E2E тестов
         log_info "Запуск всех сервисов для E2E тестов..."
-        docker-compose -f docker-compose.yml up -d
+        docker compose -f docker-compose.yml up -d
         
         # Ожидание готовности всех сервисов
         log_info "Ожидание готовности всех сервисов..."
@@ -171,7 +171,7 @@ run_e2e_tests() {
         
         # Остановка всех сервисов
         log_info "Остановка всех сервисов..."
-        docker-compose -f docker-compose.yml down
+        docker compose -f docker-compose.yml down
     else
         log_info "E2E тесты пропущены"
     fi
@@ -186,7 +186,7 @@ run_load_tests() {
         
         # Запуск минимальной конфигурации для нагрузочных тестов
         log_info "Запуск конфигурации для нагрузочных тестов..."
-        docker-compose -f docker-compose.load.yml up -d
+        docker compose -f docker-compose.load.yml up -d
         
         # Ожидание готовности
         sleep 30
@@ -200,7 +200,7 @@ run_load_tests() {
         echo "LOAD_TESTS_DURATION=$duration" >> "$REPORT_FILE.tmp"
         
         # Остановка сервисов
-        docker-compose -f docker-compose.load.yml down
+        docker compose -f docker-compose.load.yml down
     else
         log_info "Нагрузочные тесты пропущены"
     fi
@@ -331,9 +331,9 @@ cleanup() {
     rm -f "$REPORT_FILE.tmp"
     
     # Остановка всех контейнеров
-    docker-compose -f docker-compose.yml down 2>/dev/null || true
-    docker-compose -f docker-compose.test.yml down 2>/dev/null || true
-    docker-compose -f docker-compose.load.yml down 2>/dev/null || true
+    docker compose -f docker-compose.yml down 2>/dev/null || true
+    docker compose -f docker-compose.test.yml down 2>/dev/null || true
+    docker compose -f docker-compose.load.yml down 2>/dev/null || true
 }
 
 # Обработка сигналов

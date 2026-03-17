@@ -56,7 +56,7 @@
 ./scripts/deploy-monitoring.sh
 
 # Проверка статуса
-docker-compose -f docker-compose.monitoring.yml ps
+docker compose -f docker-compose.monitoring.yml ps
 ```
 
 ### 2. Доступ к сервисам
@@ -523,10 +523,10 @@ curl -X PUT "localhost:9200/_snapshot/backup/snapshot_1"
 
 ```bash
 # Обновление компонентов
-docker-compose -f docker-compose.monitoring.yml pull
+docker compose -f docker-compose.monitoring.yml pull
 
 # Перезапуск с обновлением
-docker-compose -f docker-compose.monitoring.yml up -d
+docker compose -f docker-compose.monitoring.yml up -d
 
 # Проверка после обновления
 ./scripts/test-alerts.sh all
@@ -604,8 +604,8 @@ curl http://localhost:3000/api/health
 curl http://localhost:9200/_cluster/health
 
 # Просмотр логов
-docker-compose -f docker-compose.monitoring.yml logs -f prometheus
-docker-compose -f docker-compose.monitoring.yml logs -f alertmanager
+docker compose -f docker-compose.monitoring.yml logs -f prometheus
+docker compose -f docker-compose.monitoring.yml logs -f alertmanager
 
 # Проверка конфигураций
 curl http://localhost:9090/api/v1/status/config

@@ -125,7 +125,7 @@ fi
 
 print_success "🎉 All microservices and Docker images built successfully!"
 print_status "You can now start the services using: ./scripts/start.sh"
-print_status "Or use Docker Compose: docker-compose up -d"
+print_status "Or use Docker Compose: docker compose up -d"
 
 # Display built images
 print_status "Built Docker images:"

@@ -401,7 +401,6 @@ services:
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
       QUEST_SERVICE_URL: http://quest-management-service-dev:8083
       TEAM_SERVICE_URL: http://team-management-service-dev:8085
-      STATISTICS_SERVICE_URL: http://statistics-service-dev:8087
       # Debug настройки
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       # Логирование для разработки
@@ -422,8 +421,6 @@ services:
       quest-management-service-dev:
         condition: service_healthy
       team-management-service-dev:
-        condition: service_healthy
-      statistics-service-dev:
         condition: service_healthy
     networks:
       - dn-quest-dev-network

@@ -364,7 +364,7 @@ dn-quest/
 ```bash
 ./dn-quest.sh status -h -d
 ./dn-quest.sh logs
-docker-compose ps
+docker compose ps
 docker network ls
 docker volume ls
 ```

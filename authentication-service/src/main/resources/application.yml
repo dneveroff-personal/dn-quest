@@ -89,7 +89,7 @@ spring:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:dnQuestAuthSecretKey2024ForDevelopmentOnlyChangeInProduction}
+  secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
   access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}  # 15 minutes
   refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days
   issuer: ${JWT_ISSUER:dn-quest-auth-service}

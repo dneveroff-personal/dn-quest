@@ -156,13 +156,13 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed or not in PATH"
     exit 1
 fi
 
 # Check if services are running
-RUNNING_SERVICES=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps --filter "status=running" --format "table {{.Service}}" | tail -n +2)
+RUNNING_SERVICES=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps --filter "status=running" --format "table {{.Service}}" | tail -n +2)
 
 if [[ -z "$RUNNING_SERVICES" ]]; then
     print_warning "No services are currently running for project: $PROJECT_NAME"
@@ -173,7 +173,7 @@ print_status "Currently running services:"
 echo "$RUNNING_SERVICES"
 
 # Build down command
-DOWN_CMD="docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME down"
+DOWN_CMD="docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME down"
 
 if [[ "$REMOVE_VOLUMES" == true ]]; then
     DOWN_CMD="$DOWN_CMD --volumes"
@@ -198,7 +198,7 @@ fi
 # Clean up orphaned containers if verbose
 if [[ "$VERBOSE" == true ]]; then
     print_status "Cleaning up orphaned containers..."
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" down --remove-orphans
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" down --remove-orphans
 fi
 
 # Show remaining containers

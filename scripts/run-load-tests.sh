@@ -74,7 +74,7 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose не установлен"
         exit 1
     fi
@@ -109,7 +109,7 @@ start_load_test_infrastructure() {
     log_info "Запуск инфраструктуры для нагрузочных тестов..."
     
     # Запуск оптимизированной конфигурации для нагрузочных тестов
-    docker-compose -f docker-compose.load.yml up -d
+    docker compose -f docker-compose.load.yml up -d
     
     log_info "Ожидание готовности инфраструктуры..."
     
@@ -117,7 +117,7 @@ start_load_test_infrastructure() {
     local postgres_ready=false
     local postgres_attempts=0
     while [ "$postgres_ready" = false ] && [ $postgres_attempts -lt 30 ]; do
-        if docker-compose -f docker-compose.load.yml exec -T postgres pg_isready -U postgres; then
+        if docker compose -f docker-compose.load.yml exec -T postgres pg_isready -U postgres; then
             postgres_ready=true
             log_success "PostgreSQL готов"
         else
@@ -135,7 +135,7 @@ start_load_test_infrastructure() {
     local redis_ready=false
     local redis_attempts=0
     while [ "$redis_ready" = false ] && [ $redis_attempts -lt 30 ]; do
-        if docker-compose -f docker-compose.load.yml exec -T redis redis-cli ping; then
+        if docker compose -f docker-compose.load.yml exec -T redis redis-cli ping; then
             redis_ready=true
             log_success "Redis готов"
         else
@@ -153,7 +153,7 @@ start_load_test_infrastructure() {
     local kafka_ready=false
     local kafka_attempts=0
     while [ "$kafka_ready" = false ] && [ $kafka_attempts -lt 60 ]; do
-        if docker-compose -f docker-compose.load.yml exec -T kafka kafka-topics.sh --bootstrap-server localhost:9092 --list &>/dev/null; then
+        if docker compose -f docker-compose.load.yml exec -T kafka kafka-topics.sh --bootstrap-server localhost:9092 --list &>/dev/null; then
             kafka_ready=true
             log_success "Kafka готов"
         else
@@ -497,7 +497,7 @@ stop_load_test_services() {
 stop_load_test_infrastructure() {
     if [ "$CLEANUP" = true ]; then
         log_info "Остановка инфраструктуры..."
-        docker-compose -f docker-compose.load.yml down
+        docker compose -f docker-compose.load.yml down
         log_success "Инфраструктура остановлена"
     fi
 }

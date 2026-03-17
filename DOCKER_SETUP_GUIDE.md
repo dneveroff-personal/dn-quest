@@ -304,7 +304,7 @@ SMTP_PASSWORD=your-email-password
 ./dn-quest.sh status -d -h
 
 # Проверка конкретного сервиса
-docker-compose -f docker-compose.yml ps authentication-service
+docker compose -f docker-compose.yml ps authentication-service
 ```
 
 ### Просмотр логов
@@ -334,7 +334,7 @@ docker-compose -f docker-compose.yml ps authentication-service
 ./dn-quest.sh clean
 
 # Очистка только контейнеров
-docker-compose -f docker-compose.yml down -v
+docker compose-f docker-compose.yml down -v
 
 # Очистка образов
 docker system prune -a
@@ -369,8 +369,8 @@ docker system prune -a
 ./dn-quest.sh logs postgres
 
 # Пересоздание базы данных
-docker-compose -f docker-compose.yml down -v
-docker-compose -f docker-compose.yml up -d postgres
+docker compose-f docker-compose.yml down -v
+docker compose-f docker-compose.yml up -d postgres
 ```
 
 ## Разработка

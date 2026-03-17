@@ -48,7 +48,7 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
+    if ! command -v docker compose &> /dev/null && ! docker compose version &> /dev/null; then
         print_error "Docker Compose is not installed or not in PATH"
         exit 1
     fi
@@ -94,7 +94,7 @@ build_images() {
             if docker compose version &> /dev/null; then
                 docker compose -f "$COMPOSE_FILE" build
             else
-                docker-compose -f "$COMPOSE_FILE" build
+                docker compose -f "$COMPOSE_FILE" build
             fi
         fi
         
@@ -114,7 +114,7 @@ start_services() {
     if docker compose version &> /dev/null; then
         docker compose -f "$COMPOSE_FILE" up -d
     else
-        docker-compose -f "$COMPOSE_FILE" up -d
+        docker compose -f "$COMPOSE_FILE" up -d
     fi
     
     print_success "Services started successfully"
@@ -184,7 +184,7 @@ show_status() {
     if docker compose version &> /dev/null; then
         docker compose -f "$COMPOSE_FILE" ps
     else
-        docker-compose -f "$COMPOSE_FILE" ps
+        docker compose -f "$COMPOSE_FILE" ps
     fi
     
     echo
@@ -224,7 +224,7 @@ cleanup() {
     if docker compose version &> /dev/null; then
         docker compose -f "$COMPOSE_FILE" down
     else
-        docker-compose -f "$COMPOSE_FILE" down
+        docker compose -f "$COMPOSE_FILE" down
     fi
     
     print_success "Cleanup completed"

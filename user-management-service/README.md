@@ -168,7 +168,7 @@ GET /api/users/statistics/leaderboard/achievements?page=0&size=20
 ./gradlew build
 
 # Запуск с Docker Compose
-docker-compose up user-management-service
+docker compose up user-management-service
 
 # Или локальный запуск
 ./gradlew :user-management-service:bootRun

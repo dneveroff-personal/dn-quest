@@ -74,7 +74,7 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose не установлен"
         exit 1
     fi
@@ -98,7 +98,7 @@ start_test_infrastructure() {
     log_info "Запуск тестовой инфраструктуры..."
     
     # Запуск внешних сервисов (PostgreSQL, Redis, Kafka, etc.)
-    docker-compose -f docker-compose.test.yml up -d
+    docker compose -f docker-compose.test.yml up -d
     
     log_info "Ожидание готовности тестовой инфраструктуры..."
     
@@ -106,7 +106,7 @@ start_test_infrastructure() {
     local postgres_ready=false
     local postgres_attempts=0
     while [ "$postgres_ready" = false ] && [ $postgres_attempts -lt 30 ]; do
-        if docker-compose -f docker-compose.test.yml exec -T postgres pg_isready -U postgres; then
+        if docker compose -f docker-compose.test.yml exec -T postgres pg_isready -U postgres; then
             postgres_ready=true
             log_success "PostgreSQL готов"
         else
@@ -124,7 +124,7 @@ start_test_infrastructure() {
     local redis_ready=false
     local redis_attempts=0
     while [ "$redis_ready" = false ] && [ $redis_attempts -lt 30 ]; do
-        if docker-compose -f docker-compose.test.yml exec -T redis redis-cli ping; then
+        if docker compose -f docker-compose.test.yml exec -T redis redis-cli ping; then
             redis_ready=true
             log_success "Redis готов"
         else
@@ -142,7 +142,7 @@ start_test_infrastructure() {
     local kafka_ready=false
     local kafka_attempts=0
     while [ "$kafka_ready" = false ] && [ $kafka_attempts -lt 60 ]; do
-        if docker-compose -f docker-compose.test.yml exec -T kafka kafka-topics.sh --bootstrap-server localhost:9092 --list &>/dev/null; then
+        if docker compose -f docker-compose.test.yml exec -T kafka kafka-topics.sh --bootstrap-server localhost:9092 --list &>/dev/null; then
             kafka_ready=true
             log_success "Kafka готов"
         else
@@ -364,7 +364,7 @@ stop_microservices() {
 stop_test_infrastructure() {
     if [ "$CLEANUP" = true ]; then
         log_info "Остановка тестовой инфраструктуры..."
-        docker-compose -f docker-compose.test.yml down
+        docker compose -f docker-compose.test.yml down
         log_success "Тестовая инфраструктура остановлена"
     fi
 }

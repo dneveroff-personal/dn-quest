@@ -207,7 +207,7 @@ create_backup_metadata() {
   "backup_date": "$(date -Iseconds)",
   "backup_version": "1.0",
   "dn_quest_version": "$(git describe --tags --always 2>/dev/null || echo 'unknown')",
-  "docker_compose_version": "$(docker-compose --version)",
+  "docker_compose_version": "$(docker compose --version)",
   "docker_version": "$(docker --version)",
   "system_info": {
     "hostname": "$(hostname)",
@@ -340,7 +340,7 @@ restore_backup() {
     
     # Восстанавливаем данные (требует остановки сервисов)
     log_warning "Для восстановления данных необходимо остановить сервисы мониторинга"
-    log_info "Выполните: docker-compose -f docker-compose.monitoring.yml down"
+    log_info "Выполните: docker compose -f docker-compose.monitoring.yml down"
     log_info "Затем вручную восстановите данные из $backup_dir/data/"
     
     rm -rf "$temp_dir"

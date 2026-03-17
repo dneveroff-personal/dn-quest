@@ -168,7 +168,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed or not in PATH"
     exit 1
 fi
@@ -183,9 +183,9 @@ fi
 if [[ "$PULL_IMAGES" == true ]]; then
     print_status "Pulling latest images..."
     if [[ "$VERBOSE" == true ]]; then
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" pull
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" pull
     else
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" pull --quiet
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" pull --quiet
     fi
 fi
 
@@ -193,18 +193,18 @@ fi
 if [[ "$BUILD_IMAGES" == true ]]; then
     print_status "Building images..."
     if [[ "$VERBOSE" == true ]]; then
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build
     else
-        docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build --quiet
+        docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" build --quiet
     fi
 fi
 
 # Start services
 print_status "Starting services..."
 if [[ "$VERBOSE" == true ]]; then
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" up -d
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" up -d
 else
-    docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" up -d --quiet
+    docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" up -d --quiet
 fi
 
 # Wait for services to be healthy
@@ -213,19 +213,19 @@ sleep 10
 
 # Check service health
 print_status "Checking service health..."
-UNHEALTHY_SERVICES=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps --filter "status=unhealthy" --format "table {{.Service}}")
+UNHEALTHY_SERVICES=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps --filter "status=unhealthy" --format "table {{.Service}}")
 
 if [[ -n "$UNHEALTHY_SERVICES" ]]; then
     print_warning "Some services are unhealthy:"
     echo "$UNHEALTHY_SERVICES"
-    print_warning "Check logs with: docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs [service-name]"
+    print_warning "Check logs with: docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs [service-name]"
 else
     print_success "All services are healthy!"
 fi
 
 # Show service status
 print_status "Service status:"
-docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps
+docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps
 
 # Show access URLs
 print_status "Services are accessible at:"
@@ -243,5 +243,5 @@ if [[ "$ENVIRONMENT" == "full" ]]; then
 fi
 
 print_success "DN Quest services started successfully!"
-print_status "To view logs: docker-compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs -f"
+print_status "To view logs: docker compose -f $COMPOSE_FILE --project-name $PROJECT_NAME logs -f"
 print_status "To stop services: ./scripts/stop-all.sh -e $ENVIRONMENT -f $COMPOSE_FILE"

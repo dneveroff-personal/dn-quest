@@ -156,7 +156,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     print_error "Docker Compose is not installed or not in PATH"
     exit 1
 fi
@@ -169,7 +169,7 @@ fi
 
 # Get service status
 print_header "Service Status"
-SERVICES_OUTPUT=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps)
+SERVICES_OUTPUT=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps)
 
 echo "$SERVICES_OUTPUT"
 
@@ -192,14 +192,14 @@ if [[ "$DETAILED" == true ]]; then
     print_header "Detailed Service Information"
     
     # Get all service names
-    SERVICES=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services)
+    SERVICES=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services)
     
     for SERVICE in $SERVICES; do
         echo ""
         print_status "Service: $SERVICE"
         
         # Get container info
-        CONTAINER_INFO=$(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps -q "$SERVICE")
+        CONTAINER_INFO=$(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" ps -q "$SERVICE")
         
         if [[ -n "$CONTAINER_INFO" ]]; then
             # Get container details
@@ -270,7 +270,7 @@ if [[ "$HEALTH_CHECK" == true ]]; then
     fi
     
     # Check health for each service
-    for SERVICE in $(docker-compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services); do
+    for SERVICE in $(docker compose -f "$COMPOSE_FILE" --project-name "$PROJECT_NAME" config --services); do
         if [[ -n "${HEALTH_URLS[$SERVICE]}" ]]; then
             URL="${HEALTH_URLS[$SERVICE]}"
             
@@ -296,7 +296,7 @@ if [[ "$VERBOSE" == true ]]; then
     
     # Docker info
     echo "Docker Version: $(docker --version)"
-    echo "Docker Compose Version: $(docker-compose --version)"
+    echo "Docker Compose Version: $(docker compose --version)"
     
     # Resource usage
     echo ""

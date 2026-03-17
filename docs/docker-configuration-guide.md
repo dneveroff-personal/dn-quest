@@ -200,7 +200,7 @@ cp .env.production .env
 ./scripts/publish-images.sh your-registry.com/dn-quest 1.0.0
 
 # 4. Запустить production
-docker-compose -f docker-compose.production.yml up -d
+docker compose -f docker-compose.production.yml up -d
 ```
 
 ### Тестирование:
@@ -210,7 +210,7 @@ docker-compose -f docker-compose.production.yml up -d
 cp .env.testing .env
 
 # 2. Запустить тестовые сервисы
-docker-compose -f docker-compose.optimized.yml --profile testing up -d
+docker compose -f docker-compose.optimized.yml --profile testing up -d
 
 # 3. Запустить тесты
 ./gradlew test
@@ -224,7 +224,7 @@ docker-compose -f docker-compose.optimized.yml --profile testing up -d
 
 ```bash
 # Проверить состояние всех сервисов
-docker-compose ps
+docker compose ps
 
 # Проверить health конкретного сервиса
 curl http://localhost:8080/actuator/health
@@ -234,10 +234,10 @@ curl http://localhost:8080/actuator/health
 
 ```bash
 # Логи всех сервисов
-docker-compose logs -f
+docker compose logs -f
 
 # Логи конкретного сервиса
-docker-compose logs -f api-gateway
+docker compose logs -f api-gateway
 ```
 
 ### Метрики:
@@ -320,13 +320,13 @@ networks:
 docker system prune -a
 
 # Пересобрать образы
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Проверить конфигурацию
-docker-compose config
+docker compose config
 
 # Перезапустить сервис
-docker-compose restart service-name
+docker compose restart service-name
 ```
 
 ## Best Practices
