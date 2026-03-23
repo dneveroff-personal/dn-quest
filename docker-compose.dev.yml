@@ -198,6 +198,7 @@ services:
       - ./api-gateway/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - api_gateway_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       redis-dev:
         condition: service_healthy
@@ -252,6 +253,7 @@ services:
       - ./authentication-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - authentication_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -302,6 +304,7 @@ services:
       - ./user-management-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - user_management_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -355,6 +358,7 @@ services:
       - ./quest-management-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - quest_management_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -411,6 +415,7 @@ services:
       - ./game-engine-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - game_engine_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -468,6 +473,7 @@ services:
       - ./team-management-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - team_management_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -527,6 +533,7 @@ services:
       - ./notification-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - notification_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -580,6 +587,7 @@ services:
       - ./statistics-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - statistics_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -637,6 +645,7 @@ services:
       - ./file-storage-service/build.gradle.kts:/app/build.gradle.kts
       - ./dn-quest-shared:/app/dn-quest-shared
       - file_storage_service_dev_logs:/app/logs
+      - gradle-cache:/root/.gradle
     depends_on:
       postgres-dev:
         condition: service_healthy
@@ -731,6 +740,7 @@ volumes:
     driver: local
   frontend_dev_node_modules:
     driver: local
+  gradle-cache:
 
 # ===========================================
 # Networks для разработки

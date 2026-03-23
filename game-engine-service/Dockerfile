@@ -27,7 +27,7 @@ RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 COPY src src
 
 # Build the application
-RUN ./gradlew bootJar --no-daemon -x test
+RUN ./gradlew :game-engine-service:bootJar --no-daemon -x test
 
 # Production stage
 FROM eclipse-temurin:21-jre-alpine

@@ -1,12 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id("java")
-    application
+    java
     id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.20"
-    kotlin("plugin.spring") version "1.9.20"
     id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
@@ -14,7 +9,9 @@ group = "dn.quest"
 version = "1.0.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
@@ -35,36 +32,36 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    
+
     // Spring Cloud Gateway
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
-    
+
     // Spring Cloud LoadBalancer
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
-    
+
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
-    
+
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-    
+
     // Monitoring
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.opentelemetry:opentelemetry-api")
-    
+
     // Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
-    
+
     // Shared library
     implementation(project(":dn-quest-shared"))
-    
+
     // Development tools
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
-    
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
@@ -79,22 +76,8 @@ dependencyManagement {
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "21"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-application {
-    mainClass.set("dn.quest.gateway.ApiGatewayApplication")
-}
-
-springBoot {
+// === Main class for Spring Boot (правильный способ в Kotlin DSL) ===
+tasks.bootJar {
     mainClass.set("dn.quest.gateway.ApiGatewayApplication")
 }
 
@@ -134,4 +117,8 @@ jib {
         }
     }
     containerizingMode = "packaged"
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

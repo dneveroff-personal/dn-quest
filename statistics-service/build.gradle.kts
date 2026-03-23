@@ -65,7 +65,7 @@ jib {
         image = "openjdk:21-jre-alpine"
     }
     to {
-        image = "dn-quest/statistics-service:1.0.0"
+        image = "dn-quest/statistics-service"
         tags = setOf("latest", "1.0.0")
     }
     container {
@@ -97,6 +97,6 @@ jib {
     containerizingMode = "packaged"
 }
 
-springBoot {
+tasks.bootJar {
     mainClass.set("dn.quest.statistics.StatisticsServiceApplication")
 }

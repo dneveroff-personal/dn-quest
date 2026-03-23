@@ -1,43 +1,56 @@
 plugins {
-    java
     `java-library`
+    id("org.springframework.boot") version "3.2.0" apply false
+    id("io.spring.dependency-management") version "1.1.4" apply false
 }
 
-dependencies {
-    // Spring Boot для shared компонентов
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    
-    // Spring Kafka
-    implementation("org.springframework.kafka:spring-kafka")
-    
-    // JWT
-    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
-    
-    // Utilities
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-    implementation("org.apache.commons:commons-lang3:3.14.0")
-    
-    // JSON processing
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    
-    // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.springframework.kafka:spring-kafka-test")
-}
+group = "dn.quest"
+version = "1.0.0"
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Micrometer + Tracing
+    api("io.micrometer:micrometer-core")
+    api("io.micrometer:micrometer-registry-prometheus")
+    api("io.micrometer:micrometer-tracing")
+    api("io.micrometer:micrometer-tracing-bridge-brave")
+    api("io.zipkin.reporter2:zipkin-reporter-brave")
+    api("io.zipkin.brave:brave:5.16.0")
+
+    // OpenTelemetry + Jaeger
+    api("io.opentelemetry:opentelemetry-api")
+    api("io.opentelemetry:opentelemetry-sdk")
+    api("io.opentelemetry:opentelemetry-exporter-jaeger")
+    api("io.opentelemetry:opentelemetry-exporter-jaeger-thrift")
+
+    // Spring Kafka + Kafka clients
+    api("org.springframework.kafka:spring-kafka")
+    api("org.apache.kafka:kafka-clients")
+
+    // Jakarta Annotation
+    api("jakarta.annotation:jakarta.annotation-api")
+
+    // Lombok
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+
+    // Общие утилиты
+    api("org.apache.commons:commons-lang3")
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    // Тесты
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
 tasks.withType<Test> {
@@ -46,15 +59,4 @@ tasks.withType<Test> {
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
-}
-
-// Disable Spring Boot plugin for shared library
-tasks.named("bootJar") {
-    enabled = false
-}
-
-tasks.named<Jar>("jar") {
-    enabled = true
-    archiveClassifier.set("")
 }

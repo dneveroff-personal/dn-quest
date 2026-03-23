@@ -96,7 +96,7 @@ jib {
         image = "openjdk:21-jre-alpine"
     }
     to {
-        image = "dn-quest/team-management-service:1.0.0"
+        image = "dn-quest/team-management-service"
         tags = setOf("latest", "1.0.0")
     }
     container {
@@ -125,4 +125,8 @@ jib {
         }
     }
     containerizingMode = "packaged"
+}
+
+tasks.bootJar {
+    mainClass.set("dn.quest.teammanagement.TeamManagementServiceApplication")
 }
