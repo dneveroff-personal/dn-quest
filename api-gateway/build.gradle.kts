@@ -1,4 +1,7 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
+    id("java")
     application
     id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
@@ -91,6 +94,10 @@ application {
     mainClass.set("dn.quest.gateway.ApiGatewayApplication")
 }
 
+springBoot {
+    mainClass.set("dn.quest.gateway.ApiGatewayApplication")
+}
+
 // Jib configuration for Docker image building
 jib {
     from {
@@ -117,7 +124,7 @@ jib {
         )
         user = "1001:1001"
         creationTime = "USE_CURRENT_TIMESTAMP"
-        format = "OCI"
+        format = com.google.cloud.tools.jib.api.buildplan.ImageFormat.OCI
     }
     extraDirectories {
         paths {

@@ -1,5 +1,5 @@
 # Multi-stage build for optimized production image
-FROM openjdk:21-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine AS builder
 
 LABEL maintainer="DN Quest Team"
 LABEL description="DN Quest File Storage Service"
@@ -30,7 +30,7 @@ COPY src src
 RUN ./gradlew bootJar --no-daemon -x test
 
 # Production stage
-FROM openjdk:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 LABEL maintainer="DN Quest Team"
 LABEL description="DN Quest File Storage Service"

@@ -1,8 +1,9 @@
 plugins {
     java
-    org.springframework.boot.apply(false)
-    io.spring.dependency-management.apply(false)
-    com.google.cloud.tools.jib.apply(false)
+
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
+    id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
 dependencies {
@@ -60,14 +61,6 @@ java {
     }
 }
 
-flyway {
-    url = "jdbc:postgresql://localhost:5432/dnquest_files"
-    user = "dn"
-    password = "dn"
-    locations = arrayOf("classpath:db/migration")
-    baselineOnMigrate = true
-}
-
 jib {
     from {
         image = "openjdk:21-jre-alpine"
@@ -93,7 +86,7 @@ jib {
         )
         user = "1001:1001"
         creationTime = "USE_CURRENT_TIMESTAMP"
-        format = "OCI"
+        format = com.google.cloud.tools.jib.api.buildplan.ImageFormat.OCI
     }
     extraDirectories {
         paths {

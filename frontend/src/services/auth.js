@@ -335,6 +335,3 @@ if (typeof window !== 'undefined') {
 export function clearToken() {
   clearTokens();
 }
-
-// Экспортируем старую функцию setToken для обратной совместимости
-export { setToken };

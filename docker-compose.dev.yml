@@ -162,8 +162,8 @@ services:
   # API Gateway с hot reload
   api-gateway-dev:
     build:
-      context: ./api-gateway
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
     image: dn-quest/api-gateway:dev
     container_name: dn-quest-api-gateway-dev
     ports:
@@ -220,8 +220,8 @@ services:
   # Authentication Service с hot reload
   authentication-service-dev:
     build:
-      context: ./authentication-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./authentication-service/Dockerfile
     image: dn-quest/authentication-service:dev
     container_name: dn-quest-authentication-service-dev
     ports:
@@ -276,8 +276,8 @@ services:
   # User Management Service с hot reload
   user-management-service-dev:
     build:
-      context: ./user-management-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./user-management-service/Dockerfile
     image: dn-quest/user-management-service:dev
     container_name: dn-quest-user-management-service-dev
     ports:
@@ -328,8 +328,8 @@ services:
   # Quest Management Service с hot reload
   quest-management-service-dev:
     build:
-      context: ./quest-management-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./quest-management-service/Dockerfile
     image: dn-quest/quest-management-service:dev
     container_name: dn-quest-quest-management-service-dev
     ports:
@@ -383,8 +383,8 @@ services:
   # Game Engine Service с hot reload
   game-engine-service-dev:
     build:
-      context: ./game-engine-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./game-engine-service/Dockerfile
     image: dn-quest/game-engine-service:dev
     container_name: dn-quest-game-engine-service-dev
     ports:
@@ -441,8 +441,8 @@ services:
   # Team Management Service с hot reload
   team-management-service-dev:
     build:
-      context: ./team-management-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./team-management-service/Dockerfile
     image: dn-quest/team-management-service:dev
     container_name: dn-quest-team-management-service-dev
     ports:
@@ -496,8 +496,8 @@ services:
   # Notification Service с hot reload
   notification-service-dev:
     build:
-      context: ./notification-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./notification-service/Dockerfile
     image: dn-quest/notification-service:dev
     container_name: dn-quest-notification-service-dev
     ports:
@@ -553,8 +553,8 @@ services:
   # Statistics Service с hot reload
   statistics-service-dev:
     build:
-      context: ./statistics-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./statistics-service/Dockerfile
     image: dn-quest/statistics-service:dev
     container_name: dn-quest-statistics-service-dev
     ports:
@@ -608,8 +608,8 @@ services:
   # File Storage Service с hot reload
   file-storage-service-dev:
     build:
-      context: ./file-storage-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./file-storage-service/Dockerfile
     image: dn-quest/file-storage-service:dev
     container_name: dn-quest-file-storage-service-dev
     ports:
@@ -664,7 +664,7 @@ services:
   frontend-dev:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     image: dn-quest/frontend:dev
     container_name: dn-quest-frontend-dev
     ports:
