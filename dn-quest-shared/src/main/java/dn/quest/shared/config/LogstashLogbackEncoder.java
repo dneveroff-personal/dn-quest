@@ -37,7 +37,7 @@ public class LogstashLogbackEncoder extends PatternLayoutEncoder {
             ObjectNode logEntry = objectMapper.createObjectNode();
             
             // Базовые поля лога
-            logEntry.put("@timestamp", Instant.now().format(DateTimeFormatter.ISO_INSTANT));
+            logEntry.put("@timestamp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
             logEntry.put("level", event.getLevel().toString());
             logEntry.put("logger", event.getLoggerName());
             logEntry.put("thread", event.getThreadName());
@@ -99,7 +99,7 @@ public class LogstashLogbackEncoder extends PatternLayoutEncoder {
         } catch (Exception e) {
             // В случае ошибки кодирования, возвращаем простой текстовый формат
             return String.format("[%s] %s %s - %s", 
-                Instant.now().format(DateTimeFormatter.ISO_INSTANT),
+                DateTimeFormatter.ISO_INSTANT.format(Instant.now()),
                 event.getLevel(),
                 event.getLoggerName(),
                 event.getFormattedMessage()

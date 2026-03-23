@@ -10,7 +10,6 @@ import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
 import io.micrometer.core.instrument.binder.logging.LogbackMetrics;
-import io.micrometer.core.instrument.binder.cache.CacheMetrics;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
@@ -21,8 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-
-import com.github.benmanes.caffeine.cache.Cache;
 
 import java.util.concurrent.TimeUnit;
 
@@ -121,22 +118,6 @@ public class MetricsConfiguration {
     }
 
     /**
-     * Метрики кэша (если доступен Caffeine)
-     */
-    @Bean
-    @ConditionalOnClass(CaffeineCacheManager.class)
-    @ConditionalOnProperty(name = "management.metrics.cache.enabled", havingValue = "true", matchIfMissing = true)
-    public CacheMetrics cacheMetrics(CacheManager cacheManager) {
-        if (cacheManager instanceof CaffeineCacheManager) {
-            CaffeineCacheManager caffeineCacheManager = (CaffeineCacheManager) cacheManager;
-            return new CacheMetrics(caffeineCacheManager.getCacheNames().stream()
-                    .map(name -> (Cache<?, ?>) caffeineCacheManager.getCache(name).getNativeCache())
-                    .toList());
-        }
-        return null;
-    }
-
-    /**
      * Утилитарный класс для создания бизнес-метрик
      */
     @Bean
@@ -217,7 +198,7 @@ public class MetricsConfiguration {
          */
         public void recordFileUploaded(String type, long size) {
             meterRegistry.counter("dn.quest.files.uploaded", "type", type).increment();
-            meterRegistry.timer("dn.quest.files.upload.size").record(size, TimeUnit.BYTES);
+            meterRegistry.timer("dn.quest.files.upload.size").record(size, TimeUnit.MILLISECONDS);
         }
 
         /**
@@ -283,8 +264,7 @@ public class MetricsConfiguration {
          * Регистрация метрик производительности
          */
         public void recordPerformanceMetric(String metricName, double value, String unit) {
-            meterRegistry.gauge("dn.quest.performance." + metricName, value, 
-                    "unit", unit);
+            meterRegistry.gauge("dn.quest.performance." + metricName, value);
         }
 
         /**
@@ -310,9 +290,7 @@ public class MetricsConfiguration {
          * Регистрация метрик использования ресурсов
          */
         public void recordResourceUsage(String resourceType, double usage, String unit) {
-            meterRegistry.gauge("dn.quest.resources.usage", usage,
-                    "resource_type", resourceType,
-                    "unit", unit);
+            meterRegistry.gauge("dn.quest.resources.usage." + resourceType, usage);
         }
     }
 }

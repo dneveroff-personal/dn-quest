@@ -149,7 +149,6 @@ public class KafkaConfiguration {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.getContainerProperties().setPollTimeout(3000);
         factory.getContainerProperties().setIdleBetweenPolls(1000);
-        factory.getContainerProperties().setAckOnError(false);
         
         // Настройка retry механизма
         factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler());

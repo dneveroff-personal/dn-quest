@@ -18,19 +18,18 @@ repositories {
 }
 
 dependencies {
-    // Micrometer + Tracing
+    // Spring Boot
+    api("org.springframework.boot:spring-boot-starter")
+    api("org.springframework.boot:spring-boot-starter-logging")
+
+    // Micrometer + Tracing (Brave bridge - compatible with Spring Boot 3.2)
     api("io.micrometer:micrometer-core")
     api("io.micrometer:micrometer-registry-prometheus")
-    api("io.micrometer:micrometer-tracing")
-    api("io.micrometer:micrometer-tracing-bridge-brave")
-    api("io.zipkin.reporter2:zipkin-reporter-brave")
-    api("io.zipkin.brave:brave:5.16.0")
+    api("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
 
-    // OpenTelemetry + Jaeger
-    api("io.opentelemetry:opentelemetry-api")
-    api("io.opentelemetry:opentelemetry-sdk")
-    api("io.opentelemetry:opentelemetry-exporter-jaeger")
-    api("io.opentelemetry:opentelemetry-exporter-jaeger-thrift")
+    // Zipkin Reporter
+    api("io.zipkin.reporter2:zipkin-reporter")
+    api("io.zipkin.reporter2:zipkin-reporter-brave")
 
     // Spring Kafka + Kafka clients
     api("org.springframework.kafka:spring-kafka")
@@ -38,6 +37,9 @@ dependencies {
 
     // Jakarta Annotation
     api("jakarta.annotation:jakarta.annotation-api")
+
+    // Logback
+    api("ch.qos.logback:logback-classic")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
@@ -47,6 +49,9 @@ dependencies {
     api("org.apache.commons:commons-lang3")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    
+    // Validation
+    api("jakarta.validation:jakarta.validation-api")
 
     // Тесты
     testImplementation("org.springframework.boot:spring-boot-starter-test")

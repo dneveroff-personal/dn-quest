@@ -1,11 +1,11 @@
 package dn.quest.shared.config;
 
 import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy;
 import ch.qos.logback.core.util.OptionHelper;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -35,7 +35,7 @@ public class LoggingConfiguration {
         addConsoleAppender(loggerContext);
         
         // Настраиваем корневой логгер
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(LoggerContext.ROOT_LOGGER_NAME);
+        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.INFO);
         rootLogger.setAdditive(false);
     }
@@ -52,9 +52,9 @@ public class LoggingConfiguration {
         rollingPolicy.setContext(loggerContext);
         rollingPolicy.setParent(jsonFileAppender);
         rollingPolicy.setFileNamePattern("logs/dn-quest.%d{yyyy-MM-dd}.%i.log.gz");
-        rollingPolicy.setMaxFileSize("100MB");
+        rollingPolicy.setMaxFileSize(ch.qos.logback.core.util.FileSize.valueOf("100MB"));
         rollingPolicy.setMaxHistory(30);
-        rollingPolicy.setTotalSizeCap("1GB");
+        rollingPolicy.setTotalSizeCap(ch.qos.logback.core.util.FileSize.valueOf("1GB"));
         rollingPolicy.start();
         
         jsonFileAppender.setRollingPolicy(rollingPolicy);
@@ -71,7 +71,7 @@ public class LoggingConfiguration {
         jsonFileAppender.start();
         
         // Добавляем аппендер к корневому логгеру
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(LoggerContext.ROOT_LOGGER_NAME);
+        Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.addAppender(jsonFileAppender);
     }
 
@@ -93,7 +93,7 @@ public class LoggingConfiguration {
         
         // Добавляем аппендер только для development профиля
         if ("development".equals(getEnvironment())) {
-            ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(LoggerContext.ROOT_LOGGER_NAME);
+            Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
             rootLogger.addAppender(consoleAppender);
         }
     }
