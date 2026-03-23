@@ -22,6 +22,7 @@ public class JwtUtil {
     private final long expirationMs;
 
     public JwtUtil() {
+        long expirationMs1;
         // Используем секрет из переменных окружения или генерируем новый
         String secret = System.getenv(ApplicationConstants.JWT_SECRET_PROPERTY);
         if (secret == null || secret.isEmpty()) {
@@ -36,16 +37,17 @@ public class JwtUtil {
         String expiration = System.getenv(ApplicationConstants.JWT_EXPIRATION_PROPERTY);
         if (expiration != null && !expiration.isEmpty()) {
             try {
-                this.expirationMs = Long.parseLong(expiration);
-                log.info("JWT время истечения загружено из переменных окружения: {} мс", expirationMs);
+                expirationMs1 = Long.parseLong(expiration);
+                log.info("JWT время истечения загружено из переменных окружения: {} мс", expirationMs1);
             } catch (NumberFormatException e) {
                 log.warn("Неверный формат JWT_EXPIRATION_MS, используем значение по умолчанию");
-                this.expirationMs = ApplicationConstants.DEFAULT_JWT_EXPIRATION_MS;
+                expirationMs1 = ApplicationConstants.DEFAULT_JWT_EXPIRATION_MS;
             }
         } else {
-            this.expirationMs = ApplicationConstants.DEFAULT_JWT_EXPIRATION_MS;
-            log.info("Используем время истечения JWT по умолчанию: {} мс", expirationMs);
+            expirationMs1 = ApplicationConstants.DEFAULT_JWT_EXPIRATION_MS;
+            log.info("Используем время истечения JWT по умолчанию: {} мс", expirationMs1);
         }
+        this.expirationMs = expirationMs1;
     }
 
     /**

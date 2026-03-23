@@ -13,8 +13,8 @@ COPY package*.json ./
 # ---------- Stage 1: Dependencies ----------
 FROM base AS deps
 
-# Устанавливаем зависимости детерминированно
-RUN npm ci --prefer-offline --no-audit --silent && npm cache clean --force
+# Устанавливаем зависимости детерминированно с retry логикой
+RUN npm config set registry https://registry.npmmirror.com && for i in 1 2 3 4 5; do npm ci && break; done && npm cache clean --force
 
 # ---------- Stage 2: Development ----------
 FROM base AS development
@@ -60,8 +60,8 @@ COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Создаем пользователя
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx
+RUN addgroup -g 101 -S nginx || true && \
+    adduser -S nginx -u 101 -G nginx || true
 
 # Устанавливаем правильные права
 RUN chown -R nginx:nginx /usr/share/nginx/html && \

@@ -90,30 +90,6 @@ tasks.withType<JavaCompile> {
     options.compilerArgs.add("-parameters")
 }
 
-// Docker configuration
-tasks.register<Copy>("unpack") {
-    dependsOn(tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar"))
-    from(zipTree(tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar").get().outputs.files.singleFile))
-    into("build/dependency")
-}
-
-tasks.register<com.bmuschko.gradle.docker.tasks.image.Dockerfile>("dockerFile") {
-    dependsOn(tasks.named<Copy>("unpack"))
-    destFile.set(project.file("build/docker/Dockerfile"))
-    from("build/dependency")
-    into("build/dependency")
-    instruction("FROM openjdk:17-jre-slim")
-    instruction("WORKDIR /app")
-    instruction("COPY build/dependency /app")
-    instruction("ENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]")
-}
-
-tasks.register<com.bmuschko.gradle.docker.tasks.image.DockerBuildImage>("dockerBuild") {
-    dependsOn(tasks.named<com.bmuschko.gradle.docker.tasks.image.Dockerfile>("dockerFile"))
-    images.add("${project.group}/${project.name}:${project.version}")
-    images.add("${project.group}/${project.name}:latest")
-}
-
 // Jib configuration for containerization
 jib {
     from {
@@ -139,7 +115,7 @@ jib {
         )
         user = "1001:1001"
         creationTime = "USE_CURRENT_TIMESTAMP"
-        format = "OCI"
+        format = com.google.cloud.tools.jib.api.buildplan.ImageFormat.OCI
     }
     extraDirectories {
         paths {

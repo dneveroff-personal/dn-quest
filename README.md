@@ -1,388 +1,214 @@
-# DN Quest - Платформа для онлайн квестов
+# DN Quest - Платформа для онлайн-квестов
 
-## Обзор
+[![Java 21](https://img.shields.io/badge/Java-21-blue.svg)](https://openjdk.org/)
+[![Spring Boot 3.x](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg)](https://spring.io/projects/spring-boot)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 
-DN Quest - это современная веб-платформа для создания и прохождения онлайн квестов, поддерживающая как одиночное, так и командное прохождение.
-Платформа построена на микросервисной архитектуре с использованием современных технологий.
+DN Quest — это микросервисная платформа для создания и прохождения онлайн-квестов в команде или одиночку.
 
-## Технологический стек
-
-### Backend
-- **Java 21** - последняя версия Java
-- **Spring Boot 3.x** - фреймворк для создания микросервисов
-- **Spring Security** - безопасность и аутентификация
-- **Spring Data JPA** - работа с базой данных
-- **PostgreSQL** - основная база данных
-- **Redis** - кэширование и сессии
-- **Kafka** - асинхронная коммуникация между сервисами
-
-### Frontend
-- **Vue 3** - современный JavaScript фреймворк
-- **Vite** - быстрый сборщик
-- **Naive UI** - компонентная библиотека
-- **Tailwind CSS** - утилитарный CSS фреймворк
-- **Axios** - HTTP клиент
-
-### Инфраструктура
-- **Docker** - контейнеризация
-- **Docker Compose** - оркестрация контейнеров
-- **Kubernetes** - оркестрация в продакшене
-- **Nginx** - веб-сервер и балансировщик
-- **Prometheus + Grafana** - мониторинг
-- **ELK Stack** - логирование
-
-## Архитектура
-
-### Микросервисы
-
-1. **API Gateway** - шлюз для маршрутизации запросов
-2. **Authentication Service** - аутентификация и управление пользователями
-3. **Quest Management Service** - управление квестами
-4. **Game Engine Service** - игровой движок
-5. **Team Management Service** - управление командами
-6. **Notification Service** - уведомления
-7. **Statistics Service** - статистика и аналитика
-8. **File Storage Service** - хранение файлов
-
-### База данных
-
-- **PostgreSQL** - основные данные
-- **Redis** - кэш и сессии
-- **ClickHouse** - аналитические данные
-
-## Быстрый старт
+## 🚀 Быстрый старт
 
 ### Требования
 
-- Java 21+
-- Node.js 18+
-- Docker & Docker Compose
-- PostgreSQL 14+
+- **Docker** 20.10+ и **Docker Compose** 2.0+
+- **8GB+ RAM** (минимум)
+- **20GB+ свободного диска**
 
-### Установка и запуск
-
-1. **Клонирование репозитория**
-```bash
-git clone https://gitlab.com/dn-quest/quiz-engine
-cd dn-quest
-```
-
-2. **Запуск инфраструктуры**
-```bash
-# Запуск базы данных и Redis
-docker compose up -d postgres redis
-
-# Запуск Kafka (опционально)
-docker compose -f docker compose.kafka.yml up -d
-```
-
-3. **Настройка базы данных**
-```bash
-# Создание базы данных
-createdb dnqdb
-
-# Применение миграций
-./gradlew flywayMigrate
-```
-
-4. **Запуск backend**
-```bash
-./gradlew bootRun
-```
-
-5. **Запуск frontend**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-6. **Сборка frontend для продакшена**
-```bash
-cd frontend
-npm run build
-```
-
-### Docker запуск
+### Запуск на локальной машине (Development)
 
 ```bash
-# Полный запуск всех сервисов
-docker compose up -d
+# 1. Сделать скрипт исполняемым
+chmod +x dn-quest.sh
 
-# Только основные сервисы
-docker compose up -d postgres redis backend frontend
+# 2. Инициализировать проект
+./dn-quest.sh init
+
+# 3. Запустить в режиме разработки
+./dn-quest.sh start -e dev
+
+# Проверить статус
+./dn-quest.sh status
 ```
 
-## Структура проекта
+После запуска сервисы будут доступны:
+- **Frontend**: http://localhost:3000
+- **API Gateway**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **Kafka UI**: http://localhost:8089
+- **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin)
 
-```
-dn-quest/
-├── src/main/java/dn/quest/          # Backend код
-│   ├── controllers/                 # REST контроллеры
-│   ├── services/                    # Бизнес-логика
-│   ├── repositories/                # Доступ к данным
-│   ├── model/                       # Модели данных
-│   ├── config/                      # Конфигурация
-│   └── exceptions/                  # Обработка ошибок
-├── frontend/                        # Frontend код
-│   ├── src/
-│   │   ├── components/              # Vue компоненты
-│   │   ├── pages/                   # Страницы
-│   │   ├── services/                # API сервисы
-│   │   └── router/                  # Роутинг
-│   ├── public/                      # Статические файлы
-│   └── dist/                        # Собранный frontend
-├── microservices/                   # Микросервисы
-│   ├── authentication-service/       # Сервис аутентификации
-│   ├── quest-service/               # Сервис квестов
-│   └── game-engine-service/         # Игровой движок
-├── docs/                           # Документация
-├── docker compose.yml              # Docker конфигурация
-├── docker compose.kafka.yml        # Kafka конфигурация
-└── Makefile                        # Сборочные скрипты
-```
-
-## Основные функции
-
-### Для игроков
-- Регистрация и аутентификация
-- Просмотр доступных квестов
-- Прохождение квестов в одиночку или командой
-- Ввод кодов и получение подсказок
-- Отслеживание прогресса
-
-### Для авторов
-- Создание и редактирование квестов
-- Настройка уровней, кодов и подсказок
-- Управление публикацией квестов
-- Мониторинг прохождения
-
-### Для администраторов
-- Управление пользователями
-- Мониторинг системы
-- Аналитика и статистика
-- Управление ролями
-
-## API документация
-
-### Основные эндпоинты
-
-#### Аутентификация
-- `POST /api/auth/register` - Регистрация
-- `POST /api/auth/login` - Вход
-- `POST /api/auth/refresh` - Обновление токена
-
-#### Квесты
-- `GET /api/quests` - Список квестов
-- `POST /api/quests` - Создание квеста
-- `GET /api/quests/{id}` - Получение квеста
-- `PUT /api/quests/{id}` - Обновление квеста
-
-#### Игровые сессии
-- `POST /api/game/sessions` - Начать игру
-- `POST /api/game/sessions/{id}/submit-code` - Ввести код
-- `GET /api/game/sessions/{id}/current-level` - Текущий уровень
-
-#### Команды
-- `GET /api/teams` - Список команд
-- `POST /api/teams` - Создать команду
-- `POST /api/teams/{id}/invite` - Пригласить в команду
-
-Полная документация доступна по адресу: `http://localhost:8080/swagger-ui.html`
-
-## Тестирование
-
-### Запуск тестов
+### Запуск в Production режиме
 
 ```bash
-# Backend тесты
-./gradlew test
+# 1. Настроить переменные окружения
+cp .env.production .env
+# Отредактировать .env с безопасными значениями паролей и секретов
 
-# Frontend тесты
-cd frontend
-npm run test
+# 2. Собрать и запустить
+./dn-quest.sh build
+./dn-quest.sh start -e prod
 
-# Интеграционные тесты
-./gradlew integrationTest
+# Или использовать docker-compose напрямую
+docker compose -f docker-compose.production.yml up -d
 ```
 
-### Тестовое покрытие
+## 📋 Основные команды
 
-- Backend: 85%+
-- Frontend: 80%+
-
-## Разработка
-
-### Локальная разработка
-
-1. **Настройка окружения**
 ```bash
-# Переменные окружения
-export DATABASE_URL=jdbc:postgresql://localhost:5432/dnqdb
-export JWT_SECRET=your-secret-key
-export REDIS_HOST=localhost
+# Управление сервисами
+./dn-quest.sh start          # Запуск (используйте -e dev/prod/full для разных окружений)
+./dn-quest.sh stop          # Остановка
+./dn-quest.sh restart       # Перезапуск
+./dn-quest.sh status        # Статус сервисов
+./dn-quest.sh logs          # Просмотр логов
+
+# Управление конкретным сервисом
+./dn-quest.sh restart-service api-gateway
+./dn-quest.sh logs api-gateway -f
+
+# Сборка
+./dn-quest.sh build         # Пересобрать все сервисы
+./dn-quest.sh clean         # Очистить контейнеры и volumes
 ```
 
-2. **Запуск в режиме разработки**
-```bash
-# Backend с hot reload
-./gradlew bootRun --args='--spring.profiles.active=dev'
+## 🏗️ Архитектура
 
-# Frontend с hot reload
-cd frontend
-npm run dev
-```
+### Микросервисы
 
-### Код стиль
+| Сервис | Порт | Описание |
+|--------|------|----------|
+| **API Gateway** | 8080 | Маршрутизация, аутентификация, rate limiting |
+| **Authentication Service** | 8081 | Регистрация, вход, JWT токены |
+| **User Management Service** | 8082 | Управление профилями пользователей |
+| **Quest Management Service** | 8083 | Создание и управление квестами |
+| **Game Engine Service** | 8084 | Игровая логика, обработка кодов |
+| **Team Management Service** | 8085 | Управление командами |
+| **Notification Service** | 8086 | Уведомления (email, Telegram) |
+| **Statistics Service** | 8087 | Статистика и аналитика |
+| **File Storage Service** | 8088 | Хранение файлов (MinIO/S3) |
+| **Frontend** | 3000 | Vue.js приложение |
 
-- Java: Google Java Style Guide
-- JavaScript: ESLint + Prettier
-- Используйте pre-commit hooks для проверки
+### Инфраструктура
 
-### Конвенции коммитов
+- **PostgreSQL** (8 баз данных) — основное хранилище
+- **Redis** — кэширование и сессии
+- **Kafka** — асинхронная коммуникация
+- **MinIO** — S3-совместимое хранилище файлов
+- **Nginx** — reverse proxy и load balancer
 
-```
-feat: добавление новой функции
-fix: исправление бага
-docs: обновление документации
-style: форматирование кода
-refactor: рефакторинг
-test: добавление тестов
-chore: обновление зависимостей
-```
+### Мониторинг (Full окружение)
 
-## Развертывание
+| Сервис | Порт | Описание |
+|--------|------|----------|
+| **Prometheus** | 9090 | Сбор метрик |
+| **Grafana** | 3001 | Визуализация (admin/admin) |
+| **Jaeger** | 16686 | Распределенный трейсинг |
+| **Kibana** | 5601 | Логирование |
 
-### Продакшен
+## 🌍 Окружения
 
-1. **Сборка образов**
-```bash
-./gradlew jibDockerBuild
-cd frontend && npm run build
-```
+| Окружение | Команда | Описание |
+|-----------|---------|----------|
+| **dev** | `./dn-quest.sh start -e dev` | Разработка с hot reload |
+| **prod** | `./dn-quest.sh start -e prod` | Production с оптимизациями |
+| **full** | `./dn-quest.sh start -e full` | Полный стек с мониторингом |
+| **test** | `./dn-quest.sh start -e test` | Тестирование |
 
-2. **Развертывание в Kubernetes**
-```bash
-kubectl apply -f k8s/
-```
+## 🔧 Конфигурация
 
-3. **Мониторинг**
-- Grafana: `http://your-domain/grafana`
-- Prometheus: `http://your-domain/prometheus`
-- Kibana: `http://your-domain/kibana`
+### Файлы окружений
 
-### Переменные окружения
+- `.env.development` — настройки для разработки
+- `.env.production` — настройки для продакшена
+- `.env.full` — полный стек с мониторингом
+- `.env.testing` — для тестирования
+
+### Основные переменные
 
 ```bash
 # База данных
-DATABASE_URL=jdbc:postgresql://localhost:5432/dnqdb
-DATABASE_USERNAME=dn
-DATABASE_PASSWORD=your-password
+POSTGRES_USER=dn
+POSTGRES_PASSWORD=dn  # Изменить в production!
 
 # JWT
-JWT_SECRET=your-super-secret-key
-JWT_EXPIRATION_MS=86400000
+JWT_SECRET=your-secret-key  # Изменить в production!
 
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# Kafka
-KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+# Порты
+API_GATEWAY_PORT=8080
+FRONTEND_PORT=3000
 ```
 
-## Мониторинг и логирование
+## 🗂️ Структура проекта
 
-### Метрики
-- JVM метрики
-- HTTP запросы
-- База данных
-- Kafka
+```
+dn-quest/
+├── api-gateway/              # API Gateway (Spring Cloud Gateway)
+├── authentication-service/   # Сервис аутентификации
+├── user-management-service/ # Управление пользователями
+├── quest-management-service/# Управление квестами
+├── game-engine-service/     # Игровой движок
+├── team-management-service/ # Управление командами
+├── notification-service/     # Уведомления
+├── statistics-service/       # Статистика
+├── file-storage-service/    # Хранение файлов
+├── dn-quest-shared/        # Общая библиотека
+├── frontend/                # Vue.js приложение
+├── docker/                  # Docker конфигурации
+├── docs/                   # Документация
+├── scripts/                 # Скрипты управления
+├── dn-quest.sh             # Главный скрипт управления
+└── docker-compose*.yml      # Docker Compose файлы
+```
 
-### Логи
-- Структурированные логи
-- Correlation ID для трейсинга
-- Уровни логирования
+## 📚 Документация
 
-### Алерты
-- Высокая нагрузка
-- Ошибки базы данных
-- Недоступность сервисов
+- [Полное руководство по Docker](DOCKER_SETUP_GUIDE.md)
+- [Архитектура микросервисов](README-MICROSERVICES.md)
+- [Конфигурация Docker](docs/docker-configuration-guide.md)
+- [Интеграция Kafka](docs/kafka-integration.md)
+- [Мониторинг](docs/monitoring-guide.md)
 
-## Безопасность
+## 🔒 Безопасность (Production)
 
-### Аутентификация
-- JWT токены
-- Refresh токены
-- Rate limiting
+1. **Измените все пароли** в `.env.production`
+2. **Настройте HTTPS** (SSL сертификаты)
+3. **Измените JWT_SECRET** на длинную случайную строку
+4. **Настройте firewall** — откройте только необходимые порты
+5. **Включите мониторинг** и алерты
 
-### Авторизация
-- Ролевая модель
-- RBAC
-- API ключи
+## 🐛 Troubleshooting
 
-### Защита
-- HTTPS
-- CORS
-- SQL Injection защита
-- XSS защита
+```bash
+# Проверка статуса
+./dn-quest.sh status -h -d
 
-## Производительность
+# Логи с ошибками
+./dn-quest.sh logs | grep ERROR
 
-### Оптимизация
-- Кэширование
-- Индексы базы данных
-- Connection pooling
-- Асинхронная обработка
+# Перезапуск сервиса
+./dn-quest.sh restart-service api-gateway
 
-### Масштабирование
-- Горизонтальное масштабирование
-- Load balancing
-- Auto-scaling
+# Полная очистка
+./dn-quest.sh clean
+```
 
-## Вклад в проект
+### Частые проблемы
+
+1. **Порты заняты** — измените порты в `.env` файле
+2. **Недостаточно памяти** — увеличьте Docker memory limits
+3. **Базы данных не стартуют** — проверьте права на volumes
+
+## 🤝 Вклад в проект
 
 1. Fork репозитория
 2. Создайте feature branch
-3. Вносите изменения
-4. Добавьте тесты
-5. Создайте Pull Request
+3. Внесите изменения
+4. Создайте Pull Request
 
-## Лицензия
+## 📄 Лицензия
 
-MIT License - см. файл [LICENSE](LICENSE)
+MIT License
 
-## Поддержка
+---
 
-- Документация: [docs/](docs/)
-- Issues: [GitHub Issues](https://github.com/your-org/dn-quest/issues)
-- Дискорд: [ссылка на Discord]
-
-## Дорожная карта
-
-### v1.0 (Текущая версия)
-- [x] Базовая функциональность
-- [x] Аутентификация
-- [x] Создание квестов
-- [x] Игровой движок
-
-### v1.1 (Планируется)
-- [ ] Мобильное приложение
-- [ ] Расширенная аналитика
-- [ ] Турниры
-- [ ] Интеграция с мессенджерами
-
-### v2.0 (Будущее)
-- [ ] ИИ для генерации квестов
-- [ ] VR/AR поддержка
-- [ ] Голосовые квесты
-- [ ] Международные квесты
-
-## Авторы
-
-- [DNeveroff](https://gitlab.com/denis.neverov.dev) - Developer
-
-## Благодарности
-
-- Самому себе, что нашел время :-)
-- ИИ за помощь в написании кода
+**DN Quest** — современная платформа для онлайн-квестов с микросервисной архитектурой

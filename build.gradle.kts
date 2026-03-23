@@ -5,6 +5,8 @@ plugins {
     id("org.flywaydb.flyway") version "9.22.3" apply false
     id("com.google.cloud.tools.jib") version "3.4.0" apply false
     id("jacoco")
+    kotlin("jvm") version "1.9.20" apply false
+    kotlin("plugin.spring") version "1.9.20" apply false
 }
 
 group = "dn.quest"
@@ -17,6 +19,8 @@ java {
 }
 
 repositories {
+    maven { url = uri("https://maven.aliyun.com/repository/central") }
+    maven { url = uri("https://maven.aliyun.com/repository/public") }
     mavenCentral()
 }
 
@@ -36,6 +40,8 @@ subprojects {
     }
 
     repositories {
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
+        maven { url = uri("https://maven.aliyun.com/repository/public") }
         mavenCentral()
     }
 
@@ -61,7 +67,7 @@ subprojects {
         implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
         
         // Cloud
-        implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+        implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
         
         // Monitoring
         implementation("io.micrometer:micrometer-registry-prometheus")
@@ -81,13 +87,6 @@ subprojects {
         testImplementation("org.testcontainers:junit-jupiter")
         testImplementation("org.testcontainers:postgresql")
         testImplementation("org.testcontainers:testcontainers:1.19.3")
-    }
-
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
-            mavenBom("org.testcontainers:testcontainers-bom:1.19.3")
-        }
     }
 
     tasks.withType<Test> {
@@ -111,24 +110,6 @@ subprojects {
             xml.required.set(true)
             html.required.set(true)
         }
-    }
-}
-
-// Project-wide Jacoco aggregation
-tasks.register<JacocoReport>("jacocoRootReport") {
-    group = "verification"
-    description = "Generates an aggregate report from all subprojects"
-    
-    dependsOn(subprojects.map { "${it.path}:test" })
-    
-    sourceDirectories.setFrom(files(subprojects.map { "${it.projectDir}/src/main/java" }))
-    classDirectories.setFrom(files(subprojects.map { "${it.buildDir}/classes/java/main" }))
-    executionData.setFrom(files(subprojects.map { "${it.buildDir}/jacoco/test.exec" }))
-    
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/test/html"))
     }
 }
 
