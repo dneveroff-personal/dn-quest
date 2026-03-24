@@ -1,0 +1,1886 @@
+.
+├── api-gateway
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── gateway
+│  │  │                      ├── ApiGatewayApplication.class
+│  │  │                      ├── client
+│  │  │                      │  └── AuthenticationServiceClient.class
+│  │  │                      ├── config
+│  │  │                      │  ├── FilterConfig.class
+│  │  │                      │  ├── GatewayConfig.class
+│  │  │                      │  ├── GlobalExceptionHandler.class
+│  │  │                      │  ├── MetricsConfig.class
+│  │  │                      │  ├── Resilience4jConfig.class
+│  │  │                      │  └── WebClientConfig.class
+│  │  │                      ├── controller
+│  │  │                      │  ├── FallbackController.class
+│  │  │                      │  └── GatewayHealthController.class
+│  │  │                      ├── dto
+│  │  │                      │  ├── TokenValidationResponse$TokenValidationResponseBuilder.class
+│  │  │                      │  └── TokenValidationResponse.class
+│  │  │                      ├── filter
+│  │  │                      │  ├── AuthenticationFilter.class
+│  │  │                      │  ├── LoggingFilter.class
+│  │  │                      │  └── SecurityHeadersFilter.class
+│  │  │                      └── util
+│  │  │                          └── JwtUtil.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  ├── libs
+│  │  │  ├── api-gateway-1.0.0.jar
+│  │  │  └── api-gateway-1.0.0-plain.jar
+│  │  ├── resources
+│  │  │  └── main
+│  │  │      └── application.yml
+│  │  └── tmp
+│  │      ├── bootJar
+│  │      │  └── MANIFEST.MF
+│  │      ├── compileJava
+│  │      │  └── previous-compilation-data.bin
+│  │      └── jar
+│  │          └── MANIFEST.MF
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  ├── README.md
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── gateway
+│      │  │              ├── ApiGatewayApplication.java
+│      │  │              ├── client
+│      │  │              │  └── AuthenticationServiceClient.java
+│      │  │              ├── config
+│      │  │              │  ├── FilterConfig.java
+│      │  │              │  ├── GatewayConfig.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  ├── MetricsConfig.java
+│      │  │              │  ├── Resilience4jConfig.java
+│      │  │              │  └── WebClientConfig.java
+│      │  │              ├── controller
+│      │  │              │  ├── FallbackController.java
+│      │  │              │  └── GatewayHealthController.java
+│      │  │              ├── dto
+│      │  │              │  └── TokenValidationResponse.java
+│      │  │              ├── filter
+│      │  │              │  ├── AuthenticationFilter.java
+│      │  │              │  ├── LoggingFilter.java
+│      │  │              │  └── SecurityHeadersFilter.java
+│      │  │              └── util
+│      │  │                  └── JwtUtil.java
+│      │  └── resources
+│      │      └── application.yml
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── gateway
+│                          ├── ApiGatewayApplicationTests.java
+│                          └── integration
+│                              └── ApiGatewayIntegrationTest.java
+├── authentication-service
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── authentication
+│  │  │                      ├── AuthenticationServiceApplication.class
+│  │  │                      ├── config
+│  │  │                      │  ├── GlobalExceptionHandler.class
+│  │  │                      │  ├── JwtAuthenticationFilter.class
+│  │  │                      │  ├── KafkaConfig.class
+│  │  │                      │  └── SecurityConfig.class
+│  │  │                      ├── controller
+│  │  │                      │  └── AuthController.class
+│  │  │                      ├── dto
+│  │  │                      │  ├── ChangePasswordRequestDTO$ChangePasswordRequestDTOBuilder.class
+│  │  │                      │  ├── ChangePasswordRequestDTO.class
+│  │  │                      │  ├── ForgotPasswordRequestDTO$ForgotPasswordRequestDTOBuilder.class
+│  │  │                      │  ├── ForgotPasswordRequestDTO.class
+│  │  │                      │  ├── LoginRequestDTO$LoginRequestDTOBuilder.class
+│  │  │                      │  ├── LoginRequestDTO.class
+│  │  │                      │  ├── LoginResponseDTO$LoginResponseDTOBuilder.class
+│  │  │                      │  ├── LoginResponseDTO.class
+│  │  │                      │  ├── RefreshTokenRequestDTO$RefreshTokenRequestDTOBuilder.class
+│  │  │                      │  ├── RefreshTokenRequestDTO.class
+│  │  │                      │  ├── RegisterRequestDTO$RegisterRequestDTOBuilder.class
+│  │  │                      │  ├── RegisterRequestDTO.class
+│  │  │                      │  ├── ResetPasswordRequestDTO$ResetPasswordRequestDTOBuilder.class
+│  │  │                      │  ├── ResetPasswordRequestDTO.class
+│  │  │                      │  ├── UpdateProfileRequestDTO$UpdateProfileRequestDTOBuilder.class
+│  │  │                      │  ├── UpdateProfileRequestDTO.class
+│  │  │                      │  ├── UserDTO$UserDTOBuilder.class
+│  │  │                      │  └── UserDTO.class
+│  │  │                      ├── entity
+│  │  │                      │  ├── Permission$PermissionBuilder.class
+│  │  │                      │  ├── Permission.class
+│  │  │                      │  ├── User$UserBuilder.class
+│  │  │                      │  ├── User.class
+│  │  │                      │  ├── UserPermission$UserPermissionBuilder.class
+│  │  │                      │  └── UserPermission.class
+│  │  │                      ├── event
+│  │  │                      │  ├── BaseEvent$BaseEventBuilder.class
+│  │  │                      │  ├── BaseEvent.class
+│  │  │                      │  ├── KafkaEventProducer.class
+│  │  │                      │  ├── UserEvent$UserDeletedData$UserDeletedDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserDeletedData.class
+│  │  │                      │  ├── UserEvent$UserLoggedInData$UserLoggedInDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserLoggedInData.class
+│  │  │                      │  ├── UserEvent$UserLoggedOutData$UserLoggedOutDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserLoggedOutData.class
+│  │  │                      │  ├── UserEvent$UserPasswordChangedData$UserPasswordChangedDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserPasswordChangedData.class
+│  │  │                      │  ├── UserEvent$UserPermissionsUpdatedData$UserPermissionsUpdatedDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserPermissionsUpdatedData.class
+│  │  │                      │  ├── UserEvent$UserRegisteredData$UserRegisteredDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserRegisteredData.class
+│  │  │                      │  ├── UserEvent$UserRoleChangedData$UserRoleChangedDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserRoleChangedData.class
+│  │  │                      │  ├── UserEvent$UserUpdatedData$UserUpdatedDataBuilder.class
+│  │  │                      │  ├── UserEvent$UserUpdatedData.class
+│  │  │                      │  └── UserEvent.class
+│  │  │                      ├── metrics
+│  │  │                      │  ├── AuthenticationMetrics$TimedOperation.class
+│  │  │                      │  └── AuthenticationMetrics.class
+│  │  │                      ├── repository
+│  │  │                      │  ├── PermissionRepository.class
+│  │  │                      │  ├── UserPermissionRepository.class
+│  │  │                      │  └── UserRepository.class
+│  │  │                      └── service
+│  │  │                          ├── AuthService.class
+│  │  │                          ├── impl
+│  │  │                          │  ├── AuthServiceImpl.class
+│  │  │                          │  └── UserServiceImpl.class
+│  │  │                          └── UserService.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  ├── libs
+│  │  │  ├── authentication-service-1.0.0.jar
+│  │  │  └── authentication-service-1.0.0-plain.jar
+│  │  ├── resources
+│  │  │  └── main
+│  │  │      ├── application.yml
+│  │  │      └── db
+│  │  │          └── migration
+│  │  │              ├── V1__Create_Users_Table.sql
+│  │  │              ├── V2__Create_Permissions_Table.sql
+│  │  │              └── V3__Create_User_Permissions_Table.sql
+│  │  └── tmp
+│  │      ├── bootJar
+│  │      │  └── MANIFEST.MF
+│  │      ├── compileJava
+│  │      │  └── previous-compilation-data.bin
+│  │      └── jar
+│  │          └── MANIFEST.MF
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── authentication
+│      │  │              ├── AuthenticationServiceApplication.java
+│      │  │              ├── config
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  ├── JwtAuthenticationFilter.java
+│      │  │              │  ├── KafkaConfig.java
+│      │  │              │  └── SecurityConfig.java
+│      │  │              ├── controller
+│      │  │              │  └── AuthController.java
+│      │  │              ├── dto
+│      │  │              │  ├── ChangePasswordRequestDTO.java
+│      │  │              │  ├── ForgotPasswordRequestDTO.java
+│      │  │              │  ├── LoginRequestDTO.java
+│      │  │              │  ├── LoginResponseDTO.java
+│      │  │              │  ├── RefreshTokenRequestDTO.java
+│      │  │              │  ├── RegisterRequestDTO.java
+│      │  │              │  ├── ResetPasswordRequestDTO.java
+│      │  │              │  ├── UpdateProfileRequestDTO.java
+│      │  │              │  └── UserDTO.java
+│      │  │              ├── entity
+│      │  │              │  ├── Permission.java
+│      │  │              │  ├── User.java
+│      │  │              │  └── UserPermission.java
+│      │  │              ├── event
+│      │  │              │  ├── BaseEvent.java
+│      │  │              │  ├── KafkaEventProducer.java
+│      │  │              │  └── UserEvent.java
+│      │  │              ├── metrics
+│      │  │              │  └── AuthenticationMetrics.java
+│      │  │              ├── repository
+│      │  │              │  ├── PermissionRepository.java
+│      │  │              │  ├── UserPermissionRepository.java
+│      │  │              │  └── UserRepository.java
+│      │  │              └── service
+│      │  │                  ├── AuthService.java
+│      │  │                  ├── impl
+│      │  │                  │  ├── AuthServiceImpl.java
+│      │  │                  │  └── UserServiceImpl.java
+│      │  │                  └── UserService.java
+│      │  └── resources
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              ├── V1__Create_Users_Table.sql
+│      │              ├── V2__Create_Permissions_Table.sql
+│      │              └── V3__Create_User_Permissions_Table.sql
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── authentication
+│                          ├── controller
+│                          │  └── AuthControllerIntegrationTest.java
+│                          ├── integration
+│                          │  └── AuthServiceIntegrationTest.java
+│                          └── service
+│                              └── UserServiceTest.java
+├── bin
+│  ├── default
+│  ├── generated-sources
+│  │  └── annotations
+│  ├── generated-test-sources
+│  │  └── annotations
+│  ├── main
+│  │  ├── application.properties
+│  │  ├── banner.txt
+│  │  ├── db
+│  │  │  └── migration
+│  │  │      └── V1__Add_Performance_Indexes.sql
+│  │  ├── dn
+│  │  │  └── quest
+│  │  │      ├── bot
+│  │  │      │  ├── config
+│  │  │      │  │  └── TelegramBotConfig.class
+│  │  │      │  └── QuestTelegramBot.class
+│  │  │      ├── cmd
+│  │  │      │  └── QuestConsole.class
+│  │  │      ├── config
+│  │  │      │  ├── ApplicationConstants.class
+│  │  │      │  ├── BusinessValidator.class
+│  │  │      │  ├── CacheConfig.class
+│  │  │      │  ├── DataInitializer.class
+│  │  │      │  ├── DateTimeUtils.class
+│  │  │      │  ├── DtoMapper.class
+│  │  │      │  ├── Helpers.class
+│  │  │      │  ├── JwtAuthenticationFilter.class
+│  │  │      │  ├── JwtUtil.class
+│  │  │      │  └── SecurityConfig.class
+│  │  │      ├── controllers
+│  │  │      │  ├── AttemptController.class
+│  │  │      │  ├── AuthController.class
+│  │  │      │  ├── CodeController.class
+│  │  │      │  ├── GameSessionController$StartSessionRequest.class
+│  │  │      │  ├── GameSessionController$SubmitCodeRequest.class
+│  │  │      │  ├── GameSessionController$SubmitCodeResponse.class
+│  │  │      │  ├── GameSessionController.class
+│  │  │      │  ├── LevelController.class
+│  │  │      │  ├── LevelHintController.class
+│  │  │      │  ├── ParticipationController.class
+│  │  │      │  ├── QuestController.class
+│  │  │      │  ├── RegistrationController.class
+│  │  │      │  ├── Routes.class
+│  │  │      │  ├── TeamController.class
+│  │  │      │  └── UserController.class
+│  │  │      ├── exceptions
+│  │  │      │  └── GlobalExceptionHandler.class
+│  │  │      ├── model
+│  │  │      │  ├── dto
+│  │  │      │  │  ├── CodeAttemptDTO$CodeAttemptDTOBuilder.class
+│  │  │      │  │  ├── CodeAttemptDTO.class
+│  │  │      │  │  ├── CodeDTO$CodeDTOBuilder.class
+│  │  │      │  │  ├── CodeDTO.class
+│  │  │      │  │  ├── CodeViewDTO$CodeViewDTOBuilder.class
+│  │  │      │  │  ├── CodeViewDTO.class
+│  │  │      │  │  ├── GameSessionDTO$GameSessionDTOBuilder.class
+│  │  │      │  │  ├── GameSessionDTO.class
+│  │  │      │  │  ├── LevelCompletionDTO$LevelCompletionDTOBuilder.class
+│  │  │      │  │  ├── LevelCompletionDTO.class
+│  │  │      │  │  ├── LevelDTO$LevelDTOBuilder.class
+│  │  │      │  │  ├── LevelDTO.class
+│  │  │      │  │  ├── LevelHintDTO$LevelHintDTOBuilder.class
+│  │  │      │  │  ├── LevelHintDTO.class
+│  │  │      │  │  ├── LevelProgressDTO$LevelProgressDTOBuilder.class
+│  │  │      │  │  ├── LevelProgressDTO.class
+│  │  │      │  │  ├── LevelViewDTO$LevelViewDTOBuilder.class
+│  │  │      │  │  ├── LevelViewDTO.class
+│  │  │      │  │  ├── LoginRequestDTO.class
+│  │  │      │  │  ├── LoginResponseDTO$LoginResponseDTOBuilder.class
+│  │  │      │  │  ├── LoginResponseDTO.class
+│  │  │      │  │  ├── ParticipationRequestDTO$ParticipationRequestDTOBuilder.class
+│  │  │      │  │  ├── ParticipationRequestDTO.class
+│  │  │      │  │  ├── QuestCreateUpdateDTO$QuestCreateUpdateDTOBuilder.class
+│  │  │      │  │  ├── QuestCreateUpdateDTO.class
+│  │  │      │  │  ├── QuestDTO$QuestDTOBuilder.class
+│  │  │      │  │  ├── QuestDTO.class
+│  │  │      │  │  ├── QuestStatsDTO$QuestStatsDTOBuilder.class
+│  │  │      │  │  ├── QuestStatsDTO.class
+│  │  │      │  │  ├── RegisterDTO$RegisterDTOBuilder.class
+│  │  │      │  │  ├── RegisterDTO.class
+│  │  │      │  │  ├── SubmitCodeResult$SubmitCodeResultBuilder.class
+│  │  │      │  │  ├── SubmitCodeResult.class
+│  │  │      │  │  ├── TeamDTO$TeamDTOBuilder.class
+│  │  │      │  │  ├── TeamDTO.class
+│  │  │      │  │  ├── TeamInvitationDTO$TeamInvitationDTOBuilder.class
+│  │  │      │  │  ├── TeamInvitationDTO.class
+│  │  │      │  │  ├── UserDTO$TeamShortDTO$TeamShortDTOBuilder.class
+│  │  │      │  │  ├── UserDTO$TeamShortDTO.class
+│  │  │      │  │  ├── UserDTO$UserDTOBuilder.class
+│  │  │      │  │  └── UserDTO.class
+│  │  │      │  └── entities
+│  │  │      │      ├── enums
+│  │  │      │      │  ├── ApplicantType.class
+│  │  │      │      │  ├── AttemptResult.class
+│  │  │      │      │  ├── CodeType.class
+│  │  │      │      │  ├── Difficulty.class
+│  │  │      │      │  ├── InvitationStatus.class
+│  │  │      │      │  ├── ParticipationStatus.class
+│  │  │      │      │  ├── QuestType.class
+│  │  │      │      │  ├── SessionStatus.class
+│  │  │      │      │  ├── TeamRole.class
+│  │  │      │      │  └── UserRole.class
+│  │  │      │      ├── quest
+│  │  │      │      │  ├── GameSession.class
+│  │  │      │      │  ├── level
+│  │  │      │      │  │  ├── CodeAttempt.class
+│  │  │      │      │  │  ├── Code.class
+│  │  │      │      │  │  ├── Level.class
+│  │  │      │      │  │  ├── LevelCompletion.class
+│  │  │      │      │  │  ├── LevelHint.class
+│  │  │      │      │  │  └── LevelProgress.class
+│  │  │      │      │  ├── ParticipationRequest.class
+│  │  │      │      │  └── Quest.class
+│  │  │      │      ├── team
+│  │  │      │      │  ├── Team.class
+│  │  │      │      │  ├── TeamInvitation.class
+│  │  │      │      │  └── TeamMember.class
+│  │  │      │      └── user
+│  │  │      │          └── User.class
+│  │  │      ├── QuestEngineApplication.class
+│  │  │      ├── repositories
+│  │  │      │  ├── CodeAttemptRepository.class
+│  │  │      │  ├── CodeRepository.class
+│  │  │      │  ├── GameSessionRepository.class
+│  │  │      │  ├── LevelCompletionRepository.class
+│  │  │      │  ├── LevelHintRepository.class
+│  │  │      │  ├── LevelProgressRepository.class
+│  │  │      │  ├── LevelRepository.class
+│  │  │      │  ├── ParticipationRequestRepository.class
+│  │  │      │  ├── QuestRepository.class
+│  │  │      │  ├── TeamInvitationRepository.class
+│  │  │      │  ├── TeamMemberRepository.class
+│  │  │      │  ├── TeamRepository.class
+│  │  │      │  └── UserRepository.class
+│  │  │      └── services
+│  │  │          ├── impl
+│  │  │          │  ├── AttemptServiceImpl.class
+│  │  │          │  ├── AuthServiceImpl.class
+│  │  │          │  ├── CodeServiceImpl.class
+│  │  │          │  ├── GameSessionServiceImpl.class
+│  │  │          │  ├── LeaderboardServiceImpl.class
+│  │  │          │  ├── LevelHintServiceImpl.class
+│  │  │          │  ├── LevelServiceImpl.class
+│  │  │          │  ├── ParticipationServiceImpl.class
+│  │  │          │  ├── QuestServiceImpl.class
+│  │  │          │  ├── TeamServiceImpl.class
+│  │  │          │  └── UserServiceImpl.class
+│  │  │          └── interfaces
+│  │  │              ├── AttemptService.class
+│  │  │              ├── AuthService.class
+│  │  │              ├── CodeService.class
+│  │  │              ├── GameSessionService.class
+│  │  │              ├── LeaderboardService.class
+│  │  │              ├── LevelHintService.class
+│  │  │              ├── LevelService.class
+│  │  │              ├── ParticipationService.class
+│  │  │              ├── QuestService.class
+│  │  │              ├── TeamService.class
+│  │  │              └── UserService.class
+│  │  ├── static
+│  │  │  ├── assets
+│  │  │  │  ├── FiraCode-Regular-CRwVj4V2.woff2
+│  │  │  │  ├── index-CrvHNykL.css
+│  │  │  │  ├── index-DM3vsaxu.js
+│  │  │  │  ├── InvitationsList-DHQBjzaI.js
+│  │  │  │  ├── InvitationsPage-DxKuQb0J.js
+│  │  │  │  ├── LatoLatin-Regular-Dmlz1U0B.woff2
+│  │  │  │  ├── LatoLatin-Semibold-Dbk81p2D.woff2
+│  │  │  │  ├── QuestForm-D6nIHQcw.js
+│  │  │  │  ├── QuestStats-Bb0RsPpf.css
+│  │  │  │  ├── QuestStats-DTSl5q43.js
+│  │  │  │  ├── TeamForm-BlWcBESq.js
+│  │  │  │  └── TeamPage-Cq1dYQu2.js
+│  │  │  ├── favicon.ico
+│  │  │  ├── index.html
+│  │  │  └── vite.svg
+│  │  └── templates
+│  └── test
+│      └── service
+├── build
+│  ├── libs
+│  │  └── dn-quest-1.0.0.jar
+│  ├── reports
+│  │  └── problems
+│  │      └── problems-report.html
+│  └── tmp
+│      └── jar
+│          └── MANIFEST.MF
+├── build.gradle.kts
+├── data
+│  ├── elasticsearch
+│  ├── grafana
+│  ├── jaeger
+│  ├── kafka
+│  ├── minio
+│  ├── postgres
+│  ├── prometheus
+│  └── redis
+├── dn-quest.sh
+├── dn-quest-shared
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── shared
+│  │  │                      ├── config
+│  │  │                      │  ├── KafkaConfiguration.class
+│  │  │                      │  ├── KafkaHealthConfig.class
+│  │  │                      │  ├── KafkaMetricsConfig.class
+│  │  │                      │  ├── LoggingConfiguration.class
+│  │  │                      │  ├── LogstashLogbackEncoder.class
+│  │  │                      │  ├── MetricsConfiguration$BusinessMetrics.class
+│  │  │                      │  ├── MetricsConfiguration.class
+│  │  │                      │  ├── TracingConfiguration$TracingUtils.class
+│  │  │                      │  └── TracingConfiguration.class
+│  │  │                      ├── constants
+│  │  │                      │  ├── ApplicationConstants$Api.class
+│  │  │                      │  ├── ApplicationConstants$Cache.class
+│  │  │                      │  ├── ApplicationConstants$ErrorCodes.class
+│  │  │                      │  ├── ApplicationConstants$File.class
+│  │  │                      │  ├── ApplicationConstants$Game.class
+│  │  │                      │  ├── ApplicationConstants$HttpStatus.class
+│  │  │                      │  ├── ApplicationConstants$Kafka.class
+│  │  │                      │  ├── ApplicationConstants$Quest.class
+│  │  │                      │  ├── ApplicationConstants$Security.class
+│  │  │                      │  ├── ApplicationConstants$Team.class
+│  │  │                      │  ├── ApplicationConstants$User.class
+│  │  │                      │  ├── ApplicationConstants$Validation.class
+│  │  │                      │  ├── ApplicationConstants.class
+│  │  │                      │  └── KafkaTopics.class
+│  │  │                      ├── dto
+│  │  │                      │  ├── auth
+│  │  │                      │  │  ├── LoginRequestDTO.class
+│  │  │                      │  │  ├── LoginResponseDTO.class
+│  │  │                      │  │  ├── RefreshTokenRequestDTO.class
+│  │  │                      │  │  └── RegisterDTO.class
+│  │  │                      │  ├── BaseDTO$1.class
+│  │  │                      │  ├── BaseDTO.class
+│  │  │                      │  ├── ErrorDTO$ErrorDTOBuilder.class
+│  │  │                      │  ├── ErrorDTO$ValidationError$ValidationErrorBuilder.class
+│  │  │                      │  ├── ErrorDTO$ValidationError.class
+│  │  │                      │  ├── ErrorDTO.class
+│  │  │                      │  ├── PaginationDTO$PaginationDTOBuilder.class
+│  │  │                      │  ├── PaginationDTO.class
+│  │  │                      │  └── UserDTO.class
+│  │  │                      ├── enums
+│  │  │                      │  ├── AttemptResult.class
+│  │  │                      │  ├── CodeType.class
+│  │  │                      │  ├── Difficulty.class
+│  │  │                      │  ├── InvitationStatus.class
+│  │  │                      │  ├── ParticipationStatus.class
+│  │  │                      │  ├── QuestType.class
+│  │  │                      │  ├── SessionStatus.class
+│  │  │                      │  ├── TeamRole.class
+│  │  │                      │  └── UserRole.class
+│  │  │                      ├── events
+│  │  │                      │  ├── BaseEvent$BaseEventBuilder.class
+│  │  │                      │  ├── BaseEvent$BaseEventBuilderImpl.class
+│  │  │                      │  ├── BaseEvent.class
+│  │  │                      │  ├── EventConsumer.class
+│  │  │                      │  ├── EventProducer.class
+│  │  │                      │  ├── file
+│  │  │                      │  │  ├── FileDeletedEvent$FileDeletedEventBuilder.class
+│  │  │                      │  │  ├── FileDeletedEvent$FileDeletedEventBuilderImpl.class
+│  │  │                      │  │  ├── FileDeletedEvent.class
+│  │  │                      │  │  ├── FileUpdatedEvent$FileUpdatedEventBuilder.class
+│  │  │                      │  │  ├── FileUpdatedEvent$FileUpdatedEventBuilderImpl.class
+│  │  │                      │  │  ├── FileUpdatedEvent.class
+│  │  │                      │  │  ├── FileUploadedEvent$FileUploadedEventBuilder.class
+│  │  │                      │  │  ├── FileUploadedEvent$FileUploadedEventBuilderImpl.class
+│  │  │                      │  │  └── FileUploadedEvent.class
+│  │  │                      │  ├── game
+│  │  │                      │  │  ├── CodeAttemptEvent$CodeAttemptEventType.class
+│  │  │                      │  │  ├── CodeAttemptEvent.class
+│  │  │                      │  │  ├── CodeSubmittedEvent.class
+│  │  │                      │  │  ├── GameEngineEvent.class
+│  │  │                      │  │  ├── GameSessionEvent$GameSessionEventType.class
+│  │  │                      │  │  ├── GameSessionEvent.class
+│  │  │                      │  │  ├── GameSessionFinishedEvent.class
+│  │  │                      │  │  ├── GameSessionStartedEvent.class
+│  │  │                      │  │  ├── LeaderboardEvent$LeaderboardEntry.class
+│  │  │                      │  │  ├── LeaderboardEvent.class
+│  │  │                      │  │  ├── LevelCompletedEvent.class
+│  │  │                      │  │  ├── LevelCompletionEvent.class
+│  │  │                      │  │  ├── LevelProgressEvent.class
+│  │  │                      │  │  ├── ParticipationRequestEvent.class
+│  │  │                      │  │  ├── TeamGameEvent.class
+│  │  │                      │  │  └── UserGameEvent.class
+│  │  │                      │  ├── notification
+│  │  │                      │  │  ├── NotificationEvent$NotificationEventBuilder.class
+│  │  │                      │  │  └── NotificationEvent.class
+│  │  │                      │  ├── quest
+│  │  │                      │  │  ├── QuestCreatedEvent.class
+│  │  │                      │  │  ├── QuestDeletedEvent.class
+│  │  │                      │  │  ├── QuestPublishedEvent.class
+│  │  │                      │  │  └── QuestUpdatedEvent.class
+│  │  │                      │  ├── team
+│  │  │                      │  │  ├── TeamDeletedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamCaptainChangedEvent$TeamCaptainChangedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamCaptainChangedEvent$TeamCaptainChangedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamCaptainChangedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamCreatedEvent$TeamCreatedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamCreatedEvent$TeamCreatedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamCreatedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamDeletedEvent$TeamDeletedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamDeletedEvent$TeamDeletedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamDeletedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationAcceptedEvent$TeamInvitationAcceptedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationAcceptedEvent$TeamInvitationAcceptedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationAcceptedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationDeclinedEvent$TeamInvitationDeclinedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationDeclinedEvent$TeamInvitationDeclinedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationDeclinedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationRevokedEvent$TeamInvitationRevokedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationRevokedEvent$TeamInvitationRevokedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationRevokedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationSentEvent$TeamInvitationSentEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationSentEvent$TeamInvitationSentEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamInvitationSentEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberAddedEvent$TeamMemberAddedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberAddedEvent$TeamMemberAddedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberAddedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRemovedEvent$TeamMemberRemovedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRemovedEvent$TeamMemberRemovedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRemovedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRoleChangedEvent$TeamMemberRoleChangedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRoleChangedEvent$TeamMemberRoleChangedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamMemberRoleChangedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamSettingsUpdatedEvent$TeamSettingsUpdatedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamSettingsUpdatedEvent$TeamSettingsUpdatedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamSettingsUpdatedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamStatisticsUpdatedEvent$TeamStatisticsUpdatedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamStatisticsUpdatedEvent$TeamStatisticsUpdatedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamStatisticsUpdatedEvent.class
+│  │  │                      │  │  ├── TeamEvent$TeamUpdatedEvent$TeamUpdatedEventBuilder.class
+│  │  │                      │  │  ├── TeamEvent$TeamUpdatedEvent$TeamUpdatedEventBuilderImpl.class
+│  │  │                      │  │  ├── TeamEvent$TeamUpdatedEvent.class
+│  │  │                      │  │  └── TeamEvent.class
+│  │  │                      │  └── user
+│  │  │                      │      ├── UserDeletedEvent.class
+│  │  │                      │      ├── UserEvent$UserDeletedData$UserDeletedDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserDeletedData.class
+│  │  │                      │      ├── UserEvent$UserLoggedInData$UserLoggedInDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserLoggedInData.class
+│  │  │                      │      ├── UserEvent$UserLoggedOutData$UserLoggedOutDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserLoggedOutData.class
+│  │  │                      │      ├── UserEvent$UserPasswordChangedData$UserPasswordChangedDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserPasswordChangedData.class
+│  │  │                      │      ├── UserEvent$UserPermissionsUpdatedData$UserPermissionsUpdatedDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserPermissionsUpdatedData.class
+│  │  │                      │      ├── UserEvent$UserRegisteredData$UserRegisteredDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserRegisteredData.class
+│  │  │                      │      ├── UserEvent$UserRoleChangedData$UserRoleChangedDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserRoleChangedData.class
+│  │  │                      │      ├── UserEvent$UserUpdatedData$UserUpdatedDataBuilder.class
+│  │  │                      │      ├── UserEvent$UserUpdatedData.class
+│  │  │                      │      ├── UserEvent.class
+│  │  │                      │      ├── UserRegisteredEvent.class
+│  │  │                      │      └── UserUpdatedEvent.class
+│  │  │                      ├── exceptions
+│  │  │                      │  ├── CommonExceptions$AuthenticationException.class
+│  │  │                      │  ├── CommonExceptions$AuthorizationException.class
+│  │  │                      │  ├── CommonExceptions$BusinessException.class
+│  │  │                      │  ├── CommonExceptions$ConflictException.class
+│  │  │                      │  ├── CommonExceptions$ExceptionFactory.class
+│  │  │                      │  ├── CommonExceptions$ExternalServiceException.class
+│  │  │                      │  ├── CommonExceptions$IllegalStateException.class
+│  │  │                      │  ├── CommonExceptions$RateLimitException.class
+│  │  │                      │  ├── CommonExceptions$ResourceNotFoundException.class
+│  │  │                      │  ├── CommonExceptions$SystemException.class
+│  │  │                      │  ├── CommonExceptions$TimeoutException.class
+│  │  │                      │  ├── CommonExceptions$ValidationException.class
+│  │  │                      │  ├── CommonExceptions.class
+│  │  │                      │  └── GlobalExceptionHandler.class
+│  │  │                      ├── health
+│  │  │                      │  └── KafkaHealthIndicator.class
+│  │  │                      └── utils
+│  │  │                          ├── DateTimeUtils.class
+│  │  │                          ├── DtoMapper.class
+│  │  │                          └── JwtUtil.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  ├── libs
+│  │  │  └── dn-quest-shared-1.0.0-plain.jar
+│  │  ├── resolvedMainClassName
+│  │  └── tmp
+│  │      ├── compileJava
+│  │      │  └── previous-compilation-data.bin
+│  │      └── jar
+│  │          └── MANIFEST.MF
+│  ├── build.gradle.kts
+│  └── src
+│      ├── main
+│      │  └── java
+│      │      └── dn
+│      │          └── quest
+│      │              └── shared
+│      │                  ├── config
+│      │                  │  ├── KafkaConfiguration.java
+│      │                  │  ├── KafkaHealthConfig.java
+│      │                  │  ├── KafkaMetricsConfig.java
+│      │                  │  ├── LoggingConfiguration.java
+│      │                  │  ├── LogstashLogbackEncoder.java
+│      │                  │  ├── MetricsConfiguration.java
+│      │                  │  └── TracingConfiguration.java
+│      │                  ├── constants
+│      │                  │  ├── ApplicationConstants.java
+│      │                  │  └── KafkaTopics.java
+│      │                  ├── dto
+│      │                  │  ├── auth
+│      │                  │  │  ├── LoginRequestDTO.java
+│      │                  │  │  ├── LoginResponseDTO.java
+│      │                  │  │  ├── RefreshTokenRequestDTO.java
+│      │                  │  │  └── RegisterDTO.java
+│      │                  │  ├── BaseDTO.java
+│      │                  │  ├── ErrorDTO.java
+│      │                  │  ├── PaginationDTO.java
+│      │                  │  └── UserDTO.java
+│      │                  ├── enums
+│      │                  │  ├── AttemptResult.java
+│      │                  │  ├── CodeType.java
+│      │                  │  ├── Difficulty.java
+│      │                  │  ├── InvitationStatus.java
+│      │                  │  ├── ParticipationStatus.java
+│      │                  │  ├── QuestType.java
+│      │                  │  ├── SessionStatus.java
+│      │                  │  ├── TeamRole.java
+│      │                  │  └── UserRole.java
+│      │                  ├── events
+│      │                  │  ├── BaseEvent.java
+│      │                  │  ├── EventConsumer.java
+│      │                  │  ├── EventProducer.java
+│      │                  │  ├── file
+│      │                  │  │  ├── FileDeletedEvent.java
+│      │                  │  │  ├── FileUpdatedEvent.java
+│      │                  │  │  └── FileUploadedEvent.java
+│      │                  │  ├── game
+│      │                  │  │  ├── CodeAttemptEvent.java
+│      │                  │  │  ├── CodeSubmittedEvent.java
+│      │                  │  │  ├── GameEngineEvent.java
+│      │                  │  │  ├── GameSessionEvent.java
+│      │                  │  │  ├── GameSessionFinishedEvent.java
+│      │                  │  │  ├── GameSessionStartedEvent.java
+│      │                  │  │  ├── LeaderboardEvent.java
+│      │                  │  │  ├── LevelCompletedEvent.java
+│      │                  │  │  ├── LevelCompletionEvent.java
+│      │                  │  │  ├── LevelProgressEvent.java
+│      │                  │  │  ├── ParticipationRequestEvent.java
+│      │                  │  │  ├── TeamGameEvent.java
+│      │                  │  │  └── UserGameEvent.java
+│      │                  │  ├── notification
+│      │                  │  │  └── NotificationEvent.java
+│      │                  │  ├── quest
+│      │                  │  │  ├── QuestCreatedEvent.java
+│      │                  │  │  ├── QuestDeletedEvent.java
+│      │                  │  │  ├── QuestPublishedEvent.java
+│      │                  │  │  └── QuestUpdatedEvent.java
+│      │                  │  ├── team
+│      │                  │  │  ├── TeamDeletedEvent.java
+│      │                  │  │  └── TeamEvent.java
+│      │                  │  └── user
+│      │                  │      ├── UserDeletedEvent.java
+│      │                  │      ├── UserEvent.java
+│      │                  │      ├── UserRegisteredEvent.java
+│      │                  │      └── UserUpdatedEvent.java
+│      │                  ├── exceptions
+│      │                  │  ├── CommonExceptions.java
+│      │                  │  └── GlobalExceptionHandler.java
+│      │                  ├── health
+│      │                  │  └── KafkaHealthIndicator.java
+│      │                  └── utils
+│      │                      ├── DateTimeUtils.java
+│      │                      ├── DtoMapper.java
+│      │                      └── JwtUtil.java
+│      └── test
+│          ├── java
+│          │  └── dn
+│          │      └── quest
+│          │          └── shared
+│          │              ├── base
+│          │              │  ├── AbstractIntegrationTestBase.java
+│          │              │  ├── AbstractLoadTestBase.java
+│          │              │  ├── AbstractWebSocketTestBase.java
+│          │              │  └── MicroserviceIntegrationTestBase.java
+│          │              ├── config
+│          │              │  ├── EnhancedTestContainerConfig.java
+│          │              │  ├── EnhancedTestKafkaConfig.java
+│          │              │  ├── TestContainerConfig.java
+│          │              │  ├── TestKafkaConfig.java
+│          │              │  └── TestMockConfig.java
+│          │              ├── e2e
+│          │              │  ├── EndToEndTestSuite.java
+│          │              │  └── UserJourneyE2ETest.java
+│          │              ├── events
+│          │              │  ├── EventIdempotencyTest.java
+│          │              │  ├── GameEventIntegrationTest.java
+│          │              │  ├── KafkaTestBase.java
+│          │              │  └── UserEventIntegrationTest.java
+│          │              ├── integration
+│          │              │  └── KafkaIntegrationTest.java
+│          │              ├── load
+│          │              │  ├── ApiGatewayLoadTest.java
+│          │              │  └── KafkaEventLoadTest.java
+│          │              ├── performance
+│          │              │  └── LoadTestSuite.java
+│          │              └── util
+│          │                  ├── EnhancedTestDataFactory.java
+│          │                  └── TestDataFactory.java
+│          └── resources
+│              └── application-test.yml
+├── docker
+│  ├── alertmanager
+│  │  └── alertmanager.yml
+│  ├── elasticsearch
+│  │  └── elasticsearch.yml
+│  ├── grafana
+│  │  ├── dashboards
+│  │  │  ├── dn-quest-business-metrics.json
+│  │  │  ├── dn-quest-overview.json
+│  │  │  ├── dn-quest-security-metrics.json
+│  │  │  └── dn-quest-system-overview.json
+│  │  └── provisioning
+│  │      ├── dashboards
+│  │      │  └── dashboards.yml
+│  │      └── datasources
+│  │          └── prometheus.yml
+│  ├── jaeger
+│  │  └── jaeger.yml
+│  ├── kibana
+│  │  └── kibana.yml
+│  ├── logstash
+│  │  ├── logstash.yml
+│  │  └── pipeline
+│  │      └── dn-quest.conf
+│  ├── nginx
+│  │  ├── conf.d
+│  │  │  └── default.conf
+│  │  └── nginx.conf
+│  ├── postgres
+│  │  ├── dev
+│  │  │  └── init
+│  │  │      └── init.sql
+│  │  └── init
+│  │      └── init.sql
+│  ├── prometheus
+│  │  ├── prometheus-enhanced.yml
+│  │  ├── prometheus.yml
+│  │  └── rules
+│  │      ├── dn-quest-alerts.yml
+│  │      ├── enhanced-alerts.yml
+│  │      └── recording-rules.yml
+│  └── redis
+│      ├── dev
+│      │  └── redis.conf
+│      └── redis.conf
+├── docker-compose.dev.yml
+├── docker-compose.full.yml
+├── docker-compose.kafka.yml
+├── docker-compose.monitoring.yml
+├── docker-compose.optimized.yml
+├── docker-compose.production.yml
+├── docker-compose.prod.yml
+├── docker-compose.yml
+├── Dockerfile
+├── Dockerfile.dev
+├── DOCKER_SETUP_GUIDE.md
+├── docs
+│  ├── docker-configuration-guide.md
+│  ├── kafka-integration.md
+│  ├── microservices-architecture.md
+│  ├── microservices-docker-guide.md
+│  ├── monitoring-guide.md
+│  ├── monolith-analysis-migration-plan.md
+│  └── testing-guide.md
+├── file-storage-service
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── filestorage
+│  │  │                      ├── client
+│  │  │                      │  ├── AuthenticationServiceClient$PermissionCheckRequest.class
+│  │  │                      │  └── AuthenticationServiceClient.class
+│  │  │                      ├── config
+│  │  │                      │  ├── FeignConfig$BadRequestException.class
+│  │  │                      │  ├── FeignConfig$CustomErrorDecoder.class
+│  │  │                      │  ├── FeignConfig$ForbiddenException.class
+│  │  │                      │  ├── FeignConfig$InternalServerErrorException.class
+│  │  │                      │  ├── FeignConfig$NotFoundException.class
+│  │  │                      │  ├── FeignConfig$UnauthorizedException.class
+│  │  │                      │  ├── FeignConfig.class
+│  │  │                      │  ├── GlobalExceptionHandler$ErrorResponse$ErrorResponseBuilder.class
+│  │  │                      │  ├── GlobalExceptionHandler$ErrorResponse.class
+│  │  │                      │  ├── GlobalExceptionHandler.class
+│  │  │                      │  ├── JwtAuthenticationFilter.class
+│  │  │                      │  ├── KafkaConfig.class
+│  │  │                      │  └── SecurityConfig.class
+│  │  │                      ├── controller
+│  │  │                      │  └── FileStorageController.class
+│  │  │                      ├── dto
+│  │  │                      │  ├── BatchFileUploadRequestDTO$BatchFileUploadRequestDTOBuilder.class
+│  │  │                      │  ├── BatchFileUploadRequestDTO.class
+│  │  │                      │  ├── BatchFileUploadResponseDTO$BatchFileUploadResponseDTOBuilder.class
+│  │  │                      │  ├── BatchFileUploadResponseDTO$FileUploadErrorDTO$FileUploadErrorDTOBuilder.class
+│  │  │                      │  ├── BatchFileUploadResponseDTO$FileUploadErrorDTO.class
+│  │  │                      │  ├── BatchFileUploadResponseDTO.class
+│  │  │                      │  ├── FileResponseDTO$FileResponseDTOBuilder.class
+│  │  │                      │  ├── FileResponseDTO$FileStatus.class
+│  │  │                      │  ├── FileResponseDTO.class
+│  │  │                      │  ├── FileSearchRequestDTO$FileSearchRequestDTOBuilder.class
+│  │  │                      │  ├── FileSearchRequestDTO.class
+│  │  │                      │  ├── FileSearchResponseDTO$FileSearchResponseDTOBuilder.class
+│  │  │                      │  ├── FileSearchResponseDTO.class
+│  │  │                      │  ├── FileUploadRequestDTO$FileUploadRequestDTOBuilder.class
+│  │  │                      │  ├── FileUploadRequestDTO.class
+│  │  │                      │  ├── PresignedUploadUrlRequestDTO$PresignedUploadUrlRequestDTOBuilder.class
+│  │  │                      │  ├── PresignedUploadUrlRequestDTO.class
+│  │  │                      │  ├── StorageStatisticsDTO$FileTypeStatistics$FileTypeStatisticsBuilder.class
+│  │  │                      │  ├── StorageStatisticsDTO$FileTypeStatistics.class
+│  │  │                      │  ├── StorageStatisticsDTO$StorageStatisticsDTOBuilder.class
+│  │  │                      │  ├── StorageStatisticsDTO$StorageTypeStatistics$StorageTypeStatisticsBuilder.class
+│  │  │                      │  ├── StorageStatisticsDTO$StorageTypeStatistics.class
+│  │  │                      │  ├── StorageStatisticsDTO.class
+│  │  │                      │  ├── UserDTO$UserDTOBuilder.class
+│  │  │                      │  ├── UserDTO.class
+│  │  │                      │  ├── UserStorageStatisticsDTO$UserStorageStatisticsDTOBuilder.class
+│  │  │                      │  └── UserStorageStatisticsDTO.class
+│  │  │                      ├── entity
+│  │  │                      │  ├── FileMetadata$FileMetadataBuilder.class
+│  │  │                      │  ├── FileMetadata$FileType.class
+│  │  │                      │  ├── FileMetadata$StorageType.class
+│  │  │                      │  └── FileMetadata.class
+│  │  │                      ├── event
+│  │  │                      │  ├── KafkaEventConsumer.class
+│  │  │                      │  └── KafkaEventProducer.class
+│  │  │                      ├── exception
+│  │  │                      │  ├── FileAccessException.class
+│  │  │                      │  ├── FileNotFoundException.class
+│  │  │                      │  ├── FileStorageException.class
+│  │  │                      │  ├── FileUploadException.class
+│  │  │                      │  ├── FileValidationException.class
+│  │  │                      │  └── StorageException.class
+│  │  │                      ├── FileStorageServiceApplication.class
+│  │  │                      ├── repository
+│  │  │                      │  └── FileMetadataRepository.class
+│  │  │                      ├── scheduler
+│  │  │                      │  └── FileCleanupScheduler.class
+│  │  │                      ├── service
+│  │  │                      │  ├── FileStorageService.class
+│  │  │                      │  ├── FileValidationService$1.class
+│  │  │                      │  ├── FileValidationService.class
+│  │  │                      │  ├── ImageProcessingService$ImageInfo.class
+│  │  │                      │  ├── ImageProcessingService.class
+│  │  │                      │  └── impl
+│  │  │                      │      ├── FileStorageServiceImpl.class
+│  │  │                      │      ├── FileStorageServiceImplHelper.class
+│  │  │                      │      └── ImageProcessingServiceImpl.class
+│  │  │                      └── storage
+│  │  │                          ├── impl
+│  │  │                          │  ├── LocalStorageStrategy.class
+│  │  │                          │  └── MinioStorageStrategy.class
+│  │  │                          ├── StorageStatistics$StorageStatisticsBuilder.class
+│  │  │                          ├── StorageStatistics.class
+│  │  │                          ├── StorageStrategy.class
+│  │  │                          ├── StorageStrategyFactory$1.class
+│  │  │                          └── StorageStrategyFactory.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  ├── libs
+│  │  │  ├── file-storage-service-1.0.0.jar
+│  │  │  └── file-storage-service-1.0.0-plain.jar
+│  │  ├── resources
+│  │  │  └── main
+│  │  │      ├── application.yml
+│  │  │      └── db
+│  │  │          └── migration
+│  │  │              └── V1__Create_File_Metadata_Table.sql
+│  │  └── tmp
+│  │      ├── bootJar
+│  │      │  └── MANIFEST.MF
+│  │      ├── compileJava
+│  │      │  └── previous-compilation-data.bin
+│  │      └── jar
+│  │          └── MANIFEST.MF
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  ├── README.md
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── filestorage
+│      │  │              ├── client
+│      │  │              │  └── AuthenticationServiceClient.java
+│      │  │              ├── config
+│      │  │              │  ├── FeignConfig.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  ├── JwtAuthenticationFilter.java
+│      │  │              │  ├── KafkaConfig.java
+│      │  │              │  └── SecurityConfig.java
+│      │  │              ├── controller
+│      │  │              │  └── FileStorageController.java
+│      │  │              ├── dto
+│      │  │              │  ├── BatchFileUploadRequestDTO.java
+│      │  │              │  ├── BatchFileUploadResponseDTO.java
+│      │  │              │  ├── FileResponseDTO.java
+│      │  │              │  ├── FileSearchRequestDTO.java
+│      │  │              │  ├── FileSearchResponseDTO.java
+│      │  │              │  ├── FileUploadRequestDTO.java
+│      │  │              │  ├── PresignedUploadUrlRequestDTO.java
+│      │  │              │  ├── StorageStatisticsDTO.java
+│      │  │              │  ├── UserDTO.java
+│      │  │              │  └── UserStorageStatisticsDTO.java
+│      │  │              ├── entity
+│      │  │              │  └── FileMetadata.java
+│      │  │              ├── event
+│      │  │              │  ├── KafkaEventConsumer.java
+│      │  │              │  └── KafkaEventProducer.java
+│      │  │              ├── exception
+│      │  │              │  ├── FileAccessException.java
+│      │  │              │  ├── FileNotFoundException.java
+│      │  │              │  ├── FileStorageException.java
+│      │  │              │  ├── FileUploadException.java
+│      │  │              │  ├── FileValidationException.java
+│      │  │              │  └── StorageException.java
+│      │  │              ├── FileStorageServiceApplication.java
+│      │  │              ├── repository
+│      │  │              │  └── FileMetadataRepository.java
+│      │  │              ├── scheduler
+│      │  │              │  └── FileCleanupScheduler.java
+│      │  │              ├── service
+│      │  │              │  ├── FileStorageService.java
+│      │  │              │  ├── FileValidationService.java
+│      │  │              │  ├── ImageProcessingService.java
+│      │  │              │  └── impl
+│      │  │              │      ├── FileStorageServiceImplHelper.java
+│      │  │              │      ├── FileStorageServiceImpl.java
+│      │  │              │      └── ImageProcessingServiceImpl.java
+│      │  │              └── storage
+│      │  │                  ├── impl
+│      │  │                  │  ├── LocalStorageStrategy.java
+│      │  │                  │  └── MinioStorageStrategy.java
+│      │  │                  ├── StorageStatistics.java
+│      │  │                  ├── StorageStrategyFactory.java
+│      │  │                  └── StorageStrategy.java
+│      │  └── resources
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              └── V1__Create_File_Metadata_Table.sql
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── filestorage
+│                          ├── FileStorageServiceApplicationTests.java
+│                          └── integration
+│                              └── FileStorageIntegrationTest.java
+├── frontend
+│  ├── dist
+│  │  ├── assets
+│  │  │  ├── FiraCode-Regular-CRwVj4V2.woff2
+│  │  │  ├── index-BJsy51ej.js
+│  │  │  ├── index-lYc0i5n2.css
+│  │  │  ├── InvitationsList-BnNvKUPm.js
+│  │  │  ├── InvitationsPage-V3oyi-IZ.js
+│  │  │  ├── LatoLatin-Regular-Dmlz1U0B.woff2
+│  │  │  ├── LatoLatin-Semibold-Dbk81p2D.woff2
+│  │  │  ├── QuestForm-CiAOLoRu.js
+│  │  │  ├── QuestStats-Bb0RsPpf.css
+│  │  │  ├── QuestStats-Bn1KkqKQ.js
+│  │  │  ├── TeamForm-D-pE-F-g.js
+│  │  │  └── TeamPage-DNwwMnX-.js
+│  │  ├── favicon.ico
+│  │  ├── index.html
+│  │  └── vite.svg
+│  ├── docker
+│  │  └── nginx
+│  │      ├── default.conf
+│  │      └── nginx.conf
+│  ├── Dockerfile
+│  ├── index.html
+│  ├── node_modules
+...
+│  ├── package.json
+│  ├── package-lock.json
+│  ├── postcss.config.js
+│  ├── public
+│  │  ├── favicon.ico
+│  │  └── vite.svg
+│  ├── README.md
+│  ├── src
+│  │  ├── App.vue
+│  │  ├── assets
+│  │  ├── components
+│  │  │  ├── AppHeader.vue
+│  │  │  ├── FileUpload.vue
+│  │  │  ├── GameHeader.vue
+│  │  │  ├── InvitationsList.vue
+│  │  │  ├── QuestCard.vue
+│  │  │  └── quests
+│  │  │      ├── LevelCodes.vue
+│  │  │      ├── LevelHintsEditor.vue
+│  │  │      └── LevelsManager.vue
+│  │  ├── main.js
+│  │  ├── pages
+│  │  │  ├── Finish.vue
+│  │  │  ├── Home.vue
+│  │  │  ├── InvitationsPage.vue
+│  │  │  ├── Login.vue
+│  │  │  ├── ManageUsers.vue
+│  │  │  ├── Play.vue
+│  │  │  ├── QuestForm.vue
+│  │  │  ├── QuestStats.vue
+│  │  │  ├── Register.vue
+│  │  │  ├── TeamForm.vue
+│  │  │  └── TeamPage.vue
+│  │  ├── router
+│  │  │  └── index.js
+│  │  ├── services
+│  │  │  ├── api.js
+│  │  │  ├── auth.js
+│  │  │  ├── errorHandler.js
+│  │  │  └── websocket.js
+│  │  ├── style.css
+│  │  ├── tests
+│  │  │  ├── api.test.js
+│  │  │  ├── auth.test.js
+│  │  │  ├── integration.test.js
+│  │  │  └── setup.js
+│  │  └── utils
+│  │      └── formatters.js
+│  ├── tailwind.config.js
+│  ├── vite.config.js
+│  └── vitest.config.js
+├── game-engine-service
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── gameengine
+│  │  │                      ├── config
+│  │  │                      │  └── KafkaConfig.class
+│  │  │                      ├── controller
+│  │  │                      │  └── GameSessionController.class
+│  │  │                      ├── dto
+│  │  │                      │  ├── CreateGameSessionRequest$SessionSettingsDTO.class
+│  │  │                      │  ├── CreateGameSessionRequest.class
+│  │  │                      │  ├── GameSessionDTO$GameSessionDTOBuilder.class
+│  │  │                      │  ├── GameSessionDTO$LevelProgressDTO.class
+│  │  │                      │  ├── GameSessionDTO$QuestSummaryDTO.class
+│  │  │                      │  ├── GameSessionDTO$SessionStatsDTO.class
+│  │  │                      │  ├── GameSessionDTO$TeamSummaryDTO.class
+│  │  │                      │  ├── GameSessionDTO$UserSummaryDTO.class
+│  │  │                      │  ├── GameSessionDTO.class
+│  │  │                      │  ├── LevelCompletionDTO.class
+│  │  │                      │  ├── LevelProgressDTO$AchievementDTO.class
+│  │  │                      │  ├── LevelProgressDTO$FoundCodeDTO.class
+│  │  │                      │  ├── LevelProgressDTO$UsedHintDTO.class
+│  │  │                      │  ├── LevelProgressDTO.class
+│  │  │                      │  ├── SubmitCodeRequest$CodeMetadataDTO.class
+│  │  │                      │  ├── SubmitCodeRequest.class
+│  │  │                      │  ├── SubmitCodeResponse$AchievementDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$CodeInfoDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$LeaderboardInfoDTO$NearbyPlayerDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$LeaderboardInfoDTO$TopPlayerDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$LeaderboardInfoDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$ProgressInfoDTO.class
+│  │  │                      │  ├── SubmitCodeResponse$ResponseMetadataDTO.class
+│  │  │                      │  ├── SubmitCodeResponse.class
+│  │  │                      │  └── UpdateGameSessionRequest.class
+│  │  │                      ├── entity
+│  │  │                      │  ├── Code$1.class
+│  │  │                      │  ├── CodeAttempt.class
+│  │  │                      │  ├── Code.class
+│  │  │                      │  ├── GameSession$GameSessionBuilder.class
+│  │  │                      │  ├── GameSession.class
+│  │  │                      │  ├── Level.class
+│  │  │                      │  ├── LevelCompletion.class
+│  │  │                      │  ├── LevelHint.class
+│  │  │                      │  ├── LevelProgress.class
+│  │  │                      │  ├── ParticipationRequest.class
+│  │  │                      │  ├── Quest.class
+│  │  │                      │  ├── Team.class
+│  │  │                      │  ├── TeamMember$1.class
+│  │  │                      │  ├── TeamMember.class
+│  │  │                      │  └── User.class
+│  │  │                      ├── event
+│  │  │                      │  ├── CodeAttemptEvent$CodeAttemptEventType.class
+│  │  │                      │  ├── CodeAttemptEvent.class
+│  │  │                      │  ├── GameEngineEvent.class
+│  │  │                      │  ├── GameSessionEvent$GameSessionEventType.class
+│  │  │                      │  ├── GameSessionEvent.class
+│  │  │                      │  ├── KafkaEventConsumer.class
+│  │  │                      │  └── KafkaEventProducer.class
+│  │  │                      ├── GameEngineServiceApplication.class
+│  │  │                      ├── repository
+│  │  │                      │  ├── CodeAttemptRepository.class
+│  │  │                      │  ├── CodeRepository.class
+│  │  │                      │  ├── GameSessionRepository.class
+│  │  │                      │  ├── LevelCompletionRepository.class
+│  │  │                      │  ├── LevelHintRepository.class
+│  │  │                      │  ├── LevelProgressRepository.class
+│  │  │                      │  ├── LevelRepository.class
+│  │  │                      │  ├── ParticipationRequestRepository.class
+│  │  │                      │  ├── QuestRepository.class
+│  │  │                      │  ├── TeamMemberRepository.class
+│  │  │                      │  ├── TeamRepository.class
+│  │  │                      │  └── UserRepository.class
+│  │  │                      └── service
+│  │  │                          ├── CodeAttemptService.class
+│  │  │                          ├── GameSessionService.class
+│  │  │                          ├── impl
+│  │  │                          │  └── GameSessionServiceImpl.class
+│  │  │                          ├── LeaderboardService.class
+│  │  │                          ├── LevelCompletionService.class
+│  │  │                          ├── LevelProgressService.class
+│  │  │                          ├── ParticipationRequestService.class
+│  │  │                          ├── QuestService.class
+│  │  │                          ├── TeamService.class
+│  │  │                          └── UserService.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  ├── libs
+│  │  │  ├── game-engine-service-1.0.0.jar
+│  │  │  └── game-engine-service-1.0.0-plain.jar
+│  │  ├── resources
+│  │  │  └── main
+│  │  │      ├── application.yml
+│  │  │      └── db
+│  │  │          └── migration
+│  │  │              ├── V1__Create_game_engine_tables.sql
+│  │  │              └── V2__Create_additional_tables_and_views.sql
+│  │  └── tmp
+│  │      ├── bootJar
+│  │      │  └── MANIFEST.MF
+│  │      ├── compileJava
+│  │      │  └── previous-compilation-data.bin
+│  │      └── jar
+│  │          └── MANIFEST.MF
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── gameengine
+│      │  │              ├── config
+│      │  │              │  └── KafkaConfig.java
+│      │  │              ├── controller
+│      │  │              │  └── GameSessionController.java
+│      │  │              ├── dto
+│      │  │              │  ├── CreateGameSessionRequest.java
+│      │  │              │  ├── GameSessionDTO.java
+│      │  │              │  ├── LevelCompletionDTO.java
+│      │  │              │  ├── LevelProgressDTO.java
+│      │  │              │  ├── SubmitCodeRequest.java
+│      │  │              │  ├── SubmitCodeResponse.java
+│      │  │              │  └── UpdateGameSessionRequest.java
+│      │  │              ├── entity
+│      │  │              │  ├── CodeAttempt.java
+│      │  │              │  ├── Code.java
+│      │  │              │  ├── GameSession.java
+│      │  │              │  ├── LevelCompletion.java
+│      │  │              │  ├── LevelHint.java
+│      │  │              │  ├── Level.java
+│      │  │              │  ├── LevelProgress.java
+│      │  │              │  ├── ParticipationRequest.java
+│      │  │              │  ├── Quest.java
+│      │  │              │  ├── Team.java
+│      │  │              │  ├── TeamMember.java
+│      │  │              │  └── User.java
+│      │  │              ├── event
+│      │  │              │  ├── CodeAttemptEvent.java
+│      │  │              │  ├── GameEngineEvent.java
+│      │  │              │  ├── GameSessionEvent.java
+│      │  │              │  ├── KafkaEventConsumer.java
+│      │  │              │  └── KafkaEventProducer.java
+│      │  │              ├── GameEngineServiceApplication.java
+│      │  │              ├── repository
+│      │  │              │  ├── CodeAttemptRepository.java
+│      │  │              │  ├── CodeRepository.java
+│      │  │              │  ├── GameSessionRepository.java
+│      │  │              │  ├── LevelCompletionRepository.java
+│      │  │              │  ├── LevelHintRepository.java
+│      │  │              │  ├── LevelProgressRepository.java
+│      │  │              │  ├── LevelRepository.java
+│      │  │              │  ├── ParticipationRequestRepository.java
+│      │  │              │  ├── QuestRepository.java
+│      │  │              │  ├── TeamMemberRepository.java
+│      │  │              │  ├── TeamRepository.java
+│      │  │              │  └── UserRepository.java
+│      │  │              └── service
+│      │  │                  ├── CodeAttemptService.java
+│      │  │                  ├── GameSessionService.java
+│      │  │                  ├── impl
+│      │  │                  │  └── GameSessionServiceImpl.java
+│      │  │                  ├── LeaderboardService.java
+│      │  │                  ├── LevelCompletionService.java
+│      │  │                  ├── LevelProgressService.java
+│      │  │                  ├── ParticipationRequestService.java
+│      │  │                  ├── QuestService.java
+│      │  │                  ├── TeamService.java
+│      │  │                  └── UserService.java
+│      │  └── resources
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              ├── V1__Create_game_engine_tables.sql
+│      │              └── V2__Create_additional_tables_and_views.sql
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── gameengine
+│                          └── integration
+│                              └── GameEngineIntegrationTest.java
+├── gradle
+│  └── wrapper
+│      ├── gradle-wrapper.jar
+│      └── gradle-wrapper.properties
+├── gradlew
+├── logs
+├── Makefile
+├── notification-service
+│  ├── build
+│  │  ├── classes
+│  │  │  └── java
+│  │  │      └── main
+│  │  │          └── dn
+│  │  │              └── quest
+│  │  │                  └── notification
+│  │  │                      ├── config
+│  │  │                      │  ├── AsyncConfig$CustomAsyncExceptionHandler.class
+│  │  │                      │  ├── AsyncConfig.class
+│  │  │                      │  ├── GlobalExceptionHandler$ErrorResponse$ErrorResponseBuilder.class
+│  │  │                      │  ├── GlobalExceptionHandler$ErrorResponse.class
+│  │  │                      │  ├── GlobalExceptionHandler.class
+│  │  │                      │  ├── JwtAuthenticationFilter.class
+│  │  │                      │  ├── KafkaConfig.class
+│  │  │                      │  ├── NotificationHealthIndicator.class
+│  │  │                      │  ├── RateLimitingFilter.class
+│  │  │                      │  ├── SchedulerConfig.class
+│  │  │                      │  └── SecurityConfig.class
+│  │  │                      ├── entity
+│  │  │                      │  ├── Notification$NotificationBuilder.class
+│  │  │                      │  ├── Notification.class
+│  │  │                      │  ├── NotificationQueue$NotificationQueueBuilder.class
+│  │  │                      │  ├── NotificationQueue.class
+│  │  │                      │  ├── UserNotificationPreferences$UserNotificationPreferencesBuilder.class
+│  │  │                      │  └── UserNotificationPreferences.class
+│  │  │                      ├── enums
+│  │  │                      │  ├── NotificationCategory.class
+│  │  │                      │  ├── NotificationPriority.class
+│  │  │                      │  ├── NotificationStatus.class
+│  │  │                      │  └── NotificationType.class
+│  │  │                      ├── exception
+│  │  │                      │  ├── NotificationException.class
+│  │  │                      │  ├── TemplateNotFoundException.class
+│  │  │                      │  ├── UserNotFoundException.class
+│  │  │                      │  └── ValidationException.class
+│  │  │                      └── service
+│  │  │                          ├── channel
+│  │  │                          │  ├── EmailNotificationChannel.class
+│  │  │                          │  ├── InAppNotificationChannel.class
+│  │  │                          │  ├── NotificationChannel.class
+│  │  │                          │  ├── NotificationChannelManager.class
+│  │  │                          │  ├── NotificationChannelResult$NotificationChannelResultBuilder.class
+│  │  │                          │  ├── NotificationChannelResult.class
+│  │  │                          │  ├── PushNotificationChannel.class
+│  │  │                          │  ├── SmsNotificationChannel.class
+│  │  │                          │  └── TelegramNotificationChannel.class
+│  │  │                          ├── impl
+│  │  │                          │  ├── RateLimitingServiceImpl$BlacklistEntry.class
+│  │  │                          │  ├── RateLimitingServiceImpl$IpCounter.class
+│  │  │                          │  ├── RateLimitingServiceImpl$UserCounter.class
+│  │  │                          │  └── RateLimitingServiceImpl.class
+│  │  │                          ├── NotificationAnalyticsService$ChannelStatistics.class
+│  │  │                          ├── NotificationAnalyticsService$DeliveryTimeStatistics.class
+│  │  │                          ├── NotificationAnalyticsService$ErrorStatistics.class
+│  │  │                          ├── NotificationAnalyticsService$NotificationStatistics.class
+│  │  │                          ├── NotificationAnalyticsService$NotificationTrend.class
+│  │  │                          ├── NotificationAnalyticsService$PerformanceMetrics.class
+│  │  │                          ├── NotificationAnalyticsService$RecentError.class
+│  │  │                          ├── NotificationAnalyticsService$TemplateStatistics.class
+│  │  │                          ├── NotificationAnalyticsService$UserNotificationStatistics.class
+│  │  │                          ├── NotificationAnalyticsService.class
+│  │  │                          ├── NotificationQueueService$QueueStatistics.class
+│  │  │                          ├── NotificationQueueService.class
+│  │  │                          ├── NotificationService.class
+│  │  │                          ├── RateLimitingService$GlobalRateLimitStatus.class
+│  │  │                          ├── RateLimitingService$IpRateLimitStatus.class
+│  │  │                          ├── RateLimitingService$UserRateLimitStatus.class
+│  │  │                          ├── RateLimitingService.class
+│  │  │                          ├── RetryService$RetryStatistics.class
+│  │  │                          ├── RetryService.class
+│  │  │                          └── UserNotificationPreferencesService.class
+│  │  ├── generated
+│  │  │  └── sources
+│  │  │      ├── annotationProcessor
+│  │  │      │  └── java
+│  │  │      │      └── main
+│  │  │      └── headers
+│  │  │          └── java
+│  │  │              └── main
+│  │  └── tmp
+│  │      └── compileJava
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  ├── README.md
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── notification
+│      │  │              ├── config
+│      │  │              │  ├── AsyncConfig.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  ├── JwtAuthenticationFilter.java
+│      │  │              │  ├── KafkaConfig.java
+│      │  │              │  ├── NotificationHealthIndicator.java
+│      │  │              │  ├── RateLimitingFilter.java
+│      │  │              │  ├── SchedulerConfig.java
+│      │  │              │  └── SecurityConfig.java
+│      │  │              ├── controller
+│      │  │              │  ├── AnalyticsController.java
+│      │  │              │  ├── NotificationController.java
+│      │  │              │  ├── NotificationTemplateController.java
+│      │  │              │  ├── RateLimitingController.java
+│      │  │              │  └── UserNotificationPreferencesController.java
+│      │  │              ├── dto
+│      │  │              │  ├── ApiResponse.java
+│      │  │              │  ├── BatchNotificationRequest.java
+│      │  │              │  ├── BatchNotificationResponse.java
+│      │  │              │  ├── NotificationDTO.java
+│      │  │              │  ├── PagedResponse.java
+│      │  │              │  └── SendNotificationRequest.java
+│      │  │              ├── entity
+│      │  │              │  ├── Notification.java
+│      │  │              │  ├── NotificationQueue.java
+│      │  │              │  ├── NotificationTemplate.java
+│      │  │              │  └── UserNotificationPreferences.java
+│      │  │              ├── enums
+│      │  │              │  ├── NotificationCategory.java
+│      │  │              │  ├── NotificationPriority.java
+│      │  │              │  ├── NotificationStatus.java
+│      │  │              │  └── NotificationType.java
+│      │  │              ├── event
+│      │  │              │  └── KafkaEventConsumer.java
+│      │  │              ├── exception
+│      │  │              │  ├── NotificationException.java
+│      │  │              │  ├── TemplateNotFoundException.java
+│      │  │              │  ├── UserNotFoundException.java
+│      │  │              │  └── ValidationException.java
+│      │  │              ├── NotificationServiceApplication.java
+│      │  │              ├── repository
+│      │  │              │  ├── NotificationQueueRepository.java
+│      │  │              │  ├── NotificationRepository.java
+│      │  │              │  ├── NotificationTemplateRepository.java
+│      │  │              │  └── UserNotificationPreferencesRepository.java
+│      │  │              ├── scheduler
+│      │  │              │  ├── NotificationQueueScheduler.java
+│      │  │              │  └── RetryScheduler.java
+│      │  │              └── service
+│      │  │                  ├── channel
+│      │  │                  │  ├── EmailNotificationChannel.java
+│      │  │                  │  ├── InAppNotificationChannel.java
+│      │  │                  │  ├── NotificationChannel.java
+│      │  │                  │  ├── NotificationChannelManager.java
+│      │  │                  │  ├── NotificationChannelResult.java
+│      │  │                  │  ├── PushNotificationChannel.java
+│      │  │                  │  ├── SmsNotificationChannel.java
+│      │  │                  │  └── TelegramNotificationChannel.java
+│      │  │                  ├── impl
+│      │  │                  │  ├── EnhancedNotificationServiceImpl.java
+│      │  │                  │  ├── NotificationAnalyticsServiceImpl.java
+│      │  │                  │  ├── NotificationQueueServiceImpl.java
+│      │  │                  │  ├── NotificationServiceImpl.java
+│      │  │                  │  ├── NotificationTemplateServiceImpl.java
+│      │  │                  │  ├── RateLimitingServiceImpl.java
+│      │  │                  │  ├── RetryServiceImpl.java
+│      │  │                  │  └── UserNotificationPreferencesServiceImpl.java
+│      │  │                  ├── NotificationAnalyticsService.java
+│      │  │                  ├── NotificationQueueService.java
+│      │  │                  ├── NotificationService.java
+│      │  │                  ├── NotificationTemplateService.java
+│      │  │                  ├── RateLimitingService.java
+│      │  │                  ├── RetryService.java
+│      │  │                  └── UserNotificationPreferencesService.java
+│      │  └── resources
+│      │      └── application.yml
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── notification
+│                          └── integration
+│                              └── NotificationIntegrationTest.java
+├── plans
+│  └── ARCHITECTURE_RECOMMENDATIONS.md
+├── quest-management-service
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── questmanagement
+│      │  │              ├── client
+│      │  │              │  ├── AuthenticationServiceClient.java
+│      │  │              │  ├── FileStorageServiceClient.java
+│      │  │              │  ├── StatisticsServiceClient.java
+│      │  │              │  └── UserManagementServiceClient.java
+│      │  │              ├── config
+│      │  │              │  ├── FeignConfig.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  └── KafkaConfig.java
+│      │  │              ├── controller
+│      │  │              │  ├── CodeController.java
+│      │  │              │  ├── LevelController.java
+│      │  │              │  ├── LevelHintController.java
+│      │  │              │  ├── QuestController.java
+│      │  │              │  ├── QuestRatingController.java
+│      │  │              │  └── QuestSearchController.java
+│      │  │              ├── dto
+│      │  │              │  ├── CodeDTO.java
+│      │  │              │  ├── LevelDTO.java
+│      │  │              │  ├── LevelHintDTO.java
+│      │  │              │  ├── QuestCreateUpdateDTO.java
+│      │  │              │  ├── QuestDTO.java
+│      │  │              │  ├── QuestMediaDTO.java
+│      │  │              │  ├── QuestRatingDTO.java
+│      │  │              │  ├── QuestReviewDTO.java
+│      │  │              │  └── QuestSearchRequestDTO.java
+│      │  │              ├── entity
+│      │  │              │  ├── Code.java
+│      │  │              │  ├── LevelHint.java
+│      │  │              │  ├── Level.java
+│      │  │              │  ├── Quest.java
+│      │  │              │  ├── QuestMedia.java
+│      │  │              │  ├── QuestRating.java
+│      │  │              │  ├── QuestReview.java
+│      │  │              │  └── QuestStatus.java
+│      │  │              ├── event
+│      │  │              │  ├── KafkaEventConsumer.java
+│      │  │              │  ├── KafkaEventProducer.java
+│      │  │              │  ├── QuestArchivedEvent.java
+│      │  │              │  ├── QuestCreatedEvent.java
+│      │  │              │  ├── QuestDeletedEvent.java
+│      │  │              │  ├── QuestEvent.java
+│      │  │              │  ├── QuestPublishedEvent.java
+│      │  │              │  └── QuestUpdatedEvent.java
+│      │  │              ├── exception
+│      │  │              │  ├── CodeNotFoundException.java
+│      │  │              │  ├── CodeValidationException.java
+│      │  │              │  ├── HintValidationException.java
+│      │  │              │  ├── LevelHintNotFoundException.java
+│      │  │              │  ├── LevelNotFoundException.java
+│      │  │              │  ├── LevelValidationException.java
+│      │  │              │  ├── QuestAccessDeniedException.java
+│      │  │              │  ├── QuestNotFoundException.java
+│      │  │              │  └── QuestValidationException.java
+│      │  │              ├── QuestManagementServiceApplication.java
+│      │  │              ├── repository
+│      │  │              │  ├── CodeRepository.java
+│      │  │              │  ├── LevelHintRepository.java
+│      │  │              │  ├── LevelRepository.java
+│      │  │              │  ├── QuestMediaRepository.java
+│      │  │              │  ├── QuestRatingRepository.java
+│      │  │              │  ├── QuestRepository.java
+│      │  │              │  └── QuestReviewRepository.java
+│      │  │              └── service
+│      │  │                  ├── CodeService.java
+│      │  │                  ├── impl
+│      │  │                  │  ├── CodeServiceImpl.java
+│      │  │                  │  ├── LevelHintServiceImpl.java
+│      │  │                  │  ├── LevelServiceImpl.java
+│      │  │                  │  └── QuestServiceImpl.java
+│      │  │                  ├── LevelHintService.java
+│      │  │                  ├── LevelService.java
+│      │  │                  ├── QuestRatingService.java
+│      │  │                  ├── QuestSearchService.java
+│      │  │                  ├── QuestService.java
+│      │  │                  ├── QuestValidationService.java
+│      │  │                  └── QuestVersionService.java
+│      │  └── resources
+│      │      ├── application-dev.yml
+│      │      ├── application-prod.yml
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              ├── V1__Create_Quests_Table.sql
+│      │              ├── V2__Create_Levels_Table.sql
+│      │              ├── V3__Create_Codes_Table.sql
+│      │              ├── V4__Create_Level_Hints_Table.sql
+│      │              ├── V5__Create_Quest_Media_Table.sql
+│      │              ├── V6__Create_Quest_Ratings_Table.sql
+│      │              ├── V7__Create_Quest_Reviews_Table.sql
+│      │              └── V8__Add_Average_Rating_To_Quests.sql
+│      └── test
+│          ├── java
+│          │  └── dn
+│          │      └── quest
+│          │          └── questmanagement
+│          │              ├── controller
+│          │              │  └── QuestControllerIntegrationTest.java
+│          │              ├── integration
+│          │              │  └── QuestManagementIntegrationTest.java
+│          │              ├── repository
+│          │              │  └── QuestRepositoryTest.java
+│          │              └── service
+│          │                  └── QuestServiceTest.java
+│          └── resources
+│              └── application-test.yml
+├── README.md
+├── README-MICROSERVICES.md
+├── scripts
+│  ├── backup-monitoring.sh
+│  ├── build-all-services.sh
+│  ├── build.sh
+│  ├── deploy-monitoring.sh
+│  ├── generate-test-report.sh
+│  ├── logs.sh
+│  ├── publish-images.sh
+│  ├── restart-service.sh
+│  ├── run-all-tests.sh
+│  ├── run-integration-tests.sh
+│  ├── run-load-tests.sh
+│  ├── run-local.sh
+│  ├── run-tests.sh
+│  ├── start-all.sh
+│  ├── start.sh
+│  ├── status.sh
+│  ├── stop-all.sh
+│  ├── stop.sh
+│  ├── test-alerts.sh
+│  └── test-service.sh
+├── settings.gradle.kts
+├── statistics-service
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── statistics
+│      │  │              ├── config
+│      │  │              │  ├── JwtAuthenticationFilter.java
+│      │  │              │  ├── KafkaConfig.java
+│      │  │              │  └── SecurityConfig.java
+│      │  │              ├── controller
+│      │  │              │  ├── AnalyticsController.java
+│      │  │              │  ├── LeaderboardController.java
+│      │  │              │  ├── ReportsController.java
+│      │  │              │  └── StatisticsController.java
+│      │  │              ├── dto
+│      │  │              │  ├── AnalyticsReportDTO.java
+│      │  │              │  ├── LeaderboardDTO.java
+│      │  │              │  ├── StatisticsRequestDTO.java
+│      │  │              │  └── UserStatisticsDTO.java
+│      │  │              ├── entity
+│      │  │              │  ├── DailyAggregatedStatistics.java
+│      │  │              │  ├── FileStatistics.java
+│      │  │              │  ├── GameStatistics.java
+│      │  │              │  ├── Leaderboard.java
+│      │  │              │  ├── QuestStatistics.java
+│      │  │              │  ├── SystemStatistics.java
+│      │  │              │  ├── TeamStatistics.java
+│      │  │              │  └── UserStatistics.java
+│      │  │              ├── event
+│      │  │              │  └── KafkaEventConsumer.java
+│      │  │              ├── exception
+│      │  │              │  ├── AggregationException.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  ├── StatisticsException.java
+│      │  │              │  └── StatisticsNotFoundException.java
+│      │  │              ├── repository
+│      │  │              │  ├── DailyAggregatedStatisticsRepository.java
+│      │  │              │  ├── FileStatisticsRepository.java
+│      │  │              │  ├── GameStatisticsRepository.java
+│      │  │              │  ├── LeaderboardRepository.java
+│      │  │              │  ├── QuestStatisticsRepository.java
+│      │  │              │  ├── SystemStatisticsRepository.java
+│      │  │              │  ├── TeamStatisticsRepository.java
+│      │  │              │  └── UserStatisticsRepository.java
+│      │  │              ├── scheduler
+│      │  │              │  └── StatisticsAggregationScheduler.java
+│      │  │              ├── service
+│      │  │              │  ├── AnalyticsService.java
+│      │  │              │  ├── CacheService.java
+│      │  │              │  ├── impl
+│      │  │              │  │  ├── AnalyticsServiceImpl.java
+│      │  │              │  │  ├── CacheServiceImpl.java
+│      │  │              │  │  ├── LeaderboardServiceImpl.java
+│      │  │              │  │  ├── ReportsServiceImpl.java
+│      │  │              │  │  ├── StatisticsAggregationServiceImpl.java
+│      │  │              │  │  ├── StatisticsQueryServiceImpl.java
+│      │  │              │  │  └── StatisticsServiceImpl.java
+│      │  │              │  ├── LeaderboardService.java
+│      │  │              │  ├── ReportsService.java
+│      │  │              │  ├── StatisticsAggregationService.java
+│      │  │              │  ├── StatisticsQueryService.java
+│      │  │              │  └── StatisticsService.java
+│      │  │              └── StatisticsServiceApplication.java
+│      │  └── resources
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              └── V1__Create_Statistics_Tables.sql
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── statistics
+│                          ├── controller
+│                          │  └── StatisticsControllerIntegrationTest.java
+│                          ├── integration
+│                          │  ├── StatisticsIntegrationTest.java
+│                          │  └── StatisticsServiceIntegrationTest.java
+│                          └── service
+│                              ├── AnalyticsServiceTest.java
+│                              ├── LeaderboardServiceTest.java
+│                              └── StatisticsQueryServiceTest.java
+├── team-management-service
+│  ├── build.gradle.kts
+│  ├── Dockerfile
+│  ├── README.md
+│  ├── settings.gradle.kts
+│  └── src
+│      ├── main
+│      │  ├── java
+│      │  │  └── dn
+│      │  │      └── quest
+│      │  │          └── teammanagement
+│      │  │              ├── client
+│      │  │              │  ├── AuthenticationServiceClient.java
+│      │  │              │  ├── GameEngineServiceClient.java
+│      │  │              │  ├── StatisticsServiceClient.java
+│      │  │              │  └── UserManagementServiceClient.java
+│      │  │              ├── config
+│      │  │              │  ├── FeignConfig.java
+│      │  │              │  ├── GlobalExceptionHandler.java
+│      │  │              │  └── KafkaConfig.java
+│      │  │              ├── controller
+│      │  │              │  ├── TeamController.java
+│      │  │              │  ├── TeamInvitationController.java
+│      │  │              │  └── UserController.java
+│      │  │              ├── dto
+│      │  │              │  ├── GlobalInvitationStatisticsDTO.java
+│      │  │              │  ├── InvitationStatisticsDTO.java
+│      │  │              │  ├── request
+│      │  │              │  │  ├── ChangeMemberRoleRequest.java
+│      │  │              │  │  ├── CreateTeamRequest.java
+│      │  │              │  │  ├── InviteUserRequest.java
+│      │  │              │  │  ├── RespondToInvitationRequest.java
+│      │  │              │  │  ├── SearchTeamsRequest.java
+│      │  │              │  │  ├── UpdateTeamRequest.java
+│      │  │              │  │  ├── UpdateTeamSettingsRequest.java
+│      │  │              │  │  └── ValidateTokenRequest.java
+│      │  │              │  ├── response
+│      │  │              │  │  ├── InvitationListResponse.java
+│      │  │              │  │  ├── TeamListResponse.java
+│      │  │              │  │  └── ValidateTokenResponse.java
+│      │  │              │  ├── TeamDTO.java
+│      │  │              │  ├── TeamInvitationDTO.java
+│      │  │              │  ├── TeamMemberDTO.java
+│      │  │              │  ├── TeamSettingsDTO.java
+│      │  │              │  ├── TeamStatisticsDTO.java
+│      │  │              │  ├── UserDTO.java
+│      │  │              │  └── UserStatisticsDTO.java
+│      │  │              ├── entity
+│      │  │              │  ├── TeamInvitation.java
+│      │  │              │  ├── Team.java
+│      │  │              │  ├── TeamMember.java
+│      │  │              │  ├── TeamSettings.java
+│      │  │              │  ├── TeamStatistics.java
+│      │  │              │  └── User.java
+│      │  │              ├── enums
+│      │  │              │  ├── InvitationStatus.java
+│      │  │              │  └── TeamRole.java
+│      │  │              ├── event
+│      │  │              │  ├── BaseEvent.java
+│      │  │              │  ├── GameEvents.java
+│      │  │              │  ├── KafkaEventConsumer.java
+│      │  │              │  ├── KafkaEventProducer.java
+│      │  │              │  ├── TeamEvents.java
+│      │  │              │  └── UserEvents.java
+│      │  │              ├── exception
+│      │  │              │  ├── BusinessRuleException.java
+│      │  │              │  ├── DuplicateResourceException.java
+│      │  │              │  ├── ExternalServiceException.java
+│      │  │              │  ├── InvitationNotFoundException.java
+│      │  │              │  ├── InvitationValidationException.java
+│      │  │              │  ├── ResourceLimitExceededException.java
+│      │  │              │  ├── TeamAccessException.java
+│      │  │              │  ├── TeamNotFoundException.java
+│      │  │              │  ├── TeamValidationException.java
+│      │  │              │  └── UserNotFoundException.java
+│      │  │              ├── mapper
+│      │  │              │  └── TeamMapper.java
+│      │  │              ├── repository
+│      │  │              │  ├── TeamInvitationRepository.java
+│      │  │              │  ├── TeamMemberRepository.java
+│      │  │              │  ├── TeamRepository.java
+│      │  │              │  ├── TeamSettingsRepository.java
+│      │  │              │  ├── TeamStatisticsRepository.java
+│      │  │              │  └── UserRepository.java
+│      │  │              ├── service
+│      │  │              │  ├── impl
+│      │  │              │  │  ├── TeamInvitationServiceImpl.java
+│      │  │              │  │  ├── TeamServiceImpl.java
+│      │  │              │  │  └── UserServiceImpl.java
+│      │  │              │  ├── TeamInvitationService.java
+│      │  │              │  ├── TeamService.java
+│      │  │              │  └── UserService.java
+│      │  │              └── TeamManagementServiceApplication.java
+│      │  └── resources
+│      │      ├── application.yml
+│      │      └── db
+│      │          └── migration
+│      │              ├── V1__Create_Tables.sql
+│      │              └── V2__Add_Performance_Indexes.sql
+│      └── test
+│          └── java
+│              └── dn
+│                  └── quest
+│                      └── teammanagement
+│                          └── integration
+│                              └── TeamManagementIntegrationTest.java
+├── tree.txt
+└── user-management-service
+    ├── build.gradle.kts
+    ├── Dockerfile
+    ├── README.md
+    └── src
+        ├── main
+        │  ├── java
+        │  │  └── dn
+        │  │      └── quest
+        │  │          └── usermanagement
+        │  │              ├── client
+        │  │              │  └── AuthenticationServiceClient.java
+        │  │              ├── config
+        │  │              │  └── KafkaConfig.java
+        │  │              ├── controller
+        │  │              │  ├── UserController.java
+        │  │              │  ├── UserSettingsController.java
+        │  │              │  └── UserStatisticsController.java
+        │  │              ├── dto
+        │  │              │  ├── BlockUserRequestDTO.java
+        │  │              │  ├── UpdateProfileRequestDTO.java
+        │  │              │  ├── UpdateSettingsRequestDTO.java
+        │  │              │  ├── UserProfileDTO.java
+        │  │              │  ├── UserSearchRequestDTO.java
+        │  │              │  ├── UserSettingsDTO.java
+        │  │              │  └── UserStatisticsDTO.java
+        │  │              ├── entity
+        │  │              │  ├── UserProfile.java
+        │  │              │  ├── UserSettings.java
+        │  │              │  └── UserStatistics.java
+        │  │              ├── event
+        │  │              │  ├── BaseEvent.java
+        │  │              │  ├── KafkaEventConsumer.java
+        │  │              │  ├── KafkaEventProducer.java
+        │  │              │  └── UserProfileEvent.java
+        │  │              ├── exception
+        │  │              │  ├── GlobalExceptionHandler.java
+        │  │              │  └── UserManagementExceptions.java
+        │  │              ├── repository
+        │  │              │  ├── UserProfileRepository.java
+        │  │              │  ├── UserSettingsRepository.java
+        │  │              │  └── UserStatisticsRepository.java
+        │  │              ├── service
+        │  │              │  ├── UserProfileService.java
+        │  │              │  ├── UserSettingsService.java
+        │  │              │  └── UserStatisticsService.java
+        │  │              └── UserManagementServiceApplication.java
+        │  └── resources
+        │      ├── application.yml
+        │      └── db
+        │          └── migration
+        │              ├── V1__Create_User_Profiles_Table.sql
+        │              ├── V2__Create_User_Settings_Table.sql
+        │              └── V3__Create_User_Statistics_Table.sql
+        └── test
+            └── java
+                └── dn
+                    └── quest
+                        └── usermanagement
+                            ├── controller
+                            │  └── UserControllerTest.java
+                            ├── integration
+                            │  └── UserManagementIntegrationTest.java
+                            ├── repository
+                            └── service
+
+2486 directories, 21391 files

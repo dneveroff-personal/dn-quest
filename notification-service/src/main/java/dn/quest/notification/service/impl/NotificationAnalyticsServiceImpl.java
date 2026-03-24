@@ -6,7 +6,7 @@ import dn.quest.notification.enums.*;
 import dn.quest.notification.repository.NotificationRepository;
 import dn.quest.notification.repository.NotificationQueueRepository;
 import dn.quest.notification.service.NotificationAnalyticsService;
-import dn.quest.notification.service.channel.NotificationChannel;
+import dn.quest.notification.service.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.ThreadMXBean;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +34,7 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
 
     private final NotificationRepository notificationRepository;
     private final NotificationQueueRepository queueRepository;
+    private final Map<String, NotificationChannel> channels;
 
     // In-memory метрики для реального времени
     private final Map<String, NotificationMetric> notificationMetrics = new ConcurrentHashMap<>();
@@ -43,9 +45,10 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
     private final AtomicLong totalNotificationsClicked = new AtomicLong(0);
 
     public NotificationAnalyticsServiceImpl(NotificationRepository notificationRepository,
-                                          NotificationQueueRepository queueRepository) {
+                                            NotificationQueueRepository queueRepository, Map<String, NotificationChannel> channels) {
         this.notificationRepository = notificationRepository;
         this.queueRepository = queueRepository;
+        this.channels = channels;
     }
 
     @Override
@@ -85,8 +88,9 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
         NotificationStatistics stats = new NotificationStatistics();
         
         try {
-            List<Notification> notifications = notificationRepository.findByCreatedAtBetween(startDate, endDate);
-            
+            List<Notification> notifications = notificationRepository.findByCreatedAtBetween(
+                    startDate.toInstant(ZoneOffset.UTC),
+                    endDate.toInstant(ZoneOffset.UTC));
             long totalSent = notifications.size();
             long totalDelivered = notifications.stream()
                 .mapToLong(n -> n.getStatus() == NotificationStatus.DELIVERED ? 1 : 0)
@@ -153,7 +157,12 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
                 Long count = (Long) row[1];
                 
                 try {
-                    NotificationChannel channel = NotificationChannel.valueOf(channelType);
+                    NotificationChannel channel = channels.get(channelType.toUpperCase().trim());
+
+                    if (channel == null) {
+                        // Если канал не найден — берём любой доступный (дефолтный)
+                        channel = channels.values().iterator().next();
+                    }
                     ChannelStatistics stats = new ChannelStatistics();
                     stats.setSent(count);
                     
@@ -205,7 +214,7 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
                 LocalDateTime dayEnd = current.plusDays(1);
                 
                 List<Notification> dayNotifications = notificationRepository
-                    .findByCreatedAtBetweenAndStatus(current, dayEnd, NotificationStatus.DELIVERED);
+                    .findByCreatedAtBetweenAndStatus(current.toInstant(ZoneOffset.UTC), dayEnd.toInstant(ZoneOffset.UTC), NotificationStatus.DELIVERED);
                 
                 if (!dayNotifications.isEmpty()) {
                     DeliveryTimeStatistics dayStats = new DeliveryTimeStatistics();
@@ -299,7 +308,7 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
                     error.setNotificationId(n.getNotificationId());
                     error.setErrorType(extractErrorType(n.getErrorMessage()));
                     error.setErrorMessage(n.getErrorMessage());
-                    error.setTimestamp(n.getUpdatedAt());
+                    error.setTimestamp(LocalDateTime.from(n.getUpdatedAt()));
                     return error;
                 })
                 .collect(Collectors.toList());
@@ -359,8 +368,9 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
             while (current.isBefore(endDate)) {
                 LocalDateTime dayEnd = current.plusDays(1);
                 
-                List<Notification> dayNotifications = notificationRepository
-                    .findByCreatedAtBetween(current, dayEnd);
+                List<Notification> dayNotifications = notificationRepository.findByCreatedAtBetween(
+                        startDate.toInstant(ZoneOffset.UTC),
+                        endDate.toInstant(ZoneOffset.UTC));
                 
                 NotificationTrend trend = new NotificationTrend();
                 trend.setDate(current);
