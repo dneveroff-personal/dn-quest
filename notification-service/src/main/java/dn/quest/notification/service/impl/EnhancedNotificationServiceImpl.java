@@ -1055,40 +1055,75 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
     }
 
     /**
-     * Создать уведомление
+     * Основной метод создания уведомления (полная версия)
      */
-    private Notification createNotification(String notificationId, Long userId, NotificationType type, 
-                                          NotificationCategory category, String subject, String content, 
-                                          String htmlContent, String email, String phone, 
-                                          String telegramChatId, String fcmToken, 
-                                          String relatedEntityId, String relatedEntityType, 
-                                          Map<String, Object> templateData) {
-        try {
-            return Notification.builder()
-                    .notificationId(notificationId)
-                    .userId(userId)
-                    .recipientEmail(email)
-                    .recipientPhone(phone)
-                    .telegramChatId(telegramChatId)
-                    .fcmToken(fcmToken)
-                    .type(type)
-                    .category(category)
-                    .priority(NotificationPriority.NORMAL)
-                    .subject(subject)
-                    .content(content)
-                    .htmlContent(htmlContent)
-                    .templateData(templateData != null ? new ObjectMapper().writeValueAsString(templateData) : null)
-                    .relatedEntityId(relatedEntityId)
-                    .relatedEntityType(relatedEntityType)
-                    .status(NotificationStatus.PENDING)
-                    .retryCount(0)
-                    .maxRetries(defaultRetryCount)
-                    .createdAt(Instant.now())
-                    .build();
-        } catch (Exception e) {
-            log.error("Error creating notification: {}", notificationId, e);
-            throw new RuntimeException("Failed to create notification", e);
-        }
+    private Notification createNotification(
+            String notificationId,
+            Long userId,
+            NotificationType type,
+            NotificationCategory category,
+            String subject,
+            String content,
+            String htmlContent,
+            String email,
+            String phone,
+            String telegramChatId,
+            String fcmToken,
+            String relatedEntityId,
+            String relatedEntityType,
+            Map<String, Object> templateData) {
+
+        return Notification.builder()
+                .notificationId(notificationId != null ? notificationId : UUID.randomUUID().toString())
+                .userId(userId)
+                .type(type)
+                .category(category)
+                .priority(NotificationPriority.NORMAL)
+                .subject(subject != null ? subject : "")
+                .content(content != null ? content : "")
+                .htmlContent(htmlContent)
+                .recipientEmail(email)
+                .recipientPhone(phone)
+                .telegramChatId(telegramChatId)
+                .fcmToken(fcmToken)
+                .relatedEntityId(relatedEntityId)
+                .relatedEntityType(relatedEntityType)
+                .templateData(templateData != null ? new ObjectMapper().writeValueAsString(templateData) : null)
+                .status(NotificationStatus.PENDING)
+                .retryCount(0)
+                .maxRetries(3)
+                .createdAt(Instant.now())
+                .build();
+    }
+
+    /**
+     * Перегрузка для старых вызовов (меньше параметров)
+     * Это позволяет всем существующим вызовам в классе продолжать работать
+     */
+    private Notification createNotification(
+            String notificationId,
+            Long userId,
+            NotificationType type,
+            NotificationCategory category,
+            String subject,
+            String content,
+            Map<String, Object> templateData) {
+
+        return createNotification(
+                notificationId,
+                userId,
+                type,
+                category,
+                subject,
+                content,
+                null,   // htmlContent
+                null,   // email
+                null,   // phone
+                null,   // telegramChatId
+                null,   // fcmToken
+                null,   // relatedEntityId
+                null,   // relatedEntityType
+                templateData);
     }
 
     /**
