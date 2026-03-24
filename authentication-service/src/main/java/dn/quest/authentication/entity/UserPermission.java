@@ -40,6 +40,7 @@ public class UserPermission {
     private Permission permission;
 
     @Column(name = "granted_at", nullable = false)
+    @Builder.Default
     private Instant grantedAt = Instant.now();
 
     @Column(name = "granted_by")

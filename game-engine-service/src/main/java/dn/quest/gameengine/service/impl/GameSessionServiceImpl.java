@@ -4,7 +4,7 @@ import dn.quest.gameengine.entity.GameSession;
 import dn.quest.gameengine.entity.User;
 import dn.quest.gameengine.entity.Quest;
 import dn.quest.gameengine.entity.Team;
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import dn.quest.gameengine.repository.GameSessionRepository;
 import dn.quest.gameengine.repository.UserRepository;
 import dn.quest.gameengine.repository.QuestRepository;
@@ -125,7 +125,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         leaderboardService.updateSessionLeaderboard(sessionId);
         
         // Публикация события
-        publishSessionStartedEvent(updatedSession);
+        handleSessionStartedEvent(updatedSession);
         
         return updatedSession;
     }
@@ -149,7 +149,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         log.info("Game session paused successfully: {}", sessionId);
         
         // Публикация события
-        publishSessionPausedEvent(updatedSession);
+        handleSessionPausedEvent(updatedSession);
         
         return updatedSession;
     }
@@ -173,7 +173,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         log.info("Game session resumed successfully: {}", sessionId);
         
         // Публикация события
-        publishSessionResumedEvent(updatedSession);
+        handleSessionResumedEvent(updatedSession);
         
         return updatedSession;
     }
@@ -206,7 +206,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         leaderboardService.updateSessionLeaderboard(sessionId);
         
         // Публикация события
-        publishSessionFinishedEvent(updatedSession);
+        handleSessionFinishedEvent(updatedSession);
         
         return updatedSession;
     }
@@ -275,7 +275,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         log.info("User {} joined game session successfully: {}", user.getId(), sessionId);
         
         // Публикация события
-        publishSessionJoinedEvent(updatedSession, user);
+        handleSessionJoinedEvent(updatedSession, user);
         
         return updatedSession;
     }
@@ -300,7 +300,7 @@ public class GameSessionServiceImpl implements GameSessionService {
         log.info("User {} left game session successfully: {}", user.getId(), sessionId);
         
         // Публикация события
-        publishSessionLeftEvent(updatedSession, user);
+        handleSessionLeftEvent(updatedSession, user);
         
         return updatedSession;
     }
@@ -766,32 +766,32 @@ public class GameSessionServiceImpl implements GameSessionService {
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionStartedEvent(GameSession session) {
+    private void handleSessionStartedEvent(GameSession session) {
         log.debug("Publishing session started event for session: {}", session.getId());
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionPausedEvent(GameSession session) {
+    private void handleSessionPausedEvent(GameSession session) {
         log.debug("Publishing session paused event for session: {}", session.getId());
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionResumedEvent(GameSession session) {
+    private void handleSessionResumedEvent(GameSession session) {
         log.debug("Publishing session resumed event for session: {}", session.getId());
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionFinishedEvent(GameSession session) {
+    private void handleSessionFinishedEvent(GameSession session) {
         log.debug("Publishing session finished event for session: {}", session.getId());
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionJoinedEvent(GameSession session, User user) {
+    private void handleSessionJoinedEvent(GameSession session, User user) {
         log.debug("Publishing session joined event for session: {}, user: {}", session.getId(), user.getId());
         // TODO: Реализация с Kafka
     }
 
-    private void publishSessionLeftEvent(GameSession session, User user) {
+    private void handleSessionLeftEvent(GameSession session, User user) {
         log.debug("Publishing session left event for session: {}, user: {}", session.getId(), user.getId());
         // TODO: Реализация с Kafka
     }
@@ -804,5 +804,36 @@ public class GameSessionServiceImpl implements GameSessionService {
     private void publishSessionArchivedEvent(GameSession session) {
         log.debug("Publishing session archived event for session: {}", session.getId());
         // TODO: Реализация с Kafka
+    }
+
+    // Публичные методы для реализации интерфейса
+    @Override
+    public void publishSessionStartedEvent(GameSession session) {
+        handleSessionStartedEvent(session);
+    }
+
+    @Override
+    public void publishSessionPausedEvent(GameSession session) {
+        handleSessionPausedEvent(session);
+    }
+
+    @Override
+    public void publishSessionResumedEvent(GameSession session) {
+        handleSessionResumedEvent(session);
+    }
+
+    @Override
+    public void publishSessionFinishedEvent(GameSession session) {
+        handleSessionFinishedEvent(session);
+    }
+
+    @Override
+    public void publishSessionJoinedEvent(GameSession session, User user) {
+        handleSessionJoinedEvent(session, user);
+    }
+
+    @Override
+    public void publishSessionLeftEvent(GameSession session, User user) {
+        handleSessionLeftEvent(session, user);
     }
 }

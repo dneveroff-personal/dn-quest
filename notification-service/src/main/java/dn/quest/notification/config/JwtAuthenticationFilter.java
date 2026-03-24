@@ -3,6 +3,7 @@ package dn.quest.notification.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SecurityException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,14 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = getJwtFromRequest(request);
             
             if (jwt != null && validateToken(jwt)) {
-                Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
+                Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
                     .build()
-                    .parseClaimsJws(jwt)
-                    .getBody();
+                    .parseSignedClaims(jwt)
+                    .getPayload();
 
                 String username = claims.getSubject();
-                List<String> roles = claims.get("roles", List.class);
+                @SuppressWarnings("unchecked")
+                List<String> roles = (List<String>) claims.get("roles", List.class);
                 
                 if (username != null) {
                     List<SimpleGrantedAuthority> authorities = roles.stream()
@@ -80,11 +82,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+            Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token);
+                .parseSignedClaims(token);
             return true;
+        } catch (SecurityException e) {
+            logger.error("Ошибка валидации JWT токена: {}", e.getMessage());
+            return false;
         } catch (Exception e) {
             logger.error("Ошибка валидации JWT токена: {}", e.getMessage());
             return false;

@@ -1,23 +1,24 @@
 package dn.quest.shared.events.game;
 
+import dn.quest.shared.events.BaseEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
  * Событие окончания игровой сессии
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameSessionFinishedEvent {
+public class GameSessionFinishedEvent extends BaseEvent {
 
-    private String eventId;
     private Long sessionId;
     private Long userId;
     private Long teamId;
-    private String finishTime;
     private Integer totalScore;
     private Integer levelsCompleted;
-    private String finishReason;
+    private Boolean isCompleted;
 }

@@ -1,18 +1,20 @@
 package dn.quest.shared.events.file;
 
-import lombok.AllArgsConstructor;
+import dn.quest.shared.events.BaseEvent;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Событие загрузки файла
  */
 @Data
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class FileUploadedEvent {
+public class FileUploadedEvent extends BaseEvent {
 
-    private String eventId;
     private Long fileId;
     private Long userId;
     private String fileName;

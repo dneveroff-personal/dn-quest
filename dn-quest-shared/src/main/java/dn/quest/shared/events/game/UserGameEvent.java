@@ -11,13 +11,13 @@ import java.util.Map;
 @Schema(description = "Событие пользователя в игровом движке")
 public class UserGameEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "user-event", required = true)
+    @Schema(description = "Тип события", example = "user-event", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Override
     protected String getEventTypeForSubclass() {
         return "user-event";
     }
 
-    @Schema(description = "ID пользователя", example = "123", required = true)
+    @Schema(description = "ID пользователя", example = "123", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private Long userId;
 
     @Schema(description = "Имя пользователя", example = "Player1")

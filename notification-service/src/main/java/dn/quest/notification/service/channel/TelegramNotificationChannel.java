@@ -11,6 +11,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
@@ -152,6 +153,17 @@ public class TelegramNotificationChannel extends TelegramLongPollingBot implemen
     @Override
     public String getBotUsername() {
         return botUsername;
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+        // Обработка входящих обновлений от Telegram
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            Long chatId = update.getMessage().getChatId();
+            log.info("Received message from {}: {}", chatId, messageText);
+            // Здесь можно добавить логику обработки команд
+        }
     }
 
     /**

@@ -13,15 +13,15 @@ import jakarta.validation.constraints.Max;
 @Schema(description = "Запрос на создание игровой сессии")
 public record CreateGameSessionRequest(
     
-    @Schema(description = "Название сессии", example = "Вечерний квест", required = true)
     @NotBlank(message = "Название сессии не может быть пустым")
+    @Schema(description = "Название сессии", example = "Вечерний квест")
     String name,
     
     @Schema(description = "Описание сессии", example = "Увлекательный квест для всей команды")
     String description,
     
-    @Schema(description = "ID квеста", example = "456", required = true)
     @NotNull(message = "ID квеста обязателен")
+    @Schema(description = "ID квеста", example = "456")
     Long questId,
     
     @Schema(description = "ID команды (необязательно)", example = "789")

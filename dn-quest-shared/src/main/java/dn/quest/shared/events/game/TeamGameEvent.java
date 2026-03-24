@@ -11,13 +11,13 @@ import java.util.Map;
 @Schema(description = "Событие команды в игровом движке")
 public class TeamGameEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "team-event", required = true)
+    @Schema(description = "Тип события", example = "team-event", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Override
     protected String getEventTypeForSubclass() {
         return "team-event";
     }
 
-    @Schema(description = "ID команды", example = "456", required = true)
+    @Schema(description = "ID команды", example = "456", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private Long teamId;
 
     @Schema(description = "Название команды", example = "Мстители")

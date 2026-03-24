@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -110,6 +111,45 @@ public class PaginationDTO<T> {
                 .hasPrevious(!first)
                 .numberOfElements(content.size())
                 .empty(content.isEmpty())
+                .build();
+    }
+    
+    /**
+     * Создает страницу из Spring Page
+     */
+    public static <T> PaginationDTO<T> of(Page<T> page) {
+        return PaginationDTO.<T>builder()
+                .content(page.getContent())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .numberOfElements(page.getNumberOfElements())
+                .empty(page.isEmpty())
+                .build();
+    }
+    
+    /**
+     * Создает страницу из Spring Page с функцией преобразования
+     */
+    public static <T, R> PaginationDTO<R> of(Page<T> page, java.util.function.Function<T, R> mapper) {
+        List<R> content = page.getContent().stream().map(mapper).toList();
+        return PaginationDTO.<R>builder()
+                .content(content)
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .hasNext(page.hasNext())
+                .hasPrevious(page.hasPrevious())
+                .numberOfElements(page.getNumberOfElements())
+                .empty(page.isEmpty())
                 .build();
     }
 }

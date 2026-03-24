@@ -11,14 +11,14 @@ import jakarta.validation.constraints.Pattern;
 @Schema(description = "Запрос на отправку кода для проверки")
 public record SubmitCodeRequest(
     
-    @Schema(description = "Код для проверки", example = "ABC123", required = true)
     @NotBlank(message = "Код не может быть пустым")
     @Pattern(regexp = "^[A-Za-z0-9]{3,20}$", message = "Код должен содержать от 3 до 20 символов (буквы и цифры)")
+    @Schema(description = "Код для проверки", example = "ABC123")
     String code,
     
-    @Schema(description = "Сектор кода", example = "A", required = true)
     @NotBlank(message = "Сектор не может быть пустым")
     @Pattern(regexp = "^[A-Za-z]$", message = "Сектор должен быть одной буквой")
+    @Schema(description = "Сектор кода", example = "A")
     String sector,
     
     @Schema(description = "Дополнительные параметры или метаданные")

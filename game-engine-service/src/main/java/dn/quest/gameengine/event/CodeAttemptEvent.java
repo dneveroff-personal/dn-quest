@@ -1,6 +1,6 @@
 package dn.quest.gameengine.event;
 
-import dn.quest.gameengine.entity.enums.AttemptResult;
+import dn.quest.shared.enums.AttemptResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
@@ -11,22 +11,22 @@ import java.util.Map;
 @Schema(description = "Событие попытки ввода кода")
 public class CodeAttemptEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "code-attempt-event", required = true)
+    @Schema(description = "Тип события", example = "code-attempt-event")
     @Override
     protected String getEventType() {
         return "code-attempt-event";
     }
 
-    @Schema(description = "Подтип события", example = "CODE_SUBMITTED", required = true)
+    @Schema(description = "Подтип события", example = "CODE_SUBMITTED")
     private CodeAttemptEventType subType;
 
-    @Schema(description = "ID попытки", example = "12345", required = true)
+    @Schema(description = "ID попытки", example = "12345")
     private Long attemptId;
 
-    @Schema(description = "ID сессии", example = "789", required = true)
+    @Schema(description = "ID сессии", example = "789")
     private Long sessionId;
 
-    @Schema(description = "ID пользователя", example = "123", required = true)
+    @Schema(description = "ID пользователя", example = "123")
     private Long userId;
 
     @Schema(description = "ID уровня", example = "101")
@@ -35,16 +35,16 @@ public class CodeAttemptEvent extends GameEngineEvent {
     @Schema(description = "Название уровня", example = "Первый этаж")
     private String levelName;
 
-    @Schema(description = "Отправленный код", example = "ABC123", required = true)
+    @Schema(description = "Отправленный код", example = "ABC123")
     private String submittedCode;
 
     @Schema(description = "Правильный код", example = "ABC123")
     private String correctCode;
 
-    @Schema(description = "Сектор кода", example = "A", required = true)
+    @Schema(description = "Сектор кода", example = "A")
     private String sector;
 
-    @Schema(description = "Результат попытки", example = "CORRECT", required = true)
+    @Schema(description = "Результат попытки", example = "CORRECT")
     private AttemptResult result;
 
     @Schema(description = "Полученные очки", example = "100.0")

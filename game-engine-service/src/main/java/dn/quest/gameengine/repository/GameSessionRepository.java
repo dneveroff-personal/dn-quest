@@ -133,4 +133,58 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
     // Запросы для анализа по типам квестов
     @Query("SELECT COUNT(gs) FROM GameSession gs WHERE gs.quest.type = :questType AND gs.status = :status")
     long countByQuestTypeAndStatus(@Param("questType") String questType, @Param("status") SessionStatus status);
+
+    // Дополнительные методы для сервиса
+    Page<GameSession> findByStatus(@Param("status") SessionStatus status, Pageable pageable);
+
+    @Query("SELECT gs FROM GameSession gs WHERE gs.user = :user OR EXISTS (SELECT 1 FROM TeamMember tm WHERE tm.team = gs.team AND tm.user = :user AND tm.isActive = true)")
+    List<GameSession> findByParticipantsContaining(@Param("user") User user);
+
+    @Query("SELECT gs FROM GameSession gs WHERE (gs.user = :user OR EXISTS (SELECT 1 FROM TeamMember tm WHERE tm.team = gs.team AND tm.user = :user AND tm.isActive = true)) AND gs.status IN ('ACTIVE', 'PAUSED', 'IN_PROGRESS')")
+    List<GameSession> findActiveByParticipant(@Param("user") User user);
+
+    List<GameSession> findByQuestId(Long questId);
+
+    @Query("SELECT gs FROM GameSession gs WHERE gs.status IN ('ACTIVE', 'PAUSED', 'IN_PROGRESS')")
+    List<GameSession> findActiveSessions();
+
+    long countByStatus(SessionStatus status);
+
+    @Query("SELECT gs FROM GameSession gs ORDER BY gs.createdAt DESC")
+    List<GameSession> findRecentSessions(@Param("limit") int limit);
+
+    @Query("SELECT CASE WHEN COUNT(gs) > 0 THEN true ELSE false END FROM GameSession gs WHERE gs.id = :sessionId AND (gs.user = :user OR EXISTS (SELECT 1 FROM TeamMember tm WHERE tm.team = gs.team AND tm.user = :user AND tm.isActive = true))")
+    boolean existsByIdAndParticipantsContaining(@Param("sessionId") Long sessionId, @Param("user") User user);
+
+    List<GameSession> findByCreatedAtBetween(Instant start, Instant end);
+
+    // Дополнительные методы
+    List<GameSession> findByTeamId(Long teamId);
+
+    @Query("SELECT gs FROM GameSession gs WHERE gs.quest.type = :questType")
+    List<GameSession> findByQuestType(@Param("questType") String questType);
+
+    @Query("SELECT gs FROM GameSession gs WHERE gs.quest.difficulty = :difficulty")
+    List<GameSession> findByDifficulty(@Param("difficulty") String difficulty);
+
+    // Методы для поиска
+    @Query("SELECT gs FROM GameSession gs WHERE LOWER(gs.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<GameSession> findByNameContainingIgnoreCase(@Param("keyword") String keyword, Pageable pageable);
+
+    @Query("SELECT gs FROM GameSession gs WHERE " +
+           "(:status IS NULL OR gs.status = :status) AND " +
+           "(:questId IS NULL OR gs.quest.id = :questId) AND " +
+           "(:userId IS NULL OR gs.user.id = :userId) AND " +
+           "(:teamId IS NULL OR gs.team.id = :teamId) AND " +
+           "(:startDate IS NULL OR gs.createdAt >= :startDate) AND " +
+           "(:endDate IS NULL OR gs.createdAt <= :endDate)")
+    Page<GameSession> findSessionsWithFilters(
+        @Param("status") SessionStatus status,
+        @Param("questId") Long questId,
+        @Param("userId") Long userId,
+        @Param("teamId") Long teamId,
+        @Param("startDate") Instant startDate,
+        @Param("endDate") Instant endDate,
+        Pageable pageable
+    );
 }

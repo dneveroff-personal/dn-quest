@@ -1,8 +1,9 @@
 package dn.quest.gameengine.dto;
 
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  * DTO для игровой сессии
  */
 @Schema(description = "Информация о игровой сессии")
+@Builder
 public record GameSessionDTO(
     
     @Schema(description = "ID сессии", example = "1")

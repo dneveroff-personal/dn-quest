@@ -2,7 +2,7 @@ package dn.quest.gameengine.service;
 
 import dn.quest.gameengine.entity.GameSession;
 import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -88,8 +88,8 @@ public interface GameSessionService {
     
     // Операции для администрирования
     List<GameSession> getAllSessionsForAdmin();
-    void forceFinishSession(Long sessionId, String reason);
-    void archiveSession(Long sessionId);
+    GameSession forceFinishSession(Long sessionId, String reason);
+    GameSession archiveSession(Long sessionId);
     
     // Операции с кэшированием
     void cacheSession(GameSession session);

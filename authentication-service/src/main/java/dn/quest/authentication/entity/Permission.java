@@ -38,6 +38,7 @@ public class Permission {
     private String category;
 
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private java.time.Instant createdAt = java.time.Instant.now();
 
     @PrePersist

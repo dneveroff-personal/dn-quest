@@ -11,7 +11,7 @@ import java.util.Map;
 @Schema(description = "Событие лидерборда")
 public class LeaderboardEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "leaderboard-event", required = true)
+    @Schema(description = "Тип события", example = "leaderboard-event", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Override
     protected String getEventTypeForSubclass() {
         return "leaderboard-event";

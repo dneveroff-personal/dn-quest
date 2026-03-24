@@ -19,8 +19,6 @@ import java.util.List;
 public interface LevelCompletionRepository extends JpaRepository<LevelCompletion, Long> {
 
     // Базовые запросы
-    List<LevelCompletion> findByQuest(Quest quest);
-
     @Query("select lc from LevelCompletion lc where lc.level.quest = :quest order by lc.passTime asc")
     List<LevelCompletion> findByQuest(@Param("quest") Quest quest);
 

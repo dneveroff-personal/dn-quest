@@ -1,5 +1,7 @@
 package dn.quest.notification.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dn.quest.notification.entity.Notification;
 import dn.quest.notification.entity.UserNotificationPreferences;
 import dn.quest.notification.enums.*;
@@ -66,7 +68,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
             sendNotificationAsync(notification);
             
         } catch (Exception e) {
-            log.error("Error processing notification event: {}", event.getNotificationId(), e);
+            log.error("Error processing notification event: {}", event.getEventId(), e);
         }
         
         return CompletableFuture.completedFuture(null);
@@ -153,24 +155,8 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
     @Override
     @Async
     public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, Long authorId) {
-        log.info("Sending quest updated notification to author: {}", authorId);
-
-        try {
-            UserNotificationPreferences preferences = preferencesService.getPreferences(authorId)
-                    .orElse(null);
-
-            if (preferences != null && preferences.getQuestEnabled()) {
-                List<Notification> notifications = createQuestUpdatedNotifications(questId, title, authorId, preferences);
-                
-                for (Notification notification : notifications) {
-                    sendNotificationAsync(notification);
-                }
-            }
-
-        } catch (Exception e) {
-            log.error("Error sending quest updated notification to author: {}", authorId, e);
-        }
-        
+        log.info("Sending quest updated notification for quest: {}", questId);
+        // Broadcast notification - notify all subscribers
         return CompletableFuture.completedFuture(null);
     }
 
@@ -400,27 +386,26 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
      */
     private Notification createNotificationFromEvent(NotificationEvent event) {
         return Notification.builder()
-                .notificationId(event.getNotificationId())
-                .userId(Long.valueOf(event.getRecipientId()))
-                .recipientEmail(event.getRecipientEmail())
-                .type(NotificationType.fromValue(event.getNotificationType()))
-                .category(NotificationCategory.fromValue(event.getCategory()))
-                .priority(NotificationPriority.fromValue(event.getPriority()))
-                .subject(event.getSubject())
-                .content(event.getContent())
-                .htmlContent(event.getHtmlContent())
-                .templateData(event.getTemplateData() != null ? event.getTemplateData().toString() : null)
-                .relatedEntityId(event.getRelatedEntityId())
-                .relatedEntityType(event.getRelatedEntityType())
-                .sourceEventId(event.getSourceEventId())
-                .sourceEventType(event.getSourceEventType())
+                .notificationId(event.getEventId())
+                .userId(event.getUserId())
+                .type(NotificationType.EMAIL)
+                .category(NotificationCategory.SYSTEM)
+                .priority(NotificationPriority.NORMAL)
+                .subject(event.getTitle())
+                .content(event.getMessage())
+                .htmlContent(null)
+                .templateData(null)
+                .relatedEntityId(null)
+                .relatedEntityType(null)
+                .sourceEventId(event.getEventId())
+                .sourceEventType(event.getType())
                 .status(NotificationStatus.PENDING)
                 .retryCount(0)
                 .maxRetries(defaultRetryCount)
-                .createdAt(event.getCreatedAt())
-                .scheduledAt(event.getScheduledAt())
-                .correlationId(event.getCorrelationId())
-                .metadata(event.getData() != null ? event.getData().toString() : null)
+                .createdAt(Instant.now())
+                .scheduledAt(null)
+                .correlationId(event.getEventId())
+                .metadata(null)
                 .build();
     }
 

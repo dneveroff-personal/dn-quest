@@ -104,7 +104,7 @@ public class CodeAttempt {
      * Проверяет, является ли попытка неправильной
      */
     public boolean isWrong() {
-        return result == AttemptResult.WRONG;
+        return result == AttemptResult.INCORRECT;
     }
 
     /**

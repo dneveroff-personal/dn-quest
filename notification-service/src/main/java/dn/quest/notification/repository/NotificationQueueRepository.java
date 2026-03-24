@@ -117,4 +117,15 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
     @Query("SELECT nq FROM NotificationQueue nq WHERE nq.status = 'FAILED' " +
            "AND nq.errorMessage IS NOT NULL ORDER BY nq.updatedAt DESC")
     List<NotificationQueue> findFailedNotifications();
+
+    /**
+     * Подсчитывает количество уведомлений по типу канала
+     */
+    @Query("SELECT nq.channelType, COUNT(nq) FROM NotificationQueue nq GROUP BY nq.channelType")
+    List<Object[]> countByChannelType();
+
+    /**
+     * Находит уведомления по ID пользователя (без пагинации)
+     */
+    List<NotificationQueue> findByUserId(Long userId);
 }

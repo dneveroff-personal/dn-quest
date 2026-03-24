@@ -18,6 +18,6 @@ import lombok.NoArgsConstructor;
 public class RefreshTokenRequestDTO {
     
     @NotBlank(message = "Refresh токен не может быть пустым")
-    @Schema(description = "Refresh токен", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", required = true)
+    @Schema(description = "Refresh токен", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private String refreshToken;
 }

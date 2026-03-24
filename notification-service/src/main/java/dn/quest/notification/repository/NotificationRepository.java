@@ -132,4 +132,54 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      */
     @Query("SELECT n.type, n.status, COUNT(n) FROM Notification n WHERE n.createdAt BETWEEN :start AND :end GROUP BY n.type, n.status")
     List<Object[]> getNotificationStatistics(@Param("start") Instant start, @Param("end") Instant end);
+
+    /**
+     * Найти уведомления по периоду
+     */
+    List<Notification> findByCreatedAtBetween(Instant start, Instant end);
+
+    /**
+     * Найти уведомления по статусу
+     */
+    List<Notification> findByStatus(NotificationStatus status);
+
+    /**
+     * Найти уведомления по ID пользователя
+     */
+    List<Notification> findByUserId(Long userId);
+
+    /**
+     * Подсчитать количество уведомлений по типу
+     */
+    @Query("SELECT n.type, COUNT(n) FROM Notification n GROUP BY n.type")
+    List<Object[]> countByType();
+
+    /**
+     * Подсчитать количество уведомлений по категории
+     */
+    @Query("SELECT n.category, COUNT(n) FROM Notification n GROUP BY n.category")
+    List<Object[]> countByCategory();
+
+    /**
+     * Подсчитать количество уведомлений по статусу
+     */
+    @Query("SELECT n.status, COUNT(n) FROM Notification n GROUP BY n.status")
+    List<Object[]> countByStatus();
+
+    /**
+     * Подсчитать количество уведомлений по пользователю (по убыванию)
+     */
+    @Query("SELECT n.userId, COUNT(n) as cnt FROM Notification n GROUP BY n.userId ORDER BY cnt DESC")
+    List<Object[]> countByUserIdOrderByCountDesc();
+
+    /**
+     * Получить среднее время доставки
+     */
+    @Query("SELECT AVG(FUNCTION('TIMESTAMPDIFF', 'SECOND', n.createdAt, n.deliveredAt)) FROM Notification n WHERE n.deliveredAt IS NOT NULL")
+    Double getAverageDeliveryTime();
+
+    /**
+     * Найти уведомления по статусу и периоду
+     */
+    List<Notification> findByCreatedAtBetweenAndStatus(Instant start, Instant end, NotificationStatus status);
 }

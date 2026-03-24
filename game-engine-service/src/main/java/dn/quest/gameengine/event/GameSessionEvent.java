@@ -1,6 +1,6 @@
 package dn.quest.gameengine.event;
 
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;
@@ -11,16 +11,16 @@ import java.util.Map;
 @Schema(description = "Событие игровой сессии")
 public class GameSessionEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "game-session-event", required = true)
+    @Schema(description = "Тип события", example = "game-session-event")
     @Override
     protected String getEventType() {
         return "game-session-event";
     }
 
-    @Schema(description = "Подтип события", example = "SESSION_STARTED", required = true)
+    @Schema(description = "Подтип события", example = "SESSION_STARTED")
     private GameSessionEventType subType;
 
-    @Schema(description = "ID сессии", example = "789", required = true)
+    @Schema(description = "ID сессии", example = "789")
     private Long sessionId;
 
     @Schema(description = "Название сессии", example = "Вечерний квест")

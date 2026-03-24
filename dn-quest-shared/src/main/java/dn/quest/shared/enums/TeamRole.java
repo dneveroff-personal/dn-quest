@@ -12,7 +12,12 @@ public enum TeamRole {
     /**
      * Обычный участник команды
      */
-    MEMBER("Участник");
+    MEMBER("Участник"),
+
+    /**
+     * Заместитель капитана
+     */
+    DEPUTY("Заместитель");
 
     private final String displayName;
 

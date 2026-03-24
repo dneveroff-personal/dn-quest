@@ -25,6 +25,7 @@ public class LoginResponseDTO {
     private String refreshToken;
     
     @Schema(description = "Тип токена", example = "Bearer")
+    @Builder.Default
     private String tokenType = "Bearer";
     
     @Schema(description = "Время истечения access токена в секундах", example = "900")

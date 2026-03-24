@@ -163,8 +163,8 @@ public class LevelCompletion {
         if (level == null || level.getApTime() == null) {
             return 0;
         }
-        
-        long timeLimit = level.getApTime();
+
+        int timeLimit = level.getApTime();
         if (durationSec < timeLimit * 0.5) {
             return 300; // 5 минут бонуса за очень быстрое прохождение
         } else if (durationSec < timeLimit * 0.75) {

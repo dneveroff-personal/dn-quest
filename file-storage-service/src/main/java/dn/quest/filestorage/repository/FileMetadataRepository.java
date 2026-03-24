@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stream;
+import java.util.stream.Stream;
 import java.util.UUID;
 
 /**

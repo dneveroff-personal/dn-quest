@@ -17,7 +17,6 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long> {
 
     // Базовые запросы
     List<LevelHint> findByLevel(Level level);
-    List<LevelHint> findByLevelOrderByOrderIndex(Level level);
 
     @Query("select h from LevelHint h where h.level = :level order by h.orderIndex asc")
     List<LevelHint> findByLevelOrderByOrderIndex(@Param("level") Level level);

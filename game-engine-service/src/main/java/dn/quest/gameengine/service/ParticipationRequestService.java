@@ -3,7 +3,7 @@ package dn.quest.gameengine.service;
 import dn.quest.gameengine.entity.ParticipationRequest;
 import dn.quest.gameengine.entity.GameSession;
 import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.enums.ParticipationStatus;
+import dn.quest.shared.enums.ParticipationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

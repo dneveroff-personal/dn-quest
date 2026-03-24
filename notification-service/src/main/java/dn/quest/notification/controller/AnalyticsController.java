@@ -1,6 +1,8 @@
 package dn.quest.notification.controller;
 
+import dn.quest.notification.enums.NotificationType;
 import dn.quest.notification.service.NotificationAnalyticsService;
+import dn.quest.notification.service.channel.NotificationChannel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -124,13 +126,9 @@ public class AnalyticsController {
             @Parameter(description = "Тип уведомления") @RequestParam String type,
             @Parameter(description = "Канал доставки") @RequestParam String channel,
             @Parameter(description = "Время доставки в мс") @RequestParam long deliveryTimeMs) {
-        // Преобразование строк в enum
-        dn.quest.notification.enums.NotificationType notificationType = 
-            dn.quest.notification.enums.NotificationType.valueOf(type.toUpperCase());
-        dn.quest.notification.enums.NotificationChannel notificationChannel = 
-            dn.quest.notification.enums.NotificationChannel.valueOf(channel.toUpperCase());
-        
-        analyticsService.recordNotificationSent(notificationId, notificationType, notificationChannel, deliveryTimeMs);
+        // Создать простой канал на основе строки
+        String channelType = channel != null ? channel.toUpperCase() : "UNKNOWN";
+        analyticsService.recordNotificationSent(notificationId, type, channelType, deliveryTimeMs);
         return ResponseEntity.ok().build();
     }
 

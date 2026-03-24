@@ -10,9 +10,19 @@ public enum SessionStatus {
     PENDING("Ожидает начала"),
     
     /**
+     * Создана
+     */
+    CREATED("Создана"),
+    
+    /**
      * В процессе игры
      */
     IN_PROGRESS("В процессе"),
+    
+    /**
+     * Активна
+     */
+    ACTIVE("Активна"),
     
     /**
      * Приостановлена
@@ -23,6 +33,16 @@ public enum SessionStatus {
      * Завершена успешно
      */
     COMPLETED("Завершена"),
+    
+    /**
+     * Завершена (финальный статус)
+     */
+    FINISHED("Завершена"),
+    
+    /**
+     * Архивирована
+     */
+    ARCHIVED("Архивирована"),
     
     /**
      * Прервана
@@ -48,14 +68,14 @@ public enum SessionStatus {
      * Проверяет, активна ли сессия
      */
     public boolean isActive() {
-        return this == PENDING || this == IN_PROGRESS || this == PAUSED;
+        return this == PENDING || this == IN_PROGRESS || this == ACTIVE || this == PAUSED;
     }
 
     /**
      * Проверяет, завершена ли сессия
      */
     public boolean isFinished() {
-        return this == COMPLETED || this == ABORTED || this == TIME_EXPIRED;
+        return this == COMPLETED || this == FINISHED || this == ABORTED || this == TIME_EXPIRED || this == ARCHIVED;
     }
 
     /**
@@ -69,6 +89,6 @@ public enum SessionStatus {
      * Проверяет, можно ли начать сессию
      */
     public boolean canBeStarted() {
-        return this == PENDING;
+        return this == PENDING || this == CREATED;
     }
 }
