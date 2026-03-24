@@ -189,4 +189,17 @@ public class Quest {
         }
         return Math.max(0, startAt.getEpochSecond() - Instant.now().getEpochSecond());
     }
+
+    /**
+     * Получает список ID уровней
+     */
+    public java.util.List<Long> getLevelIds() {
+        if (levels == null) {
+            return java.util.Collections.emptyList();
+        }
+        return levels.stream()
+            .map(Level::getId)
+            .sorted()
+            .collect(java.util.stream.Collectors.toList());
+    }
 }

@@ -15,6 +15,21 @@ public enum AttemptResult {
     ACCEPTED_NORMAL("Принято"),
     
     /**
+     * Код принят с бонусом
+     */
+    ACCEPTED_BONUS("Принято с бонусом"),
+    
+    /**
+     * Код принят с штрафом
+     */
+    ACCEPTED_PENALTY("Принято с штрафом"),
+    
+    /**
+     * Дубликат кода
+     */
+    DUPLICATE("Дубликат"),
+    
+    /**
      * Код неверный
      */
     INCORRECT("Неверно"),
@@ -58,14 +73,14 @@ public enum AttemptResult {
      * Проверяет, является ли результат успешным
      */
     public boolean isSuccess() {
-        return this == CORRECT;
+        return this == CORRECT || this == ACCEPTED_NORMAL || this == ACCEPTED_BONUS;
     }
 
     /**
      * Проверяет, является ли результат ошибочным
      */
     public boolean isError() {
-        return this != CORRECT;
+        return this != CORRECT && this != ACCEPTED_NORMAL && this != ACCEPTED_BONUS;
     }
 
     /**

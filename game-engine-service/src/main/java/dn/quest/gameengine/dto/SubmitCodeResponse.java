@@ -1,6 +1,6 @@
 package dn.quest.gameengine.dto;
 
-import dn.quest.gameengine.entity.enums.AttemptResult;
+import dn.quest.shared.enums.AttemptResult;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 

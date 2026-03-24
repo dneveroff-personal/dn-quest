@@ -22,7 +22,7 @@ public enum Difficulty {
     /**
      * Экспертный уровень сложности
      */
-    EXPERT("Экспертный", 4);
+    EXPERT("Эксперт", 4);
 
     private final String displayName;
     private final int level;
@@ -59,5 +59,12 @@ public enum Difficulty {
      */
     public boolean isHardOrHigher() {
         return this.level >= HARD.level;
+    }
+
+    /**
+     * Проверяет, является ли сложность высокой (HARD или EXPERT)
+     */
+    public boolean isHard() {
+        return this == HARD || this == EXPERT;
     }
 }

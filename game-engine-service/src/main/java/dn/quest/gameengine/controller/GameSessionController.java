@@ -2,7 +2,7 @@ package dn.quest.gameengine.controller;
 
 import dn.quest.gameengine.entity.GameSession;
 import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import dn.quest.gameengine.service.GameSessionService;
 import dn.quest.gameengine.dto.GameSessionDTO;
 import dn.quest.gameengine.dto.CreateGameSessionRequest;
@@ -351,10 +351,26 @@ public class GameSessionController {
         log.info("Submitting code for session {} by user: {}", id, currentUser.getId());
 
         // TODO: Реализация проверки кода через CodeAttemptService
-        SubmitCodeResponse response = SubmitCodeResponse.builder()
-            .success(false)
-            .message("Code submission not implemented yet")
-            .build();
+        SubmitCodeResponse response = new SubmitCodeResponse(
+            false,
+            null,
+            "Code submission not implemented yet",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
 
         return ResponseEntity.ok(response);
     }
@@ -468,21 +484,21 @@ public class GameSessionController {
     private GameSession convertToEntity(CreateGameSessionRequest request) {
         // TODO: Реализация конвертации из DTO в Entity
         return GameSession.builder()
-            .name(request.getName())
-            .description(request.getDescription())
-            .maxParticipants(request.getMaxParticipants())
+            .name(request.name())
+            .description(request.description())
+            .maxParticipants(request.maxParticipants())
             .build();
     }
 
     private void updateSessionFromRequest(GameSession session, UpdateGameSessionRequest request) {
-        if (request.getName() != null) {
-            session.setName(request.getName());
+        if (request.name() != null) {
+            session.setName(request.name());
         }
-        if (request.getDescription() != null) {
-            session.setDescription(request.getDescription());
+        if (request.description() != null) {
+            session.setDescription(request.description());
         }
-        if (request.getMaxParticipants() != null) {
-            session.setMaxParticipants(request.getMaxParticipants());
+        if (request.maxParticipants() != null) {
+            session.setMaxParticipants(request.maxParticipants());
         }
     }
 

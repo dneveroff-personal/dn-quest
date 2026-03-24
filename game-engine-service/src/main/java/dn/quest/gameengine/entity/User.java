@@ -243,4 +243,13 @@ public class User {
     public void updateLastLogin() {
         lastLoginAt = Instant.now();
     }
+
+    /**
+     * Получает набор ролей пользователя (для совместимости с интерфейсами)
+     */
+    public java.util.Set<UserRole> getRoles() {
+        java.util.Set<UserRole> roles = new java.util.HashSet<>();
+        roles.add(role);
+        return roles;
+    }
 }

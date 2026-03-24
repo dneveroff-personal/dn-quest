@@ -3,7 +3,7 @@ package dn.quest.gameengine.repository;
 import dn.quest.gameengine.entity.Team;
 import dn.quest.gameengine.entity.TeamMember;
 import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.enums.TeamRole;
+import dn.quest.shared.enums.TeamRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

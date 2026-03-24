@@ -1,7 +1,7 @@
 package dn.quest.gameengine.service;
 
 import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.enums.UserRole;
+import dn.quest.shared.enums.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

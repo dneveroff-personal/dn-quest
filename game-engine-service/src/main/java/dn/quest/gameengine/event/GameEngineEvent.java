@@ -3,6 +3,14 @@ package dn.quest.gameengine.event;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import dn.quest.shared.events.game.CodeAttemptEvent;
+import dn.quest.shared.events.game.GameSessionEvent;
+import dn.quest.shared.events.game.LeaderboardEvent;
+import dn.quest.shared.events.game.LevelCompletionEvent;
+import dn.quest.shared.events.game.LevelProgressEvent;
+import dn.quest.shared.events.game.ParticipationRequestEvent;
+import dn.quest.shared.events.team.TeamEvent;
+import dn.quest.shared.events.user.UserEvent;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;

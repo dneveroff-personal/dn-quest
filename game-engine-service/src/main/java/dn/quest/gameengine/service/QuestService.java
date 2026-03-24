@@ -4,8 +4,8 @@ import dn.quest.gameengine.entity.Quest;
 import dn.quest.gameengine.entity.Level;
 import dn.quest.gameengine.entity.Code;
 import dn.quest.gameengine.entity.LevelHint;
-import dn.quest.gameengine.entity.enums.QuestType;
-import dn.quest.gameengine.entity.enums.Difficulty;
+import dn.quest.shared.enums.QuestType;
+import dn.quest.shared.enums.Difficulty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

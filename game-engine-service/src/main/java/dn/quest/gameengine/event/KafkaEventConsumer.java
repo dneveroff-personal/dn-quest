@@ -5,9 +5,6 @@ import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.quest.QuestDeletedEvent;
 import dn.quest.shared.events.quest.QuestPublishedEvent;
 import dn.quest.shared.events.quest.QuestUpdatedEvent;
-import dn.quest.shared.events.team.TeamMemberAddedEvent;
-import dn.quest.shared.events.team.TeamMemberRemovedEvent;
-import dn.quest.shared.events.team.TeamUpdatedEvent;
 import dn.quest.shared.events.user.UserDeletedEvent;
 import dn.quest.shared.events.user.UserUpdatedEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -69,14 +66,8 @@ public class KafkaEventConsumer extends EventConsumer {
         super.handleTeamEvent(event, topic);
         
         switch (event.getEventType()) {
-            case "TeamUpdated":
-                handleTeamUpdated((TeamUpdatedEvent) event);
-                break;
-            case "TeamMemberAdded":
-                handleTeamMemberAdded((TeamMemberAddedEvent) event);
-                break;
-            case "TeamMemberRemoved":
-                handleTeamMemberRemoved((TeamMemberRemovedEvent) event);
+            case "TeamDeleted":
+                log.info("Team deleted: {}", ((dn.quest.shared.events.team.TeamDeletedEvent) event).getTeamId());
                 break;
             default:
                 log.warn("Unknown team event type: {}", event.getEventType());
@@ -108,22 +99,5 @@ public class KafkaEventConsumer extends EventConsumer {
     private void handleQuestDeleted(QuestDeletedEvent event) {
         log.info("Quest deleted: {}", event.getQuestId());
         // Здесь можно добавить логику для завершения всех сессий удаленного квеста
-    }
-
-    private void handleTeamUpdated(TeamUpdatedEvent event) {
-        log.info("Team updated: {}", event.getTeamId());
-        // Здесь можно добавить логику для обновления информации о команде в игровых сессиях
-    }
-
-    private void handleTeamMemberAdded(TeamMemberAddedEvent event) {
-        log.info("Team member added: {} to team: {}", 
-                event.getMemberId(), event.getTeamId());
-        // Здесь можно добавить логику для обработки добавления участника в команду
-    }
-
-    private void handleTeamMemberRemoved(TeamMemberRemovedEvent event) {
-        log.info("Team member removed: {} from team: {}", 
-                event.getMemberId(), event.getTeamId());
-        // Здесь можно добавить логику для обработки удаления участника из команды
     }
 }

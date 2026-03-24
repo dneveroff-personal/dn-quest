@@ -1,6 +1,5 @@
 package dn.quest.notification.event;
 
-import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.BaseEvent;
 import dn.quest.shared.events.user.UserRegisteredEvent;
 import dn.quest.shared.events.user.UserUpdatedEvent;
@@ -13,14 +12,16 @@ import dn.quest.shared.events.game.GameSessionStartedEvent;
 import dn.quest.shared.events.game.GameSessionFinishedEvent;
 import dn.quest.shared.events.game.CodeSubmittedEvent;
 import dn.quest.shared.events.game.LevelCompletedEvent;
-import dn.quest.shared.events.team.TeamCreatedEvent;
-import dn.quest.shared.events.team.TeamUpdatedEvent;
-import dn.quest.shared.events.team.TeamMemberAddedEvent;
-import dn.quest.shared.events.team.TeamMemberRemovedEvent;
+import dn.quest.shared.events.team.TeamEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamCreatedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamUpdatedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamMemberAddedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamMemberRemovedEvent;
 import dn.quest.shared.events.file.FileUploadedEvent;
 import dn.quest.shared.events.file.FileDeletedEvent;
 import dn.quest.shared.events.file.FileUpdatedEvent;
 import dn.quest.shared.events.notification.NotificationEvent;
+import dn.quest.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -51,7 +52,7 @@ public class KafkaEventConsumer {
     public void handleUserEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -93,7 +94,7 @@ public class KafkaEventConsumer {
     public void handleQuestEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -138,7 +139,7 @@ public class KafkaEventConsumer {
     public void handleGameEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -183,7 +184,7 @@ public class KafkaEventConsumer {
     public void handleTeamEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -228,7 +229,7 @@ public class KafkaEventConsumer {
     public void handleFileEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -270,7 +271,7 @@ public class KafkaEventConsumer {
     public void handleNotificationEvents(
             @Payload NotificationEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         

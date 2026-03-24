@@ -51,8 +51,6 @@ public interface LevelRepository extends JpaRepository<Level, Long> {
     }
 
     // Запросы для поиска по порядковому номеру
-    Optional<Level> findByQuestAndOrderIndex(Quest quest, Integer orderIndex);
-
     @Query("select l from Level l where l.quest = :quest and l.orderIndex = :orderIndex")
     Optional<Level> findByQuestAndOrderIndex(@Param("quest") Quest quest, @Param("orderIndex") Integer orderIndex);
 

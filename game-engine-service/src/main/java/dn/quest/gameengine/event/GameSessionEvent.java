@@ -1,6 +1,6 @@
 package dn.quest.gameengine.event;
 
-import dn.quest.gameengine.entity.enums.SessionStatus;
+import dn.quest.shared.enums.SessionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Map;

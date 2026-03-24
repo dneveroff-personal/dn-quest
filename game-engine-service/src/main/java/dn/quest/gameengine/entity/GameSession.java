@@ -3,6 +3,7 @@ package dn.quest.gameengine.entity;
 import dn.quest.shared.enums.SessionStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Cache;
@@ -17,6 +18,7 @@ import java.util.Set;
  */
 @Data
 @Entity
+@Builder
 @Table(name = "game_sessions",
         indexes = {
                 @Index(name = "idx_session_quest", columnList = "quest_id"),
@@ -35,6 +37,25 @@ public class GameSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Название сессии
+     */
+    @Column(name = "name", length = 200)
+    private String name;
+
+    /**
+     * Описание сессии
+     */
+    @Column(name = "description", length = 1000)
+    private String description;
+
+    /**
+     * Владелец сессии
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quest_id", nullable = false)
     private Quest quest;
@@ -51,11 +72,17 @@ public class GameSession {
     @Column(nullable = false, length = 10)
     private SessionStatus status = SessionStatus.PENDING;
 
+    @Column(name = "created_at")
+    private Instant createdAt;
+
     @Column(name = "started_at")
     private Instant startedAt;
 
     @Column(name = "finished_at")
     private Instant finishedAt;
+
+    @Column(name = "duration_seconds")
+    private Long durationSeconds;
 
     @Column(nullable = false)
     private int bonusTimeSumSec = 0;
@@ -66,6 +93,22 @@ public class GameSession {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_level_id")
     private Level currentLevel;
+
+    @Column(name = "current_level_id", insertable = false, updatable = false)
+    private Long currentLevelId;
+
+    /**
+     * Максимальное количество участников
+     */
+    @Column(name = "max_participants")
+    private Integer maxParticipants;
+
+    /**
+     * Участники сессии
+     */
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private Set<User> participants = new HashSet<>();
 
     @Column(name = "last_activity_at")
     private Instant lastActivityAt;
