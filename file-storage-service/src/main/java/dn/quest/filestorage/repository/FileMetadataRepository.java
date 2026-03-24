@@ -4,6 +4,7 @@ import dn.quest.filestorage.entity.FileMetadata;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,13 +13,14 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stream;
 import java.util.UUID;
 
 /**
  * Репозиторий для работы с метаданными файлов
  */
 @Repository
-public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID> {
+public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID>, JpaSpecificationExecutor<FileMetadata> {
 
     /**
      * Найти файл по имени хранения
@@ -29,6 +31,16 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID
      * Найти файлы по владельцу
      */
     Page<FileMetadata> findByOwnerId(UUID ownerId, Pageable pageable);
+
+    /**
+     * Найти все файлы по владельцу
+     */
+    List<FileMetadata> findAllByOwnerId(UUID ownerId);
+
+    /**
+     * Поток всех файлов по владельцу (для избежания проблем с памятью)
+     */
+    Stream<FileMetadata> streamByOwnerId(UUID ownerId);
 
     /**
      * Найти файлы по типу файла
@@ -50,6 +62,11 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID
      * Найти публичные файлы
      */
     Page<FileMetadata> findByIsPublicTrue(Pageable pageable);
+
+    /**
+     * Найти временные файлы
+     */
+    Page<FileMetadata> findByIsTemporaryTrue(Pageable pageable);
 
     /**
      * Найти файлы по владельцу и типу
@@ -107,6 +124,27 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID
     @Modifying
     @Query("DELETE FROM FileMetadata f WHERE f.isTemporary = true AND f.expiresAt < :now")
     void deleteExpiredTemporaryFiles(@Param("now") LocalDateTime now);
+
+    /**
+     * Удалить все файлы по ID владельца
+     */
+    @Modifying
+    @Query("DELETE FROM FileMetadata f WHERE f.ownerId = :ownerId")
+    void deleteAllByOwnerId(@Param("ownerId") UUID ownerId);
+
+    /**
+     * Удалить все файлы по questId
+     */
+    @Modifying
+    @Query("DELETE FROM FileMetadata f WHERE f.questId = :questId")
+    void deleteAllByQuestId(@Param("questId") UUID questId);
+
+    /**
+     * Удалить все файлы по teamId
+     */
+    @Modifying
+    @Query("DELETE FROM FileMetadata f WHERE f.teamId = :teamId")
+    void deleteAllByTeamId(@Param("teamId") UUID teamId);
 
     /**
      * Получить статистику по типам файлов

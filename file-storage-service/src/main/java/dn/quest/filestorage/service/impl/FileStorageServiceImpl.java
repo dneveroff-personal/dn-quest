@@ -9,9 +9,11 @@ import dn.quest.filestorage.service.FileStorageService;
 import dn.quest.filestorage.service.FileValidationService;
 import dn.quest.filestorage.storage.StorageStrategy;
 import dn.quest.filestorage.storage.StorageStrategyFactory;
+import dn.quest.filestorage.storage.impl.LocalStorageStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,12 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Реализация сервиса для работы с файлами
@@ -59,15 +60,16 @@ public class FileStorageServiceImpl implements FileStorageService {
             // Выбор стратегии хранения
             FileMetadata.StorageType storageType = request.getStorageType() != null 
                     ? request.getStorageType() 
-                    : storageStrategyFactory.getOptimalStrategy(request.getFileType())
-                            .getStorageType();
+                    : storageStrategyFactory.getOptimalStorageType(request.getFileType());
             
             StorageStrategy strategy = storageStrategyFactory.getStrategy(storageType);
             
             if (!strategy.isStorageAvailable()) {
                 log.warn("Основное хранилище недоступно, используется резервное: {}", storageType);
                 strategy = storageStrategyFactory.getFallbackStrategy(strategy);
-                storageType = strategy.getStorageType();
+                storageType = strategy instanceof LocalStorageStrategy 
+                        ? FileMetadata.StorageType.LOCAL 
+                        : FileMetadata.StorageType.MINIO;
             }
 
             // Генерация имени файла и пути
@@ -88,9 +90,8 @@ public class FileStorageServiceImpl implements FileStorageService {
             Map<String, String> metadata = helper.prepareMetadata(request, username);
             String storagePath = strategy.storeFile(file, path, metadata);
 
-            // Создание метаданных
+            // Создание метаданных (id генерируется автоматически БД)
             FileMetadata fileMetadata = FileMetadata.builder()
-                    .id(UUID.randomUUID())
                     .originalFileName(file.getOriginalFilename())
                     .storedFileName(storedFileName)
                     .contentType(file.getContentType())
@@ -301,34 +302,420 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
+    @Transactional
     public void deleteAllUserFiles(UUID userId) {
         log.info("Удаление всех файлов пользователя: {}", userId);
-        List<FileMetadata> files = fileMetadataRepository.findByOwnerId(userId);
+        List<FileMetadata> files = fileMetadataRepository.findAllByOwnerId(userId);
+        
+        // Удаляем файлы из хранилища
         for (FileMetadata file : files) {
-            deleteFile(file.getId(), null);
+            try {
+                StorageStrategy strategy = storageStrategyFactory.getStrategy(file.getStorageType());
+                strategy.deleteFile(file.getStoragePath());
+            } catch (Exception e) {
+                log.warn("Не удалось удалить файл из хранилища: {}", file.getId(), e);
+            }
         }
+        
+        // Массовое удаление из БД
+        fileMetadataRepository.deleteAllByOwnerId(userId);
         log.info("Удалено {} файлов пользователя: {}", files.size(), userId);
     }
 
     @Override
+    @Transactional
     public void deleteAllQuestFiles(UUID questId) {
         log.info("Удаление всех файлов квеста: {}", questId);
         List<FileMetadata> files = fileMetadataRepository.findByQuestId(questId);
+        
+        // Удаляем файлы из хранилища
         for (FileMetadata file : files) {
-            deleteFile(file.getId(), null);
+            try {
+                StorageStrategy strategy = storageStrategyFactory.getStrategy(file.getStorageType());
+                strategy.deleteFile(file.getStoragePath());
+            } catch (Exception e) {
+                log.warn("Не удалось удалить файл из хранилища: {}", file.getId(), e);
+            }
         }
+        
+        // Массовое удаление из БД
+        fileMetadataRepository.deleteAllByQuestId(questId);
         log.info("Удалено {} файлов квеста: {}", files.size(), questId);
     }
 
     @Override
+    @Transactional
     public void deleteAllTeamFiles(UUID teamId) {
         log.info("Удаление всех файлов команды: {}", teamId);
         List<FileMetadata> files = fileMetadataRepository.findByTeamId(teamId);
+        
+        // Удаляем файлы из хранилища
         for (FileMetadata file : files) {
-            deleteFile(file.getId(), null);
+            try {
+                StorageStrategy strategy = storageStrategyFactory.getStrategy(file.getStorageType());
+                strategy.deleteFile(file.getStoragePath());
+            } catch (Exception e) {
+                log.warn("Не удалось удалить файл из хранилища: {}", file.getId(), e);
+            }
         }
+        
+        // Массовое удаление из БД
+        fileMetadataRepository.deleteAllByTeamId(teamId);
         log.info("Удалено {} файлов команды: {}", files.size(), teamId);
     }
 
-    // Вспомогательные методы будут в следующей части...
+    @Override
+    public void cleanupExpiredTemporaryFiles() {
+        log.info("Очистка истекших временных файлов");
+        try {
+            List<FileMetadata> expiredFiles = fileMetadataRepository.findExpiredTemporaryFiles(LocalDateTime.now());
+            
+            // Удаляем файлы из хранилища
+            for (FileMetadata file : expiredFiles) {
+                try {
+                    StorageStrategy strategy = storageStrategyFactory.getStrategy(file.getStorageType());
+                    strategy.deleteFile(file.getStoragePath());
+                } catch (Exception e) {
+                    log.warn("Не удалось удалить файл из хранилища: {}", file.getId(), e);
+                }
+            }
+            
+            // Массовое удаление из БД
+            fileMetadataRepository.deleteExpiredTemporaryFiles(LocalDateTime.now());
+            log.info("Очищено {} истекших временных файлов", expiredFiles.size());
+        } catch (Exception e) {
+            log.error("Ошибка при очистке истекших временных файлов", e);
+            throw new FileStorageException("CLEANUP_ERROR", "Не удалось очистить временные файлы: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean hasFileAccess(UUID fileId, String username) {
+        try {
+            FileMetadata metadata = fileMetadataRepository.findById(fileId)
+                    .orElseThrow(() -> new FileNotFoundException(fileId.toString()));
+            return helper.hasFileAccess(metadata, username);
+        } catch (Exception e) {
+            log.error("Ошибка при проверке доступа к файлу: {}", fileId, e);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isFilePublic(UUID fileId) {
+        return fileMetadataRepository.findById(fileId)
+                .map(FileMetadata::getIsPublic)
+                .orElse(false);
+    }
+
+    @Override
+    public void deleteFile(UUID fileId, String username) {
+        try {
+            FileMetadata metadata = fileMetadataRepository.findById(fileId)
+                    .orElseThrow(() -> new FileNotFoundException(fileId.toString()));
+            
+            if (!helper.hasFileAccess(metadata, username)) {
+                throw new FileAccessException(fileId, "Доступ к файлу запрещен");
+            }
+            
+            StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+            strategy.deleteFile(metadata.getStoragePath());
+            fileMetadataRepository.delete(metadata);
+            
+            log.info("Файл удален: {} пользователем: {}", fileId, username);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении файла: {}", fileId, e);
+            throw new FileStorageException("DELETE_ERROR", "Не удалось удалить файл: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deleteFileByName(String fileName, String username) {
+        try {
+            FileMetadata metadata = fileMetadataRepository.findByStoredFileName(fileName)
+                    .orElseThrow(() -> new FileNotFoundException(fileName));
+            
+            deleteFile(metadata.getId(), username);
+        } catch (Exception e) {
+            log.error("Ошибка при удалении файла по имени: {}", fileName, e);
+            throw new FileStorageException("DELETE_ERROR", "Не удалось удалить файл: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String generatePresignedDownloadUrl(UUID fileId, Duration duration, String username) {
+        try {
+            FileMetadata metadata = fileMetadataRepository.findById(fileId)
+                    .orElseThrow(() -> new FileNotFoundException(fileId.toString()));
+            
+            if (!helper.hasFileAccess(metadata, username)) {
+                throw new FileAccessException(fileId, "Доступ к файлу запрещен");
+            }
+            
+            StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+            return strategy.generatePresignedUrl(metadata.getStoragePath(), duration);
+        } catch (Exception e) {
+            log.error("Ошибка при генерации предписанного URL для скачивания: {}", fileId, e);
+            throw new FileStorageException("PRESIGNED_URL_ERROR", "Не удалось сгенерировать URL: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String generatePresignedUploadUrl(String fileName, String contentType, Duration duration, String username) {
+        try {
+            UUID ownerId = helper.getUserIdByUsername(username);
+            
+            String storedFileName = helper.generateStoredFileName(fileName);
+            String path = helper.buildPath(null, FileMetadata.FileType.OTHER, username);
+            String fullPath = path + storedFileName;
+            
+            FileMetadata.StorageType storageType = storageStrategyFactory.getOptimalStorageType(FileMetadata.FileType.OTHER);
+            StorageStrategy strategy = storageStrategyFactory.getStrategy(storageType);
+            
+            return strategy.generatePresignedUploadUrl(fullPath, contentType, duration);
+        } catch (Exception e) {
+            log.error("Ошибка при генерации предписанного URL для загрузки: {}", fileName, e);
+            throw new FileStorageException("PRESIGNED_UPLOAD_URL_ERROR", "Не удалось сгенерировать URL для загрузки: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Page<FileResponseDTO> getTemporaryFiles(Pageable pageable, String username) {
+        try {
+            Page<FileMetadata> page = fileMetadataRepository.findByIsTemporaryTrue(pageable);
+            List<FileResponseDTO> files = page.getContent().stream()
+                    .map(metadata -> {
+                        StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+                        return helper.convertToResponseDTO(metadata, strategy);
+                    })
+                    .collect(Collectors.toList());
+            
+            return new PageImpl<>(files, pageable, page.getTotalElements());
+        } catch (Exception e) {
+            log.error("Ошибка при получении временных файлов", e);
+            throw new FileStorageException("TEMPORARY_FILES_ERROR", "Не удалось получить временные файлы: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Page<FileResponseDTO> getPublicFiles(Pageable pageable) {
+        try {
+            Page<FileMetadata> page = fileMetadataRepository.findByIsPublicTrue(pageable);
+            List<FileResponseDTO> files = page.getContent().stream()
+                    .map(metadata -> {
+                        StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+                        return helper.convertToResponseDTO(metadata, strategy);
+                    })
+                    .collect(Collectors.toList());
+            
+            return new PageImpl<>(files, pageable, page.getTotalElements());
+        } catch (Exception e) {
+            log.error("Ошибка при получении публичных файлов", e);
+            throw new FileStorageException("PUBLIC_FILES_ERROR", "Не удалось получить публичные файлы: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Page<FileResponseDTO> getFilesByOwner(UUID ownerId, Pageable pageable, String username) {
+        try {
+            Page<FileMetadata> page = fileMetadataRepository.findByOwnerId(ownerId, pageable);
+            List<FileResponseDTO> files = page.getContent().stream()
+                    .map(metadata -> {
+                        StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+                        return helper.convertToResponseDTO(metadata, strategy);
+                    })
+                    .collect(Collectors.toList());
+            
+            return new PageImpl<>(files, pageable, page.getTotalElements());
+        } catch (Exception e) {
+            log.error("Ошибка при получении файлов владельца", e);
+            throw new FileStorageException("OWNER_FILES_ERROR", "Не удалось получить файлы: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public FileResponseDTO updateFileMetadata(UUID fileId, FileUploadRequestDTO request, String username) {
+        try {
+            FileMetadata metadata = fileMetadataRepository.findById(fileId)
+                    .orElseThrow(() -> new FileNotFoundException(fileId.toString()));
+            
+            if (!helper.hasFileAccess(metadata, username)) {
+                throw new FileAccessException(fileId, "Доступ к файлу запрещен");
+            }
+            
+            metadata.setDescription(request.getDescription());
+            metadata.setIsPublic(request.getIsPublic());
+            metadata.setIsTemporary(request.getIsTemporary());
+            metadata.setExpiresAt(request.getExpiresAt());
+            
+            metadata = fileMetadataRepository.save(metadata);
+            
+            StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
+            return helper.convertToResponseDTO(metadata, strategy);
+        } catch (Exception e) {
+            log.error("Ошибка при обновлении метаданных файла: {}", fileId, e);
+            throw new FileStorageException("UPDATE_METADATA_ERROR", "Не удалось обновить метаданные: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public FileResponseDTO copyFile(UUID sourceFileId, FileUploadRequestDTO request, String username) {
+        try {
+            FileMetadata sourceMetadata = fileMetadataRepository.findById(sourceFileId)
+                    .orElseThrow(() -> new FileNotFoundException(sourceFileId.toString()));
+            
+            if (!helper.hasFileAccess(sourceMetadata, username)) {
+                throw new FileAccessException(sourceFileId, "Доступ к файлу запрещен");
+            }
+            
+            // Получаем ID владельца
+            UUID ownerId = helper.getUserIdByUsername(username);
+            
+            // Определяем тип хранилища
+            FileMetadata.StorageType targetStorageType = request.getStorageType() != null 
+                    ? request.getStorageType() 
+                    : sourceMetadata.getStorageType();
+            
+            StorageStrategy sourceStrategy = storageStrategyFactory.getStrategy(sourceMetadata.getStorageType());
+            StorageStrategy targetStrategy = storageStrategyFactory.getStrategy(targetStorageType);
+            
+            // Загружаем файл из источника
+            InputStream inputStream = sourceStrategy.loadFile(sourceMetadata.getStoragePath());
+            
+            // Генерируем новое имя и путь
+            String newStoredFileName = helper.generateStoredFileName(sourceMetadata.getOriginalFileName());
+            String newPath = helper.buildPath(request.getPath(), sourceMetadata.getFileType(), username);
+            
+            // Сохраняем файл в целевом хранилище
+            String storagePath = targetStrategy.storeFile(inputStream, newStoredFileName, 
+                    sourceMetadata.getContentType(), newPath, new HashMap<>());
+            
+            // Создаем метаданные для нового файла
+            FileMetadata newMetadata = FileMetadata.builder()
+                    .originalFileName(sourceMetadata.getOriginalFileName())
+                    .storedFileName(newStoredFileName)
+                    .contentType(sourceMetadata.getContentType())
+                    .fileSize(sourceMetadata.getFileSize())
+                    .fileType(sourceMetadata.getFileType())
+                    .storageType(targetStorageType)
+                    .storagePath(storagePath)
+                    .description(request.getDescription())
+                    .ownerId(ownerId)
+                    .isPublic(request.getIsPublic())
+                    .isTemporary(request.getIsTemporary())
+                    .expiresAt(request.getExpiresAt())
+                    .checksum(sourceMetadata.getChecksum())
+                    .metadataJson(sourceMetadata.getMetadataJson())
+                    .build();
+            
+            newMetadata = fileMetadataRepository.save(newMetadata);
+            return helper.convertToResponseDTO(newMetadata, targetStrategy);
+        } catch (Exception e) {
+            log.error("Ошибка при копировании файла: {}", sourceFileId, e);
+            throw new FileStorageException("COPY_FILE_ERROR", "Не удалось скопировать файл: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public FileResponseDTO moveFile(UUID sourceFileId, FileUploadRequestDTO request, String username) {
+        try {
+            FileMetadata sourceMetadata = fileMetadataRepository.findById(sourceFileId)
+                    .orElseThrow(() -> new FileNotFoundException(sourceFileId.toString()));
+            
+            if (!helper.hasFileAccess(sourceMetadata, username)) {
+                throw new FileAccessException(sourceFileId, "Доступ к файлу запрещен");
+            }
+            
+            // Определяем тип хранилища
+            FileMetadata.StorageType targetStorageType = request.getStorageType() != null 
+                    ? request.getStorageType() 
+                    : sourceMetadata.getStorageType();
+            
+            StorageStrategy sourceStrategy = storageStrategyFactory.getStrategy(sourceMetadata.getStorageType());
+            StorageStrategy targetStrategy = storageStrategyFactory.getStrategy(targetStorageType);
+            
+            String newStoragePath;
+            
+            // Если тот же тип хранилища, используем moveFile стратегии
+            if (sourceMetadata.getStorageType() == targetStorageType) {
+                String newStoredFileName = helper.generateStoredFileName(sourceMetadata.getOriginalFileName());
+                String newPath = helper.buildPath(request.getPath(), sourceMetadata.getFileType(), username);
+                newStoragePath = newPath + newStoredFileName;
+                
+                sourceStrategy.moveFile(sourceMetadata.getStoragePath(), newStoragePath);
+            } else {
+                // Разные хранилища - копируем и удаляем
+                InputStream inputStream = sourceStrategy.loadFile(sourceMetadata.getStoragePath());
+                String newStoredFileName = helper.generateStoredFileName(sourceMetadata.getOriginalFileName());
+                String newPath = helper.buildPath(request.getPath(), sourceMetadata.getFileType(), username);
+                newStoragePath = targetStrategy.storeFile(inputStream, newStoredFileName, 
+                        sourceMetadata.getContentType(), newPath, new HashMap<>());
+                sourceStrategy.deleteFile(sourceMetadata.getStoragePath());
+            }
+            
+            // Обновляем метаданные
+            sourceMetadata.setStoragePath(newStoragePath);
+            sourceMetadata.setStorageType(targetStorageType);
+            sourceMetadata.setDescription(request.getDescription());
+            sourceMetadata.setIsPublic(request.getIsPublic());
+            sourceMetadata.setIsTemporary(request.getIsTemporary());
+            sourceMetadata.setExpiresAt(request.getExpiresAt());
+            
+            sourceMetadata = fileMetadataRepository.save(sourceMetadata);
+            return helper.convertToResponseDTO(sourceMetadata, targetStrategy);
+        } catch (Exception e) {
+            log.error("Ошибка при перемещении файла: {}", sourceFileId, e);
+            throw new FileStorageException("MOVE_FILE_ERROR", "Не удалось переместить файл: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public UserStorageStatisticsDTO getUserStorageStatistics(UUID userId, String username) {
+        log.info("Получение статистики хранилища для пользователя: {}", userId);
+        
+        try {
+            // Используем стриминг для избежания проблем с памятью при большом количестве файлов
+            try (Stream<FileMetadata> fileStream = fileMetadataRepository.streamByOwnerId(userId)) {
+                Map<String, Long> filesByType = fileStream
+                        .collect(Collectors.groupingBy(f -> f.getFileType().name(), Collectors.counting()));
+                
+                long totalFiles = filesByType.values().stream().mapToLong(Long::longValue).sum();
+                
+                // Повторный стрим для подсчета общего размера
+                try (Stream<FileMetadata> sizeStream = fileMetadataRepository.streamByOwnerId(userId)) {
+                    long totalSize = sizeStream.mapToLong(FileMetadata::getFileSize).sum();
+                    
+                    return UserStorageStatisticsDTO.builder()
+                            .userId(userId)
+                            .totalFiles(totalFiles)
+                            .totalSizeBytes(totalSize)
+                            .formattedTotalSize(UserStorageStatisticsDTO.formatSize(totalSize))
+                            .filesByType(filesByType)
+                            .build();
+                }
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при получении статистики хранилища для пользователя: {}", userId, e);
+            throw new FileStorageException("STATISTICS_ERROR", "Не удалось получить статистику: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public StorageStatisticsDTO getStorageStatistics() {
+        log.info("Получение общей статистики хранилища");
+        
+        try {
+            Long totalSize = fileMetadataRepository.getTotalStorageSize();
+            Long totalFiles = fileMetadataRepository.getTotalFileCount();
+            
+            return StorageStatisticsDTO.builder()
+                    .totalFiles(totalFiles != null ? totalFiles : 0L)
+                    .totalSizeBytes(totalSize != null ? totalSize : 0L)
+                    .formattedTotalSize(StorageStatisticsDTO.formatSize(totalSize != null ? totalSize : 0L))
+                    .build();
+        } catch (Exception e) {
+            log.error("Ошибка при получении статистики хранилища", e);
+            throw new FileStorageException("STATISTICS_ERROR", "Не удалось получить статистику: " + e.getMessage(), e);
+        }
+    }
 }

@@ -99,6 +99,27 @@ public class StorageStrategyFactory {
     }
 
     /**
+     * Получить оптимальный тип хранилища для типа файла
+     *
+     * @param fileType тип файла
+     * @return оптимальный тип хранилища
+     */
+    public FileMetadata.StorageType getOptimalStorageType(FileMetadata.FileType fileType) {
+        switch (fileType) {
+            case AVATAR:
+                return FileMetadata.StorageType.MINIO;
+            case QUEST_MEDIA:
+                return FileMetadata.StorageType.MINIO;
+            case TEMPORARY:
+                return FileMetadata.StorageType.LOCAL;
+            case LEVEL_FILE:
+                return FileMetadata.StorageType.MINIO;
+            default:
+                return FileMetadata.StorageType.valueOf(defaultStorageType.toUpperCase());
+        }
+    }
+
+    /**
      * Получить стратегию на основе размера файла
      *
      * @param fileSize размер файла в байтах
