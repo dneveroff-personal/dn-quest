@@ -124,4 +124,19 @@ public interface FileStorageService {
      * Проверить, является ли файл публичным
      */
     boolean isFilePublic(UUID fileId);
+
+    /**
+     * Удалить все файлы пользователя
+     */
+    void deleteAllUserFiles(UUID userId);
+
+    /**
+     * Удалить все файлы квеста
+     */
+    void deleteAllQuestFiles(UUID questId);
+
+    /**
+     * Удалить все файлы команды
+     */
+    void deleteAllTeamFiles(UUID teamId);
 }

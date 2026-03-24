@@ -29,14 +29,14 @@ public class KafkaEventProducer {
     public void publishFileUploadedEvent(FileMetadata fileMetadata) {
         FileUploadedEvent event = new FileUploadedEvent(
                 UUID.randomUUID().toString(),
-                fileMetadata.getId(),
-                fileMetadata.getUserId(),
-                fileMetadata.getFileName(),
+                fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null,
+                fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null,
+                fileMetadata.getStoredFileName(),
                 fileMetadata.getOriginalFileName(),
                 fileMetadata.getContentType(),
                 fileMetadata.getFileSize(),
-                fileMetadata.getFilePath(),
-                fileMetadata.getStorageType()
+                fileMetadata.getStoragePath(),
+                fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null
         );
         eventProducer.publishFileUploadedEvent(event);
         log.info("Published file uploaded event for file: {}", fileMetadata.getId());
@@ -48,14 +48,14 @@ public class KafkaEventProducer {
     public void publishFileUpdatedEvent(FileMetadata fileMetadata) {
         FileUpdatedEvent event = new FileUpdatedEvent(
                 UUID.randomUUID().toString(),
-                fileMetadata.getId(),
-                fileMetadata.getUserId(),
-                fileMetadata.getFileName(),
+                fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null,
+                fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null,
+                fileMetadata.getStoredFileName(),
                 fileMetadata.getOriginalFileName(),
                 fileMetadata.getContentType(),
                 fileMetadata.getFileSize(),
-                fileMetadata.getFilePath(),
-                fileMetadata.getStorageType()
+                fileMetadata.getStoragePath(),
+                fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null
         );
         eventProducer.publishFileUpdatedEvent(event);
         log.info("Published file updated event for file: {}", fileMetadata.getId());
@@ -95,12 +95,14 @@ public class KafkaEventProducer {
      */
     public void publishFileUploadSuccessEvent(FileMetadata fileMetadata) {
         publishFileUploadedEvent(fileMetadata);
-        publishFileNotificationEvent(
-                fileMetadata.getUserId(),
-                "Файл загружен",
-                String.format("Файл '%s' успешно загружен", fileMetadata.getOriginalFileName()),
-                "FILE_UPLOAD_SUCCESS"
-        );
+        if (fileMetadata.getOwnerId() != null) {
+            publishFileNotificationEvent(
+                    fileMetadata.getOwnerId().getMostSignificantBits(),
+                    "Файл загружен",
+                    String.format("Файл '%s' успешно загружен", fileMetadata.getOriginalFileName()),
+                    "FILE_UPLOAD_SUCCESS"
+            );
+        }
     }
 
     /**

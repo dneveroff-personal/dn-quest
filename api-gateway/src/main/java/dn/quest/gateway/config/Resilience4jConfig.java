@@ -1,7 +1,6 @@
 package dn.quest.gateway.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -18,14 +17,14 @@ import java.time.Duration;
  */
 @Configuration
 @Slf4j
-public class CircuitBreakerConfig {
+public class Resilience4jConfig {
 
     /**
      * Конфигурация Circuit Breaker для микросервисов
      */
     @Bean
-    public CircuitBreakerConfig defaultCircuitBreakerConfig() {
-        return CircuitBreakerConfig.custom()
+    public io.github.resilience4j.circuitbreaker.CircuitBreakerConfig defaultCircuitBreakerConfig() {
+        return io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.custom()
                 .failureRateThreshold(50) // Процент отказов для открытия цепи
                 .waitDurationInOpenState(Duration.ofSeconds(30)) // Время ожидания в открытом состоянии
                 .slidingWindowSize(10) // Размер окна для расчета процента отказов
@@ -41,8 +40,8 @@ public class CircuitBreakerConfig {
      * Конфигурация Circuit Breaker для Authentication Service
      */
     @Bean
-    public CircuitBreakerConfig authenticationServiceCircuitBreakerConfig() {
-        return CircuitBreakerConfig.custom()
+    public io.github.resilience4j.circuitbreaker.CircuitBreakerConfig authenticationServiceCircuitBreakerConfig() {
+        return io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.custom()
                 .failureRateThreshold(30) // Более низкий порог для критичного сервиса
                 .waitDurationInOpenState(Duration.ofSeconds(15)) // Быстрее восстанавливаемся
                 .slidingWindowSize(5)
@@ -87,8 +86,8 @@ public class CircuitBreakerConfig {
      */
     @Bean
     public CircuitBreakerRegistry circuitBreakerRegistry(
-            CircuitBreakerConfig defaultCircuitBreakerConfig,
-            CircuitBreakerConfig authenticationServiceCircuitBreakerConfig) {
+            io.github.resilience4j.circuitbreaker.CircuitBreakerConfig defaultCircuitBreakerConfig,
+            io.github.resilience4j.circuitbreaker.CircuitBreakerConfig authenticationServiceCircuitBreakerConfig) {
         
         CircuitBreakerRegistry registry = CircuitBreakerRegistry.ofDefaults();
         

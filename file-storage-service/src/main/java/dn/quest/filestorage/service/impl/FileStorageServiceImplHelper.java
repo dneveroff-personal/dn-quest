@@ -28,6 +28,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.criteria.Predicate;
+
 /**
  * Вспомогательные методы для FileStorageServiceImpl
  */
@@ -267,7 +269,7 @@ public class FileStorageServiceImplHelper {
      */
     protected Specification<FileMetadata> buildSearchSpecification(FileSearchRequestDTO request, String username) {
         return (root, query, criteriaBuilder) -> {
-            List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
             
             // Фильтр по владельцу (если не администратор)
             try {
@@ -340,7 +342,7 @@ public class FileStorageServiceImplHelper {
                 predicates.add(root.get("id").in(request.getFileIds()));
             }
             
-            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

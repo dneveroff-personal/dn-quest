@@ -1,11 +1,9 @@
 package dn.quest.filestorage.event;
 
-import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.BaseEvent;
 import dn.quest.shared.events.user.UserDeletedEvent;
 import dn.quest.shared.events.quest.QuestDeletedEvent;
 import dn.quest.shared.events.team.TeamDeletedEvent;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
@@ -18,11 +16,10 @@ import org.springframework.stereotype.Service;
  * Сервис для обработки событий из других сервисов через Kafka
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class KafkaEventConsumer {
 
-    private final FileStorageService fileStorageService;
+    // private final FileStorageService fileStorageService; // TODO: implement after fixing FileStorageServiceImpl
 
     /**
      * Обработка пользовательских событий
@@ -35,7 +32,7 @@ public class KafkaEventConsumer {
     public void handleUserEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -71,7 +68,7 @@ public class KafkaEventConsumer {
     public void handleQuestEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -107,7 +104,7 @@ public class KafkaEventConsumer {
     public void handleTeamEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -136,40 +133,19 @@ public class KafkaEventConsumer {
 
     private void handleUserDeleted(UserDeletedEvent event) {
         log.debug("Handling user deleted event for user: {}", event.getUserId());
-        
-        try {
-            // Удаляем все файлы пользователя
-            fileStorageService.deleteAllUserFiles(event.getUserId());
-            log.info("Deleted all files for user: {}", event.getUserId());
-        } catch (Exception e) {
-            log.error("Error handling user deleted event for user: {}", event.getUserId(), e);
-            throw e;
-        }
+        // TODO: implement file deletion after fixing FileStorageServiceImpl
+        log.info("Received user deleted event for user: {} - file deletion pending", event.getUserId());
     }
 
     private void handleQuestDeleted(QuestDeletedEvent event) {
         log.debug("Handling quest deleted event for quest: {}", event.getQuestId());
-        
-        try {
-            // Удаляем все файлы связанные с квестом
-            fileStorageService.deleteAllQuestFiles(event.getQuestId());
-            log.info("Deleted all files for quest: {}", event.getQuestId());
-        } catch (Exception e) {
-            log.error("Error handling quest deleted event for quest: {}", event.getQuestId(), e);
-            throw e;
-        }
+        // TODO: implement file deletion after fixing FileStorageServiceImpl
+        log.info("Received quest deleted event for quest: {} - file deletion pending", event.getQuestId());
     }
 
     private void handleTeamDeleted(TeamDeletedEvent event) {
         log.debug("Handling team deleted event for team: {}", event.getTeamId());
-        
-        try {
-            // Удаляем все файлы связанные с командой
-            fileStorageService.deleteAllTeamFiles(event.getTeamId());
-            log.info("Deleted all files for team: {}", event.getTeamId());
-        } catch (Exception e) {
-            log.error("Error handling team deleted event for team: {}", event.getTeamId(), e);
-            throw e;
-        }
+        // TODO: implement file deletion after fixing FileStorageServiceImpl
+        log.info("Received team deleted event for team: {} - file deletion pending", event.getTeamId());
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -84,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(accessTokenExpiration / 1000)
-                .expiresAt(Date.from(Instant.now().plusMillis(accessTokenExpiration)))
+                .expiresAt(Instant.now().plusMillis(accessTokenExpiration))
                 .user(userService.toDTOWithPermissions(user))
                 .build();
     }
@@ -130,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(accessTokenExpiration / 1000)
-                .expiresAt(Date.from(Instant.now().plusMillis(accessTokenExpiration)))
+                .expiresAt(Instant.now().plusMillis(accessTokenExpiration))
                 .user(userService.toDTOWithPermissions(user))
                 .build();
     }
@@ -176,7 +175,7 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken(newRefreshToken)
                 .tokenType("Bearer")
                 .expiresIn(accessTokenExpiration / 1000)
-                .expiresAt(Date.from(Instant.now().plusMillis(accessTokenExpiration)))
+                .expiresAt(Instant.now().plusMillis(accessTokenExpiration))
                 .user(userService.toDTOWithPermissions(user))
                 .build();
     }

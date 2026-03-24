@@ -92,6 +92,16 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, UUID
     Optional<FileMetadata> findByChecksum(String checksum);
 
     /**
+     * Найти все файлы по questId
+     */
+    List<FileMetadata> findByQuestId(UUID questId);
+
+    /**
+     * Найти все файлы по teamId
+     */
+    List<FileMetadata> findByTeamId(UUID teamId);
+
+    /**
      * Удалить временные файлы, которые истекли
      */
     @Modifying

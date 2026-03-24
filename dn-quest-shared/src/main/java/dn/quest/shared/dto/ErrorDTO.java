@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DTO для представления ошибок в API
@@ -22,6 +23,11 @@ public class ErrorDTO {
      * Код ошибки
      */
     private String code;
+    
+    /**
+     * Название ошибки
+     */
+    private String error;
     
     /**
      * Сообщение об ошибке
@@ -53,6 +59,11 @@ public class ErrorDTO {
      * Список ошибок валидации
      */
     private List<ValidationError> validationErrors;
+    
+    /**
+     * Map ошибок валидации (поле -> сообщение)
+     */
+    private Map<String, String> validationErrorsMap;
     
     /**
      * Внутренний класс для ошибок валидации

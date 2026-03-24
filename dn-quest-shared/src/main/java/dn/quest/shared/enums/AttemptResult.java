@@ -8,6 +8,11 @@ public enum AttemptResult {
      * Код верный
      */
     CORRECT("Верно"),
+
+    /**
+     * Код принят (нормальный)
+     */
+    ACCEPTED_NORMAL("Принято"),
     
     /**
      * Код неверный

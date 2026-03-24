@@ -57,9 +57,8 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
     private HttpStatus determineHttpStatus(Throwable ex) {
         if (ex instanceof WebClientResponseException) {
             WebClientResponseException webEx = (WebClientResponseException) ex;
-            return HttpStatus.resolve(webEx.getStatusCode().value()) 
-                    ? HttpStatus.resolve(webEx.getStatusCode().value()) 
-                    : HttpStatus.INTERNAL_SERVER_ERROR;
+            HttpStatus status = HttpStatus.resolve(webEx.getStatusCode().value());
+            return status != null ? status : HttpStatus.INTERNAL_SERVER_ERROR;
         }
         
         if (ex instanceof org.springframework.cloud.gateway.support.NotFoundException) {
@@ -67,7 +66,9 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
         }
         
         if (ex instanceof org.springframework.web.server.ResponseStatusException) {
-            return ((org.springframework.web.server.ResponseStatusException) ex).getStatusCode();
+            org.springframework.web.server.ResponseStatusException rse = 
+                    (org.springframework.web.server.ResponseStatusException) ex;
+            return HttpStatus.resolve(rse.getStatusCode().value());
         }
         
         if (ex instanceof java.security.SignatureException || 

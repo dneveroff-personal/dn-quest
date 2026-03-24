@@ -41,6 +41,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     private final FileValidationService fileValidationService;
     private final StorageStrategyFactory storageStrategyFactory;
     private final AuthenticationServiceClient authServiceClient;
+    private final FileStorageServiceImplHelper helper;
 
     @Override
     public FileResponseDTO uploadFile(MultipartFile file, FileUploadRequestDTO request, String username) {
@@ -53,7 +54,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             fileValidationService.validateFile(file, request.getFileType());
 
             // Получение информации о пользователе
-            UUID ownerId = getUserIdByUsername(username);
+            UUID ownerId = helper.getUserIdByUsername(username);
 
             // Выбор стратегии хранения
             FileMetadata.StorageType storageType = request.getStorageType() != null 
@@ -70,21 +71,21 @@ public class FileStorageServiceImpl implements FileStorageService {
             }
 
             // Генерация имени файла и пути
-            String storedFileName = generateStoredFileName(file.getOriginalFilename());
-            String path = buildPath(request.getPath(), request.getFileType(), username);
+            String storedFileName = helper.generateStoredFileName(file.getOriginalFilename());
+            String path = helper.buildPath(request.getPath(), request.getFileType(), username);
 
             // Расчет контрольной суммы
-            String checksum = calculateChecksum(file);
+            String checksum = helper.calculateChecksum(file);
 
             // Проверка на дубликаты
             Optional<FileMetadata> existingFile = fileMetadataRepository.findByChecksum(checksum);
-            if (existingFile.isPresent() && shouldReuseExistingFile(existingFile.get(), request, ownerId)) {
+            if (existingFile.isPresent() && helper.shouldReuseExistingFile(existingFile.get(), request, ownerId)) {
                 log.info("Файл уже существует, используется существующая копия: {}", existingFile.get().getId());
-                return convertToResponseDTO(existingFile.get(), strategy);
+                return helper.convertToResponseDTO(existingFile.get(), strategy);
             }
 
             // Сохранение файла в хранилище
-            Map<String, String> metadata = prepareMetadata(request, username);
+            Map<String, String> metadata = helper.prepareMetadata(request, username);
             String storagePath = strategy.storeFile(file, path, metadata);
 
             // Создание метаданных
@@ -103,7 +104,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     .isTemporary(request.getIsTemporary())
                     .expiresAt(request.getExpiresAt())
                     .checksum(checksum)
-                    .metadataJson(convertMetadataToJson(metadata))
+                    .metadataJson(helper.convertMetadataToJson(metadata))
                     .build();
 
             // Сохранение метаданных в базу
@@ -113,7 +114,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     file.getOriginalFilename(), fileMetadata.getId(), 
                     System.currentTimeMillis() - startTime);
 
-            return convertToResponseDTO(fileMetadata, strategy);
+            return helper.convertToResponseDTO(fileMetadata, strategy);
 
         } catch (Exception e) {
             log.error("Ошибка при загрузке файла: {}", file.getOriginalFilename(), e);
@@ -174,10 +175,10 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Transactional(readOnly = true)
     public InputStream downloadFile(UUID fileId, String username) {
         try {
-            FileMetadata metadata = getFileMetadataById(fileId);
+            FileMetadata metadata = helper.getFileMetadataById(fileId);
             
             // Проверка прав доступа
-            if (!hasFileAccess(metadata, username)) {
+            if (!helper.hasFileAccess(metadata, username)) {
                 throw new FileAccessException(fileId, "Доступ к файлу запрещен");
             }
 
@@ -215,14 +216,14 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Transactional(readOnly = true)
     public FileResponseDTO getFileMetadata(UUID fileId, String username) {
         try {
-            FileMetadata metadata = getFileMetadataById(fileId);
+            FileMetadata metadata = helper.getFileMetadataById(fileId);
             
-            if (!hasFileAccess(metadata, username)) {
+            if (!helper.hasFileAccess(metadata, username)) {
                 throw new FileAccessException(fileId, "Доступ к метаданным файла запрещен");
             }
 
             StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
-            return convertToResponseDTO(metadata, strategy);
+            return helper.convertToResponseDTO(metadata, strategy);
 
         } catch (Exception e) {
             log.error("Ошибка при получении метаданных файла: {}", fileId, e);
@@ -252,7 +253,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         
         try {
             // Построение спецификации поиска
-            Specification<FileMetadata> spec = buildSearchSpecification(request, username);
+            Specification<FileMetadata> spec = helper.buildSearchSpecification(request, username);
             
             // Построение сортировки
             Sort sort = Sort.by(
@@ -269,7 +270,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             List<FileResponseDTO> files = page.getContent().stream()
                     .map(metadata -> {
                         StorageStrategy strategy = storageStrategyFactory.getStrategy(metadata.getStorageType());
-                        return convertToResponseDTO(metadata, strategy);
+                        return helper.convertToResponseDTO(metadata, strategy);
                     })
                     .collect(Collectors.toList());
 
@@ -297,6 +298,36 @@ public class FileStorageServiceImpl implements FileStorageService {
             log.error("Ошибка при поиске файлов", e);
             throw new FileStorageException("SEARCH_ERROR", "Ошибка при поиске файлов: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void deleteAllUserFiles(UUID userId) {
+        log.info("Удаление всех файлов пользователя: {}", userId);
+        List<FileMetadata> files = fileMetadataRepository.findByOwnerId(userId);
+        for (FileMetadata file : files) {
+            deleteFile(file.getId(), null);
+        }
+        log.info("Удалено {} файлов пользователя: {}", files.size(), userId);
+    }
+
+    @Override
+    public void deleteAllQuestFiles(UUID questId) {
+        log.info("Удаление всех файлов квеста: {}", questId);
+        List<FileMetadata> files = fileMetadataRepository.findByQuestId(questId);
+        for (FileMetadata file : files) {
+            deleteFile(file.getId(), null);
+        }
+        log.info("Удалено {} файлов квеста: {}", files.size(), questId);
+    }
+
+    @Override
+    public void deleteAllTeamFiles(UUID teamId) {
+        log.info("Удаление всех файлов команды: {}", teamId);
+        List<FileMetadata> files = fileMetadataRepository.findByTeamId(teamId);
+        for (FileMetadata file : files) {
+            deleteFile(file.getId(), null);
+        }
+        log.info("Удалено {} файлов команды: {}", files.size(), teamId);
     }
 
     // Вспомогательные методы будут в следующей части...

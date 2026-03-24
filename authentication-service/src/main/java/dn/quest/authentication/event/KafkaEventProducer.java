@@ -2,17 +2,18 @@ package dn.quest.authentication.event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dn.quest.shared.events.BaseEvent;
+import dn.quest.shared.events.user.UserEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Kafka продюсер для публикации событий
@@ -147,16 +148,12 @@ public class KafkaEventProducer {
         try {
             String jsonEvent = objectMapper.writeValueAsString(event);
             
-            ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, event.getEventId(), jsonEvent);
+            CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, event.getEventId(), jsonEvent);
             
-            future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
-                @Override
-                public void onSuccess(SendResult<String, String> result) {
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
                     log.info("Событие успешно опубликовано: {} в топик: {}", event.getEventType(), topic);
-                }
-
-                @Override
-                public void onFailure(Throwable ex) {
+                } else {
                     log.error("Ошибка публикации события: {} в топик: {}", event.getEventType(), topic, ex);
                 }
             });

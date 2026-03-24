@@ -32,7 +32,6 @@ dependencies {
     // Image processing
     implementation("net.coobird:thumbnailator:0.4.20")
     implementation("com.twelvemonkeys.imageio:imageio-jpeg:3.10.1")
-    implementation("com.twelvemonkeys.imageio:imageio-png:3.10.1")
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.10.1")
     
     compileOnly("org.projectlombok:lombok")

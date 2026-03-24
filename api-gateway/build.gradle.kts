@@ -25,6 +25,7 @@ repositories {
 }
 
 extra["springCloudVersion"] = "2023.0.0"
+extra["lombokVersion"] = "1.18.30"
 
 dependencies {
     // Spring Boot Starters
@@ -59,8 +60,11 @@ dependencies {
     implementation(project(":dn-quest-shared"))
 
     // Lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    compileOnly("org.projectlombok:lombok:${property("lombokVersion")}")
+    annotationProcessor("org.projectlombok:lombok:${property("lombokVersion")}")
+    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+    testCompileOnly("org.projectlombok:lombok:${property("lombokVersion")}")
+    testAnnotationProcessor("org.projectlombok:lombok:${property("lombokVersion")}")
 
     // Development tools
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
