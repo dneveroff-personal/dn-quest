@@ -10,16 +10,16 @@ import java.util.Map;
 @Schema(description = "Событие игровой сессии")
 public class GameSessionEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "game-session-event", required = true)
+    @Schema(description = "Тип события", example = "game-session-event", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Override
     protected String getEventTypeForSubclass() {
         return "game-session-event";
     }
 
-    @Schema(description = "Подтип события", example = "SESSION_STARTED", required = true)
+    @Schema(description = "Подтип события", example = "SESSION_STARTED", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private GameSessionEventType subType;
 
-    @Schema(description = "ID сессии", example = "789", required = true)
+    @Schema(description = "ID сессии", example = "789", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private Long sessionId;
 
     @Schema(description = "Название сессии", example = "Вечерний квест")

@@ -11,13 +11,13 @@ import java.util.Map;
 @Schema(description = "Событие завершения уровня")
 public class LevelCompletionEvent extends GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "level-completion-event", required = true)
+    @Schema(description = "Тип события", example = "level-completion-event", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Override
     protected String getEventTypeForSubclass() {
         return "level-completion-event";
     }
 
-    @Schema(description = "ID уровня", example = "101", required = true)
+    @Schema(description = "ID уровня", example = "101", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private Long levelId;
 
     @Schema(description = "Название уровня", example = "Первый этаж")

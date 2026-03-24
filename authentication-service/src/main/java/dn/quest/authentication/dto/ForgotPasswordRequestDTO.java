@@ -20,6 +20,6 @@ public class ForgotPasswordRequestDTO {
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Неверный формат email")
-    @Schema(description = "Email пользователя", example = "player@example.com", required = true)
+    @Schema(description = "Email пользователя", example = "player@example.com", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private String email;
 }

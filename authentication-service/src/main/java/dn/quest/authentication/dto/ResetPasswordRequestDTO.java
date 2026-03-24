@@ -20,12 +20,12 @@ import lombok.NoArgsConstructor;
 public class ResetPasswordRequestDTO {
 
     @NotBlank(message = "Токен сброса пароля не может быть пустым")
-    @Schema(description = "Токен сброса пароля", example = "reset-token-123", required = true)
+    @Schema(description = "Токен сброса пароля", example = "reset-token-123", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private String token;
 
     @NotBlank(message = "Новый пароль не может быть пустым")
     @Size(min = 6, max = 100, message = "Новый пароль должен содержать от 6 до 100 символов")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$", message = "Новый пароль должен содержать как минимум одну строчную букву, одну заглавную букву и одну цифру")
-    @Schema(description = "Новый пароль", example = "NewPassword123", required = true)
+    @Schema(description = "Новый пароль", example = "NewPassword123", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     private String newPassword;
 }
