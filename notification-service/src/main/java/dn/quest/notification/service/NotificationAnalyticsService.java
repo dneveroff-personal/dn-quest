@@ -78,6 +78,12 @@ public interface NotificationAnalyticsService {
      * Записать метрику отправки уведомления
      */
     void recordNotificationSent(String notificationId, NotificationType type, 
+                               String channelName, long deliveryTimeMs);
+
+    /**
+     * Записать метрику отправки уведомления
+     */
+    void recordNotificationSent(String notificationId, NotificationType type, 
                                NotificationChannel channel, long deliveryTimeMs);
 
     /**

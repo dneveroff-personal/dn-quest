@@ -1,11 +1,14 @@
 package dn.quest.notification.controller;
 
 import dn.quest.notification.enums.NotificationType;
+import dn.quest.notification.enums.NotificationType;
 import dn.quest.notification.service.NotificationAnalyticsService;
+import dn.quest.notification.service.channel.NotificationChannel;
 import dn.quest.notification.service.channel.NotificationChannel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/analytics")
 @Tag(name = "Analytics API", description = "API для аналитики и мониторинга уведомлений")
+@Slf4j
 public class AnalyticsController {
 
     private final NotificationAnalyticsService analyticsService;
@@ -126,9 +130,16 @@ public class AnalyticsController {
             @Parameter(description = "Тип уведомления") @RequestParam String type,
             @Parameter(description = "Канал доставки") @RequestParam String channel,
             @Parameter(description = "Время доставки в мс") @RequestParam long deliveryTimeMs) {
-        // Создать простой канал на основе строки
-        String channelType = channel != null ? channel.toUpperCase() : "UNKNOWN";
-        analyticsService.recordNotificationSent(notificationId, type, channelType, deliveryTimeMs);
+        try {
+            NotificationType notificationType = type != null ? NotificationType.fromValue(type) : null;
+            String channelStr = channel != null ? channel.toUpperCase() : "UNKNOWN";
+            log.info("Recording notification sent: notificationId={}, type={}, channel={}, deliveryTimeMs={}", 
+                    notificationId, notificationType, channelStr, deliveryTimeMs);
+            analyticsService.recordNotificationSent(notificationId, notificationType, 
+                    channelStr, deliveryTimeMs);
+        } catch (Exception e) {
+            log.error("Error recording notification sent", e);
+        }
         return ResponseEntity.ok().build();
     }
 
