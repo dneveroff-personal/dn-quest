@@ -57,6 +57,12 @@ public class FileMetadata {
     @Column(name = "owner_id")
     private UUID ownerId;
 
+    @Column(name = "quest_id")
+    private UUID questId;
+
+    @Column(name = "team_id")
+    private UUID teamId;
+
     @Column(name = "is_public")
     @Builder.Default
     private Boolean isPublic = false;

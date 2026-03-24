@@ -3,6 +3,7 @@ package dn.quest.gateway.config;
 import dn.quest.gateway.filter.AuthenticationFilter;
 import dn.quest.gateway.filter.LoggingFilter;
 import dn.quest.gateway.filter.SecurityHeadersFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,12 @@ import org.springframework.context.annotation.Configuration;
  * Конфигурация фильтров и маршрутов API Gateway
  */
 @Configuration
+@RequiredArgsConstructor
 public class FilterConfig {
+
+    private final AuthenticationFilter authenticationFilter;
+    private final LoggingFilter loggingFilter;
+    private final SecurityHeadersFilter securityHeadersFilter;
 
     /**
      * Конфигурация маршрутов с фильтрами
@@ -23,31 +29,29 @@ public class FilterConfig {
                 // Authentication Service
                 .route("authentication-service", r -> r.path("/api/auth/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("authenticationService")
                                         .setFallbackUri("forward:/fallback/authentication"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                         )
                         .uri("http://localhost:8081"))
 
                 // User Management Service
                 .route("user-management-service", r -> r.path("/api/users/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("userManagementService")
                                         .setFallbackUri("forward:/fallback/users"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -57,16 +61,15 @@ public class FilterConfig {
                 // Quest Management Service
                 .route("quest-management-service", r -> r.path("/api/quests/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("questManagementService")
                                         .setFallbackUri("forward:/fallback/quests"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -76,16 +79,15 @@ public class FilterConfig {
                 // Game Engine Service
                 .route("game-engine-service", r -> r.path("/api/game/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("gameEngineService")
                                         .setFallbackUri("forward:/fallback/game"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -95,16 +97,15 @@ public class FilterConfig {
                 // Team Management Service
                 .route("team-management-service", r -> r.path("/api/teams/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("teamManagementService")
                                         .setFallbackUri("forward:/fallback/teams"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -114,16 +115,15 @@ public class FilterConfig {
                 // Notification Service
                 .route("notification-service", r -> r.path("/api/notifications/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("notificationService")
                                         .setFallbackUri("forward:/fallback/notifications"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(2)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(2))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -133,16 +133,15 @@ public class FilterConfig {
                 // Statistics Service
                 .route("statistics-service", r -> r.path("/api/statistics/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("statisticsService")
                                         .setFallbackUri("forward:/fallback/statistics"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
@@ -152,16 +151,15 @@ public class FilterConfig {
                 // File Storage Service
                 .route("file-storage-service", r -> r.path("/api/files/**")
                         .filters(f -> f
-                                .filter(new LoggingFilter())
-                                .filter(new AuthenticationFilter())
-                                .filter(new SecurityHeadersFilter())
+                                .filter(loggingFilter)
+                                .filter(authenticationFilter)
+                                .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
                                         .setName("fileStorageService")
                                         .setFallbackUri("forward:/fallback/files"))
                                 .retry(retryConfig -> retryConfig
-                                        .setRetries(3)
-                                        .setBackoff(org.springframework.cloud.gateway.filter.factory.RetryBackoffConfig.exponential()))
+                                        .setRetries(3))
                                 .requestRateLimiter(config -> config
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))

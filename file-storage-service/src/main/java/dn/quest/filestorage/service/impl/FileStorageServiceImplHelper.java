@@ -5,28 +5,21 @@ import dn.quest.filestorage.dto.*;
 import dn.quest.filestorage.entity.FileMetadata;
 import dn.quest.filestorage.exception.*;
 import dn.quest.filestorage.repository.FileMetadataRepository;
-import dn.quest.filestorage.service.FileStorageService;
-import dn.quest.filestorage.service.FileValidationService;
 import dn.quest.filestorage.storage.StorageStrategy;
-import dn.quest.filestorage.storage.StorageStrategyFactory;
+import org.springframework.data.jpa.domain.Specification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import jakarta.persistence.criteria.Predicate;
 
 /**
  * Вспомогательные методы для FileStorageServiceImpl
@@ -267,7 +260,7 @@ public class FileStorageServiceImplHelper {
      */
     protected Specification<FileMetadata> buildSearchSpecification(FileSearchRequestDTO request, String username) {
         return (root, query, criteriaBuilder) -> {
-            List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
             
             // Фильтр по владельцу (если не администратор)
             try {
@@ -340,7 +333,7 @@ public class FileStorageServiceImplHelper {
                 predicates.add(root.get("id").in(request.getFileIds()));
             }
             
-            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 }

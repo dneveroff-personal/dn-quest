@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {
         
-        Map<String, String> errors = new HashMap<>();
+        Map<String, Object> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
         
         log.warn("Ошибка валидации файла: {}", ex.getMessage());
 
-        Map<String, String> details = new HashMap<>();
+        Map<String, Object> details = new HashMap<>();
         details.put("fileName", ex.getFileName());
         details.put("validationError", ex.getValidationError());
 

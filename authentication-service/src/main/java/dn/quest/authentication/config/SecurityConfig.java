@@ -88,17 +88,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .headers(headers -> headers
-                        .frameOptions().deny()
-                        .contentTypeOptions().and()
+                        .frameOptions(frameOptions -> frameOptions.disable())
                         .httpStrictTransportSecurity(hstsConfig -> hstsConfig
                                 .includeSubDomains(true)
                                 .maxAgeInSeconds(31536000)
                         )
                         .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                        .xssProtection().and()
-                        .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'")
-                        )
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Публичные эндпоинты

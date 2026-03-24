@@ -3,6 +3,7 @@ package dn.quest.filestorage.storage.impl;
 import dn.quest.filestorage.storage.StorageStatistics;
 import dn.quest.filestorage.storage.StorageStrategy;
 import io.minio.*;
+import io.minio.messages.Item;
 import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MinioStorageStrategy implements StorageStrategy {
 
-    private final MinioClient minioClient;
+    private MinioClient minioClient;
     private final String bucketName;
 
     @Value("${minio.endpoint:http://localhost:9000}")

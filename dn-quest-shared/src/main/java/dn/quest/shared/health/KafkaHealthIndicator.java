@@ -3,13 +3,9 @@ package dn.quest.shared.health;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.DescribeClusterResult;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultConsumerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
@@ -33,15 +29,15 @@ public class KafkaHealthIndicator implements HealthIndicator {
     public Health health() {
         try {
             // Проверяем подключение через AdminClient
-            Health adminHealth = checkAdminClient();
-            if (adminHealth.getStatus() != Health.Builder.up().build().getStatus()) {
-                return adminHealth;
+            boolean adminOk = checkAdminClient();
+            if (!adminOk) {
+                return Health.down().withDetail("adminClient", "Failed").build();
             }
 
             // Проверяем подключение через Consumer
-            Health consumerHealth = checkConsumerConnection();
-            if (consumerHealth.getStatus() != Health.Builder.up().build().getStatus()) {
-                return consumerHealth;
+            boolean consumerOk = checkConsumerConnection();
+            if (!consumerOk) {
+                return Health.down().withDetail("consumer", "Failed").build();
             }
 
             return Health.up()
@@ -62,7 +58,7 @@ public class KafkaHealthIndicator implements HealthIndicator {
     /**
      * Проверка подключения через AdminClient
      */
-    private Health checkAdminClient() {
+    private boolean checkAdminClient() {
         try {
             Properties props = new Properties();
             props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -72,55 +68,24 @@ public class KafkaHealthIndicator implements HealthIndicator {
             try (AdminClient adminClient = AdminClient.create(props)) {
                 DescribeClusterResult clusterResult = adminClient.describeCluster();
                 String clusterId = clusterResult.clusterId().get();
-                
-                return Health.up()
-                        .withDetail("adminClient", "Connected")
-                        .withDetail("clusterId", clusterId)
-                        .build();
+                return clusterId != null;
             }
         } catch (InterruptedException | ExecutionException e) {
-            return Health.down()
-                    .withDetail("adminClient", "Connection failed")
-                    .withDetail("error", e.getMessage())
-                    .build();
+            return false;
         }
     }
 
     /**
      * Проверка подключения через Consumer
      */
-    private Health checkConsumerConnection() {
+    private boolean checkConsumerConnection() {
         try {
-            Consumer<String, String> consumer = consumerFactory.createConsumer();
-            
-            // Пытаемся получить список топиков (простая проверка подключения)
+            var consumer = consumerFactory.createConsumer();
             consumer.listTopics();
             consumer.close();
-            
-            return Health.up()
-                    .withDetail("consumer", "Connected")
-                    .build();
+            return true;
         } catch (Exception e) {
-            return Health.down()
-                    .withDetail("consumer", "Connection failed")
-                    .withDetail("error", e.getMessage())
-                    .build();
+            return false;
         }
-    }
-
-    /**
-     * Создание ConsumerFactory для health check
-     */
-    public static ConsumerFactory<String, String> createHealthCheckConsumerFactory(String bootstrapServers) {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "health-check-group");
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, "5000");
-        props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "10000");
-
-        return new DefaultConsumerFactory<>(props);
     }
 }

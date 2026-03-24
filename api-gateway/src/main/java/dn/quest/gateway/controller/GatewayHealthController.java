@@ -43,7 +43,7 @@ public class GatewayHealthController implements HealthIndicator {
             Map<String, Object> cbInfo = new HashMap<>();
             cbInfo.put("state", cb.getState().name());
             cbInfo.put("failureRate", cb.getMetrics().getFailureRate());
-            cbInfo.put("numberOfCalls", cb.getMetrics().getNumberOfCalls());
+            cbInfo.put("numberOfBufferedCalls", cb.getMetrics().getNumberOfBufferedCalls());
             cbInfo.put("numberOfSuccessfulCalls", cb.getMetrics().getNumberOfSuccessfulCalls());
             cbInfo.put("numberOfFailedCalls", cb.getMetrics().getNumberOfFailedCalls());
             circuitBreakers.put(cb.getName(), cbInfo);
@@ -73,7 +73,7 @@ public class GatewayHealthController implements HealthIndicator {
             Map<String, Object> cbInfo = new HashMap<>();
             cbInfo.put("state", cb.getState().name());
             cbInfo.put("failureRate", cb.getMetrics().getFailureRate());
-            cbInfo.put("numberOfCalls", cb.getMetrics().getNumberOfCalls());
+            cbInfo.put("numberOfBufferedCalls", cb.getMetrics().getNumberOfBufferedCalls());
             cbInfo.put("numberOfSuccessfulCalls", cb.getMetrics().getNumberOfSuccessfulCalls());
             cbInfo.put("numberOfFailedCalls", cb.getMetrics().getNumberOfFailedCalls());
             cbInfo.put("notPermittedCalls", cb.getMetrics().getNumberOfNotPermittedCalls());
@@ -141,7 +141,7 @@ public class GatewayHealthController implements HealthIndicator {
             Map<String, Object> cbInfo = new HashMap<>();
             cbInfo.put("state", cb.getState().name());
             cbInfo.put("failureRate", cb.getMetrics().getFailureRate());
-            cbInfo.put("totalCalls", cb.getMetrics().getNumberOfCalls());
+            cbInfo.put("bufferedCalls", cb.getMetrics().getNumberOfBufferedCalls());
             cbMetrics.put(cb.getName(), cbInfo);
         });
         metrics.put("circuitBreakers", cbMetrics);

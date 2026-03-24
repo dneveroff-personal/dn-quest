@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * Feign клиент для взаимодействия с Authentication Service
  */
-@FeignClient(name = "authentication-service", configuration = FeignConfig.class)
+@FeignClient(name = "authentication-service")
 public interface AuthenticationServiceClient {
 
     /**

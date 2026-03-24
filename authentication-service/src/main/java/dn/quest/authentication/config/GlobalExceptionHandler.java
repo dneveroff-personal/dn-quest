@@ -21,7 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     public ErrorDTO handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
         log.warn("Неверный запрос: {}", ex.getMessage());
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Bad Request")
                 .message(ex.getMessage())
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     public ErrorDTO handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
         log.warn("Ресурс не найден: {}", ex.getMessage());
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Not Found")
                 .message(ex.getMessage())
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     public ErrorDTO handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
         log.warn("Неверные учетные данные: {}", ex.getMessage());
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error("Unauthorized")
                 .message("Неверные учетные данные")
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
     public ErrorDTO handleAuthenticationException(AuthenticationException ex, WebRequest request) {
         log.warn("Ошибка аутентификации: {}", ex.getMessage());
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.UNAUTHORIZED.value())
                 .error("Unauthorized")
                 .message("Ошибка аутентификации")
@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
     public ErrorDTO handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
         log.warn("Доступ запрещен: {}", ex.getMessage());
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Forbidden")
                 .message("Доступ запрещен")
@@ -123,11 +123,11 @@ public class GlobalExceptionHandler {
         log.warn("Ошибка валидации: {}", errors);
         
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Validation Error")
                 .message("Ошибка валидации данных")
-                .validationErrors(errors)
+                .validationErrorsMap(errors)
                 .path(request.getDescription(false))
                 .build();
     }
@@ -147,11 +147,11 @@ public class GlobalExceptionHandler {
         log.warn("Ошибка привязки данных: {}", errors);
         
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Binding Error")
                 .message("Ошибка привязки данных")
-                .validationErrors(errors)
+                .validationErrorsMap(errors)
                 .path(request.getDescription(false))
                 .build();
     }
@@ -170,11 +170,11 @@ public class GlobalExceptionHandler {
         log.warn("Ошибка валидации ограничений: {}", errors);
         
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Constraint Violation")
                 .message("Ошибка валидации ограничений")
-                .validationErrors(errors)
+                .validationErrorsMap(errors)
                 .path(request.getDescription(false))
                 .build();
     }
@@ -187,7 +187,7 @@ public class GlobalExceptionHandler {
         log.error("Внутренняя ошибка сервера", ex);
         
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Internal Server Error")
                 .message("Внутренняя ошибка сервера")
@@ -203,7 +203,7 @@ public class GlobalExceptionHandler {
         log.error("Ошибка выполнения", ex);
         
         return ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Runtime Error")
                 .message("Ошибка выполнения")

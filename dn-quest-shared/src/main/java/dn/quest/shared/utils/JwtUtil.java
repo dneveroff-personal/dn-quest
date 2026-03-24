@@ -136,6 +136,18 @@ public final class JwtUtil {
     /**
      * Проверяет валидность токена
      */
+    public static boolean isTokenValid(String token, String secret) {
+        try {
+            return !isTokenExpired(token, secret);
+        } catch (Exception e) {
+            log.debug("Token validation failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * Проверяет валидность токена
+     */
     public static boolean isTokenValid(String token, String secret, String expectedSubject) {
         try {
             String subject = extractSubject(token, secret);

@@ -1,10 +1,8 @@
 package dn.quest.gateway.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
-import io.github.resilience4j.reactor.retry.RetryOperator;
 import io.github.resilience4j.retry.Retry;
-import io.github.resilience4j.timelimiter.TimeLimiter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -15,12 +13,12 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
 import java.time.Duration;
-import java.util.function.Function;
 
 /**
  * Конфигурация WebClient для взаимодействия с микросервисами
  */
 @Configuration
+@Slf4j
 public class WebClientConfig {
 
     /**
@@ -57,11 +55,37 @@ public class WebClientConfig {
         
         return webClientBuilder
                 .baseUrl("http://localhost:8081")
-                .filter(ExchangeFilterFunction.ofRequestProcessor(
-                        CircuitBreakerOperator.of(authenticationServiceCircuitBreaker)))
-                .filter(ExchangeFilterFunction.ofResponseProcessor(
-                        RetryOperator.of(authenticationServiceRetry)))
+                .filter(circuitBreakerFilter(authenticationServiceCircuitBreaker))
+                .filter(retryFilter(authenticationServiceRetry))
                 .build();
+    }
+
+    /**
+     * Фильтр Circuit Breaker для WebClient
+     */
+    private ExchangeFilterFunction circuitBreakerFilter(CircuitBreaker circuitBreaker) {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            return Mono.defer(() -> {
+                if (circuitBreaker.getState() == CircuitBreaker.State.OPEN) {
+                    log.warn("Circuit breaker OPEN for service, rejecting request");
+                    return Mono.error(new java.io.IOException("Circuit breaker is OPEN"));
+                }
+                return Mono.just(clientRequest);
+            });
+        });
+    }
+
+    /**
+     * Фильтр Retry для WebClient
+     */
+    private ExchangeFilterFunction retryFilter(Retry retry) {
+        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+            if (clientResponse.statusCode().isError()) {
+                log.warn("Request failed with status: {}, will retry", clientResponse.statusCode());
+                return Mono.error(new RuntimeException("Service returned error status: " + clientResponse.statusCode().value()));
+            }
+            return Mono.just(clientResponse);
+        });
     }
 
     /**
@@ -111,10 +135,8 @@ public class WebClientConfig {
         
         return webClientBuilder
                 .baseUrl(baseUrl)
-                .filter(ExchangeFilterFunction.ofRequestProcessor(
-                        CircuitBreakerOperator.of(circuitBreaker)))
-                .filter(ExchangeFilterFunction.ofResponseProcessor(
-                        RetryOperator.of(retry)))
+                .filter(circuitBreakerFilter(circuitBreaker))
+                .filter(retryFilter(retry))
                 .build();
     }
 }

@@ -1,8 +1,8 @@
 package dn.quest.shared.events;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -26,25 +26,26 @@ public class BaseEvent {
     private String eventId;
 
     /**
-     * Тип события
+     * Тип события (например, "user.deleted", "quest.created")
      */
     private String eventType;
 
     /**
-     * Версия события
+     * Источник события (имя сервиса)
      */
-    private String eventVersion;
+    private String source;
 
     /**
      * Время создания события
      */
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    private Instant timestamp;
+    @Builder.Default
+    private Instant timestamp = Instant.now();
 
     /**
-     * Источник события (название сервиса)
+     * Версия события
      */
-    private String source;
+    @Builder.Default
+    private String eventVersion = "1.0";
 
     /**
      * Идентификатор корреляции для трассировки
@@ -59,46 +60,10 @@ public class BaseEvent {
     /**
      * Данные события
      */
-    private Map<String, Object> data;
+    private Object data;
 
     /**
      * Метаданные события
      */
-    private EventMetadata metadata;
-
-    /**
-     * Вложенный класс для метаданных
-     */
-    @Data
-    @SuperBuilder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class EventMetadata {
-
-        /**
-         * ID пользователя
-         */
-        private String userId;
-
-        /**
-         * ID сессии
-         */
-        private String sessionId;
-
-        /**
-         * IP адрес
-         */
-        private String ipAddress;
-
-        /**
-         * User Agent
-         */
-        private String userAgent;
-
-        /**
-         * Дополнительные метаданные
-         */
-        private Map<String, Object> additional;
-    }
+    private Map<String, Object> metadata;
 }

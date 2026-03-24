@@ -1,7 +1,6 @@
 package dn.quest.authentication.metrics;
 
 import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.springframework.stereotype.Component;
@@ -142,22 +141,6 @@ public class AuthenticationMetrics {
         this.activeUsersCount = new AtomicLong(0);
         this.lockedAccountsCount = new AtomicLong(0);
         this.sessionsCount = new AtomicLong(0);
-
-        // Регистрируем gauge метрики
-        Gauge.builder("auth_active_users_count")
-                .description("Количество активных пользователей")
-                .tag("service", "authentication-service")
-                .register(meterRegistry, this, AuthenticationMetrics::getActiveUsersCount);
-
-        Gauge.builder("auth_locked_accounts_count")
-                .description("Количество заблокированных аккаунтов")
-                .tag("service", "authentication-service")
-                .register(meterRegistry, this, AuthenticationMetrics::getLockedAccountsCount);
-
-        Gauge.builder("auth_sessions_count")
-                .description("Количество активных сессий")
-                .tag("service", "authentication-service")
-                .register(meterRegistry, this, AuthenticationMetrics::getSessionsCount);
     }
 
     // Методы для записи метрик
@@ -171,7 +154,7 @@ public class AuthenticationMetrics {
     }
 
     public void recordFailedLogin(String reason) {
-        failedLogins.increment(reason);
+        failedLogins.increment();
     }
 
     public void recordPasswordChangeAttempt() {
@@ -183,7 +166,7 @@ public class AuthenticationMetrics {
     }
 
     public void recordFailedPasswordChange(String reason) {
-        failedPasswordChanges.increment(reason);
+        failedPasswordChanges.increment();
     }
 
     public void recordRegistrationAttempt() {
@@ -195,7 +178,7 @@ public class AuthenticationMetrics {
     }
 
     public void recordFailedRegistration(String reason) {
-        failedRegistrations.increment(reason);
+        failedRegistrations.increment();
     }
 
     public void recordTokenRefreshAttempt() {
@@ -207,7 +190,7 @@ public class AuthenticationMetrics {
     }
 
     public void recordFailedTokenRefresh(String reason) {
-        failedTokenRefreshes.increment(reason);
+        failedTokenRefreshes.increment();
     }
 
     public void recordAccountLockout() {
@@ -258,19 +241,19 @@ public class AuthenticationMetrics {
 
     // Удобные методы для измерения времени с лямбдами
 
-    public <T> T timeLogin(TimedOperation<T> operation) {
+    public <T> T timeLogin(TimedOperation<T> operation) throws Exception {
         return loginDuration.recordCallable(operation::execute);
     }
 
-    public <T> T timeRegistration(TimedOperation<T> operation) {
+    public <T> T timeRegistration(TimedOperation<T> operation) throws Exception {
         return registrationDuration.recordCallable(operation::execute);
     }
 
-    public <T> T timePasswordChange(TimedOperation<T> operation) {
+    public <T> T timePasswordChange(TimedOperation<T> operation) throws Exception {
         return passwordChangeDuration.recordCallable(operation::execute);
     }
 
-    public <T> T timeTokenValidation(TimedOperation<T> operation) {
+    public <T> T timeTokenValidation(TimedOperation<T> operation) throws Exception {
         return tokenValidationDuration.recordCallable(operation::execute);
     }
 

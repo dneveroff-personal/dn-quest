@@ -98,7 +98,7 @@ jib {
         image = "openjdk:21-jre-alpine"
     }
     to {
-        image = "dn-quest/authentication-service:1.0.0"
+        image = "dn-quest/authentication-service"
         tags = setOf("latest", "1.0.0")
     }
     container {
@@ -130,7 +130,6 @@ jib {
     containerizingMode = "packaged"
 }
 
-// Spring Boot configuration
-springBoot {
+tasks.bootJar {
     mainClass.set("dn.quest.authentication.AuthenticationServiceApplication")
 }

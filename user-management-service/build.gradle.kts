@@ -68,7 +68,7 @@ jib {
         image = "openjdk:21-jre-alpine"
     }
     to {
-        image = "dn-quest/user-management-service:1.0.0"
+        image = "dn-quest/user-management-service"
         tags = setOf("latest", "1.0.0")
     }
     container {
@@ -100,6 +100,6 @@ jib {
     containerizingMode = "packaged"
 }
 
-springBoot {
+tasks.bootJar {
     mainClass.set("dn.quest.usermanagement.UserManagementServiceApplication")
 }
