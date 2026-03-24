@@ -37,7 +37,7 @@ import java.util.Map;
 })
 public abstract class GameEngineEvent {
 
-    @Schema(description = "Тип события", example = "game-session-event", required = true)
+    @Schema(description = "Тип события", example = "game-session-event")
     protected abstract String getEventType();
 
     @Schema(description = "ID события", example = "evt_123456789")

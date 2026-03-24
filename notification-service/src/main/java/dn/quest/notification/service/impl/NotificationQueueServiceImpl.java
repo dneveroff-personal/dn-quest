@@ -10,6 +10,7 @@ import dn.quest.notification.exception.NotificationException;
 import dn.quest.notification.repository.NotificationQueueRepository;
 import dn.quest.notification.repository.NotificationRepository;
 import dn.quest.notification.service.channel.NotificationChannelManager;
+import dn.quest.notification.service.channel.NotificationChannelResult;
 import dn.quest.notification.service.NotificationQueueService;
 import dn.quest.notification.service.RetryService;
 import org.slf4j.Logger;
@@ -123,7 +124,8 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
             Notification notification = notificationOpt.get();
 
             // Отправляем уведомление через соответствующий канал
-            boolean success = channelManager.sendNotification(notification, queueItem.getChannelType());
+            NotificationChannelResult result = channelManager.sendNotification(notification);
+            boolean success = result.isSuccess();
 
             if (success) {
                 markAsSent(queueItem.getId());

@@ -45,9 +45,11 @@ public class NotificationQueue {
     private String channelType;
 
     @Column(name = "retry_count")
+    @Builder.Default
     private Integer retryCount = 0;
 
     @Column(name = "max_retries")
+    @Builder.Default
     private Integer maxRetries = 3;
 
     @Column(name = "next_retry_at")

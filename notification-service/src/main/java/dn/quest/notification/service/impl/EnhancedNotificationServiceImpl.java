@@ -68,7 +68,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
             sendNotificationAsync(notification);
             
         } catch (Exception e) {
-            log.error("Error processing notification event: {}", event.getNotificationId(), e);
+            log.error("Error processing notification event: {}", event.getEventId(), e);
         }
         
         return CompletableFuture.completedFuture(null);
@@ -154,7 +154,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title) {
+    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, Long authorId) {
         log.info("Sending quest updated notification for quest: {}", questId);
         // Broadcast notification - notify all subscribers
         return CompletableFuture.completedFuture(null);
