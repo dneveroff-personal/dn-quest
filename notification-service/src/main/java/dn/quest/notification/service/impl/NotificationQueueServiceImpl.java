@@ -9,7 +9,7 @@ import dn.quest.notification.enums.NotificationStatus;
 import dn.quest.notification.exception.NotificationException;
 import dn.quest.notification.repository.NotificationQueueRepository;
 import dn.quest.notification.repository.NotificationRepository;
-import dn.quest.notification.service.NotificationChannelManager;
+import dn.quest.notification.service.channel.NotificationChannelManager;
 import dn.quest.notification.service.NotificationQueueService;
 import dn.quest.notification.service.RetryService;
 import org.slf4j.Logger;

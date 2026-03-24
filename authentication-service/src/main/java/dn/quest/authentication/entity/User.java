@@ -53,21 +53,26 @@ public class User {
 
     @Column(nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserRole role = UserRole.PLAYER;
 
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private Instant updatedAt = Instant.now();
 
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "is_email_verified", nullable = false)
+    @Builder.Default
     private Boolean isEmailVerified = false;
 
     @Column(name = "password_reset_token")
@@ -83,6 +88,7 @@ public class User {
     private Instant refreshTokenExpiresAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<UserPermission> userPermissions = new HashSet<>();
 
     @PreUpdate

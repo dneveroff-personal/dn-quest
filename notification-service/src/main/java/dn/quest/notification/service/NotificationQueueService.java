@@ -5,6 +5,7 @@ import dn.quest.notification.enums.NotificationPriority;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Сервис для управления очередью уведомлений
@@ -37,7 +38,7 @@ public interface NotificationQueueService {
     /**
      * Обрабатывает уведомление из очереди
      */
-    void processNotification(NotificationQueue queueItem);
+    CompletableFuture<Void> processNotification(NotificationQueue queueItem);
 
     /**
      * Повторяет отправку уведомления
@@ -92,7 +93,7 @@ public interface NotificationQueueService {
     /**
      * Пакетная обработка уведомлений
      */
-    void processBatch(List<NotificationQueue> queueItems);
+    CompletableFuture<Void> processBatch(List<NotificationQueue> queueItems);
 
     /**
      * DTO для статистики очереди

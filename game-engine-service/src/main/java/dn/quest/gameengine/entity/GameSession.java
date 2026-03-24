@@ -70,6 +70,7 @@ public class GameSession {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
+    @Builder.Default
     private SessionStatus status = SessionStatus.PENDING;
 
     @Column(name = "created_at")
@@ -85,9 +86,11 @@ public class GameSession {
     private Long durationSeconds;
 
     @Column(nullable = false)
+    @Builder.Default
     private int bonusTimeSumSec = 0;
 
     @Column(nullable = false)
+    @Builder.Default
     private int penaltyTimeSumSec = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -108,6 +111,7 @@ public class GameSession {
      */
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Builder.Default
     private Set<User> participants = new HashSet<>();
 
     @Column(name = "last_activity_at")
@@ -120,15 +124,19 @@ public class GameSession {
     private String userAgent;
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<LevelProgress> levelProgresses = new HashSet<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<CodeAttempt> codeAttempts = new HashSet<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<LevelCompletion> levelCompletions = new HashSet<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<ParticipationRequest> participationRequests = new HashSet<>();
 
     @PrePersist

@@ -1,7 +1,5 @@
 package dn.quest.notification.service.impl;
 
-import dn.quest.shared.events.notification.NotificationEvent;
-import dn.quest.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NotificationServiceImpl extends TelegramLongPollingBot implements NotificationService {
+public class NotificationServiceImpl extends TelegramLongPollingBot {
 
     private final JavaMailSender mailSender;
 
@@ -44,34 +43,57 @@ public class NotificationServiceImpl extends TelegramLongPollingBot implements N
     }
 
     @Override
-    public void processNotificationEvent(NotificationEvent event) {
-        log.info("Processing notification event: {} for user: {}", event.getType(), event.getUserId());
-        
-        try {
-            // Отправляем уведомление в зависимости от типа
-            switch (event.getType()) {
-                case "EMAIL":
-                    sendEmailNotification(event.getUserId().toString(), event.getTitle(), event.getMessage());
-                    break;
-                case "TELEGRAM":
-                    sendTelegramNotification(event.getUserId(), event.getMessage());
-                    break;
-                case "SYSTEM":
-                    // Системные уведомления могут обрабатываться по-разному
-                    log.info("System notification: {}", event.getMessage());
-                    break;
-                default:
-                    // По умолчанию отправляем email и telegram
-                    sendEmailNotification(event.getUserId().toString(), event.getTitle(), event.getMessage());
-                    sendTelegramNotification(event.getUserId(), event.getMessage());
-            }
-        } catch (Exception e) {
-            log.error("Error processing notification event: {}", event.getType(), e);
+    public void onUpdateReceived(Update update) {
+        // Обработка входящих обновлений от Telegram
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            Long chatId = update.getMessage().getChatId();
+            log.info("Received message from {}: {}", chatId, messageText);
+            // Здесь можно добавить логику обработки команд
         }
     }
 
-    @Override
-    public void sendWelcomeNotification(Long userId, String username, String email) {
+    /**
+     * Отправка email уведомления
+     */
+    public CompletableFuture<Void> sendEmailNotification(String to, String subject, String message) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                SimpleMailMessage mailMessage = new SimpleMailMessage();
+                mailMessage.setFrom(fromEmail);
+                mailMessage.setTo(to);
+                mailMessage.setSubject(subject);
+                mailMessage.setText(message);
+                mailSender.send(mailMessage);
+                log.info("Email sent to: {}", to);
+            } catch (Exception e) {
+                log.error("Failed to send email to: {}", to, e);
+            }
+        });
+    }
+
+    /**
+     * Отправка Telegram уведомления
+     */
+    public CompletableFuture<Void> sendTelegramNotification(Long userId, String message) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                SendMessage sendMessage = SendMessage.builder()
+                        .chatId(userId.toString())
+                        .text(message)
+                        .build();
+                execute(sendMessage);
+                log.info("Telegram notification sent to user: {}", userId);
+            } catch (TelegramApiException e) {
+                log.error("Failed to send Telegram notification to user: {}", userId, e);
+            }
+        });
+    }
+
+    /**
+     * Отправка приветственного уведомления
+     */
+    public CompletableFuture<Void> sendWelcomeNotification(Long userId, String username, String email) {
         String subject = "Добро пожаловать в DN Quest!";
         String message = String.format(
                 "Здравствуйте, %s!\n\n" +
@@ -84,13 +106,15 @@ public class NotificationServiceImpl extends TelegramLongPollingBot implements N
                 "Команда DN Quest",
                 username
         );
-        
+
         sendEmailNotification(email, subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendProfileUpdatedNotification(Long userId, String username) {
+    /**
+     * Отправка уведомления об обновлении профиля
+     */
+    public CompletableFuture<Void> sendProfileUpdatedNotification(Long userId, String username) {
         String subject = "Ваш профиль обновлен";
         String message = String.format(
                 "Здравствуйте, %s!\n\n" +
@@ -98,110 +122,128 @@ public class NotificationServiceImpl extends TelegramLongPollingBot implements N
                 "Если вы не вносили изменений, пожалуйста, свяжитесь с поддержкой.",
                 username
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendQuestCreatedNotification(Long questId, String title, Long authorId) {
+    /**
+     * Отправка уведомления о создании квеста
+     */
+    public CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, Long authorId) {
         String subject = "Квест создан";
         String message = String.format(
                 "Ваш квест \"%s\" (ID: %d) был успешно создан и готов к настройке.",
                 title, questId
         );
-        
+
         sendEmailNotification(authorId.toString(), subject, message);
-        sendTelegramNotification(authorId, message);
+        return sendTelegramNotification(authorId, message);
     }
 
-    @Override
-    public void sendQuestUpdatedNotification(Long questId, String title, Long authorId) {
+    /**
+     * Отправка уведомления об обновлении квеста
+     */
+    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, Long authorId) {
         String subject = "Квест обновлен";
         String message = String.format(
                 "Ваш квест \"%s\" (ID: %d) был обновлен.",
                 title, questId
         );
-        
+
         sendEmailNotification(authorId.toString(), subject, message);
-        sendTelegramNotification(authorId, message);
+        return sendTelegramNotification(authorId, message);
     }
 
-    @Override
-    public void sendQuestPublishedNotification(Long questId, String title, Long authorId) {
+    /**
+     * Отправка уведомления о публикации квеста
+     */
+    public CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, Long authorId) {
         String subject = "Квест опубликован";
         String message = String.format(
                 "Поздравляем! Ваш квест \"%s\" (ID: %d) был опубликован и теперь доступен всем игрокам.",
                 title, questId
         );
-        
+
         sendEmailNotification(authorId.toString(), subject, message);
-        sendTelegramNotification(authorId, message);
+        return sendTelegramNotification(authorId, message);
     }
 
-    @Override
-    public void sendGameSessionStartedNotification(Long userId, Long sessionId, Long questId) {
+    /**
+     * Отправка уведомления о начале игровой сессии
+     */
+    public CompletableFuture<Void> sendGameSessionStartedNotification(Long userId, Long sessionId, Long questId) {
         String subject = "Игровая сессия начата";
         String message = String.format(
                 "Вы начали игровую сессию (ID: %d) для квеста (ID: %d). Удачи!",
                 sessionId, questId
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendGameSessionFinishedNotification(Long userId, Long sessionId, boolean completed) {
+    /**
+     * Отправка уведомления о завершении игровой сессии
+     */
+    public CompletableFuture<Void> sendGameSessionFinishedNotification(Long userId, Long sessionId, boolean completed) {
         String subject = completed ? "Квест завершен!" : "Игровая сессия завершена";
         String message = String.format(
                 "Ваша игровая сессия (ID: %d) завершена.%s",
                 sessionId,
                 completed ? " Поздравляем с успешным завершением квеста!" : ""
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendLevelCompletedNotification(Long userId, Long sessionId, Integer levelNumber) {
+    /**
+     * Отправка уведомления о завершении уровня
+     */
+    public CompletableFuture<Void> sendLevelCompletedNotification(Long userId, Long sessionId, Integer levelNumber) {
         String subject = "Уровень пройден!";
         String message = String.format(
                 "Отлично! Вы прошли уровень %d в игровой сессии (ID: %d). Продолжайте в том же духе!",
                 levelNumber, sessionId
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendTeamCreatedNotification(Long teamId, String teamName, Long captainId) {
+    /**
+     * Отправка уведомления о создании команды
+     */
+    public CompletableFuture<Void> sendTeamCreatedNotification(Long teamId, String teamName, Long captainId) {
         String subject = "Команда создана";
         String message = String.format(
                 "Ваша команда \"%s\" (ID: %d) была успешно создана. Вы назначены капитаном.",
                 teamName, teamId
         );
-        
+
         sendEmailNotification(captainId.toString(), subject, message);
-        sendTelegramNotification(captainId, message);
+        return sendTelegramNotification(captainId, message);
     }
 
-    @Override
-    public void sendTeamUpdatedNotification(Long teamId, String teamName) {
+    /**
+     * Отправка уведомления об обновлении команды
+     */
+    public CompletableFuture<Void> sendTeamUpdatedNotification(Long teamId, String teamName) {
         String subject = "Команда обновлена";
         String message = String.format(
                 "Команда \"%s\" (ID: %d) была обновлена.",
                 teamName, teamId
         );
-        
+
         log.info("Team updated notification: {}", message);
-        // Здесь можно добавить логику для отправки уведомлений всем участникам команды
+        return CompletableFuture.completedFuture(null);
     }
 
-    @Override
-    public void sendTeamMemberAddedNotification(Long teamId, String teamName, Long userId, String userName) {
+    /**
+     * Отправка уведомления о добавлении участника в команду
+     */
+    public CompletableFuture<Void> sendTeamMemberAddedNotification(Long teamId, String teamName, Long userId, String userName) {
         String subject = "Добро пожаловать в команду!";
         String message = String.format(
                 "Здравствуйте, %s!\n\n" +
@@ -209,83 +251,37 @@ public class NotificationServiceImpl extends TelegramLongPollingBot implements N
                 "Приятной игры!",
                 userName, teamName, teamId
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendTeamMemberRemovedNotification(Long teamId, String teamName, Long userId, String userName) {
+    /**
+     * Отправка уведомления об удалении участника из команды
+     */
+    public CompletableFuture<Void> sendTeamMemberRemovedNotification(Long teamId, String teamName, Long userId, String userName) {
         String subject = "Вы покинули команду";
         String message = String.format(
                 "Здравствуйте, %s!\n\n" +
                 "Вы были удалены из команды \"%s\" (ID: %d).",
                 userName, teamName, teamId
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
+        return sendTelegramNotification(userId, message);
     }
 
-    @Override
-    public void sendFileUploadedNotification(Long userId, String fileName) {
+    /**
+     * Отправка уведомления о загрузке файла
+     */
+    public CompletableFuture<Void> sendFileUploadedNotification(Long userId, String fileName) {
         String subject = "Файл загружен";
         String message = String.format(
                 "Ваш файл \"%s\" был успешно загружен.",
                 fileName
         );
-        
+
         sendEmailNotification(userId.toString(), subject, message);
-        sendTelegramNotification(userId, message);
-    }
-
-    @Override
-    public void sendEmailNotification(String to, String subject, String message) {
-        try {
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setFrom(fromEmail);
-            mailMessage.setTo(to);
-            mailMessage.setSubject(subject);
-            mailMessage.setText(message);
-            
-            CompletableFuture.runAsync(() -> {
-                try {
-                    mailSender.send(mailMessage);
-                    log.info("Email sent successfully to: {}", to);
-                } catch (Exception e) {
-                    log.error("Failed to send email to: {}", to, e);
-                }
-            });
-            
-        } catch (Exception e) {
-            log.error("Error preparing email notification to: {}", to, e);
-        }
-    }
-
-    @Override
-    public void sendTelegramNotification(Long userId, String message) {
-        if (botToken == null || botToken.isEmpty()) {
-            log.debug("Telegram bot token not configured, skipping notification");
-            return;
-        }
-        
-        try {
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setChatId(userId.toString());
-            sendMessage.setText(message);
-            sendMessage.setParseMode("HTML");
-            
-            CompletableFuture.runAsync(() -> {
-                try {
-                    execute(sendMessage);
-                    log.info("Telegram message sent successfully to user: {}", userId);
-                } catch (TelegramApiException e) {
-                    log.error("Failed to send Telegram message to user: {}", userId, e);
-                }
-            });
-            
-        } catch (Exception e) {
-            log.error("Error preparing Telegram notification for user: {}", userId, e);
-        }
+        return sendTelegramNotification(userId, message);
     }
 }

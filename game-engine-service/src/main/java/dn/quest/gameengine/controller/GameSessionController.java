@@ -324,9 +324,7 @@ public class GameSessionController {
             return ResponseEntity.notFound().build();
         }
 
-        BaseDTO response = BaseDTO.builder()
-            .id(currentLevelId.get())
-            .build();
+        BaseDTO response = BaseDTO.create(currentLevelId.get());
 
         return ResponseEntity.ok(response);
     }
@@ -388,9 +386,7 @@ public class GameSessionController {
         log.info("Getting progress for session: {}", id);
 
         // TODO: Реализация получения прогресса через LevelProgressService
-        BaseDTO response = BaseDTO.builder()
-            .id(id)
-            .build();
+        BaseDTO response = BaseDTO.create(id);
 
         return ResponseEntity.ok(response);
     }
@@ -411,7 +407,7 @@ public class GameSessionController {
 
         // TODO: Реализация получения попыток через CodeAttemptService
         Page<BaseDTO> emptyPage = Page.empty();
-        PaginationDTO<BaseDTO> response = PaginationDTO.of(emptyPage, attempt -> BaseDTO.builder().id(attempt.getId()).build());
+        PaginationDTO<BaseDTO> response = PaginationDTO.of(emptyPage, attempt -> BaseDTO.create(attempt.getId()));
 
         return ResponseEntity.ok(response);
     }
@@ -431,9 +427,7 @@ public class GameSessionController {
         log.info("Getting leaderboard for session: {}", id);
 
         // TODO: Реализация получения лидерборда через LeaderboardService
-        BaseDTO response = BaseDTO.builder()
-            .id(id)
-            .build();
+        BaseDTO response = BaseDTO.create(id);
 
         return ResponseEntity.ok(response);
     }

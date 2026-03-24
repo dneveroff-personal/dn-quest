@@ -6,6 +6,7 @@ import dn.quest.notification.enums.*;
 import dn.quest.notification.repository.NotificationRepository;
 import dn.quest.notification.repository.NotificationQueueRepository;
 import dn.quest.notification.service.NotificationAnalyticsService;
+import dn.quest.notification.service.channel.NotificationChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -315,7 +315,7 @@ public class KafkaEventConsumer {
 
     private void handleQuestUpdated(QuestUpdatedEvent event) {
         log.debug("Handling quest updated event for quest: {}", event.getQuestId());
-        notificationService.sendQuestUpdatedNotification(event.getQuestId(), event.getTitle(), event.getAuthorId());
+        notificationService.sendQuestUpdatedNotification(event.getQuestId(), event.getTitle());
     }
 
     private void handleQuestPublished(QuestPublishedEvent event) {
@@ -360,13 +360,13 @@ public class KafkaEventConsumer {
     }
 
     private void handleTeamMemberAdded(TeamMemberAddedEvent event) {
-        log.debug("Handling team member added event for team: {}, user: {}", event.getTeamId(), event.getUserId());
-        notificationService.sendTeamMemberAddedNotification(event.getTeamId(), event.getTeamName(), event.getUserId(), event.getUserName());
+        log.debug("Handling team member added event for team: {}, user: {}", event.getTeamId(), event.getMemberId());
+        notificationService.sendTeamMemberAddedNotification(event.getTeamId(), event.getTeamName(), event.getMemberId(), event.getMemberUsername());
     }
 
     private void handleTeamMemberRemoved(TeamMemberRemovedEvent event) {
-        log.debug("Handling team member removed event for team: {}, user: {}", event.getTeamId(), event.getUserId());
-        notificationService.sendTeamMemberRemovedNotification(event.getTeamId(), event.getTeamName(), event.getUserId(), event.getUserName());
+        log.debug("Handling team member removed event for team: {}, user: {}", event.getTeamId(), event.getMemberId());
+        notificationService.sendTeamMemberRemovedNotification(event.getTeamId(), event.getTeamName(), event.getMemberId(), event.getMemberUsername());
     }
 
     private void handleFileUploaded(FileUploadedEvent event) {

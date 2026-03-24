@@ -10,7 +10,8 @@ public enum NotificationStatus {
     DELIVERED("delivered"),
     READ("read"),
     FAILED("failed"),
-    CANCELLED("cancelled");
+    CANCELLED("cancelled"),
+    DEAD_LETTER("dead_letter");
 
     private final String value;
 

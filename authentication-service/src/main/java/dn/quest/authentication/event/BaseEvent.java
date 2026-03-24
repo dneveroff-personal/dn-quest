@@ -33,6 +33,7 @@ public class BaseEvent {
     /**
      * Версия события
      */
+    @Builder.Default
     private String eventVersion = "1.0";
 
     /**
@@ -44,6 +45,7 @@ public class BaseEvent {
     /**
      * Источник события (название сервиса)
      */
+    @Builder.Default
     private String source = "authentication-service";
 
     /**

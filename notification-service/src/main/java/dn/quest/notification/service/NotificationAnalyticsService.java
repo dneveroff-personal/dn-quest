@@ -1,9 +1,9 @@
 package dn.quest.notification.service;
 
 import dn.quest.notification.enums.NotificationCategory;
-import dn.quest.notification.enums.NotificationChannel;
 import dn.quest.notification.enums.NotificationStatus;
 import dn.quest.notification.enums.NotificationType;
+import dn.quest.notification.service.channel.NotificationChannel;
 
 import java.time.LocalDateTime;
 import java.util.List;

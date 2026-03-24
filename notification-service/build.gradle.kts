@@ -29,6 +29,9 @@ dependencies {
     // Telegram
     implementation("org.telegram:telegrambots:6.9.7.1")
     
+    // Thymeleaf
+    implementation("org.thymeleaf:thymeleaf-spring6:3.1.1.RELEASE")
+    
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     implementation("org.apache.commons:commons-lang3:3.14.0")

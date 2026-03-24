@@ -10,7 +10,22 @@ import java.time.LocalDateTime;
  */
 @Data
 public abstract class BaseDTO {
-    
+
+    /**
+     * Конструктор по умолчанию
+     */
+    protected BaseDTO() {
+    }
+
+    /**
+     * Создает новый BaseDTO с указанным ID
+     * @param id идентификатор
+     * @return новый объект BaseDTO
+     */
+    public static BaseDTO create(Long id) {
+        return new BaseDTO() {{ setId(id); }};
+    }
+
     /**
      * Идентификатор сущности
      */

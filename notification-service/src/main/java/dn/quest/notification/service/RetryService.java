@@ -39,7 +39,7 @@ public interface RetryService {
     /**
      * Пытается повторно отправить уведомления из Dead Letter Queue
      */
-    void retryDeadLetterNotifications();
+    java.util.concurrent.CompletableFuture<Void> retryDeadLetterNotifications();
 
     /**
      * Очищает старые уведомления из Dead Letter Queue

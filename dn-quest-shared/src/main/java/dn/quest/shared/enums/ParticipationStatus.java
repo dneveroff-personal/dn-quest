@@ -13,7 +13,12 @@ public enum ParticipationStatus {
      * Принята
      */
     ACCEPTED("Принята"),
-    
+
+    /**
+     * Одобрена (синоним ACCEPTED)
+     */
+    APPROVED("Одобрена"),
+
     /**
      * Отклонена
      */

@@ -17,7 +17,12 @@ public enum UserRole {
     /**
      * Администратор - полные права доступа
      */
-    ADMIN("Администратор");
+    ADMIN("Администратор"),
+
+    /**
+     * Модератор - может модерировать контент
+     */
+    MODERATOR("Модератор");
 
     private final String displayName;
 

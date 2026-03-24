@@ -3,7 +3,7 @@ package dn.quest.notification.service.impl;
 import dn.quest.notification.entity.NotificationQueue;
 import dn.quest.notification.enums.NotificationStatus;
 import dn.quest.notification.repository.NotificationQueueRepository;
-import dn.quest.notification.service.NotificationChannelManager;
+import dn.quest.notification.service.channel.NotificationChannelManager;
 import dn.quest.notification.service.RetryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -23,7 +23,7 @@ public class BaseEvent {
     /**
      * Уникальный идентификатор события
      */
-    private String eventId;
+    protected String eventId;
 
     /**
      * Тип события (например, "user.deleted", "quest.created")

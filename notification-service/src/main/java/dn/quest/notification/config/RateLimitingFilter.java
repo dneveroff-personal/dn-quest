@@ -37,7 +37,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             // Проверяем глобальные лимиты
             if (!rateLimitingService.canSendGlobally()) {
                 logger.warn("Global rate limit exceeded for IP: {}", clientIp);
-                response.setStatus(HttpServletResponse.SC_TOO_MANY_REQUESTS);
+                response.setStatus(429);
                 response.getWriter().write("{\"error\":\"Global rate limit exceeded\"}");
                 return;
             }
@@ -45,7 +45,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             // Проверяем лимиты для IP
             if (!rateLimitingService.canSendFromIp(clientIp, requestUri)) {
                 logger.warn("IP rate limit exceeded: {} for {}", clientIp, requestUri);
-                response.setStatus(HttpServletResponse.SC_TOO_MANY_REQUESTS);
+                response.setStatus(429);
                 response.getWriter().write("{\"error\":\"IP rate limit exceeded\"}");
                 return;
             }

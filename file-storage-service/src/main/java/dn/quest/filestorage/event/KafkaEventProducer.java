@@ -27,17 +27,17 @@ public class KafkaEventProducer {
      * Публикация события загрузки файла
      */
     public void publishFileUploadedEvent(FileMetadata fileMetadata) {
-        FileUploadedEvent event = new FileUploadedEvent(
-                UUID.randomUUID().toString(),
-                fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null,
-                fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null,
-                fileMetadata.getStoredFileName(),
-                fileMetadata.getOriginalFileName(),
-                fileMetadata.getContentType(),
-                fileMetadata.getFileSize(),
-                fileMetadata.getStoragePath(),
-                fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null
-        );
+        FileUploadedEvent event = FileUploadedEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .fileId(fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null)
+                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null)
+                .fileName(fileMetadata.getStoredFileName())
+                .originalFileName(fileMetadata.getOriginalFileName())
+                .contentType(fileMetadata.getContentType())
+                .fileSize(fileMetadata.getFileSize())
+                .filePath(fileMetadata.getStoragePath())
+                .storageType(fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null)
+                .build();
         eventProducer.publishFileUploadedEvent(event);
         log.info("Published file uploaded event for file: {}", fileMetadata.getId());
     }
@@ -46,17 +46,17 @@ public class KafkaEventProducer {
      * Публикация события обновления файла
      */
     public void publishFileUpdatedEvent(FileMetadata fileMetadata) {
-        FileUpdatedEvent event = new FileUpdatedEvent(
-                UUID.randomUUID().toString(),
-                fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null,
-                fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null,
-                fileMetadata.getStoredFileName(),
-                fileMetadata.getOriginalFileName(),
-                fileMetadata.getContentType(),
-                fileMetadata.getFileSize(),
-                fileMetadata.getStoragePath(),
-                fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null
-        );
+        FileUpdatedEvent event = FileUpdatedEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .fileId(fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null)
+                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null)
+                .fileName(fileMetadata.getStoredFileName())
+                .originalFileName(fileMetadata.getOriginalFileName())
+                .contentType(fileMetadata.getContentType())
+                .fileSize(fileMetadata.getFileSize())
+                .filePath(fileMetadata.getStoragePath())
+                .storageType(fileMetadata.getStorageType() != null ? fileMetadata.getStorageType().name() : null)
+                .build();
         eventProducer.publishFileUpdatedEvent(event);
         log.info("Published file updated event for file: {}", fileMetadata.getId());
     }
@@ -65,12 +65,12 @@ public class KafkaEventProducer {
      * Публикация события удаления файла
      */
     public void publishFileDeletedEvent(Long fileId, Long userId, String fileName) {
-        FileDeletedEvent event = new FileDeletedEvent(
-                UUID.randomUUID().toString(),
-                fileId,
-                userId,
-                fileName
-        );
+        FileDeletedEvent event = FileDeletedEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .fileId(fileId)
+                .userId(userId)
+                .fileName(fileName)
+                .build();
         eventProducer.publishFileDeletedEvent(event);
         log.info("Published file deleted event for file: {}", fileId);
     }
