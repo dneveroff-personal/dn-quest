@@ -4,6 +4,7 @@ package dn.quest.questmanagement.entity;
  * Статусы квестов в системе управления квестами
  */
 public enum QuestStatus {
+
     /**
      * Черновик - квест в разработке
      */

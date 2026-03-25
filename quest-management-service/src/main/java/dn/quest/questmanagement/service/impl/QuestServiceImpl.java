@@ -11,6 +11,8 @@ import dn.quest.questmanagement.service.LevelService;
 import dn.quest.questmanagement.exception.QuestNotFoundException;
 import dn.quest.questmanagement.exception.QuestAccessDeniedException;
 import dn.quest.questmanagement.exception.QuestValidationException;
+import dn.quest.shared.enums.Difficulty;
+import dn.quest.shared.enums.QuestType;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,25 +47,21 @@ public class QuestServiceImpl implements QuestService {
         log.info("Creating new quest with title: {} for author: {}", dto.getTitle(), authorId);
 
         // Валидация DTO
-        dto.validate();
+        dto.isValid();
 
         // Создание нового квеста
         Quest quest = new Quest();
         quest.setTitle(dto.getTitle());
-        quest.setDescription(dto.getDescription());
+        quest.setDescriptionHtml(dto.getDescriptionHtml());
         quest.setDifficulty(dto.getDifficulty());
         quest.setQuestType(dto.getQuestType());
         quest.setCategory(dto.getCategory());
-        quest.setEstimatedDuration(dto.getEstimatedDuration());
+        quest.setEstimatedDurationMinutes(dto.getEstimatedDurationMinutes());
         quest.setMaxParticipants(dto.getMaxParticipants());
         quest.setMinParticipants(dto.getMinParticipants());
-        quest.setStartLocation(dto.getStartLocation());
-        quest.setEndLocation(dto.getEndLocation());
-        quest.setRules(dto.getRules());
-        quest.setPrizes(dto.getPrizes());
-        quest.setRequirements(dto.getRequirements());
+        quest.setStartAt(dto.getStartAt());
+        quest.setEndAt(dto.getEndAt());
         quest.setTags(dto.getTags());
-        quest.setIsPublic(dto.getIsPublic());
         quest.setIsTemplate(dto.getIsTemplate());
         quest.setAuthorIds(new HashSet<>(Set.of(authorId)));
         quest.setStatus(QuestStatus.DRAFT);
@@ -92,24 +91,21 @@ public class QuestServiceImpl implements QuestService {
         }
 
         // Валидация DTO
-        dto.validate();
+        dto.isValid();
 
         // Обновление полей
         quest.setTitle(dto.getTitle());
-        quest.setDescription(dto.getDescription());
+        quest.setDescriptionHtml(dto.getDescriptionHtml());
         quest.setDifficulty(dto.getDifficulty());
         quest.setQuestType(dto.getQuestType());
         quest.setCategory(dto.getCategory());
-        quest.setEstimatedDuration(dto.getEstimatedDuration());
+        quest.setEstimatedDurationMinutes(dto.getEstimatedDurationMinutes());
         quest.setMaxParticipants(dto.getMaxParticipants());
         quest.setMinParticipants(dto.getMinParticipants());
-        quest.setStartLocation(dto.getStartLocation());
-        quest.setEndLocation(dto.getEndLocation());
-        quest.setRules(dto.getRules());
-        quest.setPrizes(dto.getPrizes());
-        quest.setRequirements(dto.getRequirements());
+        quest.setStartAt(dto.getStartAt());
+        quest.setEndAt(dto.getEndAt());
         quest.setTags(dto.getTags());
-        quest.setIsPublic(dto.getIsPublic());
+        quest.setPublished(dto.isPublished());
         quest.setUpdatedAt(Instant.now());
 
         // Увеличение версии при изменении опубликованного квеста
@@ -136,7 +132,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         // Проверка, что квест не используется в активных сессиях
-        if (quest.getStatus() == QuestStatus.ACTIVE) {
+        if (quest.getStatus() == QuestStatus.PUBLISHED) {
             throw new QuestValidationException("Cannot delete active quest");
         }
 
@@ -176,7 +172,7 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getActiveQuests() {
-        List<Quest> quests = questRepository.findByStatus(QuestStatus.ACTIVE);
+        List<Quest> quests = questRepository.findByStatus(QuestStatus.PUBLISHED);
         return quests.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -200,13 +196,13 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public Page<QuestDTO> getQuestsByAuthor(Long authorId, Pageable pageable) {
-        Page<Quest> quests = questRepository.findByAuthorIdsContaining(authorId, pageable);
+        Page<Quest> quests = questRepository.findByAuthorId(authorId, pageable);
         return quests.map(this::convertToDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<QuestDTO> getQuestsByDifficulty(String difficulty) {
+    public List<QuestDTO> getQuestsByDifficulty(Difficulty difficulty) {
         List<Quest> quests = questRepository.findByDifficulty(difficulty);
         return quests.stream()
                 .map(this::convertToDTO)
@@ -215,7 +211,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<QuestDTO> getQuestsByType(String questType) {
+    public List<QuestDTO> getQuestsByType(QuestType questType) {
         List<Quest> quests = questRepository.findByQuestType(questType);
         return quests.stream()
                 .map(this::convertToDTO)
@@ -234,7 +230,7 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getQuestsByTags(Set<String> tags) {
-        List<Quest> quests = questRepository.findByTagsContaining(tags);
+        List<Quest> quests = questRepository.findByTags(tags);
         return quests.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -243,7 +239,7 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getQuestTemplates() {
-        List<Quest> quests = questRepository.findByIsTemplateTrue();
+        List<Quest> quests = questRepository.findTemplates();
         return quests.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -291,7 +287,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         // Проверка, что квест не активен
-        if (quest.getStatus() == QuestStatus.ACTIVE) {
+        if (quest.getStatus() == QuestStatus.PUBLISHED) {
             throw new QuestValidationException("Cannot unpublish active quest");
         }
 
@@ -318,7 +314,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         // Проверка, что квест не активен
-        if (quest.getStatus() == QuestStatus.ACTIVE) {
+        if (quest.getStatus() == QuestStatus.PUBLISHED) {
             throw new QuestValidationException("Cannot archive active quest");
         }
 
@@ -366,26 +362,23 @@ public class QuestServiceImpl implements QuestService {
         // Создание копии
         Quest copy = new Quest();
         copy.setTitle(newTitle);
-        copy.setDescription(originalQuest.getDescription());
+        copy.setDescriptionHtml(originalQuest.getDescriptionHtml());
         copy.setDifficulty(originalQuest.getDifficulty());
         copy.setQuestType(originalQuest.getQuestType());
         copy.setCategory(originalQuest.getCategory());
-        copy.setEstimatedDuration(originalQuest.getEstimatedDuration());
+        copy.setEstimatedDurationMinutes(originalQuest.getEstimatedDurationMinutes());
         copy.setMaxParticipants(originalQuest.getMaxParticipants());
         copy.setMinParticipants(originalQuest.getMinParticipants());
-        copy.setStartLocation(originalQuest.getStartLocation());
-        copy.setEndLocation(originalQuest.getEndLocation());
-        copy.setRules(originalQuest.getRules());
-        copy.setPrizes(originalQuest.getPrizes());
-        copy.setRequirements(originalQuest.getRequirements());
+        copy.setStartAt(originalQuest.getStartAt());
+        copy.setEndAt(originalQuest.getEndAt());
         copy.setTags(originalQuest.getTags());
-        copy.setIsPublic(false); // Копия по умолчанию не публичная
         copy.setIsTemplate(false);
         copy.setAuthorIds(new HashSet<>(Set.of(authorId)));
         copy.setStatus(QuestStatus.DRAFT);
         copy.setVersion(1);
         copy.setCreatedAt(Instant.now());
         copy.setUpdatedAt(Instant.now());
+        copy.setPublished(false);
         copy.setNumber(generateQuestNumber());
 
         Quest savedCopy = questRepository.save(copy);
@@ -413,20 +406,17 @@ public class QuestServiceImpl implements QuestService {
         // Создание шаблона
         Quest template = new Quest();
         template.setTitle(templateName);
-        template.setDescription(originalQuest.getDescription());
+        template.setDescriptionHtml(originalQuest.getDescriptionHtml());
         template.setDifficulty(originalQuest.getDifficulty());
         template.setQuestType(originalQuest.getQuestType());
         template.setCategory(originalQuest.getCategory());
-        template.setEstimatedDuration(originalQuest.getEstimatedDuration());
+        template.setEstimatedDurationMinutes(originalQuest.getEstimatedDurationMinutes());
         template.setMaxParticipants(originalQuest.getMaxParticipants());
         template.setMinParticipants(originalQuest.getMinParticipants());
-        template.setStartLocation(originalQuest.getStartLocation());
-        template.setEndLocation(originalQuest.getEndLocation());
-        template.setRules(originalQuest.getRules());
-        template.setPrizes(originalQuest.getPrizes());
-        template.setRequirements(originalQuest.getRequirements());
+        template.setStartAt(originalQuest.getStartAt());
+        template.setEndAt(originalQuest.getEndAt());
         template.setTags(originalQuest.getTags());
-        template.setIsPublic(false);
+        template.setPublished(false);
         template.setIsTemplate(true);
         template.setAuthorIds(new HashSet<>(Set.of(userId)));
         template.setStatus(QuestStatus.DRAFT);
@@ -460,20 +450,17 @@ public class QuestServiceImpl implements QuestService {
         // Создание квеста из шаблона
         Quest quest = new Quest();
         quest.setTitle(title);
-        quest.setDescription(template.getDescription());
+        quest.setDescriptionHtml(template.getDescriptionHtml());
         quest.setDifficulty(template.getDifficulty());
         quest.setQuestType(template.getQuestType());
         quest.setCategory(template.getCategory());
-        quest.setEstimatedDuration(template.getEstimatedDuration());
+        quest.setEstimatedDurationMinutes(template.getEstimatedDurationMinutes());
         quest.setMaxParticipants(template.getMaxParticipants());
         quest.setMinParticipants(template.getMinParticipants());
-        quest.setStartLocation(template.getStartLocation());
-        quest.setEndLocation(template.getEndLocation());
-        quest.setRules(template.getRules());
-        quest.setPrizes(template.getPrizes());
-        quest.setRequirements(template.getRequirements());
+        quest.setStartAt(template.getStartAt());
+        quest.setEndAt(template.getEndAt());
         quest.setTags(template.getTags());
-        quest.setIsPublic(false);
+        quest.setPublished(false);
         quest.setIsTemplate(false);
         quest.setAuthorIds(new HashSet<>(Set.of(authorId)));
         quest.setStatus(QuestStatus.DRAFT);
@@ -622,7 +609,7 @@ public class QuestServiceImpl implements QuestService {
         Quest quest = getQuestEntityById(questId);
         
         // Публичные квесты доступны всем
-        if (quest.getIsPublic()) {
+        if (quest.getPublished()) {
             return true;
         }
         
@@ -667,7 +654,7 @@ public class QuestServiceImpl implements QuestService {
             errors.add("Title is required");
         }
         
-        if (quest.getDescription() == null || quest.getDescription().trim().isEmpty()) {
+        if (quest.getDescriptionHtml() == null || quest.getDescriptionHtml().trim().isEmpty()) {
             errors.add("Description is required");
         }
         
@@ -687,7 +674,7 @@ public class QuestServiceImpl implements QuestService {
             // Проверка последовательности уровней
             for (int i = 0; i < levels.size(); i++) {
                 var level = levels.get(i);
-                if (level.getOrder() != i + 1) {
+                if (level.getOrderIndex() != i + 1) {
                     warnings.add("Level order is not sequential");
                     break;
                 }
@@ -697,7 +684,7 @@ public class QuestServiceImpl implements QuestService {
             for (var level : levels) {
                 var codes = levelService.getCodesByLevelId(level.getId());
                 if (codes.isEmpty()) {
-                    errors.add("Level " + level.getOrder() + " must have at least one code");
+                    errors.add("Level " + level.getOrderIndex() + " must have at least one code");
                 }
             }
         }
@@ -710,8 +697,8 @@ public class QuestServiceImpl implements QuestService {
         }
 
         // Проверка времени
-        if (quest.getStartTime() != null && quest.getEndTime() != null) {
-            if (quest.getStartTime().isAfter(quest.getEndTime())) {
+        if (quest.getStartAt() != null && quest.getEndAt() != null) {
+            if (quest.getStartAt().isAfter(quest.getEndAt())) {
                 errors.add("Start time cannot be after end time");
             }
         }
@@ -721,7 +708,7 @@ public class QuestServiceImpl implements QuestService {
             warnings.add("Quest has no tags for better discoverability");
         }
         
-        if (quest.getEstimatedDuration() == null) {
+        if (quest.getEstimatedDurationMinutes() == null) {
             warnings.add("Estimated duration is not specified");
         }
 
@@ -733,9 +720,9 @@ public class QuestServiceImpl implements QuestService {
     public QuestStatistics getQuestStatistics() {
         long totalQuests = questRepository.count();
         long publishedQuests = questRepository.countByStatus(QuestStatus.PUBLISHED);
-        long activeQuests = questRepository.countByStatus(QuestStatus.ACTIVE);
+        long activeQuests = questRepository.countByStatus(QuestStatus.PUBLISHED);
         long archivedQuests = questRepository.countByStatus(QuestStatus.ARCHIVED);
-        long templateQuests = questRepository.countByIsTemplateTrue();
+        long templateQuests = questRepository.findTemplates().size();
 
         return new QuestStatistics(totalQuests, publishedQuests, activeQuests, 
                                  archivedQuests, templateQuests);
@@ -762,7 +749,7 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getExpiredQuests() {
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         List<Quest> quests = questRepository.findExpiredQuests(now);
         return quests.stream()
                 .map(this::convertToDTO)
@@ -772,8 +759,8 @@ public class QuestServiceImpl implements QuestService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestDTO> getUpcomingQuests(int hours) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime future = now.plusHours(hours);
+        Instant now = Instant.now();
+        Instant future = now.plus(hours, ChronoUnit.HOURS);
         List<Quest> quests = questRepository.findUpcomingQuests(now, future);
         return quests.stream()
                 .map(this::convertToDTO)
@@ -801,13 +788,8 @@ public class QuestServiceImpl implements QuestService {
                 }
                 break;
             case PUBLISHED:
-                if (newStatus != QuestStatus.ACTIVE && newStatus != QuestStatus.DRAFT && newStatus != QuestStatus.ARCHIVED) {
+                if (newStatus != QuestStatus.DRAFT && newStatus != QuestStatus.ARCHIVED) {
                     throw new QuestValidationException("Invalid status transition from PUBLISHED to " + newStatus);
-                }
-                break;
-            case ACTIVE:
-                if (newStatus != QuestStatus.PUBLISHED && newStatus != QuestStatus.ARCHIVED) {
-                    throw new QuestValidationException("Invalid status transition from ACTIVE to " + newStatus);
                 }
                 break;
             case ARCHIVED:
@@ -896,7 +878,7 @@ public class QuestServiceImpl implements QuestService {
                 predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("publishedAt"), searchRequest.getPublishedTo()));
             }
 
-            return criteriaBuilder.and(predicates.toArray(new javax.persistence.criteria.Predicate[0]));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
 
@@ -912,19 +894,14 @@ public class QuestServiceImpl implements QuestService {
         dto.setEstimatedDurationMinutes(quest.getEstimatedDurationMinutes());
         dto.setMaxParticipants(quest.getMaxParticipants());
         dto.setMinParticipants(quest.getMinParticipants());
-        dto.setStartLocation(quest.getStartLocation());
-        dto.setEndLocation(quest.getEndLocation());
-        dto.setRules(quest.getRules());
-        dto.setPrizes(quest.getPrizes());
-        dto.setRequirements(quest.getRequirements());
+        dto.setStartAt(quest.getStartAt());
+        dto.setEndAt(quest.getEndAt());
         dto.setTags(quest.getTags());
-        dto.setIsPublic(quest.getIsPublic());
+        dto.setPublished(quest.getPublished());
         dto.setIsTemplate(quest.getIsTemplate());
         dto.setAuthorIds(quest.getAuthorIds());
         dto.setStatus(quest.getStatus());
-        dto.setVersion(quest.getVersion());
-        dto.setStartTime(quest.getStartTime());
-        dto.setEndTime(quest.getEndTime());
+        dto.setVersion(Long.valueOf(quest.getVersion()));
         dto.setCreatedAt(quest.getCreatedAt());
         dto.setUpdatedAt(quest.getUpdatedAt());
         dto.setPublishedAt(quest.getPublishedAt());

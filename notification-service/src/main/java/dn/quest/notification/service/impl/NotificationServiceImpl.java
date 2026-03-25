@@ -36,11 +36,6 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     }
 
     @Override
-    public String getBotToken() {
-        return botToken;
-    }
-
-    @Override
     public String getBotUsername() {
         return botUsername;
     }

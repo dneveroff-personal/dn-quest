@@ -2,12 +2,14 @@ package dn.quest.questmanagement.service;
 
 import dn.quest.questmanagement.dto.LevelDTO;
 import dn.quest.questmanagement.entity.Level;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
  * Сервис для управления уровнями квестов
  */
+@Service
 public interface LevelService {
 
     /**
