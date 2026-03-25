@@ -1,6 +1,7 @@
 package dn.quest.questmanagement.repository;
 
 import dn.quest.questmanagement.entity.QuestMedia;
+import dn.quest.shared.enums.FileType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -80,7 +81,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     /**
      * Найти медиа по типу файла
      */
-    List<QuestMedia> findByFileType(QuestMedia.FileType fileType);
+    List<QuestMedia> findByFileType(FileType fileType);
 
     /**
      * Найти медиа по ID квеста и типу файла
@@ -88,7 +89,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId AND m.fileType = :fileType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
     List<QuestMedia> findByQuestIdAndFileType(@Param("questId") Long questId, 
-                                              @Param("fileType") QuestMedia.FileType fileType);
+                                              @Param("fileType") FileType fileType);
 
     /**
      * Найти медиа по ID уровня и типу файла
@@ -96,7 +97,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     @Query("SELECT m FROM QuestMedia m WHERE m.levelId = :levelId AND m.fileType = :fileType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
     List<QuestMedia> findByLevelIdAndFileType(@Param("levelId") Long levelId, 
-                                              @Param("fileType") QuestMedia.FileType fileType);
+                                              @Param("fileType") FileType fileType);
 
     /**
      * Найти обложки квестов
@@ -250,7 +251,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     /**
      * Подсчет медиа по типу файла
      */
-    long countByFileType(QuestMedia.FileType fileType);
+    long countByFileType(FileType fileType);
 
     /**
      * Подсчет активных медиа по ID квеста

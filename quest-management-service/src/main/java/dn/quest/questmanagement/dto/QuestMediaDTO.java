@@ -2,6 +2,7 @@ package dn.quest.questmanagement.dto;
 
 import dn.quest.questmanagement.entity.QuestMedia;
 import dn.quest.shared.dto.BaseDTO;
+import dn.quest.shared.enums.FileType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
@@ -46,7 +47,7 @@ public class QuestMediaDTO extends BaseDTO {
      * Тип файла
      */
     @NotNull(message = "Тип файла обязателен")
-    private QuestMedia.FileType fileType;
+    private FileType fileType;
 
     /**
      * Оригинальное имя файла
@@ -122,16 +123,8 @@ public class QuestMediaDTO extends BaseDTO {
     private Integer durationSeconds;
 
     /**
-     * Дата создания
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
 
     /**
-     * Дата обновления
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
 
     /**
      * ID пользователя, загрузившего медиа

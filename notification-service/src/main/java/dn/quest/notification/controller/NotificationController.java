@@ -85,7 +85,7 @@ public class NotificationController {
             // Здесь должна быть логика получения уведомлений из сервиса
             // Временно возвращаем пустой результат
             PagedResponse<NotificationDTO> response = new PagedResponse<NotificationDTO>(
-                    List.of(), page, size, 0L, 0L, 0
+                    List.of(), page, size, 0L, 0, 0
             );
             
             return ResponseEntity.ok(ApiResponse.success(response));

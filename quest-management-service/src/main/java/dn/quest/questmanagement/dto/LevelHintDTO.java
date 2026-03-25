@@ -98,16 +98,8 @@ public class LevelHintDTO extends BaseDTO {
     private Integer usageCount;
 
     /**
-     * Дата создания
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
 
     /**
-     * Дата обновления
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
 
     /**
      * ID пользователя, создавшего подсказку

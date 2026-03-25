@@ -3,7 +3,7 @@ package dn.quest.shared.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Базовый DTO класс с общими полями
@@ -34,17 +34,17 @@ public abstract class BaseDTO {
     /**
      * Дата и время создания
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private Instant createdAt;
     
     /**
      * Дата и время последнего обновления
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private Instant updatedAt;
     
     /**
      * Версия для оптимистичной блокировки
      */
-    private Integer version;
+    private Long version;
 }

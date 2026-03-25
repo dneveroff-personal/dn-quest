@@ -1,5 +1,6 @@
 package dn.quest.questmanagement.service;
 
+import dn.quest.questmanagement.dto.QuestDTO;
 import dn.quest.questmanagement.dto.QuestRatingDTO;
 import dn.quest.questmanagement.dto.QuestReviewDTO;
 import dn.quest.questmanagement.entity.Quest;

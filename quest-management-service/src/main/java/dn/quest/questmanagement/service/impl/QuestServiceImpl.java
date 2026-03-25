@@ -11,6 +11,7 @@ import dn.quest.questmanagement.service.LevelService;
 import dn.quest.questmanagement.exception.QuestNotFoundException;
 import dn.quest.questmanagement.exception.QuestAccessDeniedException;
 import dn.quest.questmanagement.exception.QuestValidationException;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,8 +67,8 @@ public class QuestServiceImpl implements QuestService {
         quest.setAuthorIds(new HashSet<>(Set.of(authorId)));
         quest.setStatus(QuestStatus.DRAFT);
         quest.setVersion(1);
-        quest.setCreatedAt(LocalDateTime.now());
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setCreatedAt(Instant.now());
+        quest.setUpdatedAt(Instant.now());
 
         // Генерация уникального номера квеста
         quest.setNumber(generateQuestNumber());
@@ -108,7 +110,7 @@ public class QuestServiceImpl implements QuestService {
         quest.setRequirements(dto.getRequirements());
         quest.setTags(dto.getTags());
         quest.setIsPublic(dto.getIsPublic());
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         // Увеличение версии при изменении опубликованного квеста
         if (quest.getStatus() == QuestStatus.PUBLISHED) {
@@ -267,8 +269,8 @@ public class QuestServiceImpl implements QuestService {
         }
 
         quest.setStatus(QuestStatus.PUBLISHED);
-        quest.setPublishedAt(LocalDateTime.now());
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setPublishedAt(Instant.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Quest published successfully with ID: {}", savedQuest.getId());
@@ -295,7 +297,7 @@ public class QuestServiceImpl implements QuestService {
 
         quest.setStatus(QuestStatus.DRAFT);
         quest.setPublishedAt(null);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Quest unpublished successfully with ID: {}", savedQuest.getId());
@@ -321,9 +323,9 @@ public class QuestServiceImpl implements QuestService {
         }
 
         quest.setStatus(QuestStatus.ARCHIVED);
-        quest.setArchivedAt(LocalDateTime.now());
+        quest.setArchivedAt(Instant.now());
         quest.setArchiveReason(reason);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Quest archived successfully with ID: {}", savedQuest.getId());
@@ -346,7 +348,7 @@ public class QuestServiceImpl implements QuestService {
         quest.setStatus(QuestStatus.DRAFT);
         quest.setArchivedAt(null);
         quest.setArchiveReason(null);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Quest unarchived successfully with ID: {}", savedQuest.getId());
@@ -382,8 +384,8 @@ public class QuestServiceImpl implements QuestService {
         copy.setAuthorIds(new HashSet<>(Set.of(authorId)));
         copy.setStatus(QuestStatus.DRAFT);
         copy.setVersion(1);
-        copy.setCreatedAt(LocalDateTime.now());
-        copy.setUpdatedAt(LocalDateTime.now());
+        copy.setCreatedAt(Instant.now());
+        copy.setUpdatedAt(Instant.now());
         copy.setNumber(generateQuestNumber());
 
         Quest savedCopy = questRepository.save(copy);
@@ -429,8 +431,8 @@ public class QuestServiceImpl implements QuestService {
         template.setAuthorIds(new HashSet<>(Set.of(userId)));
         template.setStatus(QuestStatus.DRAFT);
         template.setVersion(1);
-        template.setCreatedAt(LocalDateTime.now());
-        template.setUpdatedAt(LocalDateTime.now());
+        template.setCreatedAt(Instant.now());
+        template.setUpdatedAt(Instant.now());
         template.setNumber(generateQuestNumber());
 
         Quest savedTemplate = questRepository.save(template);
@@ -476,8 +478,8 @@ public class QuestServiceImpl implements QuestService {
         quest.setAuthorIds(new HashSet<>(Set.of(authorId)));
         quest.setStatus(QuestStatus.DRAFT);
         quest.setVersion(1);
-        quest.setCreatedAt(LocalDateTime.now());
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setCreatedAt(Instant.now());
+        quest.setUpdatedAt(Instant.now());
         quest.setNumber(generateQuestNumber());
 
         Quest savedQuest = questRepository.save(quest);
@@ -506,12 +508,12 @@ public class QuestServiceImpl implements QuestService {
         validateStatusTransition(quest.getStatus(), status);
 
         quest.setStatus(status);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         if (status == QuestStatus.PUBLISHED && quest.getPublishedAt() == null) {
-            quest.setPublishedAt(LocalDateTime.now());
+            quest.setPublishedAt(Instant.now());
         } else if (status == QuestStatus.ARCHIVED) {
-            quest.setArchivedAt(LocalDateTime.now());
+            quest.setArchivedAt(Instant.now());
         }
 
         Quest savedQuest = questRepository.save(quest);
@@ -533,7 +535,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         quest.getAuthorIds().add(authorId);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Author added successfully to quest with ID: {}", savedQuest.getId());
@@ -559,7 +561,7 @@ public class QuestServiceImpl implements QuestService {
         }
 
         quest.getAuthorIds().remove(authorId);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Author removed successfully from quest with ID: {}", savedQuest.getId());
@@ -583,7 +585,7 @@ public class QuestServiceImpl implements QuestService {
             quest.setTags(new HashSet<>());
         }
         quest.getTags().addAll(tags);
-        quest.setUpdatedAt(LocalDateTime.now());
+        quest.setUpdatedAt(Instant.now());
 
         Quest savedQuest = questRepository.save(quest);
         log.info("Tags added successfully to quest with ID: {}", savedQuest.getId());
@@ -605,7 +607,7 @@ public class QuestServiceImpl implements QuestService {
 
         if (quest.getTags() != null) {
             quest.getTags().removeAll(tags);
-            quest.setUpdatedAt(LocalDateTime.now());
+            quest.setUpdatedAt(Instant.now());
         }
 
         Quest savedQuest = questRepository.save(quest);
@@ -818,7 +820,7 @@ public class QuestServiceImpl implements QuestService {
 
     private Specification<Quest> buildSearchSpecification(QuestSearchRequestDTO searchRequest) {
         return (root, query, criteriaBuilder) -> {
-            List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
 
             // Поиск по названию
             if (searchRequest.getTitle() != null && !searchRequest.getTitle().trim().isEmpty()) {
@@ -903,11 +905,11 @@ public class QuestServiceImpl implements QuestService {
         dto.setId(quest.getId());
         dto.setNumber(quest.getNumber());
         dto.setTitle(quest.getTitle());
-        dto.setDescription(quest.getDescription());
+        dto.setDescriptionHtml(quest.getDescriptionHtml());
         dto.setDifficulty(quest.getDifficulty());
         dto.setQuestType(quest.getQuestType());
         dto.setCategory(quest.getCategory());
-        dto.setEstimatedDuration(quest.getEstimatedDuration());
+        dto.setEstimatedDurationMinutes(quest.getEstimatedDurationMinutes());
         dto.setMaxParticipants(quest.getMaxParticipants());
         dto.setMinParticipants(quest.getMinParticipants());
         dto.setStartLocation(quest.getStartLocation());

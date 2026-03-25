@@ -1,7 +1,7 @@
 package dn.quest.questmanagement.service;
 
 import dn.quest.questmanagement.dto.CodeDTO;
-import dn.quest.questmanagement.entity.CodeType;
+import dn.quest.shared.enums.CodeType;
 
 import java.util.List;
 

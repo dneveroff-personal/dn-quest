@@ -4,8 +4,10 @@ import dn.quest.notification.entity.Notification;
 import dn.quest.notification.enums.NotificationType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -23,7 +25,6 @@ import java.util.Map;
  * Реализация Telegram канала доставки уведомлений
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class TelegramNotificationChannel extends TelegramLongPollingBot implements NotificationChannel {
 
@@ -143,11 +144,6 @@ public class TelegramNotificationChannel extends TelegramLongPollingBot implemen
     @Override
     public int getPriority() {
         return 2; // Средний приоритет
-    }
-
-    @Override
-    public String getBotToken() {
-        return botToken;
     }
 
     @Override

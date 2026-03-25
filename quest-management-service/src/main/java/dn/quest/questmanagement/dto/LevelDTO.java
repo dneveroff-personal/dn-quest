@@ -108,18 +108,6 @@ public class LevelDTO extends BaseDTO {
     private Boolean active;
 
     /**
-     * Дата создания
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    /**
-     * Дата обновления
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
-
-    /**
      * ID пользователя, создавшего уровень
      */
     private Long createdBy;
