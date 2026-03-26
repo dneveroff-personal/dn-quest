@@ -1,6 +1,7 @@
 package dn.quest.teammanagement.service.impl;
 
 import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.entity.User;
 import dn.quest.teammanagement.mapper.TeamMapper;
 import dn.quest.teammanagement.repository.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -127,7 +129,10 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(0, limit);
         List<User> users = userRepository.findByFullNameContainingIgnoreCaseAndIsActiveTrue(name, pageable);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .limit(limit)
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -137,7 +142,10 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(0, limit);
         List<User> users = userRepository.findByUsernameOrFullNameContainingIgnoreCaseAndIsActiveTrue(query, pageable);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .limit(limit)
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -147,7 +155,10 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(0, limit);
         List<User> users = userRepository.findUsersForTeamInvitation(teamId, search, pageable);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .limit(limit)
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -157,7 +168,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting users by ids: {}", userIds);
 
         List<User> users = userRepository.findByIdInAndIsActiveTrue(userIds);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -225,11 +238,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<UserDTO> getActiveUsers(int limit) {
+        log.debug("Getting active users");
+        return userRepository.activeUsers()
+                .stream()
+                .limit(limit)
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByRegistrationPeriod(Instant startDate, Instant endDate) {
         log.debug("Getting users by registration period: {} to {}", startDate, endDate);
 
         List<User> users = userRepository.findUsersByRegistrationPeriod(startDate, endDate);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -238,7 +264,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting users without teams");
 
         List<User> users = userRepository.findUsersWithoutTeams();
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -247,7 +275,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting team captains");
 
         List<User> users = userRepository.findTeamCaptains();
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -256,7 +286,9 @@ public class UserServiceImpl implements UserService {
         log.debug("Getting users by team count: {}", teamCount);
 
         List<User> users = userRepository.findUsersByTeamCount(teamCount);
-        return teamMapper.toUserDTOList(users);
+        return users.stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -354,37 +386,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public int getUserTeamCount(Long userId) {
-        log.debug("Getting team count for user: {}", userId);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
-
-        return (int) userRepository.countByUserAndIsActiveTrue(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public int getUserActiveTeamCount(Long userId) {
-        log.debug("Getting active team count for user: {}", userId);
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
-
-        return (int) userRepository.countByUserAndIsActiveTrue(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean checkUserTeamLimit(Long userId, int maxTeams) {
-        log.debug("Checking team limit for user: {} with max: {}", userId, maxTeams);
-
-        int currentTeamCount = getUserActiveTeamCount(userId);
-        return currentTeamCount < maxTeams;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByUsernamePrefix(String prefix, int limit) {
         log.debug("Getting users by username prefix: {} with limit: {}", prefix, limit);
 
@@ -406,22 +407,17 @@ public class UserServiceImpl implements UserService {
         long teamCaptains = userRepository.findTeamCaptains().size();
 
         double averageTeamsPerUser = activeUsers > 0 ? (double) totalUsers / activeUsers : 0.0;
-
         Instant monthAgo = Instant.now().minusSeconds(30 * 24 * 60 * 60);
-        Instant weekAgo = Instant.now().minusSeconds(7 * 24 * 60 * 60);
-
         long newUsersThisMonth = userRepository.findUsersByRegistrationPeriod(monthAgo, Instant.now()).size();
-        long newUsersThisWeek = userRepository.findUsersByRegistrationPeriod(weekAgo, Instant.now()).size();
 
         return new UserStatisticsDTO(
                 totalUsers,
                 activeUsers,
-                usersWithoutTeams,
                 teamCaptains,
                 averageTeamsPerUser,
                 newUsersThisMonth,
-                newUsersThisWeek
-        );
+                usersWithoutTeams
+                );
     }
 
     @Override
@@ -445,5 +441,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User toEntity(UserDTO userDTO) {
         return teamMapper.toEntity(userDTO);
+    }
+
+    /**
+     * Получить ID пользователя по имени
+     */
+    public Long getUserIdByUsername(String username) {
+       return getUserByUsername(username).getId();
+    }
+
+    @Override
+    public List<UserDTO> getUsersByRole(String role, Pageable pageable) {
+        return List.of(); //Todo - реализовать метод
     }
 }

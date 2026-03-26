@@ -160,12 +160,6 @@ public class DailyAggregatedStatistics {
     private Integer newTeams;
 
     /**
-     * Количество активных команд
-     */
-    @Column(name = "active_teams")
-    private Long activeTeams;
-
-    /**
      * Среднее количество участников в команде
      */
     @Column(name = "avg_team_size")

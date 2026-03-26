@@ -74,13 +74,13 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
      * Найти капитана команды
      */
     @Query("SELECT tm FROM TeamMember tm WHERE tm.team = :team AND tm.role = :role AND tm.isActive = true")
-    Optional<TeamMember> findByTeamAndRoleAndIsActiveTrue(@Param("team") Team team, @Param("role") TeamRole role);
+    Optional<TeamMember> findCaptainByTeamAndRole(@Param("team") Team team, @Param("role") TeamRole role);
 
     /**
      * Найти все команды пользователя
      */
     @Query("SELECT tm FROM TeamMember tm WHERE tm.user = :user AND tm.isActive = true")
-    List<TeamMember> findByUserAndIsActiveTrue(@Param("user") User user);
+    List<TeamMember> findTeamsByUser(@Param("user") User user);
 
     /**
      * Найти команды пользователя с определенной ролью
@@ -145,8 +145,7 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
     /**
      * Найти участников для пагинации
      */
-    @Query("SELECT tm FROM TeamMember tm WHERE tm.team = :team AND tm.isActive = true ORDER BY tm.role DESC, tm.joinedAt ASC")
-    Page<TeamMember> findByTeamAndIsActiveTrue(@Param("team") Team team, Pageable pageable);
+    Page<TeamMember> findActiveMembersByTeam(@Param("team") Team team, Pageable pageable);
 
     /**
      * Найти всех неактивных участников

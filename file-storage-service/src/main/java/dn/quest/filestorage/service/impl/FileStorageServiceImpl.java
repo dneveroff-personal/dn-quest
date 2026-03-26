@@ -55,7 +55,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             fileValidationService.validateFile(file, request.getFileType());
 
             // Получение информации о пользователе
-            UUID ownerId = helper.getUserIdByUsername(username);
+            Long ownerId = helper.getUserIdByUsername(username);
 
             // Выбор стратегии хранения
             FileMetadata.StorageType storageType = request.getStorageType() != null 
@@ -463,7 +463,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Override
     public String generatePresignedUploadUrl(String fileName, String contentType, Duration duration, String username) {
         try {
-            UUID ownerId = helper.getUserIdByUsername(username);
+            Long ownerId = helper.getUserIdByUsername(username);
             
             String storedFileName = helper.generateStoredFileName(fileName);
             String path = helper.buildPath(null, FileMetadata.FileType.OTHER, username);
@@ -569,7 +569,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             }
             
             // Получаем ID владельца
-            UUID ownerId = helper.getUserIdByUsername(username);
+            Long ownerId = helper.getUserIdByUsername(username);
             
             // Определяем тип хранилища
             FileMetadata.StorageType targetStorageType = request.getStorageType() != null 

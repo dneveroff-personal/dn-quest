@@ -35,7 +35,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     /**
      * Найти публичные команды
      */
-    List<Team> findByIsPrivateFalseAndIsActiveTrue();
+    Page<Team> findByIsPrivateFalseAndIsActiveTrue(Pageable pageable);
 
     /**
      * Найти команды по названию (с учетом регистра)

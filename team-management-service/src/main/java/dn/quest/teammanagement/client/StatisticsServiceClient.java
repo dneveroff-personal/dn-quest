@@ -56,12 +56,6 @@ public interface StatisticsServiceClient {
     );
 
     /**
-     * Получение глобальной статистики команд
-     */
-    @GetMapping("/api/statistics/teams/global")
-    GlobalTeamStatisticsDTO getGlobalTeamStatistics();
-
-    /**
      * Получение глобальной статистики пользователей
      */
     @GetMapping("/api/statistics/users/global")
@@ -485,7 +479,6 @@ public interface StatisticsServiceClient {
         public Integer getTotalTeams() { return totalTeams; }
         public void setTotalTeams(Integer totalTeams) { this.totalTeams = totalTeams; }
         
-        public Integer getActiveTeams() { return activeTeams; }
         public void setActiveTeams(Integer activeTeams) { this.activeTeams = activeTeams; }
         
         public Long getTotalInvitations() { return totalInvitations; }
@@ -524,7 +517,6 @@ public interface StatisticsServiceClient {
         public Long getTotalTeams() { return totalTeams; }
         public void setTotalTeams(Long totalTeams) { this.totalTeams = totalTeams; }
         
-        public Long getActiveTeams() { return activeTeams; }
         public void setActiveTeams(Long activeTeams) { this.activeTeams = activeTeams; }
         
         public Double getAverageTeamSize() { return averageTeamSize; }

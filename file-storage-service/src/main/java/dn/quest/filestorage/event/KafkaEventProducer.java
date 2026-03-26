@@ -30,7 +30,7 @@ public class KafkaEventProducer {
         FileUploadedEvent event = FileUploadedEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .fileId(fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null)
-                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null)
+                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId() : null)
                 .fileName(fileMetadata.getStoredFileName())
                 .originalFileName(fileMetadata.getOriginalFileName())
                 .contentType(fileMetadata.getContentType())
@@ -49,7 +49,7 @@ public class KafkaEventProducer {
         FileUpdatedEvent event = FileUpdatedEvent.builder()
                 .eventId(UUID.randomUUID().toString())
                 .fileId(fileMetadata.getId() != null ? fileMetadata.getId().getMostSignificantBits() : null)
-                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId().getMostSignificantBits() : null)
+                .userId(fileMetadata.getOwnerId() != null ? fileMetadata.getOwnerId() : null)
                 .fileName(fileMetadata.getStoredFileName())
                 .originalFileName(fileMetadata.getOriginalFileName())
                 .contentType(fileMetadata.getContentType())
@@ -97,7 +97,7 @@ public class KafkaEventProducer {
         publishFileUploadedEvent(fileMetadata);
         if (fileMetadata.getOwnerId() != null) {
             publishFileNotificationEvent(
-                    fileMetadata.getOwnerId().getMostSignificantBits(),
+                    fileMetadata.getOwnerId(),
                     "Файл загружен",
                     String.format("Файл '%s' успешно загружен", fileMetadata.getOriginalFileName()),
                     "FILE_UPLOAD_SUCCESS"

@@ -17,7 +17,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.criteria.Predicate;
 
@@ -35,7 +34,7 @@ public class FileStorageServiceImplHelper {
     /**
      * Получить ID пользователя по имени
      */
-    protected UUID getUserIdByUsername(String username) {
+    protected Long getUserIdByUsername(String username) {
         try {
             UserDTO user = authServiceClient.getUserByUsername(username);
             return user.getId();
@@ -112,7 +111,7 @@ public class FileStorageServiceImplHelper {
     /**
      * Проверить, можно ли переиспользовать существующий файл
      */
-    protected boolean shouldReuseExistingFile(FileMetadata existingFile, FileUploadRequestDTO request, UUID ownerId) {
+    protected boolean shouldReuseExistingFile(FileMetadata existingFile, FileUploadRequestDTO request, Long ownerId) {
         return existingFile.getOwnerId().equals(ownerId) &&
                existingFile.getFileType().equals(request.getFileType()) &&
                Objects.equals(existingFile.getIsPublic(), request.getIsPublic()) &&
@@ -216,7 +215,7 @@ public class FileStorageServiceImplHelper {
         
         // Владелец имеет доступ
         try {
-            UUID userId = getUserIdByUsername(username);
+            Long userId = getUserIdByUsername(username);
             return metadata.getOwnerId().equals(userId);
         } catch (Exception e) {
             return false;
@@ -264,7 +263,7 @@ public class FileStorageServiceImplHelper {
             
             // Фильтр по владельцу (если не администратор)
             try {
-                UUID userId = getUserIdByUsername(username);
+                Long userId = getUserIdByUsername(username);
                 predicates.add(criteriaBuilder.equal(root.get("ownerId"), userId));
             } catch (Exception e) {
                 // Если не удалось получить ID пользователя, возвращаем пустой результат

@@ -592,7 +592,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .totalQuests(totalQuests)
                 .completedQuests(completedQuests)
                 .totalTeams(totalTeams)
-                .activeTeams(activeTeams)
                 .totalGameSessions(totalGameSessions)
                 .completedGameSessions(completedGameSessions)
                 .totalGameTime(userStats.stream().mapToLong(UserStatistics::getTotalGameTimeMinutes).sum())
@@ -1268,7 +1267,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         long totalQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalQuests).sum();
         long completedQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedQuests).sum();
         long totalTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalTeams).sum();
-        long activeTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getActiveTeams).sum();
         long totalGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameSessions).sum();
         long completedGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedGameSessions).sum();
         
@@ -1278,7 +1276,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .aggregationType("weekly")
                 .activeUsers(activeUsers)
                 .completedQuests(completedQuests)
-                .activeTeams(activeTeams)
                 .completedGameSessions(completedGameSessions)
                 .totalQuests(totalQuests)
                 .totalTeams(totalTeams)
@@ -1309,7 +1306,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         long totalQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalQuests).sum();
         long completedQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedQuests).sum();
         long totalTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalTeams).sum();
-        long activeTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getActiveTeams).sum();
         long totalGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameSessions).sum();
         long completedGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedGameSessions).sum();
         
@@ -1319,7 +1315,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .aggregationType("monthly")
                 .activeUsers(activeUsers)
                 .completedQuests(completedQuests)
-                .activeTeams(activeTeams)
                 .completedGameSessions(completedGameSessions)
                 .totalQuests(totalQuests)
                 .totalTeams(totalTeams)

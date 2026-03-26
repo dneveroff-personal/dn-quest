@@ -45,6 +45,7 @@ public class Team {
     private User captain;
 
     @Column(name = "max_members")
+    @Builder.Default
     private Integer maxMembers = 10;
 
     @Column(name = "is_private")

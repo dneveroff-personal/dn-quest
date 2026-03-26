@@ -1,10 +1,11 @@
 package dn.quest.teammanagement.service;
 
+import dn.quest.teammanagement.dto.GlobalInvitationStatisticsDTO;
+import dn.quest.teammanagement.dto.InvitationStatisticsDTO;
 import dn.quest.teammanagement.dto.TeamInvitationDTO;
 import dn.quest.teammanagement.dto.request.InviteUserRequest;
 import dn.quest.teammanagement.dto.request.RespondToInvitationRequest;
 import dn.quest.teammanagement.dto.response.InvitationListResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -176,28 +177,3 @@ public interface TeamInvitationService {
      */
     TeamInvitationDTO toDTO(dn.quest.teammanagement.entity.TeamInvitation invitation);
 }
-
-/**
- * DTO для статистики приглашений команды
- */
-record InvitationStatisticsDTO(
-    long totalSent,
-    long totalAccepted,
-    long totalDeclined,
-    long totalExpired,
-    long totalPending,
-    double acceptanceRate,
-    double declineRate
-) {}
-
-/**
- * DTO для глобальной статистики приглашений
- */
-record GlobalInvitationStatisticsDTO(
-    long totalTeams,
-    long totalInvitations,
-    long activeInvitations,
-    double averageAcceptanceRate,
-    long mostActiveTeamId,
-    String mostActiveTeamName
-) {}

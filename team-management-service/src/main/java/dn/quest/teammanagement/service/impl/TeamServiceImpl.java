@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса для управления командами
@@ -208,11 +207,11 @@ public class TeamServiceImpl implements TeamService {
             throw new RuntimeException("Only captain can delete team");
         }
 
-        // Удаляем все связанные данные
-        teamInvitationRepository.deleteByTeam(team);
-        teamMemberRepository.deleteByTeam(team);
-        teamSettingsRepository.deleteByTeam(team);
-        teamStatisticsRepository.deleteByTeam(team);
+        // TODO  Удаляем все связанные данные
+        //teamInvitationRepository.deleteByTeam(team);
+        //teamMemberRepository.deleteByTeam(team);
+        //teamSettingsRepository.deleteByTeam(team);
+        //teamStatisticsRepository.deleteByTeam(team);
 
         // Удаляем команду
         teamRepository.delete(team);
@@ -316,6 +315,11 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public TeamListResponse getUserTeams(Long userId, Pageable pageable) {
+        return null;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "userActiveTeams", key = "#userId")
     public List<TeamDTO> getUserActiveTeams(Long userId) {
@@ -375,7 +379,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public void transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId) {
+    public TeamMember transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId) {
         log.debug("Transferring captain in team: {} from {} to {}", teamId, currentCaptainId, newCaptainId);
 
         Team team = getTeamEntity(teamId);
@@ -409,11 +413,13 @@ public class TeamServiceImpl implements TeamService {
         teamRepository.save(team);
 
         log.info("Captain transferred successfully in team: {} from {} to {}", teamId, currentCaptainId, newCaptainId);
+
+        return newCaptainMember;
     }
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public void addMember(Long teamId, Long userId, Long requesterId) {
+    public TeamMember addMember(Long teamId, Long userId, Long requesterId) {
         log.debug("Adding member {} to team: {} by requester: {}", userId, teamId, requesterId);
 
         Team team = getTeamEntity(teamId);
@@ -448,6 +454,7 @@ public class TeamServiceImpl implements TeamService {
         teamMemberRepository.save(member);
 
         log.info("Member {} added to team: {}", userId, teamId);
+        return member;
     }
 
     @Override
@@ -482,7 +489,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public void changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId) {
+    public TeamMember changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId) {
         log.debug("Changing role of member {} in team: {} to {} by requester: {}", 
                 userId, teamId, newRole, requesterId);
 
@@ -515,6 +522,103 @@ public class TeamServiceImpl implements TeamService {
         teamMemberRepository.save(member);
 
         log.info("Role changed for member {} in team: {} to {}", userId, teamId, newRole);
+
+        return member;
+    }
+
+    @Override
+    public TeamInvitationDTO inviteUser(Long teamId, InviteUserRequest request, Long inviterId) {
+        return null;
+    }
+
+    @Override
+    public List<TeamInvitationDTO> getTeamInvitations(Long teamId, Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public List<TeamInvitationDTO> getTeamActiveInvitations(Long teamId, Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public void revokeInvitation(Long teamId, Long invitationId, Long userId) {
+
+    }
+
+    @Override
+    public TeamSettingsDTO getTeamSettings(Long teamId) {
+        return null;
+    }
+
+    @Override
+    public TeamSettingsDTO updateTeamSettings(Long teamId, UpdateTeamSettingsRequest request, Long userId) {
+        return null;
+    }
+
+    @Override
+    public TeamStatisticsDTO getTeamStatistics(Long teamId) {
+        return null;
+    }
+
+    @Override
+    public void updateTeamStatistics(Long teamId) {
+
+    }
+
+    @Override
+    public List<TeamMemberDTO> getTeamMembers(Long teamId) {
+        return List.of();
+    }
+
+    @Override
+    public List<TeamMemberDTO> getTeamActiveMembers(Long teamId, Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public List<TeamDTO> getTeamsByName(String name) {
+        return List.of();
+    }
+
+    @Override
+    public List<TeamDTO> getTeamsByTag(String tag) {
+        return List.of();
+    }
+
+    @Override
+    public long getTeamsCount() {
+        return 0;
+    }
+
+    @Override
+    public long getPublicTeamsCount() {
+        return 0;
+    }
+
+    @Override
+    public long getPrivateTeamsCount() {
+        return 0;
+    }
+
+    @Override
+    public void activateTeam(Long teamId, Long userId) {
+
+    }
+
+    @Override
+    public void deactivateTeam(Long teamId, Long userId) {
+
+    }
+
+    @Override
+    public boolean teamExists(Long teamId) {
+        return false;
+    }
+
+    @Override
+    public boolean teamExistsByName(String name) {
+        return false;
     }
 
     // Остальные методы будут реализованы в следующей части...
@@ -523,6 +627,26 @@ public class TeamServiceImpl implements TeamService {
     public Team getTeamEntity(Long teamId) {
         return teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found: " + teamId));
+    }
+
+    @Override
+    public void updateTeamRating(Long teamId, Double newRating) {
+
+    }
+
+    @Override
+    public void updateTeamRank(Long teamId, Integer newRank) {
+
+    }
+
+    @Override
+    public List<Team> getTeamsForRatingUpdate() {
+        return List.of();
+    }
+
+    @Override
+    public void cleanupOldData() {
+
     }
 
     // Вспомогательные методы
