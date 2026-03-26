@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -54,7 +55,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Получаем данные из БД
             LocalDate targetDate = getTargetDate(period, date);
-            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDate(
+            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDateOrderByRank(
                     "users", period, targetDate);
             
             // Фильтрация по категории если необходимо
@@ -104,7 +105,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Получаем данные из БД
             LocalDate targetDate = getTargetDate(period, date);
-            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDate(
+            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDateOrderByRank(
                     "quests", period, targetDate);
             
             // Фильтрация по категории и метрике
@@ -154,7 +155,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Получаем данные из БД
             LocalDate targetDate = getTargetDate(period, date);
-            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDate(
+            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDateOrderByRank(
                     "teams", period, targetDate);
             
             // Фильтрация по категории
@@ -261,12 +262,12 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                 result.put("previousScore", entry.getPreviousScore());
                 result.put("scoreChange", entry.getScoreChange());
                 result.put("category", entry.getCategory());
+                result.put("level", entry.getLevel());
+                result.put("progressPercentage", entry.getProgressPercentage());
+                result.put("participationsCount", entry.getParticipationsCount());
+                result.put("winsCount", entry.getWinsCount());
+                result.put("winRate", entry.getWinRate());
                 result.put("avgRating", entry.getAvgRating());
-                result.put("ratingsCount", entry.getRatingsCount());
-                result.put("avgCompletionTime", entry.getAvgCompletionTime());
-                result.put("completionsCount", entry.getCompletionsCount());
-                result.put("viewsCount", entry.getViewsCount());
-                result.put("likesCount", entry.getLikesCount());
             } else {
                 // Если квест не найден в лидерборде, рассчитываем позицию динамически
                 result = calculateQuestPositionDynamically(questId, period, metric, targetDate);
@@ -374,23 +375,25 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             "users", period, userId, startDate, endDate);
             
             List<Map<String, Object>> historyData = historyEntries.stream()
-                    .map(entry -> Map.of(
-                            "date", entry.getDate(),
-                            "rank", entry.getRank(),
-                            "score", entry.getScore(),
-                            "rankChange", entry.getRankChange(),
-                            "scoreChange", entry.getScoreChange()
-                    ))
+                    .map(entry -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("date", entry.getDate());
+                        map.put("rank", entry.getRank());
+                        map.put("score", entry.getScore());
+                        map.put("rankChange", entry.getRankChange());
+                        map.put("scoreChange", entry.getScoreChange());
+                        return map;
+                    })
                     .collect(Collectors.toList());
             
-            return Map.of(
-                    "userId", userId,
-                    "period", period,
-                    "startDate", startDate,
-                    "endDate", endDate,
-                    "history", historyData
-            );
-            
+            Map<String, Object> result = new HashMap<>();
+            result.put("userId", userId);
+            result.put("period", period);
+            result.put("startDate", startDate);
+            result.put("endDate", endDate);
+            result.put("history", historyData);
+
+            return result;
         } catch (Exception e) {
             log.error("Error getting user leaderboard history", e);
             throw new StatisticsNotFoundException("Failed to get user leaderboard history", e);
@@ -430,15 +433,18 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Статистика по пользователям
             List<Leaderboard> userLeaderboards = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDate("users", period, targetDate);
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(
+                            "users", period, targetDate);
             
             // Статистика по квестам
             List<Leaderboard> questLeaderboards = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDate("quests", period, targetDate);
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(
+                            "quests", period, targetDate);
             
             // Статистика по командам
             List<Leaderboard> teamLeaderboards = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDate("teams", period, targetDate);
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(
+                            "teams", period, targetDate);
             
             return Map.of(
                     "period", period,
@@ -639,6 +645,61 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             log.error("Error getting top teams", e);
             throw new StatisticsNotFoundException("Failed to get top teams", e);
         }
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getRatingLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getScoreLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getWinsLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getCompletionTimeLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getCompletionsLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<LeaderboardDTO> getSuccessRateLeaderboard(String entityType, String period, LocalDate date, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getLeaderboardTrends(String entityType, String period, LocalDate startDate, LocalDate endDate) {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Object> getPositionComparison(Long entityId, String entityType, LocalDate date1, LocalDate date2) {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Object> getPositionForecast(Long entityId, String entityType, String period, int daysAhead) {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Object> getLeaderboardChangeAnalysis(String entityType, String period, LocalDate date) {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Object> getCategoryStatistics(String entityType, String period, LocalDate date) {
+        return Map.of();
     }
 
     // Вспомогательные методы
@@ -940,12 +1001,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             .avgRating(calculateQuestAvgRating(questId))
                             .ratingsCount(calculateQuestRatingsCount(questId))
                             .avgCompletionTime(calculateQuestAvgCompletionTime(questId))
-                            .completionsCount(aggregated.getCompletions())
                             .viewsCount(aggregated.getViews())
                             .likesCount(calculateQuestLikesCount(questId))
                             .build();
                 })
-                .sorted((l1, l2) -> Double.compare(l2.getScore(), l1.getScore())) // Сортировка по убыванию очков
+                .sorted((l1, l2) -> Double.compare(l2.getScore() != null ? l2.getScore() : 0.0, l1.getScore() != null ? l1.getScore() : 0.0)) // Сортировка по убыванию очков
                 .collect(Collectors.toList());
         
         // Устанавливаем ранги
@@ -1371,5 +1431,375 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         // В реальной реализации здесь был бы запрос к данным о лайках
         // Пока возвращаем количество на основе ID квеста
         return (int) (questId % 100) + 20;
+    }
+
+    @Override
+    public Map<String, Object> getSeasonalTrends(String entityType, String period, int year) {
+        log.debug("Getting seasonal trends for entityType: {} period: {} year: {}", entityType, period, year);
+        
+        try {
+            Map<String, Object> trends = new HashMap<>();
+            
+            // Получаем данные за все месяцы года
+            LocalDate startDate = LocalDate.of(year, 1, 1);
+            LocalDate endDate = LocalDate.of(year, 12, 31);
+            
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateBetweenOrderByDateDescRank(
+                            entityType, period, startDate, endDate);
+            
+            // Группируем по месяцам
+            Map<Integer, List<Leaderboard>> byMonth = leaderboards.stream()
+                    .collect(Collectors.groupingBy(l -> l.getDate() != null ? l.getDate().getMonthValue() : 0));
+            
+            Map<String, Object> monthlyData = new HashMap<>();
+            for (int month = 1; month <= 12; month++) {
+                List<Leaderboard> monthData = byMonth.getOrDefault(month, Collections.emptyList());
+                Map<String, Object> monthStats = new HashMap<>();
+                monthStats.put("entriesCount", monthData.size());
+                monthStats.put("avgScore", monthData.stream()
+                        .filter(l -> l.getScore() != null)
+                        .mapToDouble(Leaderboard::getScore)
+                        .average()
+                        .orElse(0.0));
+                monthStats.put("topScore", monthData.stream()
+                        .filter(l -> l.getScore() != null)
+                        .mapToDouble(Leaderboard::getScore)
+                        .max()
+                        .orElse(0.0));
+                monthlyData.put("month_" + month, monthStats);
+            }
+            
+            trends.put("entityType", entityType);
+            trends.put("period", period);
+            trends.put("year", year);
+            trends.put("monthlyData", monthlyData);
+            
+            return trends;
+            
+        } catch (Exception e) {
+            log.error("Error getting seasonal trends", e);
+            throw new StatisticsNotFoundException("Failed to get seasonal trends", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getPositionStabilityAnalysis(Long entityId, String entityType, String period, LocalDate startDate, LocalDate endDate) {
+        log.debug("Getting position stability analysis for entityId: {} entityType: {} period: {} startDate: {} endDate: {}",
+                entityId, entityType, period, startDate, endDate);
+        
+        try {
+            Map<String, Object> analysis = new HashMap<>();
+            
+            // Получаем исторические данные лидерборда
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateBetweenOrderByDateDescRank(
+                            entityType, period, startDate, endDate);
+            
+            // Фильтруем по конкретному entity
+            List<Leaderboard> entityLeaderboards = leaderboards.stream()
+                    .filter(l -> l.getEntityId() != null && l.getEntityId().equals(entityId))
+                    .sorted(Comparator.comparing(Leaderboard::getDate))
+                    .collect(Collectors.toList());
+            
+            if (entityLeaderboards.isEmpty()) {
+                analysis.put("hasEnoughData", false);
+                analysis.put("message", "No historical data found for the specified period");
+                return analysis;
+            }
+            
+            // Вычисляем статистику стабильности
+            List<Integer> positions = entityLeaderboards.stream()
+                    .map(Leaderboard::getRank)
+                    .collect(Collectors.toList());
+            
+            double avgPosition = positions.stream()
+                    .mapToInt(Integer::intValue)
+                    .average()
+                    .orElse(0.0);
+            
+            double variance = calculateVariance(positions, avgPosition);
+            double stdDev = Math.sqrt(variance);
+            
+            // Определяем стабильность
+            String stabilityLevel;
+            if (stdDev < 5.0) {
+                stabilityLevel = "HIGH";
+            } else if (stdDev < 15.0) {
+                stabilityLevel = "MEDIUM";
+            } else {
+                stabilityLevel = "LOW";
+            }
+            
+            analysis.put("entityId", entityId);
+            analysis.put("entityType", entityType);
+            analysis.put("period", period);
+            analysis.put("hasEnoughData", true);
+            analysis.put("dataPoints", positions.size());
+            analysis.put("averagePosition", avgPosition);
+            analysis.put("minPosition", Collections.min(positions));
+            analysis.put("maxPosition", Collections.max(positions));
+            analysis.put("positionChange", positions.get(positions.size() - 1) - positions.get(0));
+            analysis.put("variance", variance);
+            analysis.put("standardDeviation", stdDev);
+            analysis.put("stabilityLevel", stabilityLevel);
+            analysis.put("positions", positions);
+            
+            return analysis;
+            
+        } catch (Exception e) {
+            log.error("Error getting position stability analysis", e);
+            throw new StatisticsNotFoundException("Failed to get position stability analysis", e);
+        }
+    }
+    
+    private double calculateVariance(List<Integer> positions, double mean) {
+        if (positions.isEmpty()) return 0.0;
+        double sumSquaredDiff = positions.stream()
+                .mapToDouble(p -> Math.pow(p - mean, 2))
+                .sum();
+        return sumSquaredDiff / positions.size();
+    }
+
+    @Override
+    public Map<String, Object> getPositionMigration(String entityType, String period, LocalDate date) {
+        log.debug("Getting position migration for entityType: {} period: {} date: {}", entityType, period, date);
+        
+        try {
+            Map<String, Object> migration = new HashMap<>();
+            
+            // Получаем данные лидерборда за указанную дату
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(entityType, period, date);
+            
+            if (leaderboards.isEmpty()) {
+                migration.put("hasData", false);
+                migration.put("message", "No leaderboard data found for the specified date");
+                return migration;
+            }
+            
+            // Анализируем миграцию позиций
+            List<Map<String, Object>> positionChanges = new ArrayList<>();
+            
+            // Простая логика: сравниваем соседние позиции
+            for (int i = 0; i < leaderboards.size() - 1; i++) {
+                Leaderboard current = leaderboards.get(i);
+                Leaderboard next = leaderboards.get(i + 1);
+                
+                Map<String, Object> change = new HashMap<>();
+                change.put("fromRank", current.getRank());
+                change.put("toRank", next.getRank());
+                change.put("entityId", current.getEntityId());
+                change.put("score", current.getScore());
+                positionChanges.add(change);
+            }
+            
+            migration.put("entityType", entityType);
+            migration.put("period", period);
+            migration.put("date", date);
+            migration.put("hasData", true);
+            migration.put("totalEntries", leaderboards.size());
+            migration.put("positionChanges", positionChanges);
+            
+            // Вычисляем статистику миграции
+            long upMigrations = positionChanges.stream()
+                    .filter(c -> (Integer) c.get("fromRank") < (Integer) c.get("toRank"))
+                    .count();
+            long downMigrations = positionChanges.stream()
+                    .filter(c -> (Integer) c.get("fromRank") > (Integer) c.get("toRank"))
+                    .count();
+            
+            migration.put("upMigrations", upMigrations);
+            migration.put("downMigrations", downMigrations);
+            migration.put("stablePositions", positionChanges.size() - upMigrations - downMigrations);
+            
+            return migration;
+            
+        } catch (Exception e) {
+            log.error("Error getting position migration", e);
+            throw new StatisticsNotFoundException("Failed to get position migration", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getHistoricalLeaderboardData(String entityType, String period, LocalDate startDate, LocalDate endDate) {
+        log.debug("Getting historical leaderboard data for entityType: {} period: {} startDate: {} endDate: {}",
+                entityType, period, startDate, endDate);
+        
+        try {
+            Map<String, Object> historicalData = new HashMap<>();
+            
+            // Получаем данные за диапазон дат
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateBetweenOrderByDateDescRank(
+                            entityType, period, startDate, endDate);
+            
+            if (leaderboards.isEmpty()) {
+                historicalData.put("hasData", false);
+                historicalData.put("message", "No historical data found for the specified period");
+                return historicalData;
+            }
+            
+            // Группируем по датам
+            Map<LocalDate, List<Leaderboard>> byDate = leaderboards.stream()
+                    .collect(Collectors.groupingBy(Leaderboard::getDate));
+            
+            // Создаем список записей по датам
+            List<Map<String, Object>> dailyData = new ArrayList<>();
+            for (Map.Entry<LocalDate, List<Leaderboard>> entry : byDate.entrySet()) {
+                Map<String, Object> dayData = new HashMap<>();
+                dayData.put("date", entry.getKey());
+                dayData.put("entriesCount", entry.getValue().size());
+                dayData.put("topScore", entry.getValue().stream()
+                        .filter(l -> l.getScore() != null)
+                        .mapToDouble(Leaderboard::getScore)
+                        .max()
+                        .orElse(0.0));
+                dayData.put("avgScore", entry.getValue().stream()
+                        .filter(l -> l.getScore() != null)
+                        .mapToDouble(Leaderboard::getScore)
+                        .average()
+                        .orElse(0.0));
+                
+                // Добавляем топ-10
+                List<Map<String, Object>> topEntries = entry.getValue().stream()
+                        .sorted(Comparator.comparing(Leaderboard::getRank))
+                        .limit(10)
+                        .map(l -> {
+                            Map<String, Object> e = new HashMap<>();
+                            e.put("rank", l.getRank());
+                            e.put("entityId", l.getEntityId());
+                            e.put("entityName", l.getEntityName());
+                            e.put("score", l.getScore());
+                            return e;
+                        })
+                        .collect(Collectors.toList());
+                dayData.put("topEntries", topEntries);
+                
+                dailyData.add(dayData);
+            }
+            
+            // Сортируем по дате
+            dailyData.sort(Comparator.comparing(m -> (LocalDate) m.get("date")));
+            
+            historicalData.put("entityType", entityType);
+            historicalData.put("period", period);
+            historicalData.put("startDate", startDate);
+            historicalData.put("endDate", endDate);
+            historicalData.put("hasData", true);
+            historicalData.put("totalDays", byDate.size());
+            historicalData.put("dailyData", dailyData);
+            
+            return historicalData;
+            
+        } catch (Exception e) {
+            log.error("Error getting historical leaderboard data", e);
+            throw new StatisticsNotFoundException("Failed to get historical leaderboard data", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getCompetitionAnalysis(Long entityId, String entityType, String period, LocalDate date) {
+        log.debug("Getting competition analysis for entityId: {} entityType: {} period: {} date: {}",
+                entityId, entityType, period, date);
+        
+        try {
+            Map<String, Object> analysis = new HashMap<>();
+            
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(entityType, period, date);
+            
+            if (leaderboards.isEmpty()) {
+                analysis.put("hasData", false);
+                analysis.put("message", "No leaderboard data found");
+                return analysis;
+            }
+            
+            Leaderboard entityEntry = leaderboards.stream()
+                    .filter(l -> l.getEntityId() != null && l.getEntityId().equals(entityId))
+                    .findFirst()
+                    .orElse(null);
+            
+            if (entityEntry == null) {
+                analysis.put("hasData", false);
+                analysis.put("message", "Entity not found in leaderboard");
+                return analysis;
+            }
+            
+            int entityRank = entityEntry.getRank();
+            
+            List<Leaderboard> nearbyCompetitors = leaderboards.stream()
+                    .filter(l -> Math.abs(l.getRank() - entityRank) <= 5)
+                    .filter(l -> !l.getEntityId().equals(entityId))
+                    .sorted(Comparator.comparing(Leaderboard::getRank))
+                    .collect(Collectors.toList());
+            
+            List<Map<String, Object>> competitorData = nearbyCompetitors.stream()
+                    .map(c -> {
+                        Map<String, Object> comp = new HashMap<>();
+                        comp.put("rank", c.getRank());
+                        comp.put("entityId", c.getEntityId());
+                        comp.put("entityName", c.getEntityName());
+                        comp.put("score", c.getScore());
+                        comp.put("rankDifference", c.getRank() - entityRank);
+                        return comp;
+                    })
+                    .collect(Collectors.toList());
+            
+            analysis.put("entityId", entityId);
+            analysis.put("entityType", entityType);
+            analysis.put("period", period);
+            analysis.put("date", date);
+            analysis.put("hasData", true);
+            analysis.put("currentRank", entityRank);
+            analysis.put("totalEntries", leaderboards.size());
+            analysis.put("nearbyCompetitors", competitorData);
+            analysis.put("competitorsCount", competitorData.size());
+            
+            return analysis;
+            
+        } catch (Exception e) {
+            log.error("Error getting competition analysis", e);
+            throw new StatisticsNotFoundException("Failed to get competition analysis", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getPositionDistribution(String entityType, String period, LocalDate date) {
+        log.debug("Getting position distribution for entityType: {} period: {} date: {}", entityType, period, date);
+        
+        try {
+            Map<String, Object> distribution = new HashMap<>();
+            
+            List<Leaderboard> leaderboards = leaderboardRepository
+                    .findByLeaderboardTypeAndPeriodAndDateOrderByRank(entityType, period, date);
+            
+            if (leaderboards.isEmpty()) {
+                distribution.put("hasData", false);
+                distribution.put("message", "No leaderboard data found");
+                return distribution;
+            }
+            
+            // Группируем по диапазонам позиций
+            Map<String, Long> ranges = new LinkedHashMap<>();
+            ranges.put("top_10", leaderboards.stream().filter(l -> l.getRank() <= 10).count());
+            ranges.put("top_50", leaderboards.stream().filter(l -> l.getRank() > 10 && l.getRank() <= 50).count());
+            ranges.put("top_100", leaderboards.stream().filter(l -> l.getRank() > 50 && l.getRank() <= 100).count());
+            ranges.put("mid_range", leaderboards.stream().filter(l -> l.getRank() > 100 && l.getRank() <= 500).count());
+            ranges.put("lower_range", leaderboards.stream().filter(l -> l.getRank() > 500).count());
+            
+            distribution.put("entityType", entityType);
+            distribution.put("period", period);
+            distribution.put("date", date);
+            distribution.put("hasData", true);
+            distribution.put("totalEntries", leaderboards.size());
+            distribution.put("ranges", ranges);
+            
+            return distribution;
+            
+        } catch (Exception e) {
+            log.error("Error getting position distribution", e);
+            throw new StatisticsNotFoundException("Failed to get position distribution", e);
+        }
     }
 }

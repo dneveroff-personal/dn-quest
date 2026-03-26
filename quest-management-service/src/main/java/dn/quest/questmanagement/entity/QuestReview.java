@@ -63,6 +63,7 @@ public class QuestReview {
      * Видимость отзыва (для модерации)
      */
     @Column(name = "is_visible", nullable = false)
+    @Builder.Default
     private Boolean isVisible = true;
 
     /**

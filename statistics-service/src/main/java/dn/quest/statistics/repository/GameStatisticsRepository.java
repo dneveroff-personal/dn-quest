@@ -1,6 +1,7 @@
 package dn.quest.statistics.repository;
 
 import dn.quest.statistics.entity.GameStatistics;
+import dn.quest.statistics.entity.TeamStatistics;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -283,4 +284,9 @@ public interface GameStatisticsRepository extends JpaRepository<GameStatistics, 
      */
     @Query("SELECT COUNT(DISTINCT g.sessionId) FROM GameStatistics g WHERE g.date BETWEEN :startDate AND :endDate")
     Long countDistinctSessionsByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    /**
+     * Найти статистику за период
+     */
+    List<GameStatistics> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }

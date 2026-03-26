@@ -72,7 +72,7 @@ public class ReportsServiceImpl implements ReportsService {
             List<UserStatistics> userStats;
             
             if (userId != null) {
-                userStats = userStatisticsRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+                userStats = userStatisticsRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate);
             } else {
                 userStats = userStatisticsRepository.findByDateBetween(startDate, endDate);
             }
@@ -195,7 +195,7 @@ public class ReportsServiceImpl implements ReportsService {
         try {
             LocalDate targetDate = date != null ? date : LocalDate.now();
             
-            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDate(
+            List<Leaderboard> leaderboards = leaderboardRepository.findByLeaderboardTypeAndPeriodAndDateOrderByRank(
                     leaderboardType, period, targetDate);
             
             Map<String, Object> reportData = new HashMap<>();
@@ -366,15 +366,15 @@ public class ReportsServiceImpl implements ReportsService {
                     String reportId = entry.getKey();
                     ReportGenerationTask task = entry.getValue();
                     
-                    return Map.of(
-                        "reportId", reportId,
-                        "filename", task.getFilename(),
-                        "format", task.getFormat(),
-                        "status", task.getStatus(),
-                        "createdAt", task.getStartedAt(),
-                        "completedAt", task.getCompletedAt(),
-                        "size", task.getReportData() != null ? task.getReportData().length : 0
-                    );
+                    Map<String, Object> reportMap = new HashMap<>();
+                    reportMap.put("reportId", reportId);
+                    reportMap.put("filename", task.getFilename());
+                    reportMap.put("format", task.getFormat());
+                    reportMap.put("status", task.getStatus());
+                    reportMap.put("createdAt", task.getStartedAt());
+                    reportMap.put("completedAt", task.getCompletedAt());
+                    reportMap.put("size", task.getReportData() != null ? task.getReportData().length : 0);
+                    return reportMap;
                 })
                 .collect(Collectors.toList());
     }
@@ -458,102 +458,6 @@ public class ReportsServiceImpl implements ReportsService {
         } catch (Exception e) {
             log.error("Error exporting team statistics", e);
             throw new RuntimeException("Failed to export team statistics", e);
-        }
-    }
-
-    @Override
-    public byte[] exportFileStatistics(LocalDate startDate, LocalDate endDate, String format, String fileType) {
-        log.info("Exporting file statistics from {} to {} format: {} type: {}", startDate, endDate, format, fileType);
-        
-        try {
-            List<FileStatistics> fileStats = fileStatisticsRepository.findByDateBetween(startDate, endDate);
-            
-            if (fileType != null && !fileType.isEmpty()) {
-                fileStats = fileStats.stream()
-                        .filter(fs -> fileType.equals(fs.getFileType()))
-                        .collect(Collectors.toList());
-            }
-            
-            Map<String, Object> reportData = new HashMap<>();
-            reportData.put("fileStatistics", convertFileStatisticsToList(fileStats));
-            reportData.put("metadata", Map.of(
-                "startDate", startDate,
-                "endDate", endDate,
-                "fileType", fileType,
-                "totalRecords", fileStats.size(),
-                "generatedAt", LocalDateTime.now()
-            ));
-            
-            return switch (format.toLowerCase()) {
-                case "csv" -> generateCsvReport(reportData, "file_statistics");
-                case "json" -> generateJsonReport(reportData, "file_statistics");
-                case "excel", "xlsx" -> generateExcelReport(reportData, "file_statistics");
-                default -> throw new IllegalArgumentException("Unsupported format: " + format);
-            };
-            
-        } catch (Exception e) {
-            log.error("Error exporting file statistics", e);
-            throw new RuntimeException("Failed to export file statistics", e);
-        }
-    }
-
-    @Override
-    public byte[] exportSystemStatistics(LocalDate startDate, LocalDate endDate, String format) {
-        log.info("Exporting system statistics from {} to {} format: {}", startDate, endDate, format);
-        
-        try {
-            List<SystemStatistics> systemStats = systemStatisticsRepository.findByDateBetween(startDate, endDate);
-            
-            Map<String, Object> reportData = new HashMap<>();
-            reportData.put("systemStatistics", convertSystemStatisticsToList(systemStats));
-            reportData.put("metadata", Map.of(
-                "startDate", startDate,
-                "endDate", endDate,
-                "totalRecords", systemStats.size(),
-                "generatedAt", LocalDateTime.now()
-            ));
-            
-            return switch (format.toLowerCase()) {
-                case "csv" -> generateCsvReport(reportData, "system_statistics");
-                case "json" -> generateJsonReport(reportData, "system_statistics");
-                case "excel", "xlsx" -> generateExcelReport(reportData, "system_statistics");
-                default -> throw new IllegalArgumentException("Unsupported format: " + format);
-            };
-            
-        } catch (Exception e) {
-            log.error("Error exporting system statistics", e);
-            throw new RuntimeException("Failed to export system statistics", e);
-        }
-    }
-
-    @Override
-    public byte[] exportAggregatedStatistics(LocalDate startDate, LocalDate endDate, String aggregationType, String format) {
-        log.info("Exporting aggregated statistics from {} to {} type: {} format: {}", startDate, endDate, aggregationType, format);
-        
-        try {
-            List<DailyAggregatedStatistics> aggregatedStats = dailyAggregatedStatisticsRepository
-                    .findByDateBetweenAndAggregationType(startDate, endDate, aggregationType);
-            
-            Map<String, Object> reportData = new HashMap<>();
-            reportData.put("aggregatedStatistics", convertAggregatedStatisticsToList(aggregatedStats));
-            reportData.put("metadata", Map.of(
-                "startDate", startDate,
-                "endDate", endDate,
-                "aggregationType", aggregationType,
-                "totalRecords", aggregatedStats.size(),
-                "generatedAt", LocalDateTime.now()
-            ));
-            
-            return switch (format.toLowerCase()) {
-                case "csv" -> generateCsvReport(reportData, "aggregated_statistics");
-                case "json" -> generateJsonReport(reportData, "aggregated_statistics");
-                case "excel", "xlsx" -> generateExcelReport(reportData, "aggregated_statistics");
-                default -> throw new IllegalArgumentException("Unsupported format: " + format);
-            };
-            
-        } catch (Exception e) {
-            log.error("Error exporting aggregated statistics", e);
-            throw new RuntimeException("Failed to export aggregated statistics", e);
         }
     }
 
@@ -777,29 +681,29 @@ public class ReportsServiceImpl implements ReportsService {
         log.info("Getting report metadata for type: {}", reportType);
         
         return switch (reportType.toLowerCase()) {
-            case "user_statistics" -> Map.of(
-                "type", "user_statistics",
-                "name", "Статистика пользователей",
-                "description", "Детальная статистика по пользователям",
-                "fields", Arrays.asList(
+            case "user_statistics" -> Map.ofEntries(
+                Map.entry("type", "user_statistics"),
+                Map.entry("name", "Статистика пользователей"),
+                Map.entry("description", "Детальная статистика по пользователям"),
+                Map.entry("fields", Arrays.asList(
                     Map.of("name", "userId", "type", "long", "description", "ID пользователя"),
                     Map.of("name", "date", "type", "date", "description", "Дата статистики"),
                     Map.of("name", "gameSessions", "type", "integer", "description", "Количество игровых сессий"),
                     Map.of("name", "completedQuests", "type", "integer", "description", "Количество завершенных квестов"),
                     Map.of("name", "totalGameTimeMinutes", "type", "long", "description", "Общее время игры в минутах")
-                )
+                ))
             );
-            case "quest_statistics" -> Map.of(
-                "type", "quest_statistics",
-                "name", "Статистика квестов",
-                "description", "Детальная статистика по квестам",
-                "fields", Arrays.asList(
+            case "quest_statistics" -> Map.ofEntries(
+                Map.entry("type", "quest_statistics"),
+                Map.entry("name", "Статистика квестов"),
+                Map.entry("description", "Детальная статистика по квестам"),
+                Map.entry("fields", Arrays.asList(
                     Map.of("name", "questId", "type", "long", "description", "ID квеста"),
                     Map.of("name", "date", "type", "date", "description", "Дата статистики"),
                     Map.of("name", "views", "type", "integer", "description", "Количество просмотров"),
                     Map.of("name", "starts", "type", "integer", "description", "Количество начал"),
                     Map.of("name", "completions", "type", "integer", "description", "Количество завершений")
-                )
+                ))
             );
             default -> Map.of(
                 "type", reportType,
@@ -818,12 +722,12 @@ public class ReportsServiceImpl implements ReportsService {
         String scheduleId = UUID.randomUUID().toString();
         
         // Сохраняем информацию о расписании
-        Map<String, Object> scheduleInfo = Map.of(
-            "scheduleId", scheduleId,
-            "templateId", templateId,
-            "cronExpression", cronExpression,
-            "parameters", parameters,
-            "createdAt", LocalDateTime.now()
+        Map<String, Object> scheduleInfo = Map.ofEntries(
+            Map.entry("scheduleId", scheduleId),
+            Map.entry("templateId", templateId),
+            Map.entry("cronExpression", cronExpression),
+            Map.entry("parameters", parameters),
+            Map.entry("createdAt", LocalDateTime.now())
         );
         
         cacheService.cacheReportData("schedule_" + scheduleId, convertToJson(scheduleInfo).getBytes());
@@ -1003,10 +907,10 @@ public class ReportsServiceImpl implements ReportsService {
         }
         
         // Добавляем метаданные
-        data.put("metadata", Map.of(
-            "request", request,
-            "generatedAt", LocalDateTime.now(),
-            "version", "1.0"
+        data.put("metadata", Map.ofEntries(
+            Map.entry("request", request),
+            Map.entry("generatedAt", LocalDateTime.now()),
+            Map.entry("version", "1.0")
         ));
         
         return data;
@@ -1038,18 +942,18 @@ public class ReportsServiceImpl implements ReportsService {
                 request.setStatisticsType("user_statistics");
                 request.setStartDate((LocalDate) parameters.get("startDate"));
                 request.setEndDate((LocalDate) parameters.get("endDate"));
-                request.setEntityType("user");
+                request.setStatisticsType("user");
                 if (parameters.containsKey("userId")) {
-                    request.setEntityId((Long) parameters.get("userId"));
+                    request.setUserId((Long) parameters.get("userId"));
                 }
             }
             case "quest_performance_report" -> {
                 request.setStatisticsType("quest_statistics");
                 request.setStartDate((LocalDate) parameters.get("startDate"));
                 request.setEndDate((LocalDate) parameters.get("endDate"));
-                request.setEntityType("quest");
+                request.setStatisticsType("quest");
                 if (parameters.containsKey("questId")) {
-                    request.setEntityId((Long) parameters.get("questId"));
+                    request.setQuestId((Long) parameters.get("questId"));
                 }
             }
             // Другие шаблоны обрабатываются аналогично
@@ -1064,10 +968,10 @@ public class ReportsServiceImpl implements ReportsService {
         request.setStatisticsType((String) parameters.getOrDefault("statisticsType", "custom"));
         request.setStartDate((LocalDate) parameters.get("startDate"));
         request.setEndDate((LocalDate) parameters.get("endDate"));
-        request.setEntityType((String) parameters.get("entityType"));
+        request.setStatisticsType((String) parameters.get("entityType"));
         
         if (parameters.containsKey("entityId")) {
-            request.setEntityId((Long) parameters.get("entityId"));
+            request.setQuestId((Long) parameters.get("entityId"));
         }
         
         return request;
@@ -1077,167 +981,127 @@ public class ReportsServiceImpl implements ReportsService {
 
     private List<Map<String, Object>> convertUserStatisticsToList(List<UserStatistics> userStats) {
         return userStats.stream()
-                .map(us -> Map.of(
-                    "userId", us.getUserId(),
-                    "date", us.getDate(),
-                    "registrations", us.getRegistrations(),
-                    "logins", us.getLogins(),
-                    "gameSessions", us.getGameSessions(),
-                    "completedQuests", us.getCompletedQuests(),
-                    "createdQuests", us.getCreatedQuests(),
-                    "createdTeams", us.getCreatedTeams(),
-                    "teamMemberships", us.getTeamMemberships(),
-                    "totalGameTimeMinutes", us.getTotalGameTimeMinutes(),
-                    "uploadedFiles", us.getUploadedFiles(),
-                    "totalFileSizeBytes", us.getTotalFileSizeBytes(),
-                    "successfulCodeSubmissions", us.getSuccessfulCodeSubmissions(),
-                    "failedCodeSubmissions", us.getFailedCodeSubmissions(),
-                    "completedLevels", us.getCompletedLevels(),
-                    "lastActiveAt", us.getLastActiveAt()
-                ))
+                .map(us -> {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("userId", us.getUserId());
+                    result.put("date", us.getDate());
+                    result.put("registrations", us.getRegistrations());
+                    result.put("logins", us.getLogins());
+                    result.put("gameSessions", us.getGameSessions());
+                    result.put("completedQuests", us.getCompletedQuests());
+                    result.put("createdQuests", us.getCreatedQuests());
+                    result.put("createdTeams", us.getCreatedTeams());
+                    result.put("teamMemberships", us.getTeamMemberships());
+                    result.put("totalGameTimeMinutes", us.getTotalGameTimeMinutes());
+                    result.put("uploadedFiles", us.getUploadedFiles());
+                    result.put("totalFileSizeBytes", us.getTotalFileSizeBytes());
+                    result.put("successfulCodeSubmissions", us.getSuccessfulCodeSubmissions());
+                    result.put("failedCodeSubmissions", us.getFailedCodeSubmissions());
+                    result.put("completedLevels", us.getCompletedLevels());
+                    result.put("lastActiveAt", us.getLastActiveAt());
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> convertQuestStatisticsToList(List<QuestStatistics> questStats) {
         return questStats.stream()
-                .map(qs -> Map.of(
-                    "questId", qs.getQuestId(),
-                    "questTitle", qs.getQuestTitle(),
-                    "authorId", qs.getAuthorId(),
-                    "date", qs.getDate(),
-                    "creations", qs.getCreations(),
-                    "updates", qs.getUpdates(),
-                    "publications", qs.getPublications(),
-                    "deletions", qs.getDeletions(),
-                    "views", qs.getViews(),
-                    "uniqueViews", qs.getUniqueViews(),
-                    "starts", qs.getStarts(),
-                    "completions", qs.getCompletions(),
-                    "uniqueParticipants", qs.getUniqueParticipants(),
-                    "totalGameTimeMinutes", qs.getTotalGameTimeMinutes()
-                ))
+                .map(qs -> {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("questId", qs.getQuestId());
+                    result.put("questTitle", qs.getQuestTitle());
+                    result.put("authorId", qs.getAuthorId());
+                    result.put("date", qs.getDate());
+                    result.put("creations", qs.getCreations());
+                    result.put("updates", qs.getUpdates());
+                    result.put("publications", qs.getPublications());
+                    result.put("deletions", qs.getDeletions());
+                    result.put("views", qs.getViews());
+                    result.put("uniqueViews", qs.getUniqueViews());
+                    result.put("starts", qs.getStarts());
+                    result.put("completions", qs.getCompletions());
+                    result.put("uniqueParticipants", qs.getUniqueParticipants());
+                    result.put("totalGameTimeMinutes", qs.getTotalGameTimeMinutes());
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> convertTeamStatisticsToList(List<TeamStatistics> teamStats) {
         return teamStats.stream()
-                .map(ts -> Map.of(
-                    "teamId", ts.getTeamId(),
-                    "teamName", ts.getTeamName(),
-                    "captainId", ts.getCaptainId(),
-                    "date", ts.getDate(),
-                    "creations", ts.getCreations(),
-                    "updates", ts.getUpdates(),
-                    "deletions", ts.getDeletions(),
-                    "memberAdditions", ts.getMemberAdditions(),
-                    "memberRemovals", ts.getMemberRemovals(),
-                    "playedQuests", ts.getPlayedQuests(),
-                    "completedQuests", ts.getCompletedQuests(),
-                    "questWins", ts.getQuestWins(),
-                    "totalGameTimeMinutes", ts.getTotalGameTimeMinutes(),
-                    "successfulCodeSubmissions", ts.getSuccessfulCodeSubmissions(),
-                    "failedCodeSubmissions", ts.getFailedCodeSubmissions(),
-                    "completedLevels", ts.getCompletedLevels(),
-                    "lastActivityAt", ts.getLastActivityAt()
-                ))
+                .map(ts -> {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("teamId", ts.getTeamId());
+                    result.put("teamName", ts.getTeamName());
+                    result.put("captainId", ts.getCaptainId());
+                    result.put("date", ts.getDate());
+                    result.put("creations", ts.getCreations());
+                    result.put("updates", ts.getUpdates());
+                    result.put("deletions", ts.getDeletions());
+                    result.put("memberAdditions", ts.getMemberAdditions());
+                    result.put("memberRemovals", ts.getMemberRemovals());
+                    result.put("playedQuests", ts.getPlayedQuests());
+                    result.put("completedQuests", ts.getCompletedQuests());
+                    result.put("questWins", ts.getQuestWins());
+                    result.put("totalGameTimeMinutes", ts.getTotalGameTimeMinutes());
+                    result.put("successfulCodeSubmissions", ts.getSuccessfulCodeSubmissions());
+                    result.put("failedCodeSubmissions", ts.getFailedCodeSubmissions());
+                    result.put("completedLevels", ts.getCompletedLevels());
+                    result.put("lastActivityAt", ts.getLastActivityAt());
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> convertGameStatisticsToList(List<GameStatistics> gameStats) {
         return gameStats.stream()
-                .map(gs -> Map.of(
-                    "sessionId", gs.getSessionId(),
-                    "questId", gs.getQuestId(),
-                    "userId", gs.getUserId(),
-                    "teamId", gs.getTeamId(),
-                    "date", gs.getDate(),
-                    "startedAt", gs.getStartedAt(),
-                    "completedAt", gs.getCompletedAt(),
-                    "durationMinutes", gs.getDurationMinutes(),
-                    "status", gs.getStatus(),
-                    "score", gs.getScore(),
-                    "completedLevels", gs.getCompletedLevels(),
-                    "totalLevels", gs.getTotalLevels(),
-                    "codeSubmissions", gs.getCodeSubmissions(),
-                    "hintsUsed", gs.getHintsUsed()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private List<Map<String, Object>> convertFileStatisticsToList(List<FileStatistics> fileStats) {
-        return fileStats.stream()
-                .map(fs -> Map.of(
-                    "fileId", fs.getFileId(),
-                    "fileName", fs.getFileName(),
-                    "fileType", fs.getFileType(),
-                    "ownerId", fs.getOwnerId(),
-                    "date", fs.getDate(),
-                    "uploads", fs.getUploads(),
-                    "downloads", fs.getDownloads(),
-                    "views", fs.getViews(),
-                    "fileCount", fs.getFileCount(),
-                    "totalSizeBytes", fs.getTotalSizeBytes(),
-                    "avgSizeBytes", fs.getAvgSizeBytes(),
-                    "maxSizeBytes", fs.getMaxSizeBytes(),
-                    "minSizeBytes", fs.getMinSizeBytes()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private List<Map<String, Object>> convertSystemStatisticsToList(List<SystemStatistics> systemStats) {
-        return systemStats.stream()
-                .map(ss -> Map.of(
-                    "date", ss.getDate(),
-                    "category", ss.getCategory(),
-                    "metricName", ss.getMetricName(),
-                    "metricValue", ss.getMetricValue(),
-                    "metricUnit", ss.getMetricUnit(),
-                    "recordedAt", ss.getRecordedAt()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    private List<Map<String, Object>> convertAggregatedStatisticsToList(List<DailyAggregatedStatistics> aggregatedStats) {
-        return aggregatedStats.stream()
-                .map(as -> Map.of(
-                    "date", as.getDate(),
-                    "aggregationType", as.getAggregationType(),
-                    "totalUsers", as.getTotalUsers(),
-                    "activeUsers", as.getActiveUsers(),
-                    "totalQuests", as.getTotalQuests(),
-                    "completedQuests", as.getCompletedQuests(),
-                    "totalTeams", as.getTotalTeams(),
-                    "activeTeams", as.getActiveTeams(),
-                    "totalGameSessions", as.getTotalGameSessions(),
-                    "completedGameSessions", as.getCompletedGameSessions()
-                ))
+                .map(gs -> {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("sessionId", gs.getSessionId());
+                    result.put("questId", gs.getQuestId());
+                    result.put("userId", gs.getUserId());
+                    result.put("teamId", gs.getTeamId());
+                    result.put("date", gs.getDate());
+                    result.put("startTime", gs.getStartTime());
+                    result.put("endTime", gs.getEndTime());
+                    result.put("durationMinutes", gs.getDurationMinutes());
+                    result.put("status", gs.getStatus());
+                    result.put("score", gs.getScore());
+                    result.put("completedLevels", gs.getCompletedLevels());
+                    result.put("totalLevels", gs.getTotalLevels());
+                    result.put("codeSubmissions", gs.getCodeSubmissions());
+                    result.put("hintsUsed", gs.getHintsUsed());
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> convertLeaderboardsToList(List<Leaderboard> leaderboards) {
         return leaderboards.stream()
-                .map(l -> Map.of(
-                    "id", l.getId(),
-                    "leaderboardType", l.getLeaderboardType(),
-                    "period", l.getPeriod(),
-                    "date", l.getDate(),
-                    "entityId", l.getEntityId(),
-                    "entityName", l.getEntityName(),
-                    "rank", l.getRank(),
-                    "previousRank", l.getPreviousRank(),
-                    "rankChange", l.getRankChange(),
-                    "score", l.getScore(),
-                    "previousScore", l.getPreviousScore(),
-                    "scoreChange", l.getScoreChange(),
-                    "category", l.getCategory(),
-                    "level", l.getLevel(),
-                    "progressPercentage", l.getProgressPercentage(),
-                    "participationsCount", l.getParticipationsCount(),
-                    "winsCount", l.getWinsCount(),
-                    "winRate", l.getWinRate(),
-                    "avgRating", l.getAvgRating(),
-                    "achievementsCount", l.getAchievementsCount()
-                ))
+                .map(l -> {
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("id", l.getId());
+                    result.put("leaderboardType", l.getLeaderboardType());
+                    result.put("period", l.getPeriod());
+                    result.put("date", l.getDate());
+                    result.put("entityId", l.getEntityId());
+                    result.put("entityName", l.getEntityName());
+                    result.put("rank", l.getRank());
+                    result.put("previousRank", l.getPreviousRank());
+                    result.put("rankChange", l.getRankChange());
+                    result.put("score", l.getScore());
+                    result.put("previousScore", l.getPreviousScore());
+                    result.put("scoreChange", l.getScoreChange());
+                    result.put("category", l.getCategory());
+                    result.put("level", l.getLevel());
+                    result.put("progressPercentage", l.getProgressPercentage());
+                    result.put("participationsCount", l.getParticipationsCount());
+                    result.put("winsCount", l.getWinsCount());
+                    result.put("winRate", l.getWinRate());
+                    result.put("avgRating", l.getAvgRating());
+                    result.put("achievementsCount", l.getAchievementsCount());
+                    return result;
+                })
                 .collect(Collectors.toList());
     }
 

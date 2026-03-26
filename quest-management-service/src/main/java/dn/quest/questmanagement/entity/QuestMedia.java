@@ -125,12 +125,14 @@ public class QuestMedia {
      * Активно ли медиа
      */
     @Column(name = "active", nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     /**
      * Является ли медиа обложкой
      */
     @Column(name = "is_cover", nullable = false)
+    @Builder.Default
     private Boolean isCover = false;
 
     /**
@@ -155,12 +157,14 @@ public class QuestMedia {
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**

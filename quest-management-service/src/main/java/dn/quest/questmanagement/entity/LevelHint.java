@@ -58,6 +58,7 @@ public class LevelHint {
     @NotNull(message = "Смещение времени обязательно")
     @Min(value = 0, message = "Смещение времени не может быть отрицательным")
     @Column(name = "offset_sec", nullable = false)
+    @Builder.Default
     private Integer offsetSec = 0;
 
     /**
@@ -81,6 +82,7 @@ public class LevelHint {
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "hint_type", nullable = false, length = 20)
+    @Builder.Default
     private HintType hintType = HintType.TEXT;
 
     /**
@@ -102,36 +104,42 @@ public class LevelHint {
      */
     @Min(value = 0, message = "Стоимость подсказки не может быть отрицательной")
     @Column(name = "cost")
+    @Builder.Default
     private Integer cost = 0;
 
     /**
      * Активна ли подсказка
      */
     @Column(name = "active", nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     /**
      * Обязательна ли подсказка (показывается автоматически)
      */
     @Column(name = "mandatory", nullable = false)
+    @Builder.Default
     private Boolean mandatory = false;
 
     /**
      * Количество раз, когда подсказка была использована
      */
     @Column(name = "usage_count", nullable = false)
+    @Builder.Default
     private Integer usageCount = 0;
 
     /**
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**

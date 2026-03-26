@@ -72,6 +72,7 @@ public class Code {
      * Сдвиг времени в секундах (>0 для бонуса, <0 для штрафа, 0 для обычного)
      */
     @Column(name = "shift_seconds", nullable = false)
+    @Builder.Default
     private Integer shiftSeconds = 0;
 
     /**
@@ -85,12 +86,14 @@ public class Code {
      * Активен ли код
      */
     @Column(name = "active", nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     /**
      * Количество использований кода
      */
     @Column(name = "usage_count", nullable = false)
+    @Builder.Default
     private Integer usageCount = 0;
 
     /**
@@ -103,12 +106,14 @@ public class Code {
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**

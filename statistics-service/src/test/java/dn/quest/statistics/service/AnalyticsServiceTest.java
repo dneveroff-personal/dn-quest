@@ -157,33 +157,7 @@ class AnalyticsServiceTest {
         assertTrue(data.containsKey("activityMetrics"));
         assertTrue(data.containsKey("topTeams"));
     }
-    
-    @Test
-    void testGetFileActivityReport() {
-        // Given
-        LocalDate startDate = testDate.minusDays(7);
-        LocalDate endDate = testDate;
-        String fileType = "image";
-        
-        // When
-        Map<String, Object> result = analyticsService.getFileActivityReport(
-                startDate, endDate, fileType);
-        
-        // Then
-        assertNotNull(result);
-        assertEquals("file_activity", result.get("reportType"));
-        assertEquals(startDate, result.get("startDate"));
-        assertEquals(endDate, endDate);
-        assertEquals(fileType, result.get("fileType"));
-        assertNotNull(result.get("data"));
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> data = (Map<String, Object>) result.get("data");
-        assertTrue(data.containsKey("fileStats"));
-        assertTrue(data.containsKey("storageMetrics"));
-        assertTrue(data.containsKey("popularTypes"));
-    }
-    
+
     @Test
     void testGetForecasts() {
         // Given

@@ -8,6 +8,8 @@ import dn.quest.shared.events.game.GameSessionFinishedEvent;
 import dn.quest.shared.events.game.GameSessionStartedEvent;
 import dn.quest.shared.events.game.LevelCompletedEvent;
 import dn.quest.shared.events.notification.NotificationEvent;
+import dn.quest.shared.events.quest.QuestCreatedEvent;
+import dn.quest.shared.events.quest.QuestUpdatedEvent;
 
 /**
  * Интерфейс для публикации событий в Kafka
@@ -38,6 +40,16 @@ public interface EventProducer {
      * Публикация события начала игровой сессии
      */
     void publishGameEvent(GameSessionStartedEvent event);
+
+    /**
+     * Публикация квеста
+     */
+    void publishQuestEvent(QuestCreatedEvent event);
+
+    /**
+     * Публикация и обновление квеста
+     */
+    void publishQuestEvent(QuestUpdatedEvent event);
 
     /**
      * Публикация события завершения игровой сессии

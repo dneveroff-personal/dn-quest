@@ -35,19 +35,4 @@ public class KafkaEventProducer {
         eventProducer.publishQuestEvent(event);
     }
 
-    /**
-     * Публикация события публикации квеста
-     */
-    public void publishQuestPublishedEvent(QuestPublishedEvent event) {
-        log.info("Publishing quest published event for quest ID: {}", event.getQuestId());
-        eventProducer.publishQuestEvent(event);
-    }
-
-    /**
-     * Публикация события удаления квеста
-     */
-    public void publishQuestDeletedEvent(QuestDeletedEvent event) {
-        log.info("Publishing quest deleted event for quest ID: {}", event.getQuestId());
-        eventProducer.publishQuestEvent(event);
-    }
 }

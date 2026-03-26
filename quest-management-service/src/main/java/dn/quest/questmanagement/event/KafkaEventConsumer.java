@@ -48,9 +48,9 @@ public class KafkaEventConsumer extends EventConsumer {
      * Обработка игровых событий
      */
     @Override
-    protected void handleGameEvent(BaseEvent event, String topic) {
-        super.handleGameEvent(event, topic);
-        
+    protected void handleQuestEvent(BaseEvent event, String topic) {
+        super.handleQuestEvent(event, topic);
+
         switch (event.getEventType()) {
             case "GameSessionStarted":
                 handleGameSessionStarted((GameSessionStartedEvent) event);
@@ -115,14 +115,14 @@ public class KafkaEventConsumer extends EventConsumer {
     }
 
     private void handleGameSessionFinished(GameSessionFinishedEvent event) {
-        log.info("Game session finished for quest: {}, session: {}, status: {}", 
-                event.getQuestId(), event.getSessionId(), event.getFinalStatus());
+        log.info("Game session finished for quest: {}, session: {}, is completed: {}",
+                event.getQuestId(), event.getSessionId(), event.getIsCompleted());
         // Здесь можно добавить логику для обновления статистики квеста
     }
 
     private void handleLevelCompleted(LevelCompletedEvent event) {
-        log.info("Level completed: {} for quest: {} by participant: {}", 
-                event.getLevelId(), event.getQuestId(), event.getParticipantId());
+        log.info("Level completed: {} for quest: {} by userId: {}",
+                event.getLevelId(), event.getQuestId(), event.getUserId());
         // Здесь можно добавить логику для обновления статистики уровня
     }
 

@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
 public class QuestServiceImpl implements QuestService {
 
     private final QuestRepository questRepository;
-    private final LevelService levelService;
+    private final LevelServiceImpl levelService;
+    private final CodeServiceImpl codeService;
 
     @Override
     @Transactional
@@ -682,7 +683,7 @@ public class QuestServiceImpl implements QuestService {
             
             // Проверка кодов для каждого уровня
             for (var level : levels) {
-                var codes = levelService.getCodesByLevelId(level.getId());
+                var codes = codeService.getCodesByLevelId(level.getId());
                 if (codes.isEmpty()) {
                     errors.add("Level " + level.getOrderIndex() + " must have at least one code");
                 }

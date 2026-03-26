@@ -90,6 +90,7 @@ public class Quest {
                     joinColumns = @JoinColumn(name = "quest_id"),
                     uniqueConstraints = @UniqueConstraint(name = "uk_quest_author", columnNames = {"quest_id", "author_id"}))
     @Column(name = "author_id", nullable = false)
+    @Builder.Default
     private Set<Long> authorIds = new HashSet<>();
 
     /**
@@ -108,6 +109,7 @@ public class Quest {
      * Опубликован ли квест
      */
     @Column(name = "published", nullable = false)
+    @Builder.Default
     private Boolean published = false;
 
     /**
@@ -116,6 +118,7 @@ public class Quest {
     @NotNull(message = "Статус квеста обязателен")
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 16)
+    @Builder.Default
     private QuestStatus status = QuestStatus.DRAFT;
 
     /**
@@ -124,6 +127,7 @@ public class Quest {
     @ElementCollection
     @CollectionTable(name = "quest_tags", joinColumns = @JoinColumn(name = "quest_id"))
     @Column(name = "tag", length = 50)
+    @Builder.Default
     private Set<String> tags = new HashSet<>();
 
     /**
@@ -162,6 +166,7 @@ public class Quest {
      * Версия квеста для управления версиями
      */
     @Column(name = "version", nullable = false)
+    @Builder.Default
     private Integer version = 1;
 
     /**
@@ -174,18 +179,21 @@ public class Quest {
      * Является ли квест шаблоном
      */
     @Column(name = "is_template", nullable = false)
+    @Builder.Default
     private Boolean isTemplate = false;
 
     /**
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private Instant createdAt = Instant.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private Instant updatedAt = Instant.now();
 
     /**
@@ -210,6 +218,7 @@ public class Quest {
      * Архивирован ли квест
      */
     @Column(name = "archived", nullable = false)
+    @Builder.Default
     private Boolean archived = false;
 
     /**
@@ -229,6 +238,7 @@ public class Quest {
      * Средний рейтинг квеста
      */
     @Column(name = "average_rating", precision = 3, scale = 2)
+    @Builder.Default
     private Double averageRating = 0.0;
 
     @PrePersist

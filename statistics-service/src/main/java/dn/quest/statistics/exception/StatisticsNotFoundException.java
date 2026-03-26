@@ -20,4 +20,8 @@ public class StatisticsNotFoundException extends StatisticsException {
               "Statistics Not Found", 
               org.springframework.http.HttpStatus.NOT_FOUND);
     }
+
+    public StatisticsNotFoundException(String message, Throwable cause) {
+        super(message, "Statistics Not Found", org.springframework.http.HttpStatus.NOT_FOUND, cause);
+    }
 }

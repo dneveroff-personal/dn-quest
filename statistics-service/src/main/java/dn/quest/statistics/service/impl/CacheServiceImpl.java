@@ -359,18 +359,18 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public Map<String, Object> getCacheStatistics() {
-        Map<String, Object> stats = Map.of(
-            "userStatistics", getCacheStats(userStatisticsCache),
-            "questStatistics", getCacheStats(questStatisticsCache),
-            "teamStatistics", getCacheStats(teamStatisticsCache),
-            "leaderboard", getCacheStats(leaderboardCache),
-            "topRecords", getCacheStats(topRecordsCache),
-            "platformOverview", getCacheStats(platformOverviewCache),
-            "metricTrends", getCacheStats(metricTrendsCache),
-            "statisticsByCategories", getCacheStats(statisticsByCategoriesCache),
-            "systemMetrics", getCacheStats(systemMetricsCache),
-            "analyticsReport", getCacheStats(analyticsReportCache),
-            "reportData", getCacheStats(reportDataCache)
+        Map<String, Object> stats = Map.ofEntries(
+                Map.entry("userStatistics", getCacheStats(userStatisticsCache)),
+                Map.entry("questStatistics", getCacheStats(questStatisticsCache)),
+                Map.entry("teamStatistics", getCacheStats(teamStatisticsCache)),
+                Map.entry("leaderboard", getCacheStats(leaderboardCache)),
+                Map.entry("topRecords", getCacheStats(topRecordsCache)),
+                Map.entry("platformOverview", getCacheStats(platformOverviewCache)),
+                Map.entry("metricTrends", getCacheStats(metricTrendsCache)),
+                Map.entry("statisticsByCategories", getCacheStats(statisticsByCategoriesCache)),
+                Map.entry("systemMetrics", getCacheStats(systemMetricsCache)),
+                Map.entry("analyticsReport", getCacheStats(analyticsReportCache)),
+                Map.entry("reportData", getCacheStats(reportDataCache))
         );
         
         return stats;

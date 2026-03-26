@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
@@ -310,32 +311,26 @@ public class QuestRatingService {
         dto.setId(quest.getId());
         dto.setNumber(quest.getNumber());
         dto.setTitle(quest.getTitle());
-        dto.setDescription(quest.getDescription());
+        dto.setDescriptionHtml(quest.getDescriptionHtml());
         dto.setDifficulty(quest.getDifficulty());
         dto.setQuestType(quest.getQuestType());
         dto.setCategory(quest.getCategory());
-        dto.setEstimatedDuration(quest.getEstimatedDuration());
+        dto.setEstimatedDurationMinutes(quest.getEstimatedDurationMinutes());
         dto.setMaxParticipants(quest.getMaxParticipants());
         dto.setMinParticipants(quest.getMinParticipants());
-        dto.setStartLocation(quest.getStartLocation());
-        dto.setEndLocation(quest.getEndLocation());
-        dto.setRules(quest.getRules());
-        dto.setPrizes(quest.getPrizes());
-        dto.setRequirements(quest.getRequirements());
         dto.setTags(quest.getTags());
-        dto.setIsPublic(quest.getIsPublic());
+        dto.setPublished(quest.getPublished());
         dto.setIsTemplate(quest.getIsTemplate());
         dto.setAuthorIds(quest.getAuthorIds());
         dto.setStatus(quest.getStatus());
-        dto.setVersion(quest.getVersion());
-        dto.setStartTime(quest.getStartTime());
-        dto.setEndTime(quest.getEndTime());
+        dto.setVersion(Long.valueOf(quest.getVersion()));
+        dto.setStartAt(quest.getStartAt());
+        dto.setEndAt(quest.getEndAt());
         dto.setCreatedAt(quest.getCreatedAt());
         dto.setUpdatedAt(quest.getUpdatedAt());
         dto.setPublishedAt(quest.getPublishedAt());
         dto.setArchivedAt(quest.getArchivedAt());
         dto.setArchiveReason(quest.getArchiveReason());
-        dto.setAverageRating(quest.getAverageRating());
         return dto;
     }
 

@@ -29,7 +29,6 @@ public class QuestEvent extends BaseDTO {
     private Set<String> tags;
     private Set<Long> authorIds;
     private String status;
-    private Integer version;
     private LocalDateTime timestamp;
     private Long userId;
     private String reason;

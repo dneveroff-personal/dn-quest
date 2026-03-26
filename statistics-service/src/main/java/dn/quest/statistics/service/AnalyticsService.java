@@ -38,11 +38,6 @@ public interface AnalyticsService {
     Map<String, Object> getTeamActivityReport(LocalDate startDate, LocalDate endDate, String teamType);
 
     /**
-     * Получить отчет по файловой активности
-     */
-    Map<String, Object> getFileActivityReport(LocalDate startDate, LocalDate endDate, String fileType);
-
-    /**
      * Получить прогнозы и тренды
      */
     Map<String, Object> getForecasts(String forecastType, int periodDays, double confidenceLevel);

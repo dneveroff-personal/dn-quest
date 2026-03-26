@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GameSessionFinishedEvent extends BaseEvent {
 
+    private Long questId;
     private Long sessionId;
     private Long userId;
     private Long teamId;

@@ -46,7 +46,7 @@ public class DailyAggregatedStatistics {
      * Общее количество пользователей
      */
     @Column(name = "total_users")
-    private Integer totalUsers;
+    private Long totalUsers;
 
     /**
      * Количество новых регистраций
@@ -58,7 +58,7 @@ public class DailyAggregatedStatistics {
      * Количество активных пользователей (DAU)
      */
     @Column(name = "active_users")
-    private Integer activeUsers;
+    private Long activeUsers;
 
     /**
      * Количество уникальных пользователей за месяц (MAU)
@@ -77,7 +77,7 @@ public class DailyAggregatedStatistics {
      * Общее количество квестов
      */
     @Column(name = "total_quests")
-    private Integer totalQuests;
+    private Long totalQuests;
 
     /**
      * Количество новых квестов
@@ -95,7 +95,7 @@ public class DailyAggregatedStatistics {
      * Количество завершенных квестов
      */
     @Column(name = "completed_quests")
-    private Integer completedQuests;
+    private Long completedQuests;
 
     /**
      * Среднее время прохождения квеста (в минутах)
@@ -108,13 +108,13 @@ public class DailyAggregatedStatistics {
      * Общее количество игровых сессий
      */
     @Column(name = "total_game_sessions")
-    private Integer totalGameSessions;
+    private Long totalGameSessions;
 
     /**
      * Количество завершенных игровых сессий
      */
     @Column(name = "completed_game_sessions")
-    private Integer completedGameSessions;
+    private Long completedGameSessions;
 
     /**
      * Общее время в игре (в минутах)
@@ -151,7 +151,7 @@ public class DailyAggregatedStatistics {
      * Общее количество команд
      */
     @Column(name = "total_teams")
-    private Integer totalTeams;
+    private Long totalTeams;
 
     /**
      * Количество новых команд
@@ -163,38 +163,13 @@ public class DailyAggregatedStatistics {
      * Количество активных команд
      */
     @Column(name = "active_teams")
-    private Integer activeTeams;
+    private Long activeTeams;
 
     /**
      * Среднее количество участников в команде
      */
     @Column(name = "avg_team_size")
     private Double avgTeamSize;
-
-    // Файловая статистика
-    /**
-     * Общее количество файлов
-     */
-    @Column(name = "total_files")
-    private Integer totalFiles;
-
-    /**
-     * Количество новых файлов
-     */
-    @Column(name = "new_files")
-    private Integer newFiles;
-
-    /**
-     * Общий размер всех файлов (в байтах)
-     */
-    @Column(name = "total_storage_used")
-    private Long totalStorageUsed;
-
-    /**
-     * Количество скачиваний файлов
-     */
-    @Column(name = "file_downloads")
-    private Integer fileDownloads;
 
     // Системная статистика
     /**

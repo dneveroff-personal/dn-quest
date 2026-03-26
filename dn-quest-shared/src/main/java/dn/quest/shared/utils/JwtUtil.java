@@ -3,6 +3,7 @@ package dn.quest.shared.utils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +17,7 @@ import java.util.function.Function;
  * Утилитарный класс для работы с JWT токенами
  */
 @Slf4j
+@Service
 public final class JwtUtil {
     
     private static final String ISSUER = "dn-quest";

@@ -30,7 +30,7 @@ public interface StatisticsService {
     /**
      * Обновление статистики обновления квестов
      */
-    void updateQuestUpdateStatistics(Long questId, Long authorId, Instant timestamp);
+    void updateQuestUpdateStatistics(Long questId, Instant timestamp);
 
     /**
      * Обновление статистики публикации квестов
@@ -40,7 +40,7 @@ public interface StatisticsService {
     /**
      * Обновление статистики удаления квестов
      */
-    void updateQuestDeletionStatistics(Long questId, Long authorId, Instant timestamp);
+    void updateQuestDeletionStatistics(Long questId, Instant timestamp);
 
     /**
      * Обновление статистики начала игровых сессий
@@ -55,7 +55,7 @@ public interface StatisticsService {
     /**
      * Обновление статистики отправки кода
      */
-    void updateCodeSubmissionStatistics(Long sessionId, Long userId, Integer levelNumber, boolean success, Instant timestamp);
+    void updateCodeSubmissionStatistics(Long sessionId, Long userId, Long levelId, boolean success, Instant timestamp);
 
     /**
      * Обновление статистики завершения уровней

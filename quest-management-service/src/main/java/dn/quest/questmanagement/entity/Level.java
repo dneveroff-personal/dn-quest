@@ -82,6 +82,7 @@ public class Level {
     @NotNull(message = "Количество требуемых секторов обязательно")
     @Min(value = 0, message = "Количество требуемых секторов не может быть отрицательным")
     @Column(name = "required_sectors", nullable = false)
+    @Builder.Default
     private Integer requiredSectors = 0;
 
     /**
@@ -94,34 +95,6 @@ public class Level {
     private Double longitude;
 
     /**
-     * Радиус действия уровня в метрах (для геолокационных квестов)
-     */
-    @Min(value = 0, message = "Радиус действия не может быть отрицательным")
-    @Column(name = "radius_meters")
-    private Integer radiusMeters;
-
-    /**
-     * URL изображения уровня
-     */
-    @Size(max = 500, message = "URL изображения не должен превышать 500 символов")
-    @Column(name = "image_url", length = 500)
-    private String imageUrl;
-
-    /**
-     * URL аудио файла уровня
-     */
-    @Size(max = 500, message = "URL аудио не должен превышать 500 символов")
-    @Column(name = "audio_url", length = 500)
-    private String audioUrl;
-
-    /**
-     * URL видео файла уровня
-     */
-    @Size(max = 500, message = "URL видео не должен превышать 500 символов")
-    @Column(name = "video_url", length = 500)
-    private String videoUrl;
-
-    /**
      * Дополнительные параметры уровня в формате JSON
      */
     @Lob
@@ -132,18 +105,21 @@ public class Level {
      * Активен ли уровень
      */
     @Column(name = "active", nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     /**
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**
@@ -186,25 +162,12 @@ public class Level {
     }
 
     /**
-     * Проверяет, есть ли у уровня медиа контент
-     */
-    public boolean hasMediaContent() {
-        return imageUrl != null || audioUrl != null || videoUrl != null;
-    }
-
-    /**
      * Проверяет, ограничено ли время на прохождение уровня
      */
     public boolean hasTimeLimit() {
         return apTime != null && apTime > 0;
     }
 
-    /**
-     * Проверяет, требуются ли секторы для прохождения уровня
-     */
-    public boolean requiresSectors() {
-        return requiredSectors != null && requiredSectors > 0;
-    }
 
     /**
      * Получает копию уровня с новыми параметрами
@@ -219,10 +182,6 @@ public class Level {
                 .requiredSectors(this.requiredSectors)
                 .latitude(this.latitude)
                 .longitude(this.longitude)
-                .radiusMeters(this.radiusMeters)
-                .imageUrl(this.imageUrl)
-                .audioUrl(this.audioUrl)
-                .videoUrl(this.videoUrl)
                 .additionalParams(this.additionalParams)
                 .active(this.active)
                 .build();
@@ -238,10 +197,6 @@ public class Level {
         this.requiredSectors = other.getRequiredSectors();
         this.latitude = other.getLatitude();
         this.longitude = other.getLongitude();
-        this.radiusMeters = other.getRadiusMeters();
-        this.imageUrl = other.getImageUrl();
-        this.audioUrl = other.getAudioUrl();
-        this.videoUrl = other.getVideoUrl();
         this.additionalParams = other.getAdditionalParams();
         this.active = other.getActive();
     }
