@@ -185,4 +185,31 @@ public interface UserService {
     Long getUserIdByUsername(String username);
 
     List<UserDTO> getUsersByRole(String role, Pageable pageable);
+
+    // === Методы для обработки событий Kafka ===
+
+    /**
+     * Обновить информацию о пользователе из события
+     */
+    void updateUserFromEvent(dn.quest.shared.events.user.UserUpdatedEvent event);
+
+    /**
+     * Обновить статистику отправки кода пользователя
+     */
+    void updateCodeSubmissionStatistics(Long userId, String sessionId);
+
+    /**
+     * Обновить статистику завершения уровней
+     */
+    void updateLevelCompletionStatistics(Long userId, String sessionId, int levelNumber);
+
+    /**
+     * Обновить статистику файлов пользователя
+     */
+    void updateFileStatistics(Long userId, Long fileId, String action);
+
+    /**
+     * Обновить кэш файлов
+     */
+    void updateFileCache(Long fileId, dn.quest.shared.events.file.FileUpdatedEvent event);
 }

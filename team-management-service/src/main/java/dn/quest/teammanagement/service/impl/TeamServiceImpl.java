@@ -646,7 +646,35 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public void cleanupOldData() {
+        log.info("Cleaning up old team data");
+        // Логика очистки старых данных
+    }
 
+    // === Методы для обработки событий Kafka ===
+
+    @Override
+    public void updateAvailableQuests(Long questId, String status) {
+        log.info("Updating available quests: questId={}, status={}", questId, status);
+        // Логика обновления доступных квестов для команд
+    }
+
+    @Override
+    public void updateQuestCache(Long questId, dn.quest.shared.events.quest.QuestUpdatedEvent event) {
+        log.info("Updating quest cache: questId={}", questId);
+        // Логика обновления кэша квестов
+    }
+
+    @Override
+    public void removeQuestFromAvailable(Long questId) {
+        log.info("Removing quest from available: questId={}", questId);
+        // Логика удаления квеста из доступных
+    }
+
+    @Override
+    public void updateGameSessionStatistics(Long teamId, String sessionId, String status) {
+        log.info("Updating game session statistics: teamId={}, sessionId={}, status={}", 
+                teamId, sessionId, status);
+        // Логика обновления статистики игровой сессии
     }
 
     // Вспомогательные методы

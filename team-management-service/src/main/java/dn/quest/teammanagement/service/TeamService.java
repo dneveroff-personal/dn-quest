@@ -234,4 +234,26 @@ public interface TeamService {
      * Очистить старые данные
      */
     void cleanupOldData();
+
+    // === Методы для обработки событий Kafka ===
+
+    /**
+     * Обновить доступные квесты для команд
+     */
+    void updateAvailableQuests(Long questId, String status);
+
+    /**
+     * Обновить кэш квестов
+     */
+    void updateQuestCache(Long questId, dn.quest.shared.events.quest.QuestUpdatedEvent event);
+
+    /**
+     * Удалить квест из доступных
+     */
+    void removeQuestFromAvailable(Long questId);
+
+    /**
+     * Обновить статистику игровой сессии
+     */
+    void updateGameSessionStatistics(Long teamId, String sessionId, String status);
 }

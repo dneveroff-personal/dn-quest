@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.service.impl;
 
+import dn.quest.teammanagement.client.StatisticsServiceClient;
+import dn.quest.teammanagement.client.StatisticsServiceClient.UserStatisticsDataDTO;
 import dn.quest.teammanagement.dto.UserDTO;
 import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.entity.User;
@@ -32,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final TeamMapper teamMapper;
+    private final StatisticsServiceClient statisticsServiceClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -452,6 +455,132 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getUsersByRole(String role, Pageable pageable) {
-        return List.of(); //Todo - реализовать метод
+        log.debug("Getting users by role: {}, page: {}, size: {}", role, pageable.getPageNumber(), pageable.getPageSize());
+        return userRepository.findByRole(role, pageable)
+                .stream()
+                .map(teamMapper::toUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    // === Методы для обработки событий Kafka ===
+
+    @Override
+    public void updateUserFromEvent(dn.quest.shared.events.user.UserUpdatedEvent event) {
+        log.info("Updating user from event: userId={}", event.getUserId());
+        
+        userRepository.findById(event.getUserId()).ifPresent(user -> {
+            if (event.getUsername() != null) {
+                user.setUsername(event.getUsername());
+            }
+            if (event.getEmail() != null) {
+                user.setEmail(event.getEmail());
+            }
+            if (event.getFullName() != null) {
+                user.setFullName(event.getFullName());
+            }
+            userRepository.save(user);
+            log.info("User {} updated from event", event.getUserId());
+        });
+    }
+
+    @Override
+    public void updateCodeSubmissionStatistics(Long userId, String sessionId) {
+        log.info("Updating code submission statistics: userId={}, sessionId={}", userId, sessionId);
+        
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                log.warn("User not found for statistics update: {}", userId);
+                return;
+            }
+            
+            UserStatisticsDataDTO statistics = new UserStatisticsDataDTO();
+            statistics.setUserId(userId);
+            statistics.setUsername(user.getUsername());
+            statistics.setEmail(user.getEmail());
+            statistics.setTimestamp(Instant.now().toString());
+            statistics.setLastActivityAt(Instant.now().toString());
+            
+            statisticsServiceClient.sendUserStatistics(statistics);
+            log.info("Code submission statistics sent for user: {}", userId);
+        } catch (Exception e) {
+            log.error("Failed to update code submission statistics for user: {}", userId, e);
+        }
+    }
+
+    @Override
+    public void updateLevelCompletionStatistics(Long userId, String sessionId, int levelNumber) {
+        log.info("Updating level completion statistics: userId={}, sessionId={}, level={}", 
+                userId, sessionId, levelNumber);
+        
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                log.warn("User not found for level completion statistics: {}", userId);
+                return;
+            }
+            
+            UserStatisticsDataDTO statistics = new UserStatisticsDataDTO();
+            statistics.setUserId(userId);
+            statistics.setUsername(user.getUsername());
+            statistics.setEmail(user.getEmail());
+            statistics.setTotalGameSessions(1);
+            statistics.setCompletedGameSessions(1);
+            statistics.setTimestamp(Instant.now().toString());
+            statistics.setLastActivityAt(Instant.now().toString());
+            
+            statisticsServiceClient.sendUserStatistics(statistics);
+            log.info("Level completion statistics sent for user: {}, level: {}", userId, levelNumber);
+        } catch (Exception e) {
+            log.error("Failed to update level completion statistics for user: {}", userId, e);
+        }
+    }
+
+    @Override
+    public void updateFileStatistics(Long userId, Long fileId, String action) {
+        log.info("Updating file statistics: userId={}, fileId={}, action={}", userId, fileId, action);
+        
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                log.warn("User not found for file statistics: {}", userId);
+                return;
+            }
+            
+            UserStatisticsDataDTO statistics = new UserStatisticsDataDTO();
+            statistics.setUserId(userId);
+            statistics.setUsername(user.getUsername());
+            statistics.setEmail(user.getEmail());
+            statistics.setTimestamp(Instant.now().toString());
+            statistics.setLastActivityAt(Instant.now().toString());
+            
+            statisticsServiceClient.sendUserStatistics(statistics);
+            log.info("File statistics updated for user: {}, file: {}, action: {}", userId, fileId, action);
+        } catch (Exception e) {
+            log.error("Failed to update file statistics for user: {}", userId, e);
+        }
+    }
+
+    @Override
+    public void updateFileCache(Long fileId, dn.quest.shared.events.file.FileUpdatedEvent event) {
+        log.info("Updating file cache: fileId={}, event={}", fileId, event);
+        
+        if (event == null || event.getUserId() == null) {
+            log.warn("Invalid file update event for fileId: {}", fileId);
+            return;
+        }
+        
+        try {
+            User user = userRepository.findById(event.getUserId()).orElse(null);
+            if (user == null) {
+                log.warn("User not found for file cache update: {}", event.getUserId());
+                return;
+            }
+            
+            log.info("File cache updated for user: {}, file: {}, filename: {}", 
+                    event.getUserId(), fileId, event.getFileName());
+        } catch (Exception e) {
+            log.error("Failed to update file cache for fileId: {}", fileId, e);
+        }
     }
 }

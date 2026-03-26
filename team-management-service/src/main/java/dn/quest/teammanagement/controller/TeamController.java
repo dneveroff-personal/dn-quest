@@ -59,7 +59,7 @@ public class TeamController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         
         TeamListResponse response = search != null && !search.trim().isEmpty() 
-                ? teamService.searchTeams(search, pageable)
+                ? teamService.searchTeams(SearchTeamsRequest.builder().name(search).build(), pageable)
                 : teamService.getTeams(pageable);
         
         return ResponseEntity.ok(response);

@@ -23,6 +23,7 @@ public class UserDTO {
     private String lastName;
     private String avatarUrl;
     private Boolean isActive;
+    private String role;
     private Instant createdAt;
     private Instant updatedAt;
 

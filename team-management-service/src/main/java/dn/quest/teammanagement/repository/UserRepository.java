@@ -140,4 +140,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<User> findUsersForTeamInvitation(@Param("teamId") Long teamId, @Param("search") String search, Pageable pageable);
+
+    /**
+     * Найти пользователей по роли
+     */
+    @Query("SELECT u FROM User u WHERE u.role = :role AND u.isActive = true")
+    List<User> findByRole(@Param("role") String role, Pageable pageable);
 }

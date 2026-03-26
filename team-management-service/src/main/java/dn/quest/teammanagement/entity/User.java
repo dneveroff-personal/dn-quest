@@ -45,6 +45,10 @@ public class User {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Column(name = "role", length = 20)
+    @Builder.Default
+    private String role = "USER";
+
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();

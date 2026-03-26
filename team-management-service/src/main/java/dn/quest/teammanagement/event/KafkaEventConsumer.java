@@ -220,7 +220,7 @@ public class KafkaEventConsumer {
         
         try {
             // Создаем пользователя в локальной базе данных для кэширования
-            if (!userService.existsById(event.getUserId())) {
+            if (!userService.userExists(event.getUserId())) {
                 log.info("User {} will be synchronized from registration event", event.getUserId());
                 // Здесь можно добавить логику синхронизации с User Management Service
             }
@@ -249,7 +249,7 @@ public class KafkaEventConsumer {
             // Удаляем пользователя из всех команд
             // Отзываем все приглашения
             // Обновляем статистику команд
-            userService.handleUserDeletion(event.getUserId());
+            userService.deactivateUser(event.getUserId());
         } catch (Exception e) {
             log.error("Error handling user deleted event for user: {}", event.getUserId(), e);
             throw e;
@@ -309,7 +309,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику активности команды
-            teamService.updateGameSessionStatistics(event.getTeamId(), event.getSessionId(), "STARTED");
+            teamService.updateTeamStatistics(event.getTeamId());
         } catch (Exception e) {
             log.error("Error handling game session started event for session: {}", event.getSessionId(), e);
             throw e;

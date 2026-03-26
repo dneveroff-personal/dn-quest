@@ -29,6 +29,7 @@ public class TeamMapper {
                 .lastName(user.getLastName())
                 .avatarUrl(user.getAvatarUrl())
                 .isActive(user.getIsActive())
+                .role(user.getRole())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
@@ -245,6 +246,7 @@ public class TeamMapper {
                 .lastName(userDTO.getLastName())
                 .avatarUrl(userDTO.getAvatarUrl())
                 .isActive(userDTO.getIsActive())
+                .role(userDTO.getRole())
                 .createdAt(userDTO.getCreatedAt())
                 .updatedAt(userDTO.getUpdatedAt())
                 .build();
