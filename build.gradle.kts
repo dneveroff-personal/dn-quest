@@ -19,9 +19,9 @@ java {
 }
 
 repositories {
-    maven { url = uri("https://repo1.maven.org/maven2") }
-    maven { url = uri("https://repo1.maven.org/maven2/repository/public") }
     mavenCentral()
+    maven { url = uri("https://maven.aliyun.com/repository/central") }
+    maven { url = uri("https://repo1.maven.org/maven2/") }
 }
 
 subprojects {
@@ -40,14 +40,14 @@ subprojects {
     }
 
     repositories {
-        maven { url = uri("https://repo1.maven.org/maven2") }
-        maven { url = uri("https://repo1.maven.org/maven2/repository/public") }
         mavenCentral()
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
+        maven { url = uri("https://repo1.maven.org/maven2/") }
     }
 
     dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
         // Spring Boot Starters
         implementation("org.springframework.boot:spring-boot-starter-web")
         implementation("org.springframework.boot:spring-boot-starter-validation")

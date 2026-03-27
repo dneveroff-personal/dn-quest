@@ -24,7 +24,7 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
 # Copy source code
-COPY src src
+COPY game-engine-service/src src
 
 # Build the application
 RUN ./gradlew :game-engine-service:bootJar --no-daemon -x test

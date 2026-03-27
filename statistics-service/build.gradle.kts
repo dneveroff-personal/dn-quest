@@ -7,6 +7,11 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
+repositories {
+    mavenCentral()
+    maven { url = uri("https://maven.aliyun.com/repository/central") }
+}
+
 dependencies {
     implementation(project(":dn-quest-shared"))
     
