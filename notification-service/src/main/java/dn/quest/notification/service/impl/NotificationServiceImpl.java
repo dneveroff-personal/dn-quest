@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("deprecation")
 public class NotificationServiceImpl extends TelegramLongPollingBot {
 
     private final JavaMailSender mailSender;

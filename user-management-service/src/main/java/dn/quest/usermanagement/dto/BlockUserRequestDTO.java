@@ -21,7 +21,7 @@ import java.time.Instant;
 @Schema(description = "Запрос на блокировку пользователя")
 public class BlockUserRequestDTO {
     
-    @Schema(description = "Причина блокировки", example = "Нарушение правил сообщества", required = true)
+    @Schema(description = "Причина блокировки", example = "Нарушение правил сообщества", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Причина блокировки обязательна")
     @Size(max = 500, message = "Причина блокировки не должна превышать 500 символов")
     private String reason;

@@ -24,7 +24,7 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
 # Copy source code
-COPY src src
+COPY quest-management-service/src src
 
 # Build the application
 RUN ./gradlew :quest-management-service:bootJar --no-daemon -x test

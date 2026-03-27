@@ -24,7 +24,7 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
 # Copy source code
-COPY src src
+COPY team-management-service/src src
 
 # Build the application
 RUN ./gradlew :team-management-service:bootJar --no-daemon -x test

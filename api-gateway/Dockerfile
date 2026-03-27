@@ -24,7 +24,7 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
 # Copy source code
-COPY src src
+COPY api-gateway/src src
 
 # Build the application
 RUN ./gradlew :api-gateway:bootJar --no-daemon -x test
