@@ -274,6 +274,7 @@ public class SmsNotificationChannel implements NotificationChannel {
         String encodedCredentials = java.util.Base64.getEncoder().encodeToString(credentials.getBytes());
 
         try {
+            @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             if (response != null && response.containsKey("balance")) {
                 String balance = (String) response.get("balance");

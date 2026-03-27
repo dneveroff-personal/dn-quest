@@ -25,8 +25,8 @@ import java.util.Map;
  * Реализация Telegram канала доставки уведомлений
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("deprecation")
 public class TelegramNotificationChannel extends TelegramLongPollingBot implements NotificationChannel {
 
     @Value("${telegram.bot.token}")
@@ -49,6 +49,10 @@ public class TelegramNotificationChannel extends TelegramLongPollingBot implemen
 
     @Value("${app.notification.telegram.web-base-url:https://dn-quest.com}")
     private String webBaseUrl;
+
+    public TelegramNotificationChannel() {
+        super();
+    }
 
     @Override
     public String getChannelType() {
