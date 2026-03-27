@@ -5,6 +5,8 @@ import dn.quest.questmanagement.dto.QuestDTO;
 import dn.quest.questmanagement.dto.QuestSearchRequestDTO;
 import dn.quest.questmanagement.entity.Quest;
 import dn.quest.questmanagement.entity.QuestStatus;
+import dn.quest.shared.enums.Difficulty;
+import dn.quest.shared.enums.QuestType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -105,7 +107,7 @@ public interface QuestService {
      * @param difficulty сложность
      * @return список квестов
      */
-    List<QuestDTO> getQuestsByDifficulty(String difficulty);
+    List<QuestDTO> getQuestsByDifficulty(Difficulty difficulty);
 
     /**
      * Получить квесты по типу
@@ -113,7 +115,7 @@ public interface QuestService {
      * @param questType тип квеста
      * @return список квестов
      */
-    List<QuestDTO> getQuestsByType(String questType);
+    List<QuestDTO> getQuestsByType(QuestType questType);
 
     /**
      * Получить квесты по категории

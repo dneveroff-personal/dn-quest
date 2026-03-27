@@ -23,22 +23,12 @@ public class UserStatisticsDTO {
      * Количество активных пользователей
      */
     private Long activeUsers;
-    
-    /**
-     * Количество неактивных пользователей
-     */
-    private Long inactiveUsers;
-    
-    /**
-     * Количество пользователей, состоящих в командах
-     */
-    private Long usersInTeams;
-    
+
     /**
      * Количество капитанов команд
      */
     private Long teamCaptains;
-    
+
     /**
      * Среднее количество команд на пользователя
      */
@@ -48,19 +38,9 @@ public class UserStatisticsDTO {
      * Количество новых пользователей за последний месяц
      */
     private Long newUsersThisMonth;
-    
+
     /**
-     * Количество пользователей, присоединившихся к командам за последний месяц
+     * Пользователей без команды
      */
-    private Long usersJoinedTeamsThisMonth;
-    
-    /**
-     * Самый активный пользователь
-     */
-    private UserDTO mostActiveUser;
-    
-    /**
-     * Пользователь с наибольшим количеством команд
-     */
-    private UserDTO userWithMostTeams;
+    private Long usersWithoutTeams;
 }

@@ -165,8 +165,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestUpdateStatistics(Long questId, Long authorId, Instant timestamp) {
-        log.debug("Updating quest update statistics for quest: {} by author: {} at: {}", questId, authorId, timestamp);
+    public void updateQuestUpdateStatistics(Long questId, Instant timestamp) {
+        log.debug("Updating quest update statistics for quest: {} at: {}", questId, timestamp);
         
         CompletableFuture.runAsync(() -> {
             try {
@@ -209,8 +209,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestDeletionStatistics(Long questId, Long authorId, Instant timestamp) {
-        log.debug("Updating quest deletion statistics for quest: {} by author: {} at: {}", questId, authorId, timestamp);
+    public void updateQuestDeletionStatistics(Long questId, Instant timestamp) {
+        log.debug("Updating quest deletion statistics for quest: {} at: {}", questId, timestamp);
         
         CompletableFuture.runAsync(() -> {
             try {
@@ -289,8 +289,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateCodeSubmissionStatistics(Long sessionId, Long userId, Integer levelNumber, boolean success, Instant timestamp) {
-        log.debug("Updating code submission statistics for session: {} by user: {} level: {} success: {} at: {}", sessionId, userId, levelNumber, success, timestamp);
+    public void updateCodeSubmissionStatistics(Long sessionId, Long userId, Long LevelId, boolean success, Instant timestamp) {
+        log.debug("Updating code submission statistics for session: {} by user: {} level: {} success: {} at: {}", sessionId, userId, LevelId, success, timestamp);
         
         CompletableFuture.runAsync(() -> {
             try {

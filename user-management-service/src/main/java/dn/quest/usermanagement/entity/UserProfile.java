@@ -50,6 +50,7 @@ public class UserProfile {
 
     @Column(name = "role", nullable = false, length = 16)
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private UserRole role = UserRole.PLAYER;
 
     @Column(name = "avatar_url", length = 512)
@@ -65,9 +66,11 @@ public class UserProfile {
     private String website;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "is_blocked", nullable = false)
+    @Builder.Default
     private Boolean isBlocked = false;
 
     @Column(name = "blocked_until")
@@ -77,9 +80,11 @@ public class UserProfile {
     private String blockReason;
 
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private Instant updatedAt = Instant.now();
 
     @Column(name = "last_activity_at")

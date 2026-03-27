@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,19 +44,20 @@ public class LevelServiceImpl implements LevelService {
         }
 
         // Валидация DTO
-        dto.validate();
+        dto.isValid();
 
         // Создание нового уровня
         Level level = new Level();
         level.setQuestId(questId);
         level.setTitle(dto.getTitle());
-        level.setDescription(dto.getDescription());
-        level.setOrder(dto.getOrder() != null ? dto.getOrder() : getNextOrderNumber(questId));
-        level.setLocation(dto.getLocation());
-        level.setLatitude(dto.getLatitude());
-        level.setLongitude(dto.getLongitude());
-        level.setRadius(dto.getRadius());
-        level.setMediaIds(dto.getMediaIds());
+        level.setDescriptionHtml(dto.getDescriptionHtml());
+        level.setOrderIndex(dto.getOrderIndex() != null ? dto.getOrderIndex() : getNextOrderNumber(questId));
+        if (dto.isGeolocationLevel()) {
+            level.setLatitude(dto.getLatitude());
+            level.setLongitude(dto.getLongitude());
+        }
+        level.setActive(dto.isActive());
+        level.setApTime(dto.getApTime());
         level.setCreatedAt(LocalDateTime.now());
         level.setUpdatedAt(LocalDateTime.now());
 
@@ -71,22 +73,19 @@ public class LevelServiceImpl implements LevelService {
         log.info("Updating level with ID: {}", id);
 
         Level level = getLevelEntityById(id);
-        
+
         // Валидация DTO
-        dto.validate();
+        dto.isValid();
 
         // Обновление полей
         level.setTitle(dto.getTitle());
-        level.setDescription(dto.getDescription());
-        if (dto.getOrder() != null) {
-            level.setOrder(dto.getOrder());
-        }
-        level.setLocation(dto.getLocation());
         level.setLatitude(dto.getLatitude());
         level.setLongitude(dto.getLongitude());
-        level.setRadius(dto.getRadius());
-        level.setMediaIds(dto.getMediaIds());
         level.setUpdatedAt(LocalDateTime.now());
+        level.setDescriptionHtml(dto.getDescriptionHtml());
+        level.setOrderIndex(dto.getOrderIndex() != null ? dto.getOrderIndex() : 0);
+        level.setActive(dto.isActive());
+        level.setApTime(dto.getApTime());
 
         Level savedLevel = levelRepository.save(level);
         log.info("Level updated successfully with ID: {}", savedLevel.getId());
@@ -127,7 +126,7 @@ public class LevelServiceImpl implements LevelService {
     @Override
     @Transactional(readOnly = true)
     public List<LevelDTO> getLevelsByQuestId(Long questId) {
-        List<Level> levels = levelRepository.findByQuestIdOrderByOrderAsc(questId);
+        List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
         return levels.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -136,7 +135,7 @@ public class LevelServiceImpl implements LevelService {
     @Override
     @Transactional(readOnly = true)
     public LevelDTO getLevelByOrder(Long questId, Integer order) {
-        Level level = levelRepository.findByQuestIdAndOrder(questId, order)
+        Level level = levelRepository.findByQuestIdAndOrderIndex(questId, order)
                 .orElseThrow(() -> new LevelNotFoundException(
                         "Level not found with quest ID: " + questId + " and order: " + order));
         return convertToDTO(level);
@@ -162,29 +161,29 @@ public class LevelServiceImpl implements LevelService {
         log.info("Changing order of level with ID: {} to {}", levelId, newOrder);
 
         Level level = getLevelEntityById(levelId);
-        Integer oldOrder = level.getOrder();
+        Integer oldOrder = level.getOrderIndex();
 
         if (oldOrder.equals(newOrder)) {
             return convertToDTO(level);
         }
 
         // Получение всех уровней квеста
-        List<Level> levels = levelRepository.findByQuestIdOrderByOrderAsc(level.getQuestId());
+        List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(level.getQuestId());
 
         // Перемещение уровней
         if (newOrder < oldOrder) {
             // Двигаем уровни вверх
             levels.stream()
-                    .filter(l -> l.getOrder() >= newOrder && l.getOrder() < oldOrder)
-                    .forEach(l -> l.setOrder(l.getOrder() + 1));
+                    .filter(l -> l.getOrderIndex() >= newOrder && l.getOrderIndex() < oldOrder)
+                    .forEach(l -> l.setOrderIndex(l.getOrderIndex() + 1));
         } else {
             // Двигаем уровни вниз
             levels.stream()
-                    .filter(l -> l.getOrder() > oldOrder && l.getOrder() <= newOrder)
-                    .forEach(l -> l.setOrder(l.getOrder() - 1));
+                    .filter(l -> l.getOrderIndex() > oldOrder && l.getOrderIndex() <= newOrder)
+                    .forEach(l -> l.setOrderIndex(l.getOrderIndex() - 1));
         }
 
-        level.setOrder(newOrder);
+        level.setOrderIndex(newOrder);
         level.setUpdatedAt(LocalDateTime.now());
 
         // Сохранение всех измененных уровней
@@ -200,25 +199,25 @@ public class LevelServiceImpl implements LevelService {
     @Transactional
     public LevelDTO moveLevelUp(Long levelId) {
         Level level = getLevelEntityById(levelId);
-        
-        if (level.getOrder() <= 1) {
+
+        if (level.getOrderIndex() <= 1) {
             throw new LevelValidationException("Level is already at the top");
         }
 
-        return changeLevelOrder(levelId, level.getOrder() - 1);
+        return changeLevelOrder(levelId, level.getOrderIndex() - 1);
     }
 
     @Override
     @Transactional
     public LevelDTO moveLevelDown(Long levelId) {
         Level level = getLevelEntityById(levelId);
-        
-        Integer maxOrder = levelRepository.findMaxOrder(level.getQuestId());
-        if (level.getOrder() >= maxOrder) {
+
+        Integer maxOrder = levelRepository.findMaxOrderIndexByQuestId(level.getQuestId());
+        if (level.getOrderIndex() >= maxOrder) {
             throw new LevelValidationException("Level is already at the bottom");
         }
 
-        return changeLevelOrder(levelId, level.getOrder() + 1);
+        return changeLevelOrder(levelId, level.getOrderIndex() + 1);
     }
 
     @Override
@@ -226,27 +225,24 @@ public class LevelServiceImpl implements LevelService {
     public void copyLevelsForQuest(Long sourceQuestId, Long targetQuestId) {
         log.info("Copying levels from quest {} to quest {}", sourceQuestId, targetQuestId);
 
-        List<Level> sourceLevels = levelRepository.findByQuestIdOrderByOrderAsc(sourceQuestId);
-        
+        List<Level> sourceLevels = levelRepository.findByQuestIdOrderByOrderIndex(sourceQuestId);
+
         for (Level sourceLevel : sourceLevels) {
             Level copy = new Level();
             copy.setQuestId(targetQuestId);
             copy.setTitle(sourceLevel.getTitle());
-            copy.setDescription(sourceLevel.getDescription());
-            copy.setOrder(sourceLevel.getOrder());
-            copy.setLocation(sourceLevel.getLocation());
+            copy.setDescriptionHtml(sourceLevel.getDescriptionHtml());
+            copy.setOrderIndex(sourceLevel.getOrderIndex());
             copy.setLatitude(sourceLevel.getLatitude());
             copy.setLongitude(sourceLevel.getLongitude());
-            copy.setRadius(sourceLevel.getRadius());
-            copy.setMediaIds(sourceLevel.getMediaIds());
             copy.setCreatedAt(LocalDateTime.now());
             copy.setUpdatedAt(LocalDateTime.now());
 
             Level savedCopy = levelRepository.save(copy);
-            
+
             // Копирование кодов уровня
             codeService.copyCodesForLevel(sourceLevel.getId(), savedCopy.getId());
-            
+
             // Копирование подсказок уровня
             levelHintService.copyHintsForLevel(sourceLevel.getId(), savedCopy.getId());
         }
@@ -256,36 +252,9 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LevelDTO> getLevelsInRadius(Double latitude, Double longitude, Double radiusKm) {
-        List<Level> levels = levelRepository.findLevelsInRadius(latitude, longitude, radiusKm);
-        return levels.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LevelDTO> getLevelsWithMedia(Long questId) {
-        List<Level> levels = levelRepository.findLevelsWithMedia(questId);
-        return levels.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<LevelDTO> getLevelsWithHints(Long questId) {
-        List<Level> levels = levelRepository.findLevelsWithHints(questId);
-        return levels.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public LevelIntegrityResult checkLevelIntegrity(Long questId) {
-        List<Level> levels = levelRepository.findByQuestIdOrderByOrderAsc(questId);
-        
+        List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
+
         List<String> errors = new ArrayList<>();
         List<String> warnings = new ArrayList<>();
 
@@ -300,40 +269,33 @@ public class LevelServiceImpl implements LevelService {
         for (int i = 0; i < levels.size(); i++) {
             Level level = levels.get(i);
             Integer expectedOrder = i + 1;
-            
-            if (!level.getOrder().equals(expectedOrder)) {
-                errors.add("Level " + level.getId() + " has order " + level.getOrder() + 
-                          " but should be " + expectedOrder);
+
+            if (!level.getOrderIndex().equals(expectedOrder)) {
+                errors.add("Level " + level.getId() + " has order " + level.getOrderIndex() +
+                        " but should be " + expectedOrder);
             }
-            
-            if (orders.contains(level.getOrder())) {
-                errors.add("Duplicate order " + level.getOrder() + " found");
+
+            if (orders.contains(level.getOrderIndex())) {
+                errors.add("Duplicate order " + level.getOrderIndex() + " found");
             }
-            orders.add(level.getOrder());
+            orders.add(level.getOrderIndex());
         }
 
         // Проверка наличия кодов для каждого уровня
         for (Level level : levels) {
             var codes = codeService.getCodesByLevelId(level.getId());
             if (codes.isEmpty()) {
-                errors.add("Level " + level.getOrder() + " has no codes");
+                errors.add("Level " + level.getOrderIndex() + " has no codes");
             }
         }
 
         // Проверка геолокации
         for (Level level : levels) {
             if (level.getLatitude() != null && level.getLongitude() == null) {
-                warnings.add("Level " + level.getOrder() + " has latitude but no longitude");
+                warnings.add("Level " + level.getOrderIndex() + " has latitude but no longitude");
             }
             if (level.getLongitude() != null && level.getLatitude() == null) {
-                warnings.add("Level " + level.getOrder() + " has longitude but no latitude");
-            }
-        }
-
-        // Проверка радиуса
-        for (Level level : levels) {
-            if (level.getLatitude() != null && level.getLongitude() != null && level.getRadius() == null) {
-                warnings.add("Level " + level.getOrder() + " has location but no radius specified");
+                warnings.add("Level " + level.getOrderIndex() + " has longitude but no latitude");
             }
         }
 
@@ -345,16 +307,16 @@ public class LevelServiceImpl implements LevelService {
     public List<LevelDTO> reorderLevels(Long questId) {
         log.info("Reordering levels for quest with ID: {}", questId);
 
-        List<Level> levels = levelRepository.findByQuestIdOrderByOrderAsc(questId);
-        
+        List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
+
         for (int i = 0; i < levels.size(); i++) {
             Level level = levels.get(i);
-            level.setOrder(i + 1);
+            level.setOrderIndex(i + 1);
             level.setUpdatedAt(LocalDateTime.now());
         }
 
         levelRepository.saveAll(levels);
-        
+
         log.info("Levels reordered successfully for quest with ID: {}", questId);
 
         return levels.stream()
@@ -370,7 +332,7 @@ public class LevelServiceImpl implements LevelService {
     }
 
     private Integer getNextOrderNumber(Long questId) {
-        Integer maxOrder = levelRepository.findMaxOrder(questId);
+        Integer maxOrder = levelRepository.findMaxOrderIndexByQuestId(questId);
         return maxOrder != null ? maxOrder + 1 : 1;
     }
 
@@ -379,16 +341,13 @@ public class LevelServiceImpl implements LevelService {
         dto.setId(level.getId());
         dto.setQuestId(level.getQuestId());
         dto.setTitle(level.getTitle());
-        dto.setDescription(level.getDescription());
-        dto.setOrder(level.getOrder());
-        dto.setLocation(level.getLocation());
+        dto.setDescriptionHtml(level.getDescriptionHtml());
+        dto.setOrderIndex(level.getOrderIndex());
         dto.setLatitude(level.getLatitude());
         dto.setLongitude(level.getLongitude());
-        dto.setRadius(level.getRadius());
-        dto.setMediaIds(level.getMediaIds());
-        dto.setCreatedAt(level.getCreatedAt());
-        dto.setUpdatedAt(level.getUpdatedAt());
-        
+        dto.setCreatedAt(level.getCreatedAt().toInstant(ZoneOffset.UTC));
+        dto.setUpdatedAt(level.getUpdatedAt().toInstant(ZoneOffset.UTC));
+
         return dto;
     }
 }

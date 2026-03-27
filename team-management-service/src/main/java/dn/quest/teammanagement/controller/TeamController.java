@@ -10,6 +10,9 @@ import dn.quest.teammanagement.dto.request.SearchTeamsRequest;
 import dn.quest.teammanagement.dto.request.UpdateTeamRequest;
 import dn.quest.teammanagement.dto.request.UpdateTeamSettingsRequest;
 import dn.quest.teammanagement.dto.response.TeamListResponse;
+import dn.quest.teammanagement.entity.TeamMember;
+import dn.quest.teammanagement.enums.TeamRole;
+import dn.quest.teammanagement.mapper.TeamMapper;
 import dn.quest.teammanagement.service.TeamService;
 import dn.quest.teammanagement.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +42,7 @@ public class TeamController {
 
     private final TeamService teamService;
     private final UserService userService;
+    private final TeamMapper teamMapper;
 
     @GetMapping
     public ResponseEntity<TeamListResponse> getAllTeams(
@@ -55,8 +59,8 @@ public class TeamController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         
         TeamListResponse response = search != null && !search.trim().isEmpty() 
-                ? teamService.searchTeams(search, pageable)
-                : teamService.getAllTeams(pageable);
+                ? teamService.searchTeams(SearchTeamsRequest.builder().name(search).build(), pageable)
+                : teamService.getTeams(pageable);
         
         return ResponseEntity.ok(response);
     }
@@ -79,9 +83,7 @@ public class TeamController {
     public ResponseEntity<TeamDTO> getTeamById(@PathVariable Long id) {
         log.debug("Getting team by id: {}", id);
         
-        return teamService.getTeamById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(teamService.getTeamById(id));
     }
 
     @PutMapping("/{id}")
@@ -131,9 +133,9 @@ public class TeamController {
         log.debug("Adding member {} to team: {} by user: {}", userId, id, userDetails.getUsername());
         
         Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
-        TeamMemberDTO member = teamService.addMember(id, userId, requesterId);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(member);
+        TeamMember member = teamService.addMember(id, userId, requesterId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(teamMapper.toTeamMemberDTO(member));
     }
 
     @DeleteMapping("/{id}/members/{userId}")
@@ -163,9 +165,9 @@ public class TeamController {
                 userId, id, request.getRole(), userDetails.getUsername());
         
         Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
-        TeamMemberDTO member = teamService.changeMemberRole(id, userId, request.getRole(), requesterId);
+        TeamMember member = teamService.changeMemberRole(id, userId, String.valueOf(request.getRole()), requesterId);
         
-        return ResponseEntity.ok(member);
+        return ResponseEntity.ok(teamMapper.toTeamMemberDTO(member));
     }
 
     @PutMapping("/{id}/captain/{userId}")
@@ -179,18 +181,16 @@ public class TeamController {
                 userId, id, userDetails.getUsername());
         
         Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
-        TeamMemberDTO member = teamService.transferCaptaincy(id, userId, requesterId);
-        
-        return ResponseEntity.ok(member);
+        TeamMember member = teamService.transferCaptain(id, userId, requesterId);
+
+        return ResponseEntity.ok(teamMapper.toTeamMemberDTO(member));
     }
 
     @GetMapping("/{id}/settings")
     public ResponseEntity<TeamSettingsDTO> getTeamSettings(@PathVariable Long id) {
         log.debug("Getting settings for team: {}", id);
         
-        return teamService.getTeamSettings(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(teamService.getTeamSettings(id));
     }
 
     @PutMapping("/{id}/settings")
@@ -212,9 +212,7 @@ public class TeamController {
     public ResponseEntity<TeamStatisticsDTO> getTeamStatistics(@PathVariable Long id) {
         log.debug("Getting statistics for team: {}", id);
         
-        return teamService.getTeamStatistics(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(teamService.getTeamStatistics(id));
     }
 
     @PostMapping("/search")
@@ -226,45 +224,15 @@ public class TeamController {
         Pageable pageable = PageRequest.of(
                 request.getPage(), 
                 request.getSize(), 
-                Sort.by(Sort.Direction.fromString(request.getSortDir()), request.getSortBy())
+                Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy())
         );
         
         TeamListResponse response = teamService.searchTeams(request, pageable);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/popular")
-    public ResponseEntity<List<TeamDTO>> getPopularTeams(
-            @RequestParam(defaultValue = "10") int limit) {
-        
-        log.debug("Getting popular teams with limit: {}", limit);
-        
-        List<TeamDTO> teams = teamService.getPopularTeams(limit);
-        return ResponseEntity.ok(teams);
-    }
-
-    @GetMapping("/active")
-    public ResponseEntity<List<TeamDTO>> getActiveTeams(
-            @RequestParam(defaultValue = "10") int limit) {
-        
-        log.debug("Getting active teams with limit: {}", limit);
-        
-        List<TeamDTO> teams = teamService.getActiveTeams(limit);
-        return ResponseEntity.ok(teams);
-    }
-
-    @GetMapping("/recent")
-    public ResponseEntity<List<TeamDTO>> getRecentTeams(
-            @RequestParam(defaultValue = "10") int limit) {
-        
-        log.debug("Getting recent teams with limit: {}", limit);
-        
-        List<TeamDTO> teams = teamService.getRecentTeams(limit);
-        return ResponseEntity.ok(teams);
-    }
-
     @GetMapping("/by-tag/{tag}")
-    public ResponseEntity<TeamListResponse> getTeamsByTag(
+    public ResponseEntity<List<TeamDTO>> getTeamsByTag(
             @PathVariable String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -272,21 +240,7 @@ public class TeamController {
         log.debug("Getting teams by tag: {} with pagination: page={}, size={}", tag, page, size);
         
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        TeamListResponse response = teamService.getTeamsByTag(tag, pageable);
-        
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/by-category/{category}")
-    public ResponseEntity<TeamListResponse> getTeamsByCategory(
-            @PathVariable String category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        
-        log.debug("Getting teams by category: {} with pagination: page={}, size={}", category, page, size);
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        TeamListResponse response = teamService.getTeamsByCategory(category, pageable);
+        List<TeamDTO> response = teamService.getTeamsByTag(tag);
         
         return ResponseEntity.ok(response);
     }
@@ -295,23 +249,8 @@ public class TeamController {
     public ResponseEntity<Long> getTotalTeamsCount() {
         log.debug("Getting total teams count");
         
-        long count = teamService.getTotalTeamsCount();
+        long count = teamService.getTeamsCount();
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/active/count")
-    public ResponseEntity<Long> getActiveTeamsCount() {
-        log.debug("Getting active teams count");
-        
-        long count = teamService.getActiveTeamsCount();
-        return ResponseEntity.ok(count);
-    }
-
-    @GetMapping("/statistics/summary")
-    public ResponseEntity<TeamStatisticsDTO> getGlobalTeamStatistics() {
-        log.debug("Getting global team statistics");
-        
-        TeamStatisticsDTO statistics = teamService.getGlobalTeamStatistics();
-        return ResponseEntity.ok(statistics);
-    }
 }

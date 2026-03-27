@@ -178,11 +178,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             // Рассчитываем сложность квестов
             Map<String, Object> difficultyMetrics = calculateQuestDifficultyMetrics(questStats);
             report.put("difficultyMetrics", difficultyMetrics);
-            
-            // Топ квестов по различным метрикам
-            Map<String, Object> topQuests = calculateTopQuests(questStats);
-            report.put("topQuests", topQuests);
-            
+
             // Анализ завершаемости
             Map<String, Object> completionAnalysis = calculateQuestCompletionAnalysis(questStats);
             report.put("completionAnalysis", completionAnalysis);
@@ -221,7 +217,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             Map<String, Object> report = new HashMap<>();
             
             // Получаем игровую статистику за период
-            List<GameStatistics> gameStats = gameStatisticsRepository.findByDateBetween(startDate, endDate);
+            List<GameStatistics> gameStats = gameStatisticsRepository.findByQuestIdAndDateBetweenOrderByDateDesc(questId, startDate, endDate);
             
             // Фильтрация по квесту и пользователю если необходимо
             if (questId != null) {
@@ -330,64 +326,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         } catch (Exception e) {
             log.error("Error getting team activity report", e);
             throw new RuntimeException("Failed to get team activity report", e);
-        }
-    }
-
-    @Override
-    public Map<String, Object> getFileActivityReport(LocalDate startDate, LocalDate endDate, String fileType) {
-        log.info("Getting file activity report from {} to {} type: {}", startDate, endDate, fileType);
-        
-        try {
-            String cacheKey = "file_activity_" + startDate + "_" + endDate + "_" + fileType;
-            Map<String, Object> cachedReport = cacheService.getAnalyticsReport(cacheKey);
-            
-            if (cachedReport != null) {
-                return cachedReport;
-            }
-            
-            Map<String, Object> report = new HashMap<>();
-            
-            // Получаем файловую статистику за период
-            List<FileStatistics> fileStats = fileStatisticsRepository.findByDateBetween(startDate, endDate);
-            
-            // Фильтрация по типу файла если необходимо
-            if (fileType != null && !fileType.isEmpty()) {
-                fileStats = fileStats.stream()
-                        .filter(f -> fileType.equals(f.getFileType()))
-                        .collect(Collectors.toList());
-            }
-            
-            // Рассчитываем метрики файловой активности
-            Map<String, Object> activityMetrics = calculateFileActivityMetrics(fileStats);
-            report.put("activityMetrics", activityMetrics);
-            
-            // Рассчитываем использование хранилища
-            Map<String, Object> storageMetrics = calculateStorageMetrics(fileStats);
-            report.put("storageMetrics", storageMetrics);
-            
-            // Анализ типов файлов
-            Map<String, Object> fileTypeAnalysis = calculateFileTypeAnalysis(fileStats);
-            report.put("fileTypeAnalysis", fileTypeAnalysis);
-            
-            // Топ файлы по различным метрикам
-            Map<String, Object> topFiles = calculateTopFiles(fileStats);
-            report.put("topFiles", topFiles);
-            
-            // Добавляем метаданные
-            report.put("metadata", Map.of(
-                "startDate", startDate,
-                "endDate", endDate,
-                "fileType", fileType,
-                "totalFiles", fileStats.stream().map(FileStatistics::getFileId).distinct().count(),
-                "generatedAt", LocalDateTime.now()
-            ));
-            
-            cacheService.cacheAnalyticsReport(cacheKey, report);
-            return report;
-            
-        } catch (Exception e) {
-            log.error("Error getting file activity report", e);
-            throw new RuntimeException("Failed to get file activity report", e);
         }
     }
 
@@ -677,17 +615,16 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private String buildAnalyticsCacheKey(StatisticsRequestDTO request) {
         return "analytics_" + request.getStatisticsType() + "_" + 
-               request.getStartDate() + "_" + request.getEndDate() + "_" +
-               request.getEntityType() + "_" + request.getEntityId();
+               request.getStartDate() + "_" + request.getEndDate();
     }
 
     private AnalyticsReportDTO convertToAnalyticsReportDTO(Map<String, Object> reportData) {
         return AnalyticsReportDTO.builder()
-                .id(UUID.randomUUID().toString())
+                .reportId(UUID.randomUUID().toString())
                 .reportType((String) reportData.getOrDefault("reportType", "general"))
                 .title("Analytics Report")
                 .description("Generated analytics report")
-                .data(reportData)
+                .keyMetrics(reportData)
                 .generatedAt(LocalDateTime.now())
                 .status("completed")
                 .build();
@@ -905,33 +842,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return metrics;
     }
 
-    private Map<String, Object> calculateTopQuests(List<QuestStatistics> questStats) {
-        Map<String, Object> topQuests = new HashMap<>();
-        
-        // Топ квестов по количеству завершений
-        List<Map<String, Object>> topByCompletions = questStats.stream()
-                .collect(Collectors.groupingBy(QuestStatistics::getQuestId))
-                .entrySet().stream()
-                .map(entry -> {
-                    Long questId = entry.getKey();
-                    List<QuestStatistics> stats = entry.getValue();
-                    long totalCompletions = stats.stream().mapToLong(QuestStatistics::getCompletions).sum();
-                    String questTitle = stats.get(0).getQuestTitle();
-                    
-                    return Map.of(
-                        "questId", questId,
-                        "questTitle", questTitle,
-                        "completions", totalCompletions
-                    );
-                })
-                .sorted((a, b) -> Long.compare((Long) b.get("completions"), (Long) a.get("completions")))
-                .limit(10)
-                .collect(Collectors.toList());
-        
-        topQuests.put("topByCompletions", topByCompletions);
-        return topQuests;
-    }
-
     private Map<String, Object> calculateQuestCompletionAnalysis(List<QuestStatistics> questStats) {
         Map<String, Object> analysis = new HashMap<>();
         
@@ -974,8 +884,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         
         // Упрощенный анализ временных паттернов
         Map<String, Long> hourlyDistribution = gameStats.stream()
+                .filter(gs -> gs.getStartTime() != null)
                 .collect(Collectors.groupingBy(
-                        gs -> gs.getStartedAt().getHour() + ":00",
+                        gs -> gs.getStartTime().getHour() + ":00",
                         Collectors.counting()
                 ));
         
@@ -1612,15 +1523,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                     long totalWins = stats.stream().mapToLong(TeamStatistics::getQuestWins).sum();
                     String teamName = stats.get(0).getTeamName();
                     
-                    return Map.of(
-                        "teamId", teamId,
-                        "teamName", teamName,
-                        "wins", totalWins
-                    );
+                    Map<String, Object> result = new HashMap<>();
+                    result.put("teamId", teamId);
+                    result.put("teamName", teamName);
+                    result.put("wins", totalWins);
+                    return result;
                 })
                 .sorted((a, b) -> Long.compare((Long) b.get("wins"), (Long) a.get("wins")))
                 .limit(10)
-                .collect(Collectors.toList());
+                .toList();
         
         topTeams.put("topByWins", topByWins);
         return topTeams;
@@ -1663,12 +1574,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private Map<String, Object> calculateStorageMetrics(List<FileStatistics> fileStats) {
         Map<String, Object> metrics = new HashMap<>();
         
-        long totalSize = fileStats.stream().mapToLong(FileStatistics::getTotalSizeBytes).sum();
-        double avgFileSize = fileStats.stream()
-                .filter(fs -> fs.getFileCount() > 0)
-                .mapToDouble(fs -> (double) fs.getTotalSizeBytes() / fs.getFileCount())
-                .average()
-                .orElse(0.0);
+        long totalSize = fileStats.stream().mapToLong(fs -> fs.getTotalSizeBytes() != null ? fs.getTotalSizeBytes() : 0L).sum();
+        long totalUploads = fileStats.stream().mapToLong(fs -> fs.getUploads() != null ? fs.getUploads() : 0L).sum();
+        double avgFileSize = totalUploads > 0 ? (double) totalSize / totalUploads : 0.0;
         
         metrics.put("totalStorageUsed", totalSize);
         metrics.put("avgFileSize", Math.round(avgFileSize));
@@ -1694,14 +1602,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Map<String, Object> topFiles = new HashMap<>();
         
         List<Map<String, Object>> topByDownloads = fileStats.stream()
-                .sorted((a, b) -> Long.compare(b.getDownloads(), a.getDownloads()))
+                .sorted((a, b) -> Long.compare(b.getDownloads() != null ? b.getDownloads() : 0L, a.getDownloads() != null ? a.getDownloads() : 0L))
                 .limit(10)
-                .map(fs -> Map.of(
-                    "fileId", fs.getFileId(),
-                    "fileName", fs.getFileName(),
-                    "downloads", fs.getDownloads(),
-                    "size", fs.getTotalSizeBytes()
-                ))
+                .map(fs -> {
+                    Map<String, Object> fileMap = new HashMap<>();
+                    fileMap.put("fileId", fs.getFileId());
+                    fileMap.put("downloads", fs.getDownloads() != null ? fs.getDownloads() : 0);
+                    fileMap.put("size", fs.getTotalSizeBytes() != null ? fs.getTotalSizeBytes() : 0L);
+                    return fileMap;
+                })
                 .collect(Collectors.toList());
         
         topFiles.put("topByDownloads", topByDownloads);

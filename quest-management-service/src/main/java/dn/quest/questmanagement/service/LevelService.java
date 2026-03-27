@@ -2,6 +2,7 @@ package dn.quest.questmanagement.service;
 
 import dn.quest.questmanagement.dto.LevelDTO;
 import dn.quest.questmanagement.entity.Level;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -110,32 +111,6 @@ public interface LevelService {
      * @param targetQuestId ID целевого квеста
      */
     void copyLevelsForQuest(Long sourceQuestId, Long targetQuestId);
-
-    /**
-     * Получить уровни в радиусе от точки
-     *
-     * @param latitude широта
-     * @param longitude долгота
-     * @param radiusKm радиус в километрах
-     * @return список уровней
-     */
-    List<LevelDTO> getLevelsInRadius(Double latitude, Double longitude, Double radiusKm);
-
-    /**
-     * Получить уровни с медиа файлами
-     *
-     * @param questId ID квеста
-     * @return список уровней с медиа
-     */
-    List<LevelDTO> getLevelsWithMedia(Long questId);
-
-    /**
-     * Получить уровни с подсказками
-     *
-     * @param questId ID квеста
-     * @return список уровней с подсказками
-     */
-    List<LevelDTO> getLevelsWithHints(Long questId);
 
     /**
      * Проверить целостность уровней квеста

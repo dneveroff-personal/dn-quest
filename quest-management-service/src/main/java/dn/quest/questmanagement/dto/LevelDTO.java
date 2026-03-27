@@ -74,30 +74,6 @@ public class LevelDTO extends BaseDTO {
     private Double longitude;
 
     /**
-     * Радиус действия уровня в метрах
-     */
-    @Min(value = 0, message = "Радиус действия не может быть отрицательным")
-    private Integer radiusMeters;
-
-    /**
-     * URL изображения уровня
-     */
-    @Size(max = 500, message = "URL изображения не должен превышать 500 символов")
-    private String imageUrl;
-
-    /**
-     * URL аудио файла уровня
-     */
-    @Size(max = 500, message = "URL аудио не должен превышать 500 символов")
-    private String audioUrl;
-
-    /**
-     * URL видео файла уровня
-     */
-    @Size(max = 500, message = "URL видео не должен превышать 500 символов")
-    private String videoUrl;
-
-    /**
      * Дополнительные параметры уровня в формате JSON
      */
     private String additionalParams;
@@ -106,18 +82,6 @@ public class LevelDTO extends BaseDTO {
      * Активен ли уровень
      */
     private Boolean active;
-
-    /**
-     * Дата создания
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    /**
-     * Дата обновления
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
 
     /**
      * ID пользователя, создавшего уровень
@@ -172,15 +136,6 @@ public class LevelDTO extends BaseDTO {
     }
 
     /**
-     * Проверяет, есть ли у уровня медиа контент
-     */
-    public boolean hasMediaContent() {
-        return (imageUrl != null && !imageUrl.trim().isEmpty()) ||
-               (audioUrl != null && !audioUrl.trim().isEmpty()) ||
-               (videoUrl != null && !videoUrl.trim().isEmpty());
-    }
-
-    /**
      * Проверяет, ограничено ли время на прохождение уровня
      */
     public boolean hasTimeLimit() {
@@ -199,27 +154,6 @@ public class LevelDTO extends BaseDTO {
      */
     public boolean isActive() {
         return active != null && active;
-    }
-
-    /**
-     * Проверяет, есть ли у уровня изображение
-     */
-    public boolean hasImage() {
-        return imageUrl != null && !imageUrl.trim().isEmpty();
-    }
-
-    /**
-     * Проверяет, есть ли у уровня аудио
-     */
-    public boolean hasAudio() {
-        return audioUrl != null && !audioUrl.trim().isEmpty();
-    }
-
-    /**
-     * Проверяет, есть ли у уровня видео
-     */
-    public boolean hasVideo() {
-        return videoUrl != null && !videoUrl.trim().isEmpty();
     }
 
     /**
@@ -313,19 +247,7 @@ public class LevelDTO extends BaseDTO {
         if (descriptionHtml != null && descriptionHtml.length() > 5000) {
             return false;
         }
-        
-        if (imageUrl != null && imageUrl.length() > 500) {
-            return false;
-        }
-        
-        if (audioUrl != null && audioUrl.length() > 500) {
-            return false;
-        }
-        
-        if (videoUrl != null && videoUrl.length() > 500) {
-            return false;
-        }
-        
+
         // Проверка геолокационных данных
         if (latitude != null && (latitude < -90 || latitude > 90)) {
             return false;
@@ -334,11 +256,7 @@ public class LevelDTO extends BaseDTO {
         if (longitude != null && (longitude < -180 || longitude > 180)) {
             return false;
         }
-        
-        if (radiusMeters != null && radiusMeters < 0) {
-            return false;
-        }
-        
+
         // Проверка времени
         if (apTime != null && apTime < 0) {
             return false;
@@ -358,19 +276,7 @@ public class LevelDTO extends BaseDTO {
         if (descriptionHtml != null) {
             descriptionHtml = descriptionHtml.trim();
         }
-        
-        if (imageUrl != null) {
-            imageUrl = imageUrl.trim();
-        }
-        
-        if (audioUrl != null) {
-            audioUrl = audioUrl.trim();
-        }
-        
-        if (videoUrl != null) {
-            videoUrl = videoUrl.trim();
-        }
-        
+
         if (additionalParams != null) {
             additionalParams = additionalParams.trim();
         }

@@ -9,9 +9,7 @@ import dn.quest.statistics.service.StatisticsQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -143,7 +141,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
         log.debug("Getting statistics for user: {} for period: {} to {}", userId, startDate, endDate);
         
         try {
-            Page<UserStatistics> statsPage = userStatisticsRepository.findByUserIdAndDateBetween(userId, startDate, endDate, pageable);
+            Page<UserStatistics> statsPage = userStatisticsRepository.findByUserIdAndDateBetweenOrderByDateDesc(userId, startDate, endDate, pageable);
             
             List<UserStatisticsDTO> dtoList = statsPage.getContent().stream()
                     .map(stats -> UserStatisticsDTO.builder()
@@ -191,8 +189,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
                             .views(0)
                             .starts(0)
                             .completions(0)
-                            .averageCompletionTimeMinutes(0L)
-                            .rating(0.0)
+                            .avgCompletionTimeMinutes(0.0)
                             .ratingCount(0)
                             .build());
             
@@ -201,8 +198,8 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
             statistics.put("views", stats.getViews());
             statistics.put("starts", stats.getStarts());
             statistics.put("completions", stats.getCompletions());
-            statistics.put("averageCompletionTimeMinutes", stats.getAverageCompletionTimeMinutes());
-            statistics.put("rating", stats.getRating());
+            statistics.put("averageCompletionTimeMinutes", stats.getAvgCompletionTimeMinutes());
+            statistics.put("rating", stats.getCurrentRating());
             statistics.put("ratingCount", stats.getRatingCount());
             
             // Добавляем процент завершения
@@ -234,25 +231,29 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
             TeamStatistics stats = teamStatisticsRepository.findByTeamIdAndDate(teamId, targetDate)
                     .orElse(TeamStatistics.builder()
                             .teamId(teamId)
+                            .teamName("")
                             .date(targetDate)
-                            .activeMembers(0)
-                            .totalMembers(0)
-                            .gameSessions(0)
+                            .currentMembersCount(0)
+                            .totalUniqueMembers(0)
                             .completedQuests(0)
-                            .averageScore(0.0)
+                            .currentRating(0.0)
+                            .playedQuests(0)
+                            .questWins(0)
                             .build());
             
             statistics.put("teamId", stats.getTeamId());
+            statistics.put("teamName", stats.getTeamName());
             statistics.put("date", stats.getDate());
-            statistics.put("activeMembers", stats.getActiveMembers());
-            statistics.put("totalMembers", stats.getTotalMembers());
-            statistics.put("gameSessions", stats.getGameSessions());
+            statistics.put("currentMembersCount", stats.getCurrentMembersCount());
+            statistics.put("totalUniqueMembers", stats.getTotalUniqueMembers());
+            statistics.put("currentRating", stats.getCurrentRating());
             statistics.put("completedQuests", stats.getCompletedQuests());
-            statistics.put("averageScore", stats.getAverageScore());
-            
+            statistics.put("playedQuests", stats.getPlayedQuests());
+            statistics.put("questWins", stats.getQuestWins());
+
             // Добавляем процент активных членов
-            if (stats.getTotalMembers() > 0) {
-                double activeRate = (double) stats.getActiveMembers() / stats.getTotalMembers() * 100;
+            if (stats.getTotalUniqueMembers() > 0) {
+                double activeRate = (double) stats.getCurrentMembersCount() / stats.getTotalUniqueMembers() * 100;
                 statistics.put("activeRate", activeRate);
             } else {
                 statistics.put("activeRate", 0.0);
@@ -320,30 +321,31 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
         
         try {
             LocalDate targetDate = date != null ? date : LocalDate.now();
-            
+            Pageable pageable = PageRequest.of(0, limit, Sort.Direction.DESC);
+
             // В зависимости от метрики получаем топ пользователей
             switch (metric.toLowerCase()) {
                 case "completedquests":
-                    topUsers = userStatisticsRepository.findTopUsersByCompletedQuests(targetDate, limit)
+                    topUsers = userStatisticsRepository.findTopUsersByCompletedQuests(targetDate, pageable)
                             .stream()
                             .map(this::convertUserStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 case "gamesessions":
-                    topUsers = userStatisticsRepository.findTopUsersByGameSessions(targetDate, limit)
+                    topUsers = userStatisticsRepository.findTopUsersByGameSessions(targetDate, pageable)
                             .stream()
                             .map(this::convertUserStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 case "createdquests":
-                    topUsers = userStatisticsRepository.findTopUsersByCreatedQuests(targetDate, limit)
+                    topUsers = userStatisticsRepository.findTopUsersByCreatedQuests(targetDate, pageable)
                             .stream()
                             .map(this::convertUserStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 default:
                     // По умолчанию используем completedQuests
-                    topUsers = userStatisticsRepository.findTopUsersByCompletedQuests(targetDate, limit)
+                    topUsers = userStatisticsRepository.findTopUsersByCompletedQuests(targetDate, pageable)
                             .stream()
                             .map(this::convertUserStatsToMap)
                             .collect(Collectors.toList());
@@ -362,33 +364,34 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
         log.debug("Getting top quests by metric: {} limit: {} date: {}", metric, limit, date);
         
         List<Map<String, Object>> topQuests = new ArrayList<>();
-        
+        Pageable pageable = PageRequest.of(0, limit, Sort.Direction.DESC);
+
         try {
             LocalDate targetDate = date != null ? date : LocalDate.now();
             
             // В зависимости от метрики получаем топ квестов
             switch (metric.toLowerCase()) {
                 case "completions":
-                    topQuests = questStatisticsRepository.findTopQuestsByCompletions(targetDate, limit)
+                    topQuests = questStatisticsRepository.findTopQuestsByCompletions(targetDate, pageable)
                             .stream()
                             .map(this::convertQuestStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 case "views":
-                    topQuests = questStatisticsRepository.findTopQuestsByViews(targetDate, limit)
+                    topQuests = questStatisticsRepository.findTopQuestsByViews(targetDate, pageable)
                             .stream()
                             .map(this::convertQuestStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 case "rating":
-                    topQuests = questStatisticsRepository.findTopQuestsByRating(targetDate, limit)
+                    topQuests = questStatisticsRepository.findTopQuestsByRating(targetDate, pageable)
                             .stream()
                             .map(this::convertQuestStatsToMap)
                             .collect(Collectors.toList());
                     break;
                 default:
                     // По умолчанию используем completions
-                    topQuests = questStatisticsRepository.findTopQuestsByCompletions(targetDate, limit)
+                    topQuests = questStatisticsRepository.findTopQuestsByCompletions(targetDate, pageable)
                             .stream()
                             .map(this::convertQuestStatsToMap)
                             .collect(Collectors.toList());
@@ -560,7 +563,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
         map.put("completions", stats.getCompletions());
         map.put("views", stats.getViews());
         map.put("starts", stats.getStarts());
-        map.put("rating", stats.getRating());
+        map.put("rating", stats.getAvgRating());
         return map;
     }
 

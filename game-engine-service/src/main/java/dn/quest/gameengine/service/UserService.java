@@ -49,7 +49,6 @@ public interface UserService {
     long getUsersRegisteredThisWeek();
     long getUsersRegisteredThisMonth();
     double getAverageUserRating();
-    List<User> getMostActiveUsers(int limit);
     List<User> getHighestRatedUsers(int limit);
     
     // Игровая статистика
@@ -110,8 +109,7 @@ public interface UserService {
     void unbanUser(Long userId);
     List<User> getSuspendedUsers();
     List<User> getBannedUsers();
-    List<User> getInactiveUsers(int inactiveDays);
-    
+
     // Операции с кэшированием
     void cacheUser(User user);
     void evictUserFromCache(Long userId);

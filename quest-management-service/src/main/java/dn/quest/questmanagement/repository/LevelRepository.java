@@ -124,13 +124,6 @@ public interface LevelRepository extends JpaRepository<Level, Long>, JpaSpecific
     List<Level> findGeolocationLevels();
 
     /**
-     * Найти уровни с медиа контентом
-     */
-    @Query("SELECT l FROM Level l WHERE l.imageUrl IS NOT NULL OR l.audioUrl IS NOT NULL OR l.videoUrl IS NOT NULL " +
-           "ORDER BY l.questId, l.orderIndex ASC")
-    List<Level> findLevelsWithMedia();
-
-    /**
      * Найти активные уровни
      */
     List<Level> findByActiveTrue();

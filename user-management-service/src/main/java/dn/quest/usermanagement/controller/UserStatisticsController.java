@@ -343,8 +343,8 @@ public class UserStatisticsController {
     @GetMapping("/global/summary")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить общую статистику", description = "Возвращает общую статистику сервиса")
-    public ResponseEntity<UserStatisticsService.GlobalStatisticsSummary> getGlobalStatistics() {
-        UserStatisticsService.GlobalStatisticsSummary summary = userStatisticsService.getGlobalStatistics();
+    public ResponseEntity<dn.quest.usermanagement.dto.GlobalStatisticsSummaryDTO> getGlobalStatistics() {
+        dn.quest.usermanagement.dto.GlobalStatisticsSummaryDTO summary = userStatisticsService.getGlobalStatistics();
         return ResponseEntity.ok(summary);
     }
 }

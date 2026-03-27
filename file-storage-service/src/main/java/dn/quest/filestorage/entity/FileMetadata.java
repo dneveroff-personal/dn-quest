@@ -55,7 +55,7 @@ public class FileMetadata {
     private String description;
 
     @Column(name = "owner_id")
-    private UUID ownerId;
+    private Long ownerId;
 
     @Column(name = "quest_id")
     private UUID questId;

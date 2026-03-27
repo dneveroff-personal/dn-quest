@@ -1,6 +1,7 @@
 package dn.quest.usermanagement.exception;
 
 import dn.quest.shared.dto.ErrorDTO;
+import dn.quest.shared.exceptions.CommonExceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -36,7 +39,7 @@ public class GlobalExceptionHandler {
         log.warn("Сущность не найдена: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Сущность не найдена")
                 .message(ex.getMessage())
@@ -62,11 +65,11 @@ public class GlobalExceptionHandler {
                 ));
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Ошибка валидации")
                 .message("Нарушены ограничения валидации")
-                .validationErrors(violations)
+                .validationErrors((List<ErrorDTO.ValidationError>) violations)
                 .path(request.getDescription(false))
                 .build();
         
@@ -90,11 +93,11 @@ public class GlobalExceptionHandler {
         });
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Ошибка валидации")
                 .message("Некорректные данные запроса")
-                .validationErrors(errors)
+                .validationErrors((List<ErrorDTO.ValidationError>) errors)
                 .path(request.getDescription(false))
                 .build();
         
@@ -111,7 +114,7 @@ public class GlobalExceptionHandler {
         log.warn("Доступ запрещен: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Доступ запрещен")
                 .message("У вас нет прав для выполнения этой операции")
@@ -124,14 +127,14 @@ public class GlobalExceptionHandler {
     /**
      * Обработка исключения пользователь уже существует
      */
-    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ExceptionHandler(UserManagementExceptions.UserAlreadyExistsException.class)
     public ResponseEntity<ErrorDTO> handleUserAlreadyExistsException(
-            UserAlreadyExistsException ex, WebRequest request) {
+            UserManagementExceptions.UserAlreadyExistsException ex, WebRequest request) {
         
         log.warn("Пользователь уже существует: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CONFLICT.value())
                 .error("Конфликт данных")
                 .message(ex.getMessage())
@@ -144,14 +147,14 @@ public class GlobalExceptionHandler {
     /**
      * Обработка исключения пользователь не найден
      */
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(UserManagementExceptions.UserNotFoundException.class)
     public ResponseEntity<ErrorDTO> handleUserNotFoundException(
-            UserNotFoundException ex, WebRequest request) {
+            UserManagementExceptions.UserNotFoundException ex, WebRequest request) {
         
         log.warn("Пользователь не найден: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Пользователь не найден")
                 .message(ex.getMessage())
@@ -164,14 +167,14 @@ public class GlobalExceptionHandler {
     /**
      * Обработка исключения недопустимая операция
      */
-    @ExceptionHandler(IllegalOperationException.class)
+    @ExceptionHandler(UserManagementExceptions.IllegalOperationException.class)
     public ResponseEntity<ErrorDTO> handleIllegalOperationException(
-            IllegalOperationException ex, WebRequest request) {
+            UserManagementExceptions.IllegalOperationException ex, WebRequest request) {
         
         log.warn("Недопустимая операция: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Недопустимая операция")
                 .message(ex.getMessage())
@@ -184,14 +187,14 @@ public class GlobalExceptionHandler {
     /**
      * Обработка исключения внешнего сервиса
      */
-    @ExceptionHandler(ExternalServiceException.class)
+    @ExceptionHandler(CommonExceptions.ExternalServiceException.class)
     public ResponseEntity<ErrorDTO> handleExternalServiceException(
-            ExternalServiceException ex, WebRequest request) {
+            CommonExceptions.ExternalServiceException ex, WebRequest request) {
         
         log.error("Ошибка внешнего сервиса: {}", ex.getMessage(), ex);
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_GATEWAY.value())
                 .error("Ошибка внешнего сервиса")
                 .message("Временная проблема с внешним сервисом. Попробуйте позже.")
@@ -204,14 +207,14 @@ public class GlobalExceptionHandler {
     /**
      * Обработка исключения бизнес-логики
      */
-    @ExceptionHandler(BusinessException.class)
+    @ExceptionHandler(CommonExceptions.BusinessException.class)
     public ResponseEntity<ErrorDTO> handleBusinessException(
-            BusinessException ex, WebRequest request) {
+            CommonExceptions.BusinessException ex, WebRequest request) {
         
         log.warn("Ошибка бизнес-логики: {}", ex.getMessage());
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
                 .error("Ошибка бизнес-логики")
                 .message(ex.getMessage())
@@ -231,7 +234,7 @@ public class GlobalExceptionHandler {
         log.error("Непредвиденная ошибка: {}", ex.getMessage(), ex);
         
         ErrorDTO errorDTO = ErrorDTO.builder()
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error("Внутренняя ошибка сервера")
                 .message("Произошла непредвиденная ошибка. Пожалуйста, обратитесь в поддержку.")

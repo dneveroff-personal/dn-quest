@@ -12,6 +12,7 @@ import dn.quest.notification.service.NotificationTemplateService;
 import dn.quest.notification.service.UserNotificationPreferencesService;
 import dn.quest.notification.service.channel.NotificationChannelManager;
 import dn.quest.notification.service.channel.NotificationChannelResult;
+import dn.quest.shared.constants.ApplicationConstants;
 import dn.quest.shared.events.notification.NotificationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -413,7 +414,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
      * Асинхронная отправка уведомления
      */
     @Async
-    private CompletableFuture<Void> sendNotificationAsync(Notification notification) {
+    protected CompletableFuture<Void> sendNotificationAsync(Notification notification) {
         try {
             // Проверка предпочтений пользователя
             if (!checkUserPreferences(notification)) {
@@ -676,6 +677,8 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     null,
                     null,
+                    null,
+                    null,
                     variables
             ));
         }
@@ -688,6 +691,8 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     NotificationCategory.WELCOME,
                     "Добро пожаловать!",
                     "Добро пожаловать в DN Quest, " + username + "!",
+                    null,
+                    null,
                     null,
                     null,
                     null,
@@ -718,6 +723,8 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     NotificationCategory.SYSTEM,
                     "Профиль обновлен",
                     "Ваш профиль был успешно обновлен.",
+                    null,
+                    null,
                     null,
                     null,
                     null,
@@ -755,6 +762,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     questId.toString(),
                     "quest",
+                    ApplicationConstants.Quest.class.getTypeName(),
                     variables
             ));
         }
@@ -787,6 +795,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     questId.toString(),
                     "quest",
+                    ApplicationConstants.Quest.class.getTypeName(),
                     variables
             ));
         }
@@ -819,6 +828,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     questId.toString(),
                     "quest",
+                    ApplicationConstants.Quest.class.getTypeName(),
                     variables
             ));
         }
@@ -851,6 +861,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     sessionId.toString(),
                     "game",
+                    ApplicationConstants.Game.class.getTypeName(),
                     variables
             ));
         }
@@ -886,6 +897,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     sessionId.toString(),
                     "game",
+                    ApplicationConstants.Game.class.getTypeName(),
                     variables
             ));
         }
@@ -918,6 +930,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     sessionId.toString(),
                     "game",
+                    ApplicationConstants.Game.class.getTypeName(),
                     variables
             ));
         }
@@ -950,6 +963,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     teamId.toString(),
                     "team",
+                    ApplicationConstants.Team.class.getTypeName(),
                     variables
             ));
         }
@@ -983,6 +997,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     teamId.toString(),
                     "team",
+                    ApplicationConstants.Team.class.getTypeName(),
                     variables
             ));
         }
@@ -1016,6 +1031,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     null,
                     teamId.toString(),
                     "team",
+                    ApplicationConstants.Team.class.getTypeName(),
                     variables
             ));
         }
@@ -1041,6 +1057,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                     NotificationCategory.SYSTEM,
                     "Файл загружен",
                     "Ваш файл \"" + fileName + "\" успешно загружен",
+                    null,
                     null,
                     null,
                     null,

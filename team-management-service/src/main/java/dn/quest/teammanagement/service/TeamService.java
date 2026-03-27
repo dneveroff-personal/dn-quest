@@ -4,7 +4,8 @@ import dn.quest.teammanagement.dto.*;
 import dn.quest.teammanagement.dto.request.*;
 import dn.quest.teammanagement.dto.response.TeamListResponse;
 import dn.quest.teammanagement.entity.Team;
-import org.springframework.data.domain.Page;
+import dn.quest.teammanagement.entity.TeamMember;
+import dn.quest.teammanagement.enums.TeamRole;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -65,6 +66,11 @@ public interface TeamService {
     List<TeamDTO> getUserTeams(Long userId);
 
     /**
+     * Получить команды пользователя постранично
+     */
+    TeamListResponse getUserTeams(Long userId, Pageable pageable);
+
+    /**
      * Получить активные команды пользователя
      */
     List<TeamDTO> getUserActiveTeams(Long userId);
@@ -92,12 +98,12 @@ public interface TeamService {
     /**
      * Передать права капитана
      */
-    void transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId);
+    TeamMember transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId);
 
     /**
      * Добавить участника в команду
      */
-    void addMember(Long teamId, Long userId, Long requesterId);
+    TeamMember addMember(Long teamId, Long userId, Long requesterId);
 
     /**
      * Удалить участника из команды
@@ -107,7 +113,7 @@ public interface TeamService {
     /**
      * Изменить роль участника
      */
-    void changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId);
+    TeamMember changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId);
 
     /**
      * Пригласить пользователя в команду
@@ -132,7 +138,7 @@ public interface TeamService {
     /**
      * Получить настройки команды
      */
-    TeamSettingsDTO getTeamSettings(Long teamId, Long userId);
+    TeamSettingsDTO getTeamSettings(Long teamId);
 
     /**
      * Обновить настройки команды
@@ -142,7 +148,7 @@ public interface TeamService {
     /**
      * Получить статистику команды
      */
-    TeamStatisticsDTO getTeamStatistics(Long teamId, Long userId);
+    TeamStatisticsDTO getTeamStatistics(Long teamId);
 
     /**
      * Обновить статистику команды
@@ -152,7 +158,7 @@ public interface TeamService {
     /**
      * Получить участников команды
      */
-    List<TeamMemberDTO> getTeamMembers(Long teamId, Long userId);
+    List<TeamMemberDTO> getTeamMembers(Long teamId);
 
     /**
      * Получить активных участников команды
@@ -173,11 +179,6 @@ public interface TeamService {
      * Получить количество команд
      */
     long getTeamsCount();
-
-    /**
-     * Получить количество активных команд
-     */
-    long getActiveTeamsCount();
 
     /**
      * Получить количество публичных команд
@@ -233,4 +234,26 @@ public interface TeamService {
      * Очистить старые данные
      */
     void cleanupOldData();
+
+    // === Методы для обработки событий Kafka ===
+
+    /**
+     * Обновить доступные квесты для команд
+     */
+    void updateAvailableQuests(Long questId, String status);
+
+    /**
+     * Обновить кэш квестов
+     */
+    void updateQuestCache(Long questId, dn.quest.shared.events.quest.QuestUpdatedEvent event);
+
+    /**
+     * Удалить квест из доступных
+     */
+    void removeQuestFromAvailable(Long questId);
+
+    /**
+     * Обновить статистику игровой сессии
+     */
+    void updateGameSessionStatistics(Long teamId, String sessionId, String status);
 }

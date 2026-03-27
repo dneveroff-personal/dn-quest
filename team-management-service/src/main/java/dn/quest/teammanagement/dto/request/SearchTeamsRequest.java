@@ -29,13 +29,17 @@ public class SearchTeamsRequest {
     private Boolean allowSearch;
 
     @Min(value = 0, message = "Номер страницы должен быть не менее 0")
+    @Builder.Default
     private Integer page = 0;
 
     @Min(value = 1, message = "Размер страницы должен быть не менее 1")
     @Max(value = 100, message = "Размер страницы не должен превышать 100")
+    @Builder.Default
     private Integer size = 20;
 
+    @Builder.Default
     private String sortBy = "name";
 
+    @Builder.Default
     private String sortDirection = "asc";
 }

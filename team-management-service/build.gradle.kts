@@ -36,7 +36,6 @@ dependencies {
     // Database
     implementation("org.postgresql:postgresql")
     implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-database-postgresql")
     
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -50,7 +49,6 @@ dependencies {
     // JSON Processing
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-java8")
     
     // Lombok
     compileOnly("org.projectlombok:lombok")

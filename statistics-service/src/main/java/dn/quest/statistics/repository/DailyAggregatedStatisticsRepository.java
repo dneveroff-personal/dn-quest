@@ -22,7 +22,7 @@ public interface DailyAggregatedStatisticsRepository extends JpaRepository<Daily
     /**
      * Найти статистику по дате
      */
-    Optional<DailyAggregatedStatistics> findByDate(LocalDate date);
+    List<DailyAggregatedStatistics> findByDate(LocalDate date);
 
     /**
      * Найти статистику за период

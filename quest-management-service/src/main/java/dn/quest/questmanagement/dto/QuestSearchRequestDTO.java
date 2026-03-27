@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import java.time.LocalDateTime;
@@ -157,8 +159,8 @@ public class QuestSearchRequestDTO {
     /**
      * Радиус поиска в километрах
      */
-    @Min(value = 0.1, message = "Радиус поиска должен быть не менее 0.1 км")
-    @Max(value = 1000, message = "Радиус поиска не должен превышать 1000 км")
+    @DecimalMin(value = "0.1", message = "Радиус поиска должен быть не менее 0.1 км")
+    @DecimalMax(value = "1000", message = "Радиус поиска не должен превышать 1000 км")
     private Double radiusKm;
 
     /**

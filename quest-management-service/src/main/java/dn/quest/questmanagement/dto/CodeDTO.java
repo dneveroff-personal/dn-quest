@@ -77,16 +77,8 @@ public class CodeDTO extends BaseDTO {
     private Integer maxUsageCount;
 
     /**
-     * Дата создания
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
 
     /**
-     * Дата обновления
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
 
     /**
      * ID пользователя, создавшего код

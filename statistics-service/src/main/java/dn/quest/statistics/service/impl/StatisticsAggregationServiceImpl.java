@@ -21,17 +21,14 @@ import dn.quest.statistics.service.CacheService;
 import dn.quest.statistics.service.StatisticsAggregationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.embedded.TomcatVirtualThreadsWebServerFactoryCustomizer;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -53,10 +50,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
     private final FileStatisticsRepository fileStatisticsRepository;
     private final SystemStatisticsRepository systemStatisticsRepository;
     private final CacheService cacheService;
+    private final TomcatVirtualThreadsWebServerFactoryCustomizer tomcatVirtualThreadsProtocolHandlerCustomizer;
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateRealTimeStatistics() {
+    public void aggregateRealTimeStatistics() {
         log.debug("Starting real-time statistics aggregation");
         
         try {
@@ -80,13 +78,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during real-time statistics aggregation", e);
             throw new AggregationException("Failed to aggregate real-time statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateHourlyStatistics() {
+    public void aggregateHourlyStatistics() {
         log.debug("Starting hourly statistics aggregation");
         
         try {
@@ -106,13 +102,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during hourly statistics aggregation", e);
             throw new AggregationException("Failed to aggregate hourly statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateDailyStatistics() {
+    public void aggregateDailyStatistics() {
         log.info("Starting daily statistics aggregation for date: {}", LocalDate.now().minusDays(1));
         
         try {
@@ -133,13 +127,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during daily statistics aggregation", e);
             throw new AggregationException("Failed to aggregate daily statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateWeeklyStatistics() {
+    public void aggregateWeeklyStatistics() {
         log.info("Starting weekly statistics aggregation");
         
         try {
@@ -158,13 +150,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during weekly statistics aggregation", e);
             throw new AggregationException("Failed to aggregate weekly statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateMonthlyStatistics() {
+    public void aggregateMonthlyStatistics() {
         log.info("Starting monthly statistics aggregation");
         
         try {
@@ -183,13 +173,12 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during monthly statistics aggregation", e);
             throw new AggregationException("Failed to aggregate monthly statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
+
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> updateLeaderboards() {
+    public void updateLeaderboards() {
         log.debug("Updating leaderboards");
         
         try {
@@ -210,13 +199,12 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during leaderboards update", e);
             throw new AggregationException("Failed to update leaderboards", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
+
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> cleanupOldStatistics() {
+    public void cleanupOldStatistics() {
         log.info("Starting cleanup of old statistics");
         
         try {
@@ -239,13 +227,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during old statistics cleanup", e);
             throw new AggregationException("Failed to cleanup old statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> generateSystemMetrics() {
+    public void generateSystemMetrics() {
         log.debug("Generating system metrics");
         
         try {
@@ -266,13 +252,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during system metrics generation", e);
             throw new AggregationException("Failed to generate system metrics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> validateDataIntegrity() {
+    public void validateDataIntegrity() {
         log.info("Starting data integrity validation");
         
         try {
@@ -296,13 +280,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during data integrity validation", e);
             throw new AggregationException("Failed to validate data integrity", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> recalculateAggregatedData(LocalDate startDate, LocalDate endDate) {
+    public void recalculateAggregatedData(LocalDate startDate, LocalDate endDate) {
         log.info("Recalculating aggregated data from {} to {}", startDate, endDate);
         
         try {
@@ -325,13 +307,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during aggregated data recalculation", e);
             throw new AggregationException("Failed to recalculate aggregated data", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateUserStatistics(Long userId, LocalDate date) {
+    public void aggregateUserStatistics(Long userId, LocalDate date) {
         log.debug("Aggregating user statistics for user: {} date: {}", userId, date);
         
         try {
@@ -355,13 +335,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during user statistics aggregation for user: {} date: {}", userId, date, e);
             throw new AggregationException("Failed to aggregate user statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateQuestStatistics(Long questId, LocalDate date) {
+    public void aggregateQuestStatistics(Long questId, LocalDate date) {
         log.debug("Aggregating quest statistics for quest: {} date: {}", questId, date);
         
         try {
@@ -385,13 +363,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during quest statistics aggregation for quest: {} date: {}", questId, date, e);
             throw new AggregationException("Failed to aggregate quest statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateTeamStatistics(Long teamId, LocalDate date) {
+    public void aggregateTeamStatistics(Long teamId, LocalDate date) {
         log.debug("Aggregating team statistics for team: {} date: {}", teamId, date);
         
         try {
@@ -415,13 +391,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during team statistics aggregation for team: {} date: {}", teamId, date, e);
             throw new AggregationException("Failed to aggregate team statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateGameStatistics(String sessionId, LocalDate date) {
+    public void aggregateGameStatistics(String sessionId, LocalDate date) {
         log.debug("Aggregating game statistics for session: {} date: {}", sessionId, date);
         
         try {
@@ -434,13 +408,11 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during game statistics aggregation for session: {} date: {}", sessionId, date, e);
             throw new AggregationException("Failed to aggregate game statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
-    public CompletableFuture<Void> aggregateFileStatistics(String fileId, LocalDate date) {
+    public void aggregateFileStatistics(String fileId, LocalDate date) {
         log.debug("Aggregating file statistics for file: {} date: {}", fileId, date);
         
         try {
@@ -453,8 +425,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             log.error("Error during file statistics aggregation for file: {} date: {}", fileId, date, e);
             throw new AggregationException("Failed to aggregate file statistics", e);
         }
-        
-        return CompletableFuture.completedFuture(null);
     }
 
     // Приватные методы для агрегации данных
@@ -622,17 +592,12 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .totalQuests(totalQuests)
                 .completedQuests(completedQuests)
                 .totalTeams(totalTeams)
-                .activeTeams(activeTeams)
                 .totalGameSessions(totalGameSessions)
                 .completedGameSessions(completedGameSessions)
-                .totalGameTimeMinutes(userStats.stream().mapToLong(UserStatistics::getTotalGameTimeMinutes).sum())
-                .totalRegistrations(userStats.stream().mapToInt(UserStatistics::getRegistrations).sum())
-                .totalLogins(userStats.stream().mapToInt(UserStatistics::getLogins).sum())
-                .totalCodeSubmissions(userStats.stream()
+                .totalGameTime(userStats.stream().mapToLong(UserStatistics::getTotalGameTimeMinutes).sum())
+                .codeSubmissions(userStats.stream()
                         .mapToInt(us -> us.getSuccessfulCodeSubmissions() + us.getFailedCodeSubmissions())
                         .sum())
-                .totalFilesUploaded(userStats.stream().mapToInt(UserStatistics::getUploadedFiles).sum())
-                .totalFileSizeBytes(userStats.stream().mapToLong(UserStatistics::getTotalFileSizeBytes).sum())
                 .build();
         
         dailyAggregatedStatisticsRepository.save(aggregated);
@@ -705,7 +670,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             // Получаем предыдущий ранг
             Optional<Leaderboard> previousEntry = leaderboardRepository
                     .findByLeaderboardTypeAndPeriodAndDateAndEntityId(
-                            "users", "daily", date.minusDays(1), userId);
+                            "users", "daily", date.minusDays(1), leaderboard.getEntityId());
             
             if (previousEntry.isPresent()) {
                 leaderboard.setPreviousRank(previousEntry.get().getRank());
@@ -752,7 +717,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                             .avgRating(calculateQuestAvgRating(questId))
                             .ratingsCount(calculateQuestRatingsCount(questId))
                             .avgCompletionTime(calculateQuestAvgCompletionTime(questId))
-                            .completionsCount(aggregated.getCompletions())
                             .viewsCount(aggregated.getViews())
                             .likesCount(calculateQuestLikesCount(questId))
                             .build();
@@ -768,7 +732,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             // Получаем предыдущий ранг
             Optional<Leaderboard> previousEntry = leaderboardRepository
                     .findByLeaderboardTypeAndPeriodAndDateAndEntityId(
-                            "quests", "daily", date.minusDays(1), questId);
+                            "quests", "daily", date.minusDays(1), leaderboard.getEntityId());
             
             if (previousEntry.isPresent()) {
                 leaderboard.setPreviousRank(previousEntry.get().getRank());
@@ -831,7 +795,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
             // Получаем предыдущий ранг
             Optional<Leaderboard> previousEntry = leaderboardRepository
                     .findByLeaderboardTypeAndPeriodAndDateAndEntityId(
-                            "teams", "daily", date.minusDays(1), teamId);
+                            "teams", "daily", date.minusDays(1), leaderboard.getEntityId());
             
             if (previousEntry.isPresent()) {
                 leaderboard.setPreviousRank(previousEntry.get().getRank());
@@ -935,10 +899,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics performanceMetric = SystemStatistics.builder()
                 .date(date)
                 .category("performance")
-                .metricName("avg_session_duration")
-                .metricValue(avgSessionDuration)
-                .metricUnit("minutes")
-                .recordedAt(LocalDateTime.now())
+                .metric("avg_session_duration")
+                .value(avgSessionDuration)
+                .unit("minutes")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(performanceMetric);
@@ -946,10 +910,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics completionMetric = SystemStatistics.builder()
                 .date(date)
                 .category("performance")
-                .metricName("completion_rate")
-                .metricValue(completionRate)
-                .metricUnit("percent")
-                .recordedAt(LocalDateTime.now())
+                .metric("completion_rate")
+                .value(completionRate)
+                .unit("percent")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(completionMetric);
@@ -957,10 +921,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics activeUsersMetric = SystemStatistics.builder()
                 .date(date)
                 .category("performance")
-                .metricName("active_users")
-                .metricValue(totalActiveUsers)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("active_users")
+                .value((double) totalActiveUsers)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(activeUsersMetric);
@@ -990,10 +954,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics registrationsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("business")
-                .metricName("new_registrations")
-                .metricValue(newRegistrations)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("new_registrations")
+                .value((double) newRegistrations)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(registrationsMetric);
@@ -1001,10 +965,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics questsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("business")
-                .metricName("new_quests")
-                .metricValue(newQuests)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("new_quests")
+                .value((double) newQuests)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(questsMetric);
@@ -1012,10 +976,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics teamsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("business")
-                .metricName("new_teams")
-                .metricValue(newTeams)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("new_teams")
+                .value((double) newTeams)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(teamsMetric);
@@ -1023,10 +987,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics engagementMetric = SystemStatistics.builder()
                 .date(date)
                 .category("business")
-                .metricName("total_game_time")
-                .metricValue(totalGameTime)
-                .metricUnit("minutes")
-                .recordedAt(LocalDateTime.now())
+                .metric("total_game_time")
+                .value((double) totalGameTime)
+                .unit("minutes")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(engagementMetric);
@@ -1034,10 +998,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics codeMetric = SystemStatistics.builder()
                 .date(date)
                 .category("business")
-                .metricName("code_submissions")
-                .metricValue(totalCodeSubmissions)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("code_submissions")
+                .value((double) totalCodeSubmissions)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(codeMetric);
@@ -1064,10 +1028,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics loginsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("usage")
-                .metricName("total_logins")
-                .metricValue(totalLogins)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("total_logins")
+                .value((double) totalLogins)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(loginsMetric);
@@ -1075,10 +1039,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics sessionsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("usage")
-                .metricName("total_game_sessions")
-                .metricValue(totalGameSessions)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("total_game_sessions")
+                .value((double) totalGameSessions)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(sessionsMetric);
@@ -1086,10 +1050,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics uploadsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("usage")
-                .metricName("file_uploads")
-                .metricValue(totalFileUploads)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("file_uploads")
+                .value((double) totalFileUploads)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(uploadsMetric);
@@ -1097,10 +1061,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics downloadsMetric = SystemStatistics.builder()
                 .date(date)
                 .category("usage")
-                .metricName("file_downloads")
-                .metricValue(totalFileDownloads)
-                .metricUnit("count")
-                .recordedAt(LocalDateTime.now())
+                .metric("file_downloads")
+                .value((double) totalFileDownloads)
+                .unit("count")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(downloadsMetric);
@@ -1108,10 +1072,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         SystemStatistics storageMetric = SystemStatistics.builder()
                 .date(date)
                 .category("usage")
-                .metricName("storage_used")
-                .metricValue(totalFileSize)
-                .metricUnit("bytes")
-                .recordedAt(LocalDateTime.now())
+                .metric("storage_used")
+                .value((double) totalFileSize)
+                .unit("bytes")
+                .createdAt(LocalDateTime.now())
                 .build();
         
         systemStatisticsRepository.save(storageMetric);
@@ -1290,7 +1254,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         
         // Получаем дневную агрегированную статистику за неделю
         List<DailyAggregatedStatistics> dailyStats = dailyAggregatedStatisticsRepository
-                .findByDateBetween(weekStart, weekEnd);
+                .findByDateBetweenOrderByDateDesc(weekStart, weekEnd);
         
         if (dailyStats.isEmpty()) {
             log.warn("No daily statistics found for weekly aggregation from {} to {}", weekStart, weekEnd);
@@ -1303,7 +1267,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         long totalQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalQuests).sum();
         long completedQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedQuests).sum();
         long totalTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalTeams).sum();
-        long activeTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getActiveTeams).sum();
         long totalGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameSessions).sum();
         long completedGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedGameSessions).sum();
         
@@ -1311,20 +1274,14 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         DailyAggregatedStatistics weeklyAggregated = DailyAggregatedStatistics.builder()
                 .date(weekEnd) // Используем конец недели как дату
                 .aggregationType("weekly")
-                .totalUsers(totalUsers)
                 .activeUsers(activeUsers)
-                .totalQuests(totalQuests)
                 .completedQuests(completedQuests)
-                .totalTeams(totalTeams)
-                .activeTeams(activeTeams)
-                .totalGameSessions(totalGameSessions)
                 .completedGameSessions(completedGameSessions)
-                .totalGameTimeMinutes(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameTimeMinutes).sum())
-                .totalRegistrations(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalRegistrations).sum())
-                .totalLogins(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalLogins).sum())
-                .totalCodeSubmissions(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalCodeSubmissions).sum())
-                .totalFilesUploaded(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalFilesUploaded).sum())
-                .totalFileSizeBytes(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalFileSizeBytes).sum())
+                .totalQuests(totalQuests)
+                .totalTeams(totalTeams)
+                .totalGameSessions(totalGameSessions)
+                .totalUsers(totalUsers)
+                .totalGameTime(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameTime).sum())
                 .build();
         
         dailyAggregatedStatisticsRepository.save(weeklyAggregated);
@@ -1336,7 +1293,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         
         // Получаем дневную агрегированную статистику за месяц
         List<DailyAggregatedStatistics> dailyStats = dailyAggregatedStatisticsRepository
-                .findByDateBetween(monthStart, monthEnd);
+                .findByDateBetweenOrderByDateDesc(monthStart, monthEnd);
         
         if (dailyStats.isEmpty()) {
             log.warn("No daily statistics found for monthly aggregation from {} to {}", monthStart, monthEnd);
@@ -1349,7 +1306,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         long totalQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalQuests).sum();
         long completedQuests = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedQuests).sum();
         long totalTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalTeams).sum();
-        long activeTeams = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getActiveTeams).sum();
         long totalGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameSessions).sum();
         long completedGameSessions = dailyStats.stream().mapToLong(DailyAggregatedStatistics::getCompletedGameSessions).sum();
         
@@ -1357,20 +1313,14 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         DailyAggregatedStatistics monthlyAggregated = DailyAggregatedStatistics.builder()
                 .date(monthEnd) // Используем конец месяца как дату
                 .aggregationType("monthly")
-                .totalUsers(totalUsers)
                 .activeUsers(activeUsers)
-                .totalQuests(totalQuests)
                 .completedQuests(completedQuests)
-                .totalTeams(totalTeams)
-                .activeTeams(activeTeams)
-                .totalGameSessions(totalGameSessions)
                 .completedGameSessions(completedGameSessions)
-                .totalGameTimeMinutes(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameTimeMinutes).sum())
-                .totalRegistrations(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalRegistrations).sum())
-                .totalLogins(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalLogins).sum())
-                .totalCodeSubmissions(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalCodeSubmissions).sum())
-                .totalFilesUploaded(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalFilesUploaded).sum())
-                .totalFileSizeBytes(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalFileSizeBytes).sum())
+                .totalQuests(totalQuests)
+                .totalTeams(totalTeams)
+                .totalUsers(totalUsers)
+                .totalGameSessions(totalGameSessions)
+                .totalGameTime(dailyStats.stream().mapToLong(DailyAggregatedStatistics::getTotalGameTime).sum())
                 .build();
         
         dailyAggregatedStatisticsRepository.save(monthlyAggregated);
@@ -1378,66 +1328,63 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
     }
 
     // Вспомогательные методы для конвертации в Map
-
     private Map<String, Object> convertUserStatisticsToMap(UserStatistics stats) {
-        return Map.of(
-            "userId", stats.getUserId(),
-            "date", stats.getDate(),
-            "registrations", stats.getRegistrations(),
-            "logins", stats.getLogins(),
-            "gameSessions", stats.getGameSessions(),
-            "completedQuests", stats.getCompletedQuests(),
-            "createdQuests", stats.getCreatedQuests(),
-            "createdTeams", stats.getCreatedTeams(),
-            "teamMemberships", stats.getTeamMemberships(),
-            "totalGameTimeMinutes", stats.getTotalGameTimeMinutes(),
-            "uploadedFiles", stats.getUploadedFiles(),
-            "totalFileSizeBytes", stats.getTotalFileSizeBytes(),
-            "successfulCodeSubmissions", stats.getSuccessfulCodeSubmissions(),
-            "failedCodeSubmissions", stats.getFailedCodeSubmissions(),
-            "completedLevels", stats.getCompletedLevels(),
-            "lastActiveAt", stats.getLastActiveAt()
+        return Map.ofEntries(
+                Map.entry("userId", stats.getUserId()),
+                Map.entry("date", stats.getDate()),
+                Map.entry("registrations", stats.getRegistrations()),
+                Map.entry("logins", stats.getLogins()),
+                Map.entry("gameSessions", stats.getGameSessions()),
+                Map.entry("completedQuests", stats.getCompletedQuests()),
+                Map.entry("createdQuests", stats.getCreatedQuests()),
+                Map.entry("createdTeams", stats.getCreatedTeams()),
+                Map.entry("teamMemberships", stats.getTeamMemberships()),
+                Map.entry("totalGameTimeMinutes", stats.getTotalGameTimeMinutes()),
+                Map.entry("successfulCodeSubmissions", stats.getSuccessfulCodeSubmissions()),
+                Map.entry("failedCodeSubmissions", stats.getFailedCodeSubmissions()),
+                Map.entry("completedLevels", stats.getCompletedLevels()),
+                Map.entry("lastActiveAt", stats.getLastActiveAt())
         );
     }
 
     private Map<String, Object> convertQuestStatisticsToMap(QuestStatistics stats) {
-        return Map.of(
-            "questId", stats.getQuestId(),
-            "questTitle", stats.getQuestTitle(),
-            "authorId", stats.getAuthorId(),
-            "date", stats.getDate(),
-            "creations", stats.getCreations(),
-            "updates", stats.getUpdates(),
-            "publications", stats.getPublications(),
-            "deletions", stats.getDeletions(),
-            "views", stats.getViews(),
-            "uniqueViews", stats.getUniqueViews(),
-            "starts", stats.getStarts(),
-            "completions", stats.getCompletions(),
-            "uniqueParticipants", stats.getUniqueParticipants(),
-            "totalGameTimeMinutes", stats.getTotalGameTimeMinutes()
+        return Map.ofEntries(
+            Map.entry("questId", stats.getQuestId()),
+            Map.entry("questTitle", stats.getQuestTitle()),
+            Map.entry("authorId", stats.getAuthorId()),
+            Map.entry("date", stats.getDate()),
+            Map.entry("creations", stats.getCreations()),
+            Map.entry("updates", stats.getUpdates()),
+            Map.entry("publications", stats.getPublications()),
+            Map.entry("deletions", stats.getDeletions()),
+            Map.entry("views", stats.getViews()),
+            Map.entry("uniqueViews", stats.getUniqueViews()),
+            Map.entry("starts", stats.getStarts()),
+            Map.entry("completions", stats.getCompletions()),
+            Map.entry("uniqueParticipants", stats.getUniqueParticipants()),
+            Map.entry("totalGameTimeMinutes", stats.getTotalGameTimeMinutes())
         );
     }
 
     private Map<String, Object> convertTeamStatisticsToMap(TeamStatistics stats) {
-        return Map.of(
-            "teamId", stats.getTeamId(),
-            "teamName", stats.getTeamName(),
-            "captainId", stats.getCaptainId(),
-            "date", stats.getDate(),
-            "creations", stats.getCreations(),
-            "updates", stats.getUpdates(),
-            "deletions", stats.getDeletions(),
-            "memberAdditions", stats.getMemberAdditions(),
-            "memberRemovals", stats.getMemberRemovals(),
-            "playedQuests", stats.getPlayedQuests(),
-            "completedQuests", stats.getCompletedQuests(),
-            "questWins", stats.getQuestWins(),
-            "totalGameTimeMinutes", stats.getTotalGameTimeMinutes(),
-            "successfulCodeSubmissions", stats.getSuccessfulCodeSubmissions(),
-            "failedCodeSubmissions", stats.getFailedCodeSubmissions(),
-            "completedLevels", stats.getCompletedLevels(),
-            "lastActivityAt", stats.getLastActivityAt()
+        return Map.ofEntries(
+                Map.entry("teamId", stats.getTeamId()),
+                Map.entry("teamName", stats.getTeamName()),
+                Map.entry("captainId", stats.getCaptainId()),
+                Map.entry("date", stats.getDate()),
+                Map.entry("creations", stats.getCreations()),
+                Map.entry("updates", stats.getUpdates()),
+                Map.entry("deletions", stats.getDeletions()),
+                Map.entry("memberAdditions", stats.getMemberAdditions()),
+                Map.entry("memberRemovals", stats.getMemberRemovals()),
+                Map.entry("playedQuests", stats.getPlayedQuests()),
+                Map.entry("completedQuests", stats.getCompletedQuests()),
+                Map.entry("questWins", stats.getQuestWins()),
+                Map.entry("totalGameTimeMinutes", stats.getTotalGameTimeMinutes()),
+                Map.entry("successfulCodeSubmissions", stats.getSuccessfulCodeSubmissions()),
+                Map.entry("failedCodeSubmissions", stats.getFailedCodeSubmissions()),
+                Map.entry("completedLevels", stats.getCompletedLevels()),
+                Map.entry("lastActivityAt", stats.getLastActivityAt())
         );
     }
 

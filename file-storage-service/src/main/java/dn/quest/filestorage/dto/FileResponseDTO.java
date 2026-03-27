@@ -61,7 +61,7 @@ public class FileResponseDTO {
     /**
      * ID владельца файла
      */
-    private java.util.UUID ownerId;
+    private Long ownerId;
 
     /**
      * Является ли файл публичным

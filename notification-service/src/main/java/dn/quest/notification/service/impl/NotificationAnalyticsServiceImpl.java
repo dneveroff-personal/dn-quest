@@ -467,6 +467,47 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
 
     @Override
     @Transactional
+    public void recordNotificationSent(String notificationId, NotificationType type, 
+                                     String channelName, long deliveryTimeMs) {
+        // Создаём простой канал на основе имени
+        recordNotificationSent(notificationId, type, new SimpleChannelWrapper(channelName), deliveryTimeMs);
+    }
+
+    private static class SimpleChannelWrapper implements NotificationChannel {
+        private final String channelName;
+
+        SimpleChannelWrapper(String channelName) {
+            this.channelName = channelName;
+        }
+
+        @Override
+        public String getChannelType() {
+            return channelName;
+        }
+
+        @Override
+        public boolean isAvailable() {
+            return true;
+        }
+
+        @Override
+        public boolean canSend(Notification notification) {
+            return true;
+        }
+
+        @Override
+        public NotificationChannelResult send(Notification notification) {
+            return NotificationChannelResult.success(notification.getNotificationId());
+        }
+
+        @Override
+        public boolean validate(Notification notification) {
+            return true;
+        }
+    }
+
+    @Override
+    @Transactional
     public void recordNotificationError(String notificationId, String errorType, String errorMessage) {
         try {
             totalNotificationsFailed.incrementAndGet();

@@ -1,7 +1,7 @@
 package dn.quest.questmanagement.service;
 
 import dn.quest.questmanagement.dto.CodeDTO;
-import dn.quest.questmanagement.entity.CodeType;
+import dn.quest.shared.enums.CodeType;
 
 import java.util.List;
 
@@ -52,14 +52,6 @@ public interface CodeService {
     List<CodeDTO> getCodesByLevelId(Long levelId);
 
     /**
-     * Получить активные коды уровня
-     *
-     * @param levelId ID уровня
-     * @return список активных кодов
-     */
-    List<CodeDTO> getActiveCodesByLevelId(Long levelId);
-
-    /**
      * Получить коды по типу
      *
      * @param levelId ID уровня
@@ -76,43 +68,6 @@ public interface CodeService {
      * @return результат проверки
      */
     CodeValidationResult validateCode(Long levelId, String codeValue);
-
-    /**
-     * Использовать код
-     *
-     * @param codeId ID кода
-     * @param userId ID пользователя
-     * @return результат использования
-     */
-    CodeUsageResult useCode(Long codeId, Long userId);
-
-    /**
-     * Получить неиспользованные коды уровня
-     *
-     * @param levelId ID уровня
-     * @param userId ID пользователя
-     * @return список неиспользованных кодов
-     */
-    List<CodeDTO> getUnusedCodesByLevelId(Long levelId, Long userId);
-
-    /**
-     * Получить использованные коды уровня
-     *
-     * @param levelId ID уровня
-     * @param userId ID пользователя
-     * @return список использованных кодов
-     */
-    List<CodeDTO> getUsedCodesByLevelId(Long levelId, Long userId);
-
-    /**
-     * Проверить уникальность кода в рамках квеста
-     *
-     * @param questId ID квеста
-     * @param codeValue значение кода
-     * @param excludeCodeId ID кода для исключения из проверки (при обновлении)
-     * @return true если код уникален
-     */
-    boolean isCodeUniqueInQuest(Long questId, String codeValue, Long excludeCodeId);
 
     /**
      * Копировать коды из одного уровня в другой

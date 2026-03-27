@@ -205,8 +205,8 @@ public class UserController {
     @GetMapping("/statistics/summary")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить сводную статистику пользователей", description = "Возвращает сводную статистику по пользователям")
-    public ResponseEntity<UserProfileService.UserStatisticsSummary> getUserStatisticsSummary() {
-        UserProfileService.UserStatisticsSummary summary = userProfileService.getUserStatisticsSummary();
+    public ResponseEntity<dn.quest.usermanagement.dto.UserStatisticsSummaryDTO> getUserStatisticsSummary() {
+        dn.quest.usermanagement.dto.UserStatisticsSummaryDTO summary = userProfileService.getUserStatisticsSummary();
         return ResponseEntity.ok(summary);
     }
 

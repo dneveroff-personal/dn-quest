@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.service.impl;
 
+import dn.quest.teammanagement.dto.GlobalInvitationStatisticsDTO;
+import dn.quest.teammanagement.dto.InvitationStatisticsDTO;
 import dn.quest.teammanagement.dto.TeamInvitationDTO;
 import dn.quest.teammanagement.dto.request.InviteUserRequest;
 import dn.quest.teammanagement.dto.request.RespondToInvitationRequest;
@@ -366,8 +368,8 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         User user = userService.getUserEntityById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
-        Page<TeamInvitation> invitationPage = invitationRepository.findByInvitedBy(user, pageable);
-        return teamMapper.toTeamInvitationDTOList(invitationPage.getContent());
+        List<TeamInvitation> invitationPage = invitationRepository.findByInvitedBy(user);
+        return teamMapper.toTeamInvitationDTOList(invitationPage);
     }
 
     @Override

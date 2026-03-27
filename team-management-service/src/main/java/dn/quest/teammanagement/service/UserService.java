@@ -1,10 +1,12 @@
 package dn.quest.teammanagement.service;
 
 import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Сервис для работы с пользователями (интеграция с User Management Service)
@@ -97,6 +99,11 @@ public interface UserService {
     long getActiveUsersCount();
 
     /**
+     * Получить количество активных пользователей
+     */
+    List<UserDTO> getActiveUsers(int limit);
+
+    /**
      * Получить пользователей, зарегистрированных за период
      */
     List<UserDTO> getUsersByRegistrationPeriod(java.time.Instant startDate, 
@@ -148,21 +155,6 @@ public interface UserService {
     boolean canUserBeInvited(Long userId, Long teamId);
 
     /**
-     * Получить количество команд пользователя
-     */
-    int getUserTeamCount(Long userId);
-
-    /**
-     * Получить количество активных команд пользователя
-     */
-    int getUserActiveTeamCount(Long userId);
-
-    /**
-     * Проверить лимит команд для пользователя
-     */
-    boolean checkUserTeamLimit(Long userId, int maxTeams);
-
-    /**
      * Получить пользователей по первым буквам имени
      */
     List<UserDTO> getUsersByUsernamePrefix(String prefix, int limit);
@@ -186,17 +178,38 @@ public interface UserService {
      * Конвертировать DTO в Entity
      */
     User toEntity(UserDTO userDTO);
-}
 
-/**
- * DTO для статистики пользователей
- */
-record UserStatisticsDTO(
-    long totalUsers,
-    long activeUsers,
-    long usersWithoutTeams,
-    long teamCaptains,
-    double averageTeamsPerUser,
-    long newUsersThisMonth,
-    long newUsersThisWeek
-) {}
+    /**
+     * Получить ID юзера по имени
+     */
+    Long getUserIdByUsername(String username);
+
+    List<UserDTO> getUsersByRole(String role, Pageable pageable);
+
+    // === Методы для обработки событий Kafka ===
+
+    /**
+     * Обновить информацию о пользователе из события
+     */
+    void updateUserFromEvent(dn.quest.shared.events.user.UserUpdatedEvent event);
+
+    /**
+     * Обновить статистику отправки кода пользователя
+     */
+    void updateCodeSubmissionStatistics(Long userId, String sessionId);
+
+    /**
+     * Обновить статистику завершения уровней
+     */
+    void updateLevelCompletionStatistics(Long userId, String sessionId, int levelNumber);
+
+    /**
+     * Обновить статистику файлов пользователя
+     */
+    void updateFileStatistics(Long userId, Long fileId, String action);
+
+    /**
+     * Обновить кэш файлов
+     */
+    void updateFileCache(Long fileId, dn.quest.shared.events.file.FileUpdatedEvent event);
+}

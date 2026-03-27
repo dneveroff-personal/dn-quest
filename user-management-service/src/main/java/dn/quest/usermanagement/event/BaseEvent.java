@@ -31,9 +31,11 @@ public class BaseEvent {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @Builder.Default
     private Instant timestamp = Instant.now();
-    
+
+    @Builder.Default
     private String source = "user-management-service";
-    
+
+    @Builder.Default
     private String version = "1.0";
     
     private Map<String, Object> metadata;

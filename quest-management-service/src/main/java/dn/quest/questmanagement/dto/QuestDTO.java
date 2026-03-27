@@ -116,9 +116,6 @@ public class QuestDTO extends BaseDTO {
     private String imageUrl;
 
     /**
-     * Версия квеста
-     */
-    private Integer version;
 
     /**
      * ID родительского квеста

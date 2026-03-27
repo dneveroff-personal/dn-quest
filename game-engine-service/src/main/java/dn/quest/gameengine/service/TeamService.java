@@ -39,7 +39,6 @@ public interface TeamService {
     
     // Поиск и фильтрация команд
     Page<Team> getAllTeams(Pageable pageable);
-    List<Team> getActiveTeams();
     List<Team> getTeamsByCaptain(Long captainId);
     List<Team> getTeamsByNameContaining(String name);
     List<Team> getTeamsByRating(Double minRating, Double maxRating);
@@ -55,7 +54,6 @@ public interface TeamService {
     
     // Статистика команд
     long getTotalTeamsCount();
-    long getActiveTeamsCount();
     long getTeamsCountByCaptain(Long captainId);
     int getTeamMemberCount(Long teamId);
     int getActiveTeamMemberCount(Long teamId);

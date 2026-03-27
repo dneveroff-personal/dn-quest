@@ -1,6 +1,5 @@
 package dn.quest.teammanagement.event;
 
-import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.BaseEvent;
 import dn.quest.shared.events.user.UserRegisteredEvent;
 import dn.quest.shared.events.user.UserUpdatedEvent;
@@ -16,6 +15,9 @@ import dn.quest.shared.events.game.LevelCompletedEvent;
 import dn.quest.shared.events.file.FileUploadedEvent;
 import dn.quest.shared.events.file.FileDeletedEvent;
 import dn.quest.shared.events.file.FileUpdatedEvent;
+import dn.quest.teammanagement.service.UserService;
+import dn.quest.teammanagement.service.TeamService;
+import dn.quest.teammanagement.service.TeamInvitationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -48,7 +50,7 @@ public class KafkaEventConsumer {
     public void handleUserEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -90,7 +92,7 @@ public class KafkaEventConsumer {
     public void handleQuestEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -135,7 +137,7 @@ public class KafkaEventConsumer {
     public void handleGameEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -180,7 +182,7 @@ public class KafkaEventConsumer {
     public void handleFileEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -218,7 +220,7 @@ public class KafkaEventConsumer {
         
         try {
             // Создаем пользователя в локальной базе данных для кэширования
-            if (!userService.existsById(event.getUserId())) {
+            if (!userService.userExists(event.getUserId())) {
                 log.info("User {} will be synchronized from registration event", event.getUserId());
                 // Здесь можно добавить логику синхронизации с User Management Service
             }
@@ -247,7 +249,7 @@ public class KafkaEventConsumer {
             // Удаляем пользователя из всех команд
             // Отзываем все приглашения
             // Обновляем статистику команд
-            userService.handleUserDeletion(event.getUserId());
+            userService.deactivateUser(event.getUserId());
         } catch (Exception e) {
             log.error("Error handling user deleted event for user: {}", event.getUserId(), e);
             throw e;
@@ -307,7 +309,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику активности команды
-            teamService.updateGameSessionStatistics(event.getTeamId(), event.getSessionId(), "STARTED");
+            teamService.updateTeamStatistics(event.getTeamId());
         } catch (Exception e) {
             log.error("Error handling game session started event for session: {}", event.getSessionId(), e);
             throw e;
@@ -319,7 +321,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику команды на основе результатов сессии
-            teamService.updateGameSessionStatistics(event.getTeamId(), event.getSessionId(), "FINISHED");
+            teamService.updateGameSessionStatistics(event.getTeamId(), String.valueOf(event.getSessionId()), "FINISHED");
         } catch (Exception e) {
             log.error("Error handling game session finished event for session: {}", event.getSessionId(), e);
             throw e;
@@ -332,7 +334,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику активности пользователя в команде
-            userService.updateCodeSubmissionStatistics(event.getUserId(), event.getSessionId());
+            userService.updateCodeSubmissionStatistics(event.getUserId(), String.valueOf(event.getSessionId()));
         } catch (Exception e) {
             log.error("Error handling code submitted event for session: {}, user: {}", 
                     event.getSessionId(), event.getUserId(), e);
@@ -341,12 +343,12 @@ public class KafkaEventConsumer {
     }
 
     private void handleLevelCompleted(LevelCompletedEvent event) {
-        log.debug("Handling level completed event for session: {}, user: {}", 
-                event.getSessionId(), event.getUserId());
+        log.debug("Handling level completed event for session: {}, user: {}, level: {}", 
+                event.getSessionId(), event.getUserId(), event.getLevelNumber());
         
         try {
             // Обновляем достижения пользователя в команде
-            userService.updateLevelCompletionStatistics(event.getUserId(), event.getSessionId(), event.getLevelNumber());
+            userService.updateLevelCompletionStatistics(event.getUserId(), String.valueOf(event.getSessionId()), event.getLevelNumber());
         } catch (Exception e) {
             log.error("Error handling level completed event for session: {}, user: {}", 
                     event.getSessionId(), event.getUserId(), e);

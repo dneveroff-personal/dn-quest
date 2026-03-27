@@ -1,6 +1,7 @@
 package dn.quest.teammanagement.client;
 
 import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,31 +62,6 @@ public interface UserManagementServiceClient {
             @PathVariable("role") String role,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
-    );
-
-    /**
-     * Получение неактивных пользователей
-     */
-    @GetMapping("/api/users/inactive")
-    List<UserDTO> getInactiveUsers(
-            @RequestParam(value = "days", defaultValue = "30") int days,
-            @RequestParam(value = "limit", defaultValue = "10") int limit
-    );
-
-    /**
-     * Получение топ участников
-     */
-    @GetMapping("/api/users/top-contributors")
-    List<UserDTO> getTopContributors(
-            @RequestParam(value = "limit", defaultValue = "10") int limit
-    );
-
-    /**
-     * Получение самых активных пользователей
-     */
-    @GetMapping("/api/users/most-active")
-    List<UserDTO> getMostActiveUsers(
-            @RequestParam(value = "limit", defaultValue = "10") int limit
     );
 
     /**
@@ -211,45 +187,6 @@ public interface UserManagementServiceClient {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
     );
-
-    /**
-     * Внутренние DTO классы для User Management Service
-     */
-    class UserStatisticsDTO {
-        private Long totalUsers;
-        private Long activeUsers;
-        private Long usersInTeams;
-        private Long teamCaptains;
-        private Double averageTeamsPerUser;
-        private Long newUsersThisMonth;
-        private UserDTO mostActiveUser;
-        private UserDTO userWithMostTeams;
-        
-        // Getters and setters
-        public Long getTotalUsers() { return totalUsers; }
-        public void setTotalUsers(Long totalUsers) { this.totalUsers = totalUsers; }
-        
-        public Long getActiveUsers() { return activeUsers; }
-        public void setActiveUsers(Long activeUsers) { this.activeUsers = activeUsers; }
-        
-        public Long getUsersInTeams() { return usersInTeams; }
-        public void setUsersInTeams(Long usersInTeams) { this.usersInTeams = usersInTeams; }
-        
-        public Long getTeamCaptains() { return teamCaptains; }
-        public void setTeamCaptains(Long teamCaptains) { this.teamCaptains = teamCaptains; }
-        
-        public Double getAverageTeamsPerUser() { return averageTeamsPerUser; }
-        public void setAverageTeamsPerUser(Double averageTeamsPerUser) { this.averageTeamsPerUser = averageTeamsPerUser; }
-        
-        public Long getNewUsersThisMonth() { return newUsersThisMonth; }
-        public void setNewUsersThisMonth(Long newUsersThisMonth) { this.newUsersThisMonth = newUsersThisMonth; }
-        
-        public UserDTO getMostActiveUser() { return mostActiveUser; }
-        public void setMostActiveUser(UserDTO mostActiveUser) { this.mostActiveUser = mostActiveUser; }
-        
-        public UserDTO getUserWithMostTeams() { return userWithMostTeams; }
-        public void setUserWithMostTeams(UserDTO userWithMostTeams) { this.userWithMostTeams = userWithMostTeams; }
-    }
 
     class UserTeamDTO {
         private Long teamId;

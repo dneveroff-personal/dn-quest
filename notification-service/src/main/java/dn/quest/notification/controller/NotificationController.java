@@ -84,8 +84,8 @@ public class NotificationController {
         try {
             // Здесь должна быть логика получения уведомлений из сервиса
             // Временно возвращаем пустой результат
-            PagedResponse<NotificationDTO> response = new PagedResponse<>(
-                    List.of(), page, size, 0L, 0L, 0
+            PagedResponse<NotificationDTO> response = new PagedResponse<NotificationDTO>(
+                    List.of(), page, size, 0L, 0, 0
             );
             
             return ResponseEntity.ok(ApiResponse.success(response));
@@ -260,13 +260,11 @@ public class NotificationController {
     private dn.quest.shared.events.notification.NotificationEvent createNotificationEvent(Notification notification) {
         // Временная реализация - должна быть заменена на реальную
         return dn.quest.shared.events.notification.NotificationEvent.builder()
-                .notificationId(notification.getNotificationId())
-                .recipientId(notification.getUserId().toString())
-                .notificationType(notification.getType().getValue())
-                .category(notification.getCategory().getValue())
-                .subject(notification.getSubject())
-                .content(notification.getContent())
-                .htmlContent(notification.getHtmlContent())
+                .eventId(notification.getNotificationId())
+                .userId(notification.getUserId())
+                .title(notification.getSubject())
+                .message(notification.getContent())
+                .type(notification.getType().getValue())
                 .build();
     }
 

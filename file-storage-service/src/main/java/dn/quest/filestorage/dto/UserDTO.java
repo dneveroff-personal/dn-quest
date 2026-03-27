@@ -21,7 +21,7 @@ public class UserDTO {
     /**
      * ID пользователя
      */
-    private UUID id;
+    private Long id;
 
     /**
      * Имя пользователя

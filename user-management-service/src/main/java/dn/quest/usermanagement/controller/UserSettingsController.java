@@ -186,8 +186,8 @@ public class UserSettingsController {
     @GetMapping("/statistics/summary")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Получить сводную статистику настроек", description = "Возвращает сводную статистику по настройкам пользователей")
-    public ResponseEntity<UserSettingsService.SettingsStatisticsSummary> getSettingsStatistics() {
-        UserSettingsService.SettingsStatisticsSummary summary = userSettingsService.getSettingsStatistics();
+    public ResponseEntity<dn.quest.usermanagement.dto.SettingsStatisticsSummaryDTO> getSettingsStatistics() {
+        dn.quest.usermanagement.dto.SettingsStatisticsSummaryDTO summary = userSettingsService.getSettingsStatistics();
         return ResponseEntity.ok(summary);
     }
 }

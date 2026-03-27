@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,13 +35,13 @@ public class GlobalExceptionHandler {
         
         log.error("Quest not found: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.NOT_FOUND.value(),
-                "Quest not found",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .error("Quest not found")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
@@ -55,13 +55,13 @@ public class GlobalExceptionHandler {
         
         log.error("Access denied to quest: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.FORBIDDEN.value(),
-                "Access denied",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.FORBIDDEN.value()))
+                .error("Access denied")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.FORBIDDEN);
     }
@@ -75,13 +75,13 @@ public class GlobalExceptionHandler {
         
         log.error("Quest validation failed: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Quest validation failed",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Quest validation failed")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -95,13 +95,13 @@ public class GlobalExceptionHandler {
         
         log.error("Level not found: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.NOT_FOUND.value(),
-                "Level not found",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .error("Level not found")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
@@ -115,13 +115,13 @@ public class GlobalExceptionHandler {
         
         log.error("Level validation failed: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Level validation failed",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Level validation failed")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -135,13 +135,13 @@ public class GlobalExceptionHandler {
         
         log.error("Code not found: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.NOT_FOUND.value(),
-                "Code not found",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .error("Code not found")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
@@ -155,13 +155,13 @@ public class GlobalExceptionHandler {
         
         log.error("Code validation failed: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Code validation failed",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Code validation failed")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -175,13 +175,13 @@ public class GlobalExceptionHandler {
         
         log.error("Level hint not found: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.NOT_FOUND.value(),
-                "Level hint not found",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .error("Level hint not found")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
     }
@@ -195,13 +195,13 @@ public class GlobalExceptionHandler {
         
         log.error("Hint validation failed: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Hint validation failed",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Hint validation failed")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -222,13 +222,13 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "DTO validation failed",
-                "Validation errors: " + errors.toString(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("DTO validation failed")
+                .message("Validation errors: " + errors.toString())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -249,13 +249,13 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Binding validation failed",
-                "Validation errors: " + errors.toString(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Binding validation failed")
+                .message("Validation errors: " + errors.toString())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -277,13 +277,13 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         }
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Constraint validation failed",
-                "Validation errors: " + errors.toString(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Constraint validation failed")
+                .message("Validation errors: " + errors.toString())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -297,13 +297,13 @@ public class GlobalExceptionHandler {
         
         log.error("Illegal argument: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.BAD_REQUEST.value(),
-                "Illegal argument",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .error("Illegal argument")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
     }
@@ -317,13 +317,13 @@ public class GlobalExceptionHandler {
         
         log.error("Illegal state: {}", ex.getMessage());
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.CONFLICT.value(),
-                "Illegal state",
-                ex.getMessage(),
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.CONFLICT.value()))
+                .error("Illegal state")
+                .message(ex.getMessage())
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.CONFLICT);
     }
@@ -337,13 +337,13 @@ public class GlobalExceptionHandler {
         
         log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         
-        ErrorDTO errorDTO = new ErrorDTO(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal server error",
-                "An unexpected error occurred. Please try again later.",
-                request.getDescription(false),
-                LocalDateTime.now()
-        );
+        ErrorDTO errorDTO = ErrorDTO.builder()
+                .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .error("Internal server error")
+                .message("An unexpected error occurred. Please try again later.")
+                .details(request.getDescription(false))
+                .timestamp(LocalDateTime.now())
+                .build();
         
         return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }

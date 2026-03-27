@@ -147,29 +147,6 @@ public class AnalyticsController {
     }
 
     /**
-     * Получить отчет по файловой активности
-     */
-    @GetMapping("/files/activity")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
-    @Operation(summary = "Получить отчет по файловой активности", description = "Возвращает отчет по загрузкам и использованию файлов")
-    public ResponseEntity<Map<String, Object>> getFileActivityReport(
-            @Parameter(description = "Начальная дата периода") 
-            @RequestParam 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            
-            @Parameter(description = "Конечная дата периода") 
-            @RequestParam 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            
-            @Parameter(description = "Тип файла") 
-            @RequestParam(required = false) String fileType) {
-        
-        log.info("Getting file activity report from {} to {} type: {}", startDate, endDate, fileType);
-        Map<String, Object> report = analyticsService.getFileActivityReport(startDate, endDate, fileType);
-        return ResponseEntity.ok(report);
-    }
-
-    /**
      * Получить прогнозы и тренды
      */
     @GetMapping("/forecasts")

@@ -1,7 +1,7 @@
 package dn.quest.statistics.event;
 
-import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.BaseEvent;
+import dn.quest.shared.events.team.TeamEvent;
 import dn.quest.shared.events.user.UserRegisteredEvent;
 import dn.quest.shared.events.user.UserUpdatedEvent;
 import dn.quest.shared.events.user.UserDeletedEvent;
@@ -13,13 +13,10 @@ import dn.quest.shared.events.game.GameSessionStartedEvent;
 import dn.quest.shared.events.game.GameSessionFinishedEvent;
 import dn.quest.shared.events.game.CodeSubmittedEvent;
 import dn.quest.shared.events.game.LevelCompletedEvent;
-import dn.quest.shared.events.team.TeamCreatedEvent;
-import dn.quest.shared.events.team.TeamUpdatedEvent;
-import dn.quest.shared.events.team.TeamMemberAddedEvent;
-import dn.quest.shared.events.team.TeamMemberRemovedEvent;
 import dn.quest.shared.events.file.FileUploadedEvent;
 import dn.quest.shared.events.file.FileDeletedEvent;
 import dn.quest.shared.events.file.FileUpdatedEvent;
+import dn.quest.statistics.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -50,7 +47,7 @@ public class KafkaEventConsumer {
     public void handleUserEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -92,7 +89,7 @@ public class KafkaEventConsumer {
     public void handleQuestEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -137,7 +134,7 @@ public class KafkaEventConsumer {
     public void handleGameEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -182,7 +179,7 @@ public class KafkaEventConsumer {
     public void handleTeamEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -192,16 +189,16 @@ public class KafkaEventConsumer {
         try {
             switch (event.getEventType()) {
                 case "team.created":
-                    handleTeamCreated((TeamCreatedEvent) event);
+                    handleTeamCreated((TeamEvent.TeamCreatedEvent) event);
                     break;
                 case "team.updated":
-                    handleTeamUpdated((TeamUpdatedEvent) event);
+                    handleTeamUpdated((TeamEvent.TeamUpdatedEvent) event);
                     break;
                 case "team.member.added":
-                    handleTeamMemberAdded((TeamMemberAddedEvent) event);
+                    handleTeamMemberAdded((TeamEvent.TeamMemberAddedEvent) event);
                     break;
                 case "team.member.removed":
-                    handleTeamMemberRemoved((TeamMemberRemovedEvent) event);
+                    handleTeamMemberRemoved((TeamEvent.TeamMemberRemovedEvent) event);
                     break;
                 default:
                     log.debug("Ignoring team event type: {}", event.getEventType());
@@ -227,7 +224,7 @@ public class KafkaEventConsumer {
     public void handleFileEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -282,7 +279,7 @@ public class KafkaEventConsumer {
 
     private void handleQuestUpdated(QuestUpdatedEvent event) {
         log.debug("Handling quest updated event for quest: {}", event.getQuestId());
-        statisticsService.updateQuestUpdateStatistics(event.getQuestId(), event.getAuthorId(), event.getTimestamp());
+        statisticsService.updateQuestUpdateStatistics(event.getQuestId(), event.getTimestamp());
     }
 
     private void handleQuestPublished(QuestPublishedEvent event) {
@@ -292,7 +289,7 @@ public class KafkaEventConsumer {
 
     private void handleQuestDeleted(QuestDeletedEvent event) {
         log.debug("Handling quest deleted event for quest: {}", event.getQuestId());
-        statisticsService.updateQuestDeletionStatistics(event.getQuestId(), event.getAuthorId(), event.getTimestamp());
+        statisticsService.updateQuestDeletionStatistics(event.getQuestId(), event.getTimestamp());
     }
 
     private void handleGameSessionStarted(GameSessionStartedEvent event) {
@@ -302,12 +299,12 @@ public class KafkaEventConsumer {
 
     private void handleGameSessionFinished(GameSessionFinishedEvent event) {
         log.debug("Handling game session finished event for session: {}", event.getSessionId());
-        statisticsService.updateGameSessionFinishStatistics(event.getSessionId(), event.getUserId(), event.getTeamId(), event.getQuestId(), event.isCompleted(), event.getTimestamp());
+        statisticsService.updateGameSessionFinishStatistics(event.getSessionId(), event.getUserId(), event.getTeamId(), event.getQuestId(), event.getIsCompleted(), event.getTimestamp());
     }
 
     private void handleCodeSubmitted(CodeSubmittedEvent event) {
         log.debug("Handling code submitted event for session: {}, user: {}", event.getSessionId(), event.getUserId());
-        statisticsService.updateCodeSubmissionStatistics(event.getSessionId(), event.getUserId(), event.getLevelNumber(), event.isSuccess(), event.getTimestamp());
+        statisticsService.updateCodeSubmissionStatistics(event.getSessionId(), event.getUserId(), event.getLevelId(), event.getIsCorrect(), event.getTimestamp());
     }
 
     private void handleLevelCompleted(LevelCompletedEvent event) {
@@ -316,24 +313,24 @@ public class KafkaEventConsumer {
         statisticsService.updateLevelCompletionStatistics(event.getSessionId(), event.getUserId(), event.getLevelNumber(), event.getCompletionTime(), event.getTimestamp());
     }
 
-    private void handleTeamCreated(TeamCreatedEvent event) {
+    private void handleTeamCreated(TeamEvent.TeamCreatedEvent event) {
         log.debug("Handling team created event for team: {}", event.getTeamId());
         statisticsService.updateTeamCreationStatistics(event.getTeamId(), event.getCaptainId(), event.getTimestamp());
     }
 
-    private void handleTeamUpdated(TeamUpdatedEvent event) {
+    private void handleTeamUpdated(TeamEvent.TeamUpdatedEvent event) {
         log.debug("Handling team updated event for team: {}", event.getTeamId());
         statisticsService.updateTeamActivityStatistics(event.getTeamId(), event.getTimestamp());
     }
 
-    private void handleTeamMemberAdded(TeamMemberAddedEvent event) {
-        log.debug("Handling team member added event for team: {}, user: {}", event.getTeamId(), event.getUserId());
-        statisticsService.updateTeamMembershipStatistics(event.getTeamId(), event.getUserId(), "ADDED", event.getTimestamp());
+    private void handleTeamMemberAdded(TeamEvent.TeamMemberAddedEvent event) {
+        log.debug("Handling team member added event for team: {}, user: {}", event.getTeamId(), event.getMemberId());
+        statisticsService.updateTeamMembershipStatistics(event.getTeamId(), event.getMemberId(), "ADDED", event.getTimestamp());
     }
 
-    private void handleTeamMemberRemoved(TeamMemberRemovedEvent event) {
-        log.debug("Handling team member removed event for team: {}, user: {}", event.getTeamId(), event.getUserId());
-        statisticsService.updateTeamMembershipStatistics(event.getTeamId(), event.getUserId(), "REMOVED", event.getTimestamp());
+    private void handleTeamMemberRemoved(TeamEvent.TeamMemberRemovedEvent event) {
+        log.debug("Handling team member removed event for team: {}, user: {}", event.getTeamId(), event.getMemberId());
+        statisticsService.updateTeamMembershipStatistics(event.getTeamId(), event.getMemberId(), "REMOVED", event.getTimestamp());
     }
 
     private void handleFileUploaded(FileUploadedEvent event) {

@@ -61,7 +61,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :name, '%')) OR " +
            "LOWER(CONCAT(u.firstName, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :name, '%'))) " +
            "AND u.isActive = true")
-    Page<User> findByFullNameContainingIgnoreCaseAndIsActiveTrue(@Param("name") String name, Pageable pageable);
+    List<User> findByFullNameContainingIgnoreCaseAndIsActiveTrue(@Param("name") String name, Pageable pageable);
 
     /**
      * Найти пользователей по имени пользователя или полному имени
@@ -72,7 +72,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(CONCAT(u.firstName, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "AND u.isActive = true")
-    Page<User> findByUsernameOrFullNameContainingIgnoreCaseAndIsActiveTrue(@Param("search") String search, Pageable pageable);
+    List<User> findByUsernameOrFullNameContainingIgnoreCaseAndIsActiveTrue(@Param("search") String search, Pageable pageable);
 
     /**
      * Найти пользователей по списку ID
@@ -85,6 +85,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = true")
     long countActiveUsers();
+
+    /**
+     * Получить количество активных пользователей
+     */
+    @Query("SELECT u FROM User u WHERE u.isActive = true")
+    List<User> activeUsers();
 
     /**
      * Найти пользователей, зарегистрированных за определенный период
@@ -133,5 +139,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "AND (LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<User> findUsersForTeamInvitation(@Param("teamId") Long teamId, @Param("search") String search, Pageable pageable);
+    List<User> findUsersForTeamInvitation(@Param("teamId") Long teamId, @Param("search") String search, Pageable pageable);
+
+    /**
+     * Найти пользователей по роли
+     */
+    @Query("SELECT u FROM User u WHERE u.role = :role AND u.isActive = true")
+    List<User> findByRole(@Param("role") String role, Pageable pageable);
 }

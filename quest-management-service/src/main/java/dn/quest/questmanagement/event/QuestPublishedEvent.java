@@ -17,7 +17,7 @@ public class QuestPublishedEvent extends QuestEvent {
     public QuestPublishedEvent(Long questId, Long questNumber, String title, String description,
                               String difficulty, String questType, String category,
                               java.util.Set<String> tags, java.util.Set<Long> authorIds,
-                              Integer version, Long userId) {
+                              Long version, Long userId) {
         super("QUEST_PUBLISHED", questId, userId);
         this.setQuestNumber(questNumber);
         this.setTitle(title);

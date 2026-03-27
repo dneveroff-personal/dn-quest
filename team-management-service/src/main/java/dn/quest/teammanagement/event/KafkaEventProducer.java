@@ -28,12 +28,16 @@ public class KafkaEventProducer {
      * Публикация события создания команды
      */
     public void publishTeamCreatedEvent(Long teamId, String teamName, Long captainId, String captainName) {
-        TeamCreatedEvent event = new TeamCreatedEvent(
-                UUID.randomUUID().toString(),
+        TeamEvent.TeamCreatedEvent event = new TeamEvent.TeamCreatedEvent(
                 teamId,
-                captainId,
                 teamName,
-                captainName
+                null,
+                null,
+                null,
+                captainId,
+                captainName,
+                false,
+                0
         );
         eventProducer.publishTeamCreatedEvent(event);
         log.info("Published team created event for team: {}", teamId);
@@ -43,11 +47,16 @@ public class KafkaEventProducer {
      * Публикация события обновления команды
      */
     public void publishTeamUpdatedEvent(Long teamId, String teamName, String description) {
-        TeamUpdatedEvent event = new TeamUpdatedEvent(
-                UUID.randomUUID().toString(),
+        TeamEvent.TeamUpdatedEvent event = new TeamEvent.TeamUpdatedEvent(
                 teamId,
                 teamName,
-                description
+                description,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
         eventProducer.publishTeamUpdatedEvent(event);
         log.info("Published team updated event for team: {}", teamId);
@@ -57,11 +66,7 @@ public class KafkaEventProducer {
      * Публикация события удаления команды
      */
     public void publishTeamDeletedEvent(Long teamId, String teamName) {
-        TeamDeletedEvent event = new TeamDeletedEvent(
-                UUID.randomUUID().toString(),
-                teamId,
-                teamName
-        );
+        TeamDeletedEvent event = new TeamDeletedEvent(teamId);
         eventProducer.publishTeamDeletedEvent(event);
         log.info("Published team deleted event for team: {}", teamId);
     }
@@ -70,12 +75,15 @@ public class KafkaEventProducer {
      * Публикация события добавления участника в команду
      */
     public void publishTeamMemberAddedEvent(Long teamId, Long userId, String userName, String role) {
-        TeamMemberAddedEvent event = new TeamMemberAddedEvent(
-                UUID.randomUUID().toString(),
+        TeamEvent.TeamMemberAddedEvent event = new TeamEvent.TeamMemberAddedEvent(
                 teamId,
+                null,
                 userId,
                 userName,
-                role
+                role,
+                null,
+                null,
+                null
         );
         eventProducer.publishTeamMemberAddedEvent(event);
         log.info("Published team member added event for team: {}, user: {}", teamId, userId);
@@ -85,11 +93,14 @@ public class KafkaEventProducer {
      * Публикация события удаления участника из команды
      */
     public void publishTeamMemberRemovedEvent(Long teamId, Long userId, String userName) {
-        TeamMemberRemovedEvent event = new TeamMemberRemovedEvent(
-                UUID.randomUUID().toString(),
+        TeamEvent.TeamMemberRemovedEvent event = new TeamEvent.TeamMemberRemovedEvent(
                 teamId,
+                null,
                 userId,
-                userName
+                userName,
+                null,
+                null,
+                null
         );
         eventProducer.publishTeamMemberRemovedEvent(event);
         log.info("Published team member removed event for team: {}, user: {}", teamId, userId);
@@ -100,10 +111,11 @@ public class KafkaEventProducer {
      */
     public void publishUserRegisteredEvent(Long userId, String username, String email) {
         UserRegisteredEvent event = new UserRegisteredEvent(
-                UUID.randomUUID().toString(),
                 userId,
                 username,
-                email
+                email,
+                null,
+                null
         );
         eventProducer.publishUserRegisteredEvent(event);
         log.info("Published user registered event for user: {}", userId);
@@ -114,10 +126,13 @@ public class KafkaEventProducer {
      */
     public void publishUserUpdatedEvent(Long userId, String username, String email) {
         UserUpdatedEvent event = new UserUpdatedEvent(
-                UUID.randomUUID().toString(),
                 userId,
                 username,
-                email
+                email,
+                null,
+                null,
+                null,
+                null
         );
         eventProducer.publishUserUpdatedEvent(event);
         log.info("Published user updated event for user: {}", userId);
@@ -126,12 +141,8 @@ public class KafkaEventProducer {
     /**
      * Публикация события удаления пользователя
      */
-    public void publishUserDeletedEvent(Long userId, String username) {
-        UserDeletedEvent event = new UserDeletedEvent(
-                UUID.randomUUID().toString(),
-                userId,
-                username
-        );
+    public void publishUserDeletedEvent(Long userId) {
+        UserDeletedEvent event = new UserDeletedEvent(userId);
         eventProducer.publishUserDeletedEvent(event);
         log.info("Published user deleted event for user: {}", userId);
     }
@@ -139,29 +150,32 @@ public class KafkaEventProducer {
     /**
      * Публикация события начала игровой сессии
      */
-    public void publishGameSessionStartedEvent(Long sessionId, Long teamId, Long questId) {
+    public void publishGameSessionStartedEvent(Long sessionId, Long userId, Long teamId, Long questId, String difficultyString) {
         GameSessionStartedEvent event = new GameSessionStartedEvent(
-                UUID.randomUUID().toString(),
                 sessionId,
+                userId,
                 teamId,
-                questId
+                questId,
+                difficultyString
         );
-        eventProducer.publishGameSessionStartedEvent(event);
+        eventProducer.publishGameEvent(event);
         log.info("Published game session started event for session: {}", sessionId);
     }
 
     /**
      * Публикация события завершения игровой сессии
      */
-    public void publishGameSessionFinishedEvent(Long sessionId, Long teamId, Long questId, boolean completed) {
+    public void publishGameSessionFinishedEvent(Long sessionId, Long userId, Long teamId, Long questId, boolean completed) {
         GameSessionFinishedEvent event = new GameSessionFinishedEvent(
-                UUID.randomUUID().toString(),
-                sessionId,
-                teamId,
                 questId,
+                sessionId,
+                userId,
+                teamId,
+                null,
+                null,
                 completed
         );
-        eventProducer.publishGameSessionFinishedEvent(event);
+        eventProducer.publishGameEvent(event);
         log.info("Published game session finished event for session: {}", sessionId);
     }
 

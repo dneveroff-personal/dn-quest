@@ -174,7 +174,7 @@ public class ReportsController {
         byte[] data = reportsService.exportGameStatistics(startDate, endDate, format, questId, userId);
         String filename = String.format("game_statistics_%s_to_%s.%s", 
                 startDate.format(DateTimeFormatter.ISO_DATE),
-                endDate.format(DateTimeFormatter.ISO.DATE),
+                endDate.format(DateTimeFormatter.ISO_DATE),
                 format);
         
         HttpHeaders headers = new HttpHeaders();

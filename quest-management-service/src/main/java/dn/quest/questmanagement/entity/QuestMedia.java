@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import dn.quest.shared.enums.FileType;
+
 /**
  * Сущность медиа файла квеста
  */
@@ -123,12 +125,14 @@ public class QuestMedia {
      * Активно ли медиа
      */
     @Column(name = "active", nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     /**
      * Является ли медиа обложкой
      */
     @Column(name = "is_cover", nullable = false)
+    @Builder.Default
     private Boolean isCover = false;
 
     /**
@@ -153,12 +157,14 @@ public class QuestMedia {
      * Дата создания
      */
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
      * Дата обновления
      */
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**
@@ -263,7 +269,7 @@ public class QuestMedia {
         if (fileSizeBytes == null) {
             return "Unknown";
         }
-        
+
         long bytes = fileSizeBytes;
         if (bytes < 1024) {
             return bytes + " B";
@@ -330,32 +336,32 @@ public class QuestMedia {
         if ((questId == null && levelId == null) || (questId != null && levelId != null)) {
             return false;
         }
-        
+
         // Имя файла не должно быть пустым
         if (originalFilename == null || originalFilename.trim().isEmpty()) {
             return false;
         }
-        
+
         // Путь к файлу не должен быть пустым
         if (filePath == null || filePath.trim().isEmpty()) {
             return false;
         }
-        
+
         // Размер файла должен быть положительным
         if (fileSizeBytes != null && fileSizeBytes <= 0) {
             return false;
         }
-        
+
         // Размеры должны быть положительными
         if ((width != null && width <= 0) || (height != null && height <= 0)) {
             return false;
         }
-        
+
         // Длительность должна быть положительной
         if (durationSeconds != null && durationSeconds <= 0) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -372,38 +378,6 @@ public class QuestMedia {
         private final String displayName;
 
         MediaType(String displayName) {
-            this.displayName = displayName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-    }
-
-    /**
-     * Типы файлов
-     */
-    public enum FileType {
-        JPEG("JPEG"),
-        PNG("PNG"),
-        GIF("GIF"),
-        WEBP("WebP"),
-        MP4("MP4"),
-        AVI("AVI"),
-        MOV("MOV"),
-        MP3("MP3"),
-        WAV("WAV"),
-        OGG("OGG"),
-        PDF("PDF"),
-        DOC("DOC"),
-        DOCX("DOCX"),
-        TXT("TXT"),
-        ZIP("ZIP"),
-        RAR("RAR");
-
-        private final String displayName;
-
-        FileType(String displayName) {
             this.displayName = displayName;
         }
 

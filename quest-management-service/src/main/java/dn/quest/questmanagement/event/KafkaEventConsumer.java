@@ -5,10 +5,10 @@ import dn.quest.shared.events.EventConsumer;
 import dn.quest.shared.events.game.GameSessionFinishedEvent;
 import dn.quest.shared.events.game.GameSessionStartedEvent;
 import dn.quest.shared.events.game.LevelCompletedEvent;
-import dn.quest.shared.events.team.TeamCreatedEvent;
-import dn.quest.shared.events.team.TeamMemberAddedEvent;
-import dn.quest.shared.events.team.TeamMemberRemovedEvent;
-import dn.quest.shared.events.team.TeamUpdatedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamCreatedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamMemberAddedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamMemberRemovedEvent;
+import dn.quest.shared.events.team.TeamEvent.TeamUpdatedEvent;
 import dn.quest.shared.events.user.UserDeletedEvent;
 import dn.quest.shared.events.user.UserRegisteredEvent;
 import dn.quest.shared.events.user.UserUpdatedEvent;
@@ -48,9 +48,9 @@ public class KafkaEventConsumer extends EventConsumer {
      * Обработка игровых событий
      */
     @Override
-    protected void handleGameEvent(BaseEvent event, String topic) {
-        super.handleGameEvent(event, topic);
-        
+    protected void handleQuestEvent(BaseEvent event, String topic) {
+        super.handleQuestEvent(event, topic);
+
         switch (event.getEventType()) {
             case "GameSessionStarted":
                 handleGameSessionStarted((GameSessionStartedEvent) event);
@@ -115,14 +115,14 @@ public class KafkaEventConsumer extends EventConsumer {
     }
 
     private void handleGameSessionFinished(GameSessionFinishedEvent event) {
-        log.info("Game session finished for quest: {}, session: {}, status: {}", 
-                event.getQuestId(), event.getSessionId(), event.getFinalStatus());
+        log.info("Game session finished for quest: {}, session: {}, is completed: {}",
+                event.getQuestId(), event.getSessionId(), event.getIsCompleted());
         // Здесь можно добавить логику для обновления статистики квеста
     }
 
     private void handleLevelCompleted(LevelCompletedEvent event) {
-        log.info("Level completed: {} for quest: {} by participant: {}", 
-                event.getLevelId(), event.getQuestId(), event.getParticipantId());
+        log.info("Level completed: {} for quest: {} by userId: {}",
+                event.getLevelId(), event.getQuestId(), event.getUserId());
         // Здесь можно добавить логику для обновления статистики уровня
     }
 

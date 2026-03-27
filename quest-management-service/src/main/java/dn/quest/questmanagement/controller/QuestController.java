@@ -7,6 +7,8 @@ import dn.quest.questmanagement.entity.QuestStatus;
 import dn.quest.questmanagement.service.QuestService;
 import dn.quest.questmanagement.service.QuestService.QuestStatistics;
 import dn.quest.questmanagement.service.QuestService.QuestValidationResult;
+import dn.quest.shared.enums.Difficulty;
+import dn.quest.shared.enums.QuestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,7 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -179,7 +181,7 @@ public class QuestController {
      * Получить квесты по сложности
      */
     @GetMapping("/difficulty/{difficulty}")
-    public ResponseEntity<List<QuestDTO>> getQuestsByDifficulty(@PathVariable String difficulty) {
+    public ResponseEntity<List<QuestDTO>> getQuestsByDifficulty(@PathVariable Difficulty difficulty) {
         List<QuestDTO> quests = questService.getQuestsByDifficulty(difficulty);
         return ResponseEntity.ok(quests);
     }
@@ -188,7 +190,7 @@ public class QuestController {
      * Получить квесты по типу
      */
     @GetMapping("/type/{questType}")
-    public ResponseEntity<List<QuestDTO>> getQuestsByType(@PathVariable String questType) {
+    public ResponseEntity<List<QuestDTO>> getQuestsByType(@PathVariable QuestType questType) {
         List<QuestDTO> quests = questService.getQuestsByType(questType);
         return ResponseEntity.ok(quests);
     }

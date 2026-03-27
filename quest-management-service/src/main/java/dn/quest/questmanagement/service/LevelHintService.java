@@ -61,33 +61,6 @@ public interface LevelHintService {
     List<LevelHintDTO> getAvailableHintsByLevelId(Long levelId, Long userId);
 
     /**
-     * Получить использованные подсказки уровня для пользователя
-     *
-     * @param levelId ID уровня
-     * @param userId ID пользователя
-     * @return список использованных подсказок
-     */
-    List<LevelHintDTO> getUsedHintsByLevelId(Long levelId, Long userId);
-
-    /**
-     * Получить неиспользованные подсказки уровня для пользователя
-     *
-     * @param levelId ID уровня
-     * @param userId ID пользователя
-     * @return список неиспользованных подсказок
-     */
-    List<LevelHintDTO> getUnusedHintsByLevelId(Long levelId, Long userId);
-
-    /**
-     * Использовать подсказку
-     *
-     * @param hintId ID подсказки
-     * @param userId ID пользователя
-     * @return результат использования
-     */
-    HintUsageResult useHint(Long hintId, Long userId);
-
-    /**
      * Проверить доступность подсказки
      *
      * @param hintId ID подсказки
@@ -95,31 +68,6 @@ public interface LevelHintService {
      * @return результат проверки
      */
     HintAvailabilityResult checkHintAvailability(Long hintId, Long userId);
-
-    /**
-     * Получить подсказки по времени
-     *
-     * @param levelId ID уровня
-     * @param availableAfter время после которого подсказка доступна
-     * @return список подсказок
-     */
-    List<LevelHintDTO> getHintsByAvailableAfter(Long levelId, LocalDateTime availableAfter);
-
-    /**
-     * Получить бесплатные подсказки уровня
-     *
-     * @param levelId ID уровня
-     * @return список бесплатных подсказок
-     */
-    List<LevelHintDTO> getFreeHintsByLevelId(Long levelId);
-
-    /**
-     * Получить платные подсказки уровня
-     *
-     * @param levelId ID уровня
-     * @return список платных подсказок
-     */
-    List<LevelHintDTO> getPaidHintsByLevelId(Long levelId);
 
     /**
      * Копировать подсказки из одного уровня в другой
@@ -130,21 +78,6 @@ public interface LevelHintService {
     void copyHintsForLevel(Long sourceLevelId, Long targetLevelId);
 
     /**
-     * Получить статистику использования подсказок уровня
-     *
-     * @param levelId ID уровня
-     * @return статистика
-     */
-    HintUsageStatistics getHintUsageStatistics(Long levelId);
-
-    /**
-     * Сбросить использование подсказок уровня
-     *
-     * @param levelId ID уровня
-     */
-    void resetHintUsage(Long levelId);
-
-    /**
      * Активировать/деактивировать подсказку
      *
      * @param hintId ID подсказки
@@ -152,39 +85,6 @@ public interface LevelHintService {
      * @return обновленная подсказка
      */
     LevelHintDTO toggleHintActive(Long hintId, boolean active);
-
-    /**
-     * Результат использования подсказки
-     */
-    class HintUsageResult {
-        private final boolean success;
-        private final String message;
-        private final boolean wasAlreadyUsed;
-        private final Integer cost;
-
-        public HintUsageResult(boolean success, String message, boolean wasAlreadyUsed, Integer cost) {
-            this.success = success;
-            this.message = message;
-            this.wasAlreadyUsed = wasAlreadyUsed;
-            this.cost = cost;
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public boolean wasAlreadyUsed() {
-            return wasAlreadyUsed;
-        }
-
-        public Integer getCost() {
-            return cost;
-        }
-    }
 
     /**
      * Результат проверки доступности подсказки

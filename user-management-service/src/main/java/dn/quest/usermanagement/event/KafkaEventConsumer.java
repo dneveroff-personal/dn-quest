@@ -10,6 +10,9 @@ import dn.quest.shared.events.game.GameSessionFinishedEvent;
 import dn.quest.shared.events.game.LevelCompletedEvent;
 import dn.quest.shared.events.file.FileUploadedEvent;
 import dn.quest.shared.events.file.FileDeletedEvent;
+import dn.quest.usermanagement.service.UserProfileService;
+import dn.quest.usermanagement.service.UserSettingsService;
+import dn.quest.usermanagement.service.UserStatisticsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -42,7 +45,7 @@ public class KafkaEventConsumer {
     public void handleUserEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -84,7 +87,7 @@ public class KafkaEventConsumer {
     public void handleGameEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -126,7 +129,7 @@ public class KafkaEventConsumer {
     public void handleFileEvents(
             @Payload BaseEvent event,
             @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-            @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition,
+            @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset,
             Acknowledgment acknowledgment) {
         
@@ -165,7 +168,8 @@ public class KafkaEventConsumer {
                     event.getUserId(), 
                     event.getUsername(), 
                     event.getEmail(), 
-                    event.getPublicName()
+                    event.getPublicName(),
+                    event.getRole()
             );
             
             // Создаем настройки пользователя по умолчанию
@@ -212,8 +216,7 @@ public class KafkaEventConsumer {
             // Удаляем статистику пользователя
             userStatisticsService.deleteUserStatistics(event.getUserId());
             
-            log.info("Deleted user profile: userId={}, username={}", 
-                    event.getUserId(), event.getUsername());
+            log.info("Deleted user profile: userId={}", event.getUserId());
             
         } catch (Exception e) {
             log.error("Error handling user deleted event for user: {}", event.getUserId(), e);

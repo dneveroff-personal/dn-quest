@@ -82,21 +82,6 @@ public interface ReportsService {
     byte[] exportTeamStatistics(LocalDate startDate, LocalDate endDate, String format, Long teamId);
 
     /**
-     * Экспортировать файловую статистику
-     */
-    byte[] exportFileStatistics(LocalDate startDate, LocalDate endDate, String format, String fileType);
-
-    /**
-     * Экспортировать системную статистику
-     */
-    byte[] exportSystemStatistics(LocalDate startDate, LocalDate endDate, String format);
-
-    /**
-     * Экспортировать агрегированную статистику
-     */
-    byte[] exportAggregatedStatistics(LocalDate startDate, LocalDate endDate, String aggregationType, String format);
-
-    /**
      * Сгенерировать CSV отчет
      */
     byte[] generateCsvReport(Map<String, Object> data, String filename);
