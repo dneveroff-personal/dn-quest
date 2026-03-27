@@ -106,17 +106,5 @@ public interface UserSettingsService {
     /**
      * Получает статистику по настройкам
      */
-    SettingsStatisticsSummary getSettingsStatistics();
+    dn.quest.usermanagement.dto.SettingsStatisticsSummaryDTO getSettingsStatistics();
 }
-
-/**
- * Класс для сводной статистики настроек
- */
-record SettingsStatisticsSummary(
-    long totalUsers,
-    long publicProfiles,
-    long emailNotificationsEnabled,
-    java.util.Map<String, Long> themes,
-    java.util.Map<String, Long> languages,
-    java.util.Map<String, Long> timezones
-) {}

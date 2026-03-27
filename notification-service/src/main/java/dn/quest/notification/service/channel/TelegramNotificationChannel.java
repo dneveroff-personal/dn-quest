@@ -25,6 +25,7 @@ import java.util.Map;
  * Реализация Telegram канала доставки уведомлений
  */
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class TelegramNotificationChannel extends TelegramLongPollingBot implements NotificationChannel {
 

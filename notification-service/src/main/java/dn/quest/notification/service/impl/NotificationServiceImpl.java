@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
  * Реализация сервиса для обработки и отправки уведомлений
  */
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class NotificationServiceImpl extends TelegramLongPollingBot {
 
@@ -30,10 +31,6 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
 
     @Value("${telegram.bot.username}")
     private String botUsername;
-
-    public NotificationServiceImpl(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     @Override
     public String getBotUsername() {

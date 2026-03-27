@@ -38,15 +38,19 @@ public class UserSearchRequestDTO {
     
     @Schema(description = "Номер страницы", example = "0", defaultValue = "0")
     @Min(value = 0, message = "Номер страницы не может быть отрицательным")
+    @Builder.Default
     private Integer page = 0;
     
     @Schema(description = "Размер страницы", example = "20", defaultValue = "20")
     @Min(value = 1, message = "Размер страницы должен быть положительным")
+    @Builder.Default
     private Integer size = 20;
     
     @Schema(description = "Поле сортировки", example = "createdAt", defaultValue = "createdAt")
+    @Builder.Default
     private String sortBy = "createdAt";
     
     @Schema(description = "Направление сортировки", example = "desc", defaultValue = "desc", allowableValues = {"asc", "desc"})
+    @Builder.Default
     private String sortDirection = "desc";
 }

@@ -40,77 +40,100 @@ public class UserStatistics {
 
     // Общая статистика
     @Column(name = "total_score", nullable = false)
+    @Builder.Default
     private Long totalScore = 0L;
 
     @Column(name = "level", nullable = false)
+    @Builder.Default
     private Integer level = 1;
 
     @Column(name = "experience_points", nullable = false)
+    @Builder.Default
     private Long experiencePoints = 0L;
 
     @Column(name = "experience_to_next_level", nullable = false)
+    @Builder.Default
     private Long experienceToNextLevel = 100L;
 
     // Статистика квестов
     @Column(name = "quests_completed", nullable = false)
+    @Builder.Default
     private Integer questsCompleted = 0;
 
     @Column(name = "quests_started", nullable = false)
+    @Builder.Default
     private Integer questsStarted = 0;
 
     @Column(name = "quests_abandoned", nullable = false)
+    @Builder.Default
     private Integer questsAbandoned = 0;
 
     @Column(name = "total_playtime_minutes", nullable = false)
+    @Builder.Default
     private Long totalPlaytimeMinutes = 0L;
 
     // Статистика уровней
     @Column(name = "levels_completed", nullable = false)
+    @Builder.Default
     private Integer levelsCompleted = 0;
 
     @Column(name = "codes_solved", nullable = false)
+    @Builder.Default
     private Integer codesSolved = 0;
 
     @Column(name = "hints_used", nullable = false)
+    @Builder.Default
     private Integer hintsUsed = 0;
 
     @Column(name = "attempts_made", nullable = false)
+    @Builder.Default
     private Integer attemptsMade = 0;
 
     // Статистика команд
     @Column(name = "teams_joined", nullable = false)
+    @Builder.Default
     private Integer teamsJoined = 0;
 
     @Column(name = "teams_created", nullable = false)
+    @Builder.Default
     private Integer teamsCreated = 0;
 
     @Column(name = "teams_led", nullable = false)
+    @Builder.Default
     private Integer teamsLed = 0;
 
     @Column(name = "invitations_sent", nullable = false)
+    @Builder.Default
     private Integer invitationsSent = 0;
 
     @Column(name = "invitations_received", nullable = false)
+    @Builder.Default
     private Integer invitationsReceived = 0;
 
     // Достижения
     @Column(name = "achievements_unlocked", nullable = false)
+    @Builder.Default
     private Integer achievementsUnlocked = 0;
 
     @Column(name = "rare_achievements", nullable = false)
+    @Builder.Default
     private Integer rareAchievements = 0;
 
     @Column(name = "legendary_achievements", nullable = false)
+    @Builder.Default
     private Integer legendaryAchievements = 0;
 
     // Активность
     @Column(name = "login_count", nullable = false)
+    @Builder.Default
     private Integer loginCount = 0;
 
     @Column(name = "current_streak_days", nullable = false)
+    @Builder.Default
     private Integer currentStreakDays = 0;
 
     @Column(name = "longest_streak_days", nullable = false)
+    @Builder.Default
     private Integer longestStreakDays = 0;
 
     @Column(name = "last_login_at")
@@ -124,9 +147,11 @@ public class UserStatistics {
 
     // Временные метки
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at", nullable = false)
+    @Builder.Default
     private Instant updatedAt = Instant.now();
 
     @PreUpdate

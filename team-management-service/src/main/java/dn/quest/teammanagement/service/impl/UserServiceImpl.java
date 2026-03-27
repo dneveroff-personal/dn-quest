@@ -475,8 +475,8 @@ public class UserServiceImpl implements UserService {
             if (event.getEmail() != null) {
                 user.setEmail(event.getEmail());
             }
-            if (event.getFullName() != null) {
-                user.setFullName(event.getFullName());
+            if (event.getPublicName() != null) {
+                user.setFirstName((event.getPublicName()));
             }
             userRepository.save(user);
             log.info("User {} updated from event", event.getUserId());

@@ -10,6 +10,11 @@ import dn.quest.shared.events.game.LevelCompletedEvent;
 import dn.quest.shared.events.notification.NotificationEvent;
 import dn.quest.shared.events.quest.QuestCreatedEvent;
 import dn.quest.shared.events.quest.QuestUpdatedEvent;
+import dn.quest.shared.events.team.TeamDeletedEvent;
+import dn.quest.shared.events.team.TeamEvent;
+import dn.quest.shared.events.user.UserDeletedEvent;
+import dn.quest.shared.events.user.UserRegisteredEvent;
+import dn.quest.shared.events.user.UserUpdatedEvent;
 
 /**
  * Интерфейс для публикации событий в Kafka
@@ -65,4 +70,44 @@ public interface EventProducer {
      * Публикация события завершения уровня
      */
     void publishGameEvent(LevelCompletedEvent event);
+
+    /**
+     * Публикация события создания команды
+     */
+    void publishTeamCreatedEvent(TeamEvent.TeamCreatedEvent event);
+
+    /**
+     * Публикация события обновления команды
+     */
+    void publishTeamUpdatedEvent(TeamEvent.TeamUpdatedEvent event);
+
+    /**
+     * Публикация события удаления команды
+     */
+    void publishTeamDeletedEvent(TeamDeletedEvent event);
+
+    /**
+     * Публикация события добавления участника в команду
+     */
+    void publishTeamMemberAddedEvent(TeamEvent.TeamMemberAddedEvent event);
+
+    /**
+     * Публикация события удаления участника из команды
+     */
+    void publishTeamMemberRemovedEvent(TeamEvent.TeamMemberRemovedEvent event);
+
+    /**
+     * Публикация события регистрации пользователя
+     */
+    void publishUserRegisteredEvent(UserRegisteredEvent event);
+
+    /**
+     * Публикация события обновления пользователя
+     */
+    void publishUserUpdatedEvent(UserUpdatedEvent event);
+
+    /**
+     * Публикация события удаления пользователя
+     */
+    void publishUserDeletedEvent(UserDeletedEvent event);
 }

@@ -169,8 +169,9 @@ public class SmsNotificationChannel implements NotificationChannel {
         headers.put("Content-Type", "application/x-www-form-urlencoded");
 
         // Отправка запроса
+        @SuppressWarnings("unchecked")
         Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
-        
+
         if (response != null && response.containsKey("sid")) {
             return (String) response.get("sid");
         } else {
@@ -193,8 +194,9 @@ public class SmsNotificationChannel implements NotificationChannel {
         headers.put("Content-Type", "application/json");
 
         // Отправка запроса
+        @SuppressWarnings("unchecked")
         Map<String, Object> response = restTemplate.postForObject(smsApiUrl, requestBody, Map.class);
-        
+
         if (response != null && response.containsKey("messageId")) {
             return (String) response.get("messageId");
         } else if (response != null && response.containsKey("id")) {

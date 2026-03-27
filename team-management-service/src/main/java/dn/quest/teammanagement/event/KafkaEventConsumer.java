@@ -321,7 +321,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику команды на основе результатов сессии
-            teamService.updateGameSessionStatistics(event.getTeamId(), event.getSessionId(), "FINISHED");
+            teamService.updateGameSessionStatistics(event.getTeamId(), String.valueOf(event.getSessionId()), "FINISHED");
         } catch (Exception e) {
             log.error("Error handling game session finished event for session: {}", event.getSessionId(), e);
             throw e;
@@ -334,7 +334,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем статистику активности пользователя в команде
-            userService.updateCodeSubmissionStatistics(event.getUserId(), event.getSessionId());
+            userService.updateCodeSubmissionStatistics(event.getUserId(), String.valueOf(event.getSessionId()));
         } catch (Exception e) {
             log.error("Error handling code submitted event for session: {}, user: {}", 
                     event.getSessionId(), event.getUserId(), e);
@@ -348,7 +348,7 @@ public class KafkaEventConsumer {
         
         try {
             // Обновляем достижения пользователя в команде
-            userService.updateLevelCompletionStatistics(event.getUserId(), event.getSessionId(), event.getLevelNumber());
+            userService.updateLevelCompletionStatistics(event.getUserId(), String.valueOf(event.getSessionId()), event.getLevelNumber());
         } catch (Exception e) {
             log.error("Error handling level completed event for session: {}, user: {}", 
                     event.getSessionId(), event.getUserId(), e);

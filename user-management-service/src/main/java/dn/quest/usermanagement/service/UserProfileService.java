@@ -154,15 +154,10 @@ public interface UserProfileService {
     /**
      * Получает статистику по пользователям
      */
-    UserStatisticsSummary getUserStatisticsSummary();
-}
+    dn.quest.usermanagement.dto.UserStatisticsSummaryDTO getUserStatisticsSummary();
 
-/**
- * Класс для сводной статистики пользователей
- */
-record UserStatisticsSummary(
-    long totalUsers,
-    long activeUsers,
-    long blockedUsers,
-    java.util.Map<String, Long> usersByRole
-) {}
+    /**
+     * Обновляет профиль пользователя из события
+     */
+    void updateUserProfileFromEvent(dn.quest.shared.events.user.UserUpdatedEvent event);
+}

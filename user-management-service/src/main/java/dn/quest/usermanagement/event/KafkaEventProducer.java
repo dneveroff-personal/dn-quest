@@ -26,11 +26,11 @@ public class KafkaEventProducer {
      */
     public void publishUserRegisteredEvent(Long userId, String username, String email, String publicName) {
         UserRegisteredEvent event = new UserRegisteredEvent(
-                UUID.randomUUID().toString(),
                 userId,
                 username,
                 email,
-                publicName
+                publicName,
+                "USER"
         );
         eventProducer.publishUserRegisteredEvent(event);
         log.info("Published user registered event for user: {}", userId);
@@ -41,11 +41,13 @@ public class KafkaEventProducer {
      */
     public void publishUserUpdatedEvent(Long userId, String username, String email, String publicName) {
         UserUpdatedEvent event = new UserUpdatedEvent(
-                UUID.randomUUID().toString(),
                 userId,
                 username,
                 email,
-                publicName
+                publicName,
+                "USER",
+                true,
+                true
         );
         eventProducer.publishUserUpdatedEvent(event);
         log.info("Published user updated event for user: {}", userId);
@@ -56,9 +58,7 @@ public class KafkaEventProducer {
      */
     public void publishUserDeletedEvent(Long userId, String username) {
         UserDeletedEvent event = new UserDeletedEvent(
-                UUID.randomUUID().toString(),
-                userId,
-                username
+                userId
         );
         eventProducer.publishUserDeletedEvent(event);
         log.info("Published user deleted event for user: {}", userId);

@@ -156,20 +156,20 @@ public interface UserStatisticsService {
     /**
      * Получает общую статистику сервиса
      */
-    GlobalStatisticsSummary getGlobalStatistics();
-}
+    dn.quest.usermanagement.dto.GlobalStatisticsSummaryDTO getGlobalStatistics();
 
-/**
- * Класс для общей статистики сервиса
- */
-record GlobalStatisticsSummary(
-    long totalUsers,
-    long activeUsers,
-    Double averageScore,
-    Double averageLevel,
-    Double averageQuestsCompleted,
-    Long totalScore,
-    Long totalPlaytimeMinutes,
-    java.util.Map<String, Long> usersByLevelRange,
-    java.util.Map<String, Long> usersByQuestRange
-) {}
+    /**
+     * Обновляет статистику игровых сессий
+     */
+    void updateGameSessionStatistics(Long userId, Long sessionId, String status);
+
+    /**
+     * Обновляет статистику прохождения уровней
+     */
+    void updateLevelCompletionStatistics(Long userId, Integer levelNumber);
+
+    /**
+     * Обновляет статистику файлов
+     */
+    void updateFileStatistics(Long userId, Long fileId, String action);
+}
