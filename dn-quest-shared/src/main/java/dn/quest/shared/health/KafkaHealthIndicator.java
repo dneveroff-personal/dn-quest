@@ -6,15 +6,12 @@ import org.apache.kafka.clients.admin.DescribeClusterResult;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.stereotype.Component;
-
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Health indicator для проверки подключения к Kafka
  */
-@Component
 public class KafkaHealthIndicator implements HealthIndicator {
 
     private final String bootstrapServers;
