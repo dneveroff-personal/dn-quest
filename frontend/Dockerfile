@@ -14,7 +14,7 @@ COPY package*.json ./
 FROM base AS deps
 
 # Устанавливаем зависимости детерминированно с retry логикой
-RUN npm config set registry https://registry.npmmirror.com && for i in 1 2 3 4 5; do npm ci && break; done && npm cache clean --force
+RUN npm config set registry https://registry.npmmirror.com && for i in 1 2 3 4 5; do npm ci && break; done
 
 # ---------- Stage 2: Development ----------
 FROM base AS development
