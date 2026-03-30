@@ -283,10 +283,10 @@ public class EnhancedTestKafkaConfig {
                         "data": %s
                     }
                     """,
-                    java.util.UUID.randomUUID().toString(),
+                    java.util.UUID.randomUUID(),
                     eventType,
                     java.time.Instant.now().toString(),
-                    java.util.UUID.randomUUID().toString(),
+                    java.util.UUID.randomUUID(),
                     data);
         }
 

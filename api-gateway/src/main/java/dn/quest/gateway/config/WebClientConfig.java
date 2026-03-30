@@ -105,7 +105,7 @@ public class WebClientConfig {
             clientRequest.headers().forEach((name, values) -> 
                     values.forEach(value -> sb.append("\n  ").append(name).append(": ").append(value)));
             
-            System.out.println(sb.toString());
+            System.out.println(sb);
             return Mono.just(clientRequest);
         });
     }

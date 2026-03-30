@@ -92,12 +92,8 @@ public class Code {
         if (!isActive()) {
             return false;
         }
-        
-        if (maxUsageCount != null && usageCount != null && usageCount >= maxUsageCount) {
-            return false;
-        }
-        
-        return true;
+
+        return maxUsageCount == null || usageCount == null || usageCount < maxUsageCount;
     }
 
     /**

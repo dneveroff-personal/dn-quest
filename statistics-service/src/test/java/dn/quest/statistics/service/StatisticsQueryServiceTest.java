@@ -206,7 +206,7 @@ class StatisticsQueryServiceTest {
         LocalDate endDate = LocalDate.now();
         Pageable pageable = PageRequest.of(0, 20);
         
-        List<UserStatistics> statisticsList = Arrays.asList(testUserStatistics);
+        List<UserStatistics> statisticsList = Collections.singletonList(testUserStatistics);
         Page<UserStatistics> statisticsPage = new PageImpl<>(statisticsList, pageable, 1);
         
         when(userStatisticsRepository.findByUserIdAndDateBetween(userId, startDate, endDate, pageable))
@@ -330,7 +330,7 @@ class StatisticsQueryServiceTest {
         int limit = 10;
         LocalDate date = LocalDate.now();
         
-        List<UserStatistics> topUsers = Arrays.asList(testUserStatistics);
+        List<UserStatistics> topUsers = Collections.singletonList(testUserStatistics);
         when(userStatisticsRepository.findTopUsersByCompletedQuests(date, limit))
                 .thenReturn(topUsers);
         
@@ -355,7 +355,7 @@ class StatisticsQueryServiceTest {
         int limit = 10;
         LocalDate date = LocalDate.now();
         
-        List<QuestStatistics> topQuests = Arrays.asList(testQuestStatistics);
+        List<QuestStatistics> topQuests = Collections.singletonList(testQuestStatistics);
         when(questStatisticsRepository.findTopQuestsByCompletions(date, limit))
                 .thenReturn(topQuests);
         

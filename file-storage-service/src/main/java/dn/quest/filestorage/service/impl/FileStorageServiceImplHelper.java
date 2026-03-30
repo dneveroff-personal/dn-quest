@@ -55,7 +55,7 @@ public class FileStorageServiceImplHelper {
             extension = originalFileName.substring(dotIndex);
         }
         
-        return UUID.randomUUID().toString() + extension;
+        return UUID.randomUUID() + extension;
     }
 
     /**

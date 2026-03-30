@@ -29,14 +29,14 @@ public final class DtoMapper {
      * Безопасное копирование строки
      */
     public static String safeCopyString(String source) {
-        return source != null ? source : null;
+        return source;
     }
     
     /**
      * Безопасное копирование даты
      */
     public static LocalDateTime safeCopyDateTime(LocalDateTime source) {
-        return source != null ? source : null;
+        return source;
     }
     
     /**

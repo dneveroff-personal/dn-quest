@@ -193,12 +193,8 @@ public class Code {
         if (!active) {
             return false;
         }
-        
-        if (hasUsageLimit() && usageCount >= maxUsageCount) {
-            return false;
-        }
-        
-        return true;
+
+        return !hasUsageLimit() || usageCount < maxUsageCount;
     }
 
     /**
@@ -270,10 +266,6 @@ public class Code {
         }
         
         // Значение кода не должно быть пустым
-        if (codeValue == null || codeValue.trim().isEmpty()) {
-            return false;
-        }
-        
-        return true;
+        return codeValue != null && !codeValue.trim().isEmpty();
     }
 }

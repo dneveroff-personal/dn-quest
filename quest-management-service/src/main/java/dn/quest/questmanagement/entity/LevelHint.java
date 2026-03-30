@@ -305,11 +305,7 @@ public class LevelHint {
         }
         
         // Стоимость не должна быть отрицательной
-        if (cost != null && cost < 0) {
-            return false;
-        }
-        
-        return true;
+        return cost == null || cost >= 0;
     }
 
     /**

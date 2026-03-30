@@ -39,7 +39,7 @@ public class UserEventIntegrationTest extends KafkaTestBase {
     private ObjectMapper objectMapper;
 
     private final List<BaseEvent> receivedEvents = new ArrayList<>();
-    private CountDownLatch latch = new CountDownLatch(3);
+    private final CountDownLatch latch = new CountDownLatch(3);
 
     @Test
     @DisplayName("Должен отправлять и получать UserRegisteredEvent")
@@ -192,10 +192,10 @@ public class UserEventIntegrationTest extends KafkaTestBase {
         // Then
         assertTrue(latch.await(10, TimeUnit.SECONDS), "Ожидание получения всех событий");
         assertEquals(3, receivedEvents.size());
-        
-        assertTrue(receivedEvents.get(0) instanceof UserRegisteredEvent);
-        assertTrue(receivedEvents.get(1) instanceof UserUpdatedEvent);
-        assertTrue(receivedEvents.get(2) instanceof UserDeletedEvent);
+
+        assertInstanceOf(UserRegisteredEvent.class, receivedEvents.get(0));
+        assertInstanceOf(UserUpdatedEvent.class, receivedEvents.get(1));
+        assertInstanceOf(UserDeletedEvent.class, receivedEvents.get(2));
     }
 
     @KafkaListener(topics = KafkaTopics.USER_EVENTS, 

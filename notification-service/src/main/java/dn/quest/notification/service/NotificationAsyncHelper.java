@@ -95,11 +95,7 @@ public class NotificationAsyncHelper {
         }
 
         String categoryValue = notification.getCategory() != null ? notification.getCategory().getValue() : null;
-        if (categoryValue != null && !preferencesService.isNotificationCategoryEnabled(notification.getUserId(), categoryValue)) {
-            return false;
-        }
-
-        return true;
+        return categoryValue == null || preferencesService.isNotificationCategoryEnabled(notification.getUserId(), categoryValue);
     }
 
     /**

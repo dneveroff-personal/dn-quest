@@ -454,7 +454,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     public int deleteOldInvitations(int daysOld) {
         log.debug("Deleting invitations older than {} days", daysOld);
 
-        Instant cutoffDate = Instant.now().minusSeconds(daysOld * 24 * 60 * 60);
+        Instant cutoffDate = Instant.now().minusSeconds((long) daysOld * 24 * 60 * 60);
         int deletedCount = invitationRepository.deleteInvitationsOlderThan(cutoffDate);
         log.info("Deleted {} old invitations", deletedCount);
         return deletedCount;
@@ -631,7 +631,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     public List<TeamInvitationDTO> getInvitationsExpiringSoon(int hours) {
         log.debug("Getting invitations expiring in {} hours", hours);
 
-        Instant cutoffTime = Instant.now().plusSeconds(hours * 60 * 60);
+        Instant cutoffTime = Instant.now().plusSeconds((long) hours * 60 * 60);
         List<TeamInvitation> invitations = invitationRepository.findExpiredInvitations(Instant.now())
                 .stream()
                 .filter(inv -> inv.getExpiresAt() != null && inv.getExpiresAt().isBefore(cutoffTime))

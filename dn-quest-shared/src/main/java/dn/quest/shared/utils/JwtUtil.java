@@ -206,7 +206,7 @@ public final class JwtUtil {
     @SuppressWarnings("unchecked")
     public static <T> T getCustomClaim(String token, String secret, String claimName, Class<T> type) {
         Object claim = getCustomClaim(token, secret, claimName);
-        if (claim != null && type.isInstance(claim)) {
+        if (type.isInstance(claim)) {
             return (T) claim;
         }
         return null;

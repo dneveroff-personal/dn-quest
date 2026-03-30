@@ -278,12 +278,8 @@ public class QuestCreateUpdateDTO {
         if (imageUrl != null && imageUrl.length() > 500) {
             return false;
         }
-        
-        if (archiveReason != null && archiveReason.length() > 500) {
-            return false;
-        }
-        
-        return true;
+
+        return archiveReason == null || archiveReason.length() <= 500;
     }
 
     /**

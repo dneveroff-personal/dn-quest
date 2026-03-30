@@ -69,7 +69,7 @@ class LeaderboardServiceTest {
         LocalDate date = testDate;
         Pageable pageable = PageRequest.of(0, 20);
         
-        List<Leaderboard> leaderboards = Arrays.asList(testLeaderboard);
+        List<Leaderboard> leaderboards = Collections.singletonList(testLeaderboard);
         Page<Leaderboard> leaderboardPage = new PageImpl<>(leaderboards, pageable, 1);
         
         when(leaderboardRepository.findByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
@@ -103,7 +103,7 @@ class LeaderboardServiceTest {
         LocalDate date = testDate;
         Pageable pageable = PageRequest.of(0, 20);
         
-        List<Leaderboard> leaderboards = Arrays.asList(testLeaderboard);
+        List<Leaderboard> leaderboards = Collections.singletonList(testLeaderboard);
         Page<Leaderboard> leaderboardPage = new PageImpl<>(leaderboards, pageable, 1);
         
         when(leaderboardRepository.findByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
@@ -137,7 +137,7 @@ class LeaderboardServiceTest {
         LocalDate date = testDate;
         Pageable pageable = PageRequest.of(0, 20);
         
-        List<Leaderboard> leaderboards = Arrays.asList(testLeaderboard);
+        List<Leaderboard> leaderboards = Collections.singletonList(testLeaderboard);
         Page<Leaderboard> leaderboardPage = new PageImpl<>(leaderboards, pageable, 1);
         
         when(leaderboardRepository.findByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
@@ -276,7 +276,7 @@ class LeaderboardServiceTest {
         int count = 5;
         LocalDate date = testDate;
         
-        List<Leaderboard> surroundingLeaderboards = Arrays.asList(testLeaderboard);
+        List<Leaderboard> surroundingLeaderboards = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findSurroundingUsersByRank(
                 "user", period, date, 1, count))
@@ -306,7 +306,7 @@ class LeaderboardServiceTest {
         LocalDate startDate = testDate.minusDays(7);
         LocalDate endDate = testDate;
         
-        List<Leaderboard> history = Arrays.asList(testLeaderboard);
+        List<Leaderboard> history = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findByEntityTypeAndEntityIdAndPeriodAndDateBetweenOrderByDateAsc(
                 "user", userId, period, startDate, endDate))
@@ -355,7 +355,7 @@ class LeaderboardServiceTest {
         String period = "all_time";
         LocalDate date = testDate;
         
-        List<Leaderboard> allLeaderboards = Arrays.asList(testLeaderboard);
+        List<Leaderboard> allLeaderboards = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findByPeriodAndDate(period, date))
                 .thenReturn(allLeaderboards);
@@ -446,7 +446,7 @@ class LeaderboardServiceTest {
         int limit = 10;
         LocalDate date = testDate;
         
-        List<Leaderboard> topUsers = Arrays.asList(testLeaderboard);
+        List<Leaderboard> topUsers = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findTopByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
                 "user", period, category, date, PageRequest.of(0, limit)))
@@ -477,7 +477,7 @@ class LeaderboardServiceTest {
         int limit = 10;
         LocalDate date = testDate;
         
-        List<Leaderboard> topQuests = Arrays.asList(testLeaderboard);
+        List<Leaderboard> topQuests = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findTopByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
                 "quest", period, category, date, PageRequest.of(0, limit)))
@@ -508,7 +508,7 @@ class LeaderboardServiceTest {
         int limit = 10;
         LocalDate date = testDate;
         
-        List<Leaderboard> topTeams = Arrays.asList(testLeaderboard);
+        List<Leaderboard> topTeams = Collections.singletonList(testLeaderboard);
         
         when(leaderboardRepository.findTopByEntityTypeAndPeriodAndCategoryAndDateOrderByRankAsc(
                 "team", period, category, date, PageRequest.of(0, limit)))

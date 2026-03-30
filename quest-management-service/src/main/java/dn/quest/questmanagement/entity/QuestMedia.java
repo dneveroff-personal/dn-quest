@@ -358,11 +358,7 @@ public class QuestMedia {
         }
 
         // Длительность должна быть положительной
-        if (durationSeconds != null && durationSeconds <= 0) {
-            return false;
-        }
-
-        return true;
+        return durationSeconds == null || durationSeconds > 0;
     }
 
     /**

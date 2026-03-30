@@ -40,7 +40,7 @@ public class GameEventIntegrationTest extends KafkaTestBase {
     private ObjectMapper objectMapper;
 
     private final List<BaseEvent> receivedEvents = new ArrayList<>();
-    private CountDownLatch latch = new CountDownLatch(4);
+    private final CountDownLatch latch = new CountDownLatch(4);
 
     @Test
     @DisplayName("Должен отправлять и получать GameSessionStartedEvent")
@@ -281,10 +281,10 @@ public class GameEventIntegrationTest extends KafkaTestBase {
         assertEquals(4, receivedEvents.size());
         
         // Проверяем последовательность событий
-        assertTrue(receivedEvents.get(0) instanceof GameSessionStartedEvent);
-        assertTrue(receivedEvents.get(1) instanceof CodeSubmittedEvent);
-        assertTrue(receivedEvents.get(2) instanceof LevelCompletedEvent);
-        assertTrue(receivedEvents.get(3) instanceof GameSessionFinishedEvent);
+        assertInstanceOf(GameSessionStartedEvent.class, receivedEvents.get(0));
+        assertInstanceOf(CodeSubmittedEvent.class, receivedEvents.get(1));
+        assertInstanceOf(LevelCompletedEvent.class, receivedEvents.get(2));
+        assertInstanceOf(GameSessionFinishedEvent.class, receivedEvents.get(3));
         
         // Проверяем correlationId
         receivedEvents.forEach(event -> 

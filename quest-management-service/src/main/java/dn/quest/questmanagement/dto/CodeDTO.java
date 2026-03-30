@@ -151,12 +151,8 @@ public class CodeDTO extends BaseDTO {
         if (!isActive()) {
             return false;
         }
-        
-        if (hasUsageLimit() && getRemainingUsages() <= 0) {
-            return false;
-        }
-        
-        return true;
+
+        return !hasUsageLimit() || getRemainingUsages() > 0;
     }
 
     /**
@@ -283,12 +279,8 @@ public class CodeDTO extends BaseDTO {
         if (maxUsageCount != null && maxUsageCount <= 0) {
             return false;
         }
-        
-        if (usageCount != null && usageCount < 0) {
-            return false;
-        }
-        
-        return true;
+
+        return usageCount == null || usageCount >= 0;
     }
 
     /**

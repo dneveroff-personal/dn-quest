@@ -371,14 +371,10 @@ public class UserServiceImpl implements UserService {
         log.debug("Checking if user {} can be invited to team: {}", userId, teamId);
 
         // Проверяем, что пользователь существует и активен
-        if (!isUserActive(userId)) {
-            return false;
-        }
+        return isUserActive(userId);
 
         // Здесь можно добавить дополнительные проверки
         // Например, проверка на блокировки, лимиты и т.д.
-
-        return true;
     }
 
     @Override
@@ -422,7 +418,7 @@ public class UserServiceImpl implements UserService {
     public int cleanupInactiveUsers(int daysInactive) {
         log.debug("Cleaning up inactive users older than {} days", daysInactive);
 
-        Instant cutoffDate = Instant.now().minusSeconds(daysInactive * 24 * 60 * 60);
+        Instant cutoffDate = Instant.now().minusSeconds((long) daysInactive * 24 * 60 * 60);
         
         // Здесь можно добавить логику для удаления неактивных пользователей
         // Например, удаление пользователей, которые не были активны долгое время

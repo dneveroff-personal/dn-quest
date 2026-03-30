@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -498,7 +499,7 @@ public class ReportsServiceImpl implements ReportsService {
                 generateGenericCsv(csv, data);
             }
             
-            return csv.toString().getBytes("UTF-8");
+            return csv.toString().getBytes(StandardCharsets.UTF_8);
             
         } catch (Exception e) {
             log.error("Error generating CSV report", e);
@@ -513,7 +514,7 @@ public class ReportsServiceImpl implements ReportsService {
         try {
             // Простая сериализация в JSON
             String json = convertToJson(data);
-            return json.getBytes("UTF-8");
+            return json.getBytes(StandardCharsets.UTF_8);
             
         } catch (Exception e) {
             log.error("Error generating JSON report", e);
@@ -544,7 +545,7 @@ public class ReportsServiceImpl implements ReportsService {
             excel.append("Data:\n");
             excel.append(convertToJson(data));
             
-            return excel.toString().getBytes("UTF-8");
+            return excel.toString().getBytes(StandardCharsets.UTF_8);
             
         } catch (Exception e) {
             log.error("Error generating Excel report", e);
@@ -576,7 +577,7 @@ public class ReportsServiceImpl implements ReportsService {
             pdf.append("Data:\n");
             pdf.append(convertToJson(data));
             
-            return pdf.toString().getBytes("UTF-8");
+            return pdf.toString().getBytes(StandardCharsets.UTF_8);
             
         } catch (Exception e) {
             log.error("Error generating PDF report", e);
@@ -639,10 +640,8 @@ public class ReportsServiceImpl implements ReportsService {
             if (parameters.containsKey("startDate") && parameters.containsKey("endDate")) {
                 LocalDate startDate = (LocalDate) parameters.get("startDate");
                 LocalDate endDate = (LocalDate) parameters.get("endDate");
-                
-                if (startDate.isAfter(endDate)) {
-                    return false;
-                }
+
+                return !startDate.isAfter(endDate);
             }
             
             return true;

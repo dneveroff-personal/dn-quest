@@ -66,15 +66,15 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
         String token = authHeader.substring(7);
 
         // Сначала выполняем локальную валидацию токена
-        if (!jwtUtil.validateToken(token, jwtSecret)) {
+        if (!JwtUtil.validateToken(token, jwtSecret)) {
             log.warn("Невалидный JWT токен для пути: {}", path);
             return handleUnauthorized(exchange);
         }
 
         // Извлекаем информацию из токена
-        String username = jwtUtil.extractUsername(token, jwtSecret);
-        Long userId = jwtUtil.extractUserId(token, jwtSecret);
-        String role = jwtUtil.extractRole(token, jwtSecret);
+        String username = JwtUtil.extractUsername(token, jwtSecret);
+        Long userId = JwtUtil.extractUserId(token, jwtSecret);
+        String role = JwtUtil.extractRole(token, jwtSecret);
 
         if (username == null) {
             log.warn("Не удалось извлечь имя пользователя из токена для пути: {}", path);
