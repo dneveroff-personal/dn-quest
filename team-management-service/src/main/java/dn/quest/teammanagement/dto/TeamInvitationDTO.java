@@ -1,6 +1,7 @@
 package dn.quest.teammanagement.dto;
 
-import dn.quest.teammanagement.enums.InvitationStatus;
+import dn.quest.shared.dto.UserDTO;
+import dn.quest.shared.enums.InvitationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,21 +49,7 @@ public class TeamInvitationDTO {
      * Получить статус в виде строки
      */
     public String getStatusDisplayName() {
-        if (status == null) {
-            return "UNKNOWN";
-        }
-        switch (status) {
-            case PENDING:
-                return isExpired() ? "Истекло" : "Ожидает";
-            case ACCEPTED:
-                return "Принято";
-            case DECLINED:
-                return "Отклонено";
-            case EXPIRED:
-                return "Истекло";
-            default:
-                return status.name();
-        }
+        return status.getDisplayName();
     }
 
     /**
@@ -145,13 +132,13 @@ public class TeamInvitationDTO {
      * Получить имя пользователя
      */
     public String getUserName() {
-        return user != null ? user.getDisplayName() : "Unknown User";
+        return user != null ? user.getPublicName() : "Unknown User";
     }
 
     /**
      * Получить имя пригласившего
      */
     public String getInvitedByName() {
-        return invitedBy != null ? invitedBy.getDisplayName() : "Unknown";
+        return invitedBy != null ? invitedBy.getPublicName() : "Unknown";
     }
 }

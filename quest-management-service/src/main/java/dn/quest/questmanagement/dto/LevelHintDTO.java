@@ -219,12 +219,8 @@ public class LevelHintDTO extends BaseDTO {
         if (available != null) {
             return available;
         }
-        
-        if (offsetSec == null || offsetSec <= 0) {
-            return true;
-        }
-        
-        return false; // Нужно передавать время начала уровня для проверки
+
+        return offsetSec == null || offsetSec <= 0;// Нужно передавать время начала уровня для проверки
     }
 
     /**
@@ -332,12 +328,8 @@ public class LevelHintDTO extends BaseDTO {
         if (cost != null && cost < 0) {
             return false;
         }
-        
-        if (usageCount != null && usageCount < 0) {
-            return false;
-        }
-        
-        return true;
+
+        return usageCount == null || usageCount >= 0;
     }
 
     /**

@@ -1,5 +1,6 @@
 package dn.quest.teammanagement.mapper;
 
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.dto.*;
 import dn.quest.teammanagement.entity.*;
 import org.springframework.stereotype.Component;
@@ -25,13 +26,11 @@ public class TeamMapper {
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .publicName(user.getFirstName())
                 .avatarUrl(user.getAvatarUrl())
                 .isActive(user.getIsActive())
                 .role(user.getRole())
                 .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 
@@ -242,13 +241,11 @@ public class TeamMapper {
                 .id(userDTO.getId())
                 .username(userDTO.getUsername())
                 .email(userDTO.getEmail())
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
+                .firstName(userDTO.getPublicName())
                 .avatarUrl(userDTO.getAvatarUrl())
                 .isActive(userDTO.getIsActive())
                 .role(userDTO.getRole())
                 .createdAt(userDTO.getCreatedAt())
-                .updatedAt(userDTO.getUpdatedAt())
                 .build();
     }
 

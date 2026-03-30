@@ -61,8 +61,8 @@ environment:
 
 ```properties
 # application.yml
-jwt:
-  secret: ${JWT_SECRET}  # Без fallback для prod
+jwt=
+secret=${JWT_SECRET}  # Без fallback для prod
 ```
 
 ---

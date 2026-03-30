@@ -1,15 +1,13 @@
 package dn.quest.teammanagement.controller;
 
-import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.dto.TeamDTO;
-import dn.quest.teammanagement.dto.TeamMemberDTO;
 import dn.quest.teammanagement.dto.response.TeamListResponse;
 import dn.quest.teammanagement.service.UserService;
 import dn.quest.teammanagement.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

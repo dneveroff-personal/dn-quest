@@ -1,6 +1,6 @@
 package dn.quest.filestorage.client;
 
-import dn.quest.filestorage.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

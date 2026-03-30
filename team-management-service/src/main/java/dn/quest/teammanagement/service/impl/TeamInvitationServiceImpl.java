@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.service.impl;
 
+import dn.quest.shared.enums.InvitationStatus;
+import dn.quest.shared.enums.TeamRole;
 import dn.quest.teammanagement.dto.GlobalInvitationStatisticsDTO;
 import dn.quest.teammanagement.dto.InvitationStatisticsDTO;
 import dn.quest.teammanagement.dto.TeamInvitationDTO;
@@ -7,7 +9,6 @@ import dn.quest.teammanagement.dto.request.InviteUserRequest;
 import dn.quest.teammanagement.dto.request.RespondToInvitationRequest;
 import dn.quest.teammanagement.dto.response.InvitationListResponse;
 import dn.quest.teammanagement.entity.*;
-import dn.quest.teammanagement.enums.InvitationStatus;
 import dn.quest.teammanagement.mapper.TeamMapper;
 import dn.quest.teammanagement.repository.*;
 import dn.quest.teammanagement.service.TeamInvitationService;
@@ -202,7 +203,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         TeamMember member = TeamMember.builder()
                 .team(invitation.getTeam())
                 .user(invitation.getUser())
-                .role(dn.quest.teammanagement.enums.TeamRole.MEMBER)
+                .role(TeamRole.MEMBER)
                 .joinedAt(Instant.now())
                 .isActive(true)
                 .build();
@@ -453,7 +454,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     public int deleteOldInvitations(int daysOld) {
         log.debug("Deleting invitations older than {} days", daysOld);
 
-        Instant cutoffDate = Instant.now().minusSeconds(daysOld * 24 * 60 * 60);
+        Instant cutoffDate = Instant.now().minusSeconds((long) daysOld * 24 * 60 * 60);
         int deletedCount = invitationRepository.deleteInvitationsOlderThan(cutoffDate);
         log.info("Deleted {} old invitations", deletedCount);
         return deletedCount;
@@ -500,7 +501,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
             totalSent += count;
             switch (status) {
                 case ACCEPTED -> totalAccepted += count;
-                case DECLINED -> totalDeclined += count;
+                case REJECTED -> totalDeclined += count;
                 case EXPIRED -> totalExpired += count;
                 case PENDING -> totalPending += count;
             }
@@ -630,7 +631,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     public List<TeamInvitationDTO> getInvitationsExpiringSoon(int hours) {
         log.debug("Getting invitations expiring in {} hours", hours);
 
-        Instant cutoffTime = Instant.now().plusSeconds(hours * 60 * 60);
+        Instant cutoffTime = Instant.now().plusSeconds((long) hours * 60 * 60);
         List<TeamInvitation> invitations = invitationRepository.findExpiredInvitations(Instant.now())
                 .stream()
                 .filter(inv -> inv.getExpiresAt() != null && inv.getExpiresAt().isBefore(cutoffTime))
@@ -695,11 +696,11 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         // Обновляем статистику приглашений
         long totalSent = invitationRepository.countByTeamAndStatus(team, InvitationStatus.PENDING) +
                          invitationRepository.countByTeamAndStatus(team, InvitationStatus.ACCEPTED) +
-                         invitationRepository.countByTeamAndStatus(team, InvitationStatus.DECLINED) +
+                         invitationRepository.countByTeamAndStatus(team, InvitationStatus.REJECTED) +
                          invitationRepository.countByTeamAndStatus(team, InvitationStatus.EXPIRED);
 
         long totalAccepted = invitationRepository.countByTeamAndStatus(team, InvitationStatus.ACCEPTED);
-        long totalDeclined = invitationRepository.countByTeamAndStatus(team, InvitationStatus.DECLINED);
+        long totalDeclined = invitationRepository.countByTeamAndStatus(team, InvitationStatus.REJECTED);
 
         statistics.setTotalInvitationsSent(totalSent);
         statistics.setTotalInvitationsAccepted(totalAccepted);
@@ -716,7 +717,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
         TeamMember member = TeamMember.builder()
                 .team(invitation.getTeam())
                 .user(invitation.getUser())
-                .role(dn.quest.teammanagement.enums.TeamRole.MEMBER)
+                .role(TeamRole.MEMBER)
                 .joinedAt(Instant.now())
                 .isActive(true)
                 .build();

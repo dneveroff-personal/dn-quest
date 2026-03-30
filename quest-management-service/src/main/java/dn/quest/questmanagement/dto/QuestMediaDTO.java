@@ -385,12 +385,8 @@ public class QuestMediaDTO extends BaseDTO {
         if (durationSeconds != null && durationSeconds <= 0) {
             return false;
         }
-        
-        if (orderIndex != null && orderIndex < 0) {
-            return false;
-        }
-        
-        return true;
+
+        return orderIndex == null || orderIndex >= 0;
     }
 
     /**

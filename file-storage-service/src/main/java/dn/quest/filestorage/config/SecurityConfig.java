@@ -1,5 +1,6 @@
 package dn.quest.filestorage.config;
 
+import dn.quest.shared.config.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import dn.quest.filestorage.client.AuthenticationServiceClient;
@@ -15,13 +16,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -55,12 +56,10 @@ public class SecurityConfig {
                 // Получаем данные пользователя через Authentication Service
                 var userResponse = authServiceClient.getUserByUsername(username);
                 
-                return org.springframework.security.core.userdetails.User.builder()
+                return User.builder()
                         .username(userResponse.getUsername())
                         .password("") // Пароль не нужен для валидации токена
-                        .authorities(userResponse.getRoles().stream()
-                                .map(role -> "ROLE_" + role)
-                                .toArray(String[]::new))
+                        .authorities("ROLE_" + userResponse.getRole())
                         .accountLocked(!userResponse.getIsActive())
                         .accountExpired(false)
                         .credentialsExpired(false)
@@ -146,7 +145,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(Arrays.asList("X-Username", "Authorization", "Content-Disposition"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);

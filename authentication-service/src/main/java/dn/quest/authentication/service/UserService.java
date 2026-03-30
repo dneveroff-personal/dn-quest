@@ -1,6 +1,6 @@
 package dn.quest.authentication.service;
 
-import dn.quest.authentication.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.authentication.entity.User;
 import dn.quest.shared.enums.UserRole;
 import org.springframework.data.domain.Page;

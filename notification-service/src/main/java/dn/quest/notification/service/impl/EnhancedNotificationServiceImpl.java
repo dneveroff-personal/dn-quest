@@ -569,11 +569,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         }
 
         // Проверка категории уведомлений
-        if (!preferencesService.isNotificationCategoryEnabled(notification.getUserId(), notification.getCategory().getValue())) {
-            return false;
-        }
-
-        return true;
+        return preferencesService.isNotificationCategoryEnabled(notification.getUserId(), notification.getCategory().getValue());
     }
 
     /**

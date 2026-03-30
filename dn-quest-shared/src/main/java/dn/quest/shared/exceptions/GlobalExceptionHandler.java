@@ -18,9 +18,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -329,6 +333,101 @@ public class GlobalExceptionHandler {
         
         log.warn("Endpoint not found: {}", errorDTO.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+    }
+    
+    /**
+     * Обработка IllegalArgumentException
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDTO> handleIllegalArgumentException(
+            IllegalArgumentException ex,
+            HttpServletRequest request) {
+        
+        ErrorDTO errorDTO = ErrorDTO.of(
+                "ILLEGAL_ARGUMENT",
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+        errorDTO.setPath(request.getRequestURI());
+        
+        log.warn("Illegal argument: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(errorDTO);
+    }
+    
+    /**
+     * Обработка IllegalStateException
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorDTO> handleIllegalStateException(
+            IllegalStateException ex,
+            HttpServletRequest request) {
+        
+        ErrorDTO errorDTO = ErrorDTO.of(
+                "ILLEGAL_STATE",
+                ex.getMessage(),
+                HttpStatus.CONFLICT.value()
+        );
+        errorDTO.setPath(request.getRequestURI());
+        
+        log.warn("Illegal state: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDTO);
+    }
+    
+    /**
+     * Обработка EntityNotFoundException
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorDTO> handleEntityNotFoundException(
+            EntityNotFoundException ex,
+            HttpServletRequest request) {
+        
+        ErrorDTO errorDTO = ErrorDTO.of(
+                ApplicationConstants.ErrorCodes.NOT_FOUND_ERROR,
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value()
+        );
+        errorDTO.setPath(request.getRequestURI());
+        
+        log.warn("Entity not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDTO);
+    }
+    
+    /**
+     * Обработка BadCredentialsException
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDTO> handleBadCredentialsException(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+        
+        ErrorDTO errorDTO = ErrorDTO.of(
+                ApplicationConstants.ErrorCodes.AUTHENTICATION_ERROR,
+                "Invalid credentials",
+                HttpStatus.UNAUTHORIZED.value()
+        );
+        errorDTO.setPath(request.getRequestURI());
+        
+        log.warn("Bad credentials: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDTO);
+    }
+    
+    /**
+     * Обработка MaxUploadSizeExceededException
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorDTO> handleMaxUploadSizeExceededException(
+            MaxUploadSizeExceededException ex,
+            HttpServletRequest request) {
+        
+        ErrorDTO errorDTO = ErrorDTO.of(
+                "FILE_TOO_LARGE",
+                "Maximum upload size exceeded",
+                HttpStatus.PAYLOAD_TOO_LARGE.value()
+        );
+        errorDTO.setPath(request.getRequestURI());
+        
+        log.warn("Max upload size exceeded: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(errorDTO);
     }
     
     /**

@@ -1,6 +1,7 @@
 package dn.quest.authentication.service;
 
 import dn.quest.authentication.dto.*;
+import dn.quest.shared.dto.UserDTO;
 
 /**
  * Сервис аутентификации пользователей

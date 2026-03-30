@@ -1,6 +1,7 @@
 package dn.quest.teammanagement.dto;
 
-import dn.quest.teammanagement.enums.TeamRole;
+import dn.quest.shared.dto.UserDTO;
+import dn.quest.shared.enums.TeamRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,28 +36,28 @@ public class TeamMemberDTO {
      * Проверить, является ли участник модератором или капитаном
      */
     public boolean isModeratorOrAbove() {
-        return TeamRole.CAPTAIN.equals(role) || TeamRole.MODERATOR.equals(role);
+        return TeamRole.CAPTAIN.equals(role) || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверить, может ли участник управлять командой
      */
     public boolean canManageTeam() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверить, может ли участник приглашать новых членов
      */
     public boolean canInviteMembers() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверить, может ли участник удалять других участников
      */
     public boolean canRemoveMembers() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**
@@ -69,7 +70,7 @@ public class TeamMemberDTO {
         switch (role) {
             case CAPTAIN:
                 return "Капитан";
-            case MODERATOR:
+            case DEPUTY:
                 return "Модератор";
             case MEMBER:
                 return "Участник";
@@ -104,6 +105,6 @@ public class TeamMemberDTO {
      * Получить отображаемое имя пользователя
      */
     public String getUserDisplayName() {
-        return user != null ? user.getDisplayName() : "Unknown";
+        return user != null ? user.getPublicName() : "Unknown";
     }
 }

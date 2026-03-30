@@ -206,7 +206,7 @@ public final class JwtUtil {
     @SuppressWarnings("unchecked")
     public static <T> T getCustomClaim(String token, String secret, String claimName, Class<T> type) {
         Object claim = getCustomClaim(token, secret, claimName);
-        if (claim != null && type.isInstance(claim)) {
+        if (type.isInstance(claim)) {
             return (T) claim;
         }
         return null;
@@ -220,5 +220,38 @@ public final class JwtUtil {
             throw new JwtException("Invalid refresh token");
         }
         return generateAccessToken(secret, subject, claims);
+    }
+    
+    /**
+     * Валидирует токен
+     */
+    public static boolean validateToken(String token, String secret) {
+        return isTokenValid(token, secret);
+    }
+    
+    /**
+     * Извлекает имя пользователя из токена
+     */
+    public static String extractUsername(String token, String secret) {
+        return extractSubject(token, secret);
+    }
+    
+    /**
+     * Извлекает ID пользователя из токена
+     */
+    public static Long extractUserId(String token, String secret) {
+        Object userId = getCustomClaim(token, secret, "userId");
+        if (userId instanceof Number) {
+            return ((Number) userId).longValue();
+        }
+        return null;
+    }
+    
+    /**
+     * Извлекает роль пользователя из токена
+     */
+    public static String extractRole(String token, String secret) {
+        Object role = getCustomClaim(token, secret, "role");
+        return role != null ? role.toString() : null;
     }
 }

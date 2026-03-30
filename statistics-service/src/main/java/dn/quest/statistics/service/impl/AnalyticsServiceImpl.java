@@ -1446,8 +1446,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         // Расчет статистики по сегментам
         long totalUsers = 0;
         for (Object segmentData : segmentation.values()) {
-            if (segmentData instanceof Map) {
-                Map<?, ?> segmentMap = (Map<?, ?>) segmentData;
+            if (segmentData instanceof Map<?, ?> segmentMap) {
                 for (Object count : segmentMap.values()) {
                     if (count instanceof Number) {
                         totalUsers += ((Number) count).longValue();

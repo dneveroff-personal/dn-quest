@@ -1,10 +1,10 @@
 package dn.quest.teammanagement.service.impl;
 
+import dn.quest.shared.enums.TeamRole;
 import dn.quest.teammanagement.dto.*;
 import dn.quest.teammanagement.dto.request.*;
 import dn.quest.teammanagement.dto.response.TeamListResponse;
 import dn.quest.teammanagement.entity.*;
-import dn.quest.teammanagement.enums.TeamRole;
 import dn.quest.teammanagement.mapper.TeamMapper;
 import dn.quest.teammanagement.repository.*;
 import dn.quest.teammanagement.service.TeamService;

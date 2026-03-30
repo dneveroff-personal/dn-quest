@@ -21,10 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -230,7 +227,7 @@ class QuestServiceTest {
     @Test
     void getPublishedQuests_ShouldReturnPublishedQuests() {
         // Given
-        List<Quest> quests = Arrays.asList(testQuest);
+        List<Quest> quests = Collections.singletonList(testQuest);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Quest> questPage = new PageImpl<>(quests, pageable, quests.size());
 
@@ -249,7 +246,7 @@ class QuestServiceTest {
     @Test
     void getQuestsByAuthor_ShouldReturnAuthorQuests() {
         // Given
-        List<Quest> quests = Arrays.asList(testQuest);
+        List<Quest> quests = Collections.singletonList(testQuest);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Quest> questPage = new PageImpl<>(quests, pageable, quests.size());
 
@@ -268,7 +265,7 @@ class QuestServiceTest {
     @Test
     void searchQuests_ShouldReturnMatchingQuests() {
         // Given
-        List<Quest> quests = Arrays.asList(testQuest);
+        List<Quest> quests = Collections.singletonList(testQuest);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Quest> questPage = new PageImpl<>(quests, pageable, quests.size());
 

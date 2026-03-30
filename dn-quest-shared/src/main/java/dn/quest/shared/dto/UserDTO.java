@@ -1,40 +1,49 @@
 package dn.quest.shared.dto;
 
-import dn.quest.shared.dto.BaseDTO;
 import dn.quest.shared.enums.UserRole;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO для представления пользователя
  */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = true)
 public class UserDTO extends BaseDTO {
-    
-    /**
-     * Имя пользователя (уникальное)
-     */
+
+    @Schema(description = "ID пользователя", example = "1")
+    private Long id;
+
+    @Schema(description = "Имя пользователя", example = "player123")
     private String username;
-    
-    /**
-     * Email пользователя
-     */
+
+    @Schema(description = "Email пользователя", example = "player@example.com")
     private String email;
-    
-    /**
-     * Публичное имя (отображаемое)
-     */
+
+    @Schema(description = "Публичное имя", example = "Player One")
     private String publicName;
-    
-    /**
-     * Роль пользователя
-     */
+
+    @Schema(description = "Роль пользователя", example = "PLAYER")
     private UserRole role;
-    
+
+    @Schema(description = "Флаг активности", example = "true")
+    private Boolean isActive;
+
+    @Schema(description = "Дата регистрации", example = "2024-01-01T12:00:00Z")
+    private Instant createdAt;
+
+    @Schema(description = "Дата последнего входа", example = "2024-01-01T12:30:00Z")
+    private Instant lastLoginAt;
+
     /**
      * URL аватара
      */
@@ -44,26 +53,21 @@ public class UserDTO extends BaseDTO {
      * Описание пользователя
      */
     private String bio;
-    
-    /**
-     * Дата последнего входа
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastLoginAt;
-    
+
     /**
      * Активен ли пользователь
      */
     private Boolean active;
-    
-    /**
-     * Подтвержден ли email
-     */
-    private Boolean emailVerified;
+
+    @Schema(description = "Флаг верификации email", example = "false")
+    private Boolean isEmailVerified;
     
     /**
      * Дата верификации email
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime emailVerifiedAt;
+
+    @Schema(description = "Список разрешений пользователя")
+    private List<String> permissions;
 }

@@ -6,6 +6,7 @@ import dn.quest.filestorage.entity.FileMetadata;
 import dn.quest.filestorage.exception.*;
 import dn.quest.filestorage.repository.FileMetadataRepository;
 import dn.quest.filestorage.storage.StorageStrategy;
+import dn.quest.shared.dto.UserDTO;
 import org.springframework.data.jpa.domain.Specification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class FileStorageServiceImplHelper {
             extension = originalFileName.substring(dotIndex);
         }
         
-        return UUID.randomUUID().toString() + extension;
+        return UUID.randomUUID() + extension;
     }
 
     /**

@@ -1,5 +1,6 @@
 package dn.quest.teammanagement.event;
 
+import dn.quest.shared.events.BaseEvent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

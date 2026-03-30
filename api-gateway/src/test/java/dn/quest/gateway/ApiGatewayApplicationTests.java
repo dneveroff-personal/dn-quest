@@ -40,7 +40,7 @@ class ApiGatewayApplicationTests {
     @Test
     void authenticationFilterShouldBeConfigured() {
         assertNotNull(authenticationFilter);
-        assertTrue(authenticationFilter instanceof GatewayFilter);
+        assertInstanceOf(GatewayFilter.class, authenticationFilter);
     }
 
     @Test

@@ -247,8 +247,8 @@ public class User {
     /**
      * Получает набор ролей пользователя (для совместимости с интерфейсами)
      */
-    public java.util.Set<UserRole> getRoles() {
-        java.util.Set<UserRole> roles = new java.util.HashSet<>();
+    public Set<UserRole> getRoles() {
+        Set<UserRole> roles = new HashSet<>();
         roles.add(role);
         return roles;
     }

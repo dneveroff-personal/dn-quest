@@ -258,11 +258,7 @@ public class LevelDTO extends BaseDTO {
         }
 
         // Проверка времени
-        if (apTime != null && apTime < 0) {
-            return false;
-        }
-        
-        return true;
+        return apTime == null || apTime >= 0;
     }
 
     /**

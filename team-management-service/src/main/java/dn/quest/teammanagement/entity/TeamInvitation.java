@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.entity;
 
-import dn.quest.teammanagement.enums.InvitationStatus;
+import dn.quest.shared.enums.InvitationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -111,7 +111,7 @@ public class TeamInvitation {
      * Отклоняет приглашение
      */
     public void decline(String responseMessage) {
-        this.status = InvitationStatus.DECLINED;
+        this.status = InvitationStatus.CANCELLED;
         this.responseMessage = responseMessage;
         this.respondedAt = Instant.now();
     }

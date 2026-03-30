@@ -1,5 +1,6 @@
 package dn.quest.teammanagement.dto;
 
+import dn.quest.shared.dto.UserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

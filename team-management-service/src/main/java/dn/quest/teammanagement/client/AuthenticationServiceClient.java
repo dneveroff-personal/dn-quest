@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.client;
 
-import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.dto.request.ValidateTokenRequest;
 import dn.quest.teammanagement.dto.response.ValidateTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -1,10 +1,10 @@
 package dn.quest.gateway.filter;
 
 import dn.quest.gateway.client.AuthenticationServiceClient;
-import dn.quest.gateway.dto.TokenValidationResponse;
-import dn.quest.gateway.util.JwtUtil;
+import dn.quest.shared.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
@@ -28,6 +28,9 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
 
     private final JwtUtil jwtUtil;
     private final AuthenticationServiceClient authenticationServiceClient;
+    
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/api/auth/login",
@@ -63,15 +66,15 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
         String token = authHeader.substring(7);
 
         // Сначала выполняем локальную валидацию токена
-        if (!jwtUtil.validateToken(token)) {
+        if (!JwtUtil.validateToken(token, jwtSecret)) {
             log.warn("Невалидный JWT токен для пути: {}", path);
             return handleUnauthorized(exchange);
         }
 
         // Извлекаем информацию из токена
-        String username = jwtUtil.extractUsername(token);
-        Long userId = jwtUtil.extractUserId(token);
-        String role = jwtUtil.extractRole(token);
+        String username = JwtUtil.extractUsername(token, jwtSecret);
+        Long userId = JwtUtil.extractUserId(token, jwtSecret);
+        String role = JwtUtil.extractRole(token, jwtSecret);
 
         if (username == null) {
             log.warn("Не удалось извлечь имя пользователя из токена для пути: {}", path);

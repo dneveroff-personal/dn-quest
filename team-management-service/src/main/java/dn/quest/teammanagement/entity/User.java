@@ -1,5 +1,6 @@
 package dn.quest.teammanagement.entity;
 
+import dn.quest.shared.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,19 +48,11 @@ public class User {
 
     @Column(name = "role", length = 20)
     @Builder.Default
-    private String role = "USER";
+    private UserRole role = UserRole.PLAYER;
 
     @Column(name = "created_at", nullable = false)
     @Builder.Default
     private Instant createdAt = Instant.now();
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = Instant.now();
-    }
 
     /**
      * Получает полное имя пользователя

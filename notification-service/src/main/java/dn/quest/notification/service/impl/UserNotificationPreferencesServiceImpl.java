@@ -512,9 +512,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
         if (prefs.getMaxNotificationsPerDay() != null) {
             Instant oneDayAgo = Instant.now().minusSeconds(86400);
             long countLastDay = notificationRepository.countByUserIdAndCreatedAtBetween(userId, oneDayAgo, Instant.now());
-            if (countLastDay >= prefs.getMaxNotificationsPerDay()) {
-                return false;
-            }
+            return countLastDay < prefs.getMaxNotificationsPerDay();
         }
 
         return true;
