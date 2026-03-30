@@ -24,7 +24,10 @@ RUN chmod +x gradlew
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
 # Copy source code
-COPY authentication-service/src src
+COPY dn-quest-shared/build.gradle.kts dn-quest-shared/build.gradle.kts
+COPY dn-quest-shared/src dn-quest-shared/src
+COPY authentication-service/build.gradle.kts authentication-service/build.gradle.kts
+COPY authentication-service/src authentication-service/src
 
 # Build the application
 RUN ./gradlew :authentication-service:bootJar --no-daemon -x test
@@ -47,7 +50,7 @@ RUN addgroup -g 1001 dnquest && \
 WORKDIR /app
 
 # Copy the built jar from builder stage
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/authentication-service/build/libs/*.jar app.jar
 
 # Change ownership to non-root user
 RUN chown -R dnquest:dnquest /app

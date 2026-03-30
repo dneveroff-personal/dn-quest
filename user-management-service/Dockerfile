@@ -6,7 +6,7 @@ LABEL description="DN Quest User Management Service"
 LABEL version="1.0.0"
 
 # Install required packages for building
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl gradle
 
 # Set working directory
 WORKDIR /app
@@ -21,10 +21,13 @@ COPY settings.gradle.kts .
 RUN chmod +x gradlew
 
 # Download dependencies first for better caching
-RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
+RUN ./gradlew dependencies --configuration compileClasspath --no-daemon --warning-mode all
 
 # Copy source code
-COPY user-management-service/src src
+COPY dn-quest-shared/build.gradle.kts dn-quest-shared/build.gradle.kts
+COPY dn-quest-shared/src dn-quest-shared/src
+COPY user-management-service/build.gradle.kts user-management-service/build.gradle.kts
+COPY user-management-service/src user-management-service/src
 
 # Build the application
 RUN ./gradlew :user-management-service:bootJar --no-daemon -x test
@@ -47,7 +50,7 @@ RUN addgroup -g 1001 dnquest && \
 WORKDIR /app
 
 # Copy the built jar from builder stage
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/user-management-service/build/libs/*.jar app.jar
 
 # Change ownership to non-root user
 RUN chown -R dnquest:dnquest /app
