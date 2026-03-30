@@ -23,8 +23,11 @@ RUN chmod +x gradlew
 # Download dependencies first for better caching
 RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
 
-# Copy source code
-COPY statistics-service/src src
+# Copy shared module and source code
+COPY dn-quest-shared/build.gradle.kts dn-quest-shared/build.gradle.kts
+COPY dn-quest-shared/src dn-quest-shared/src
+COPY statistics-service/build.gradle.kts statistics-service/build.gradle.kts
+COPY statistics-service/src statistics-service/src
 
 # Build the application
 RUN ./gradlew :statistics-service:bootJar --no-daemon -x test
@@ -47,7 +50,7 @@ RUN addgroup -g 1001 dnquest && \
 WORKDIR /app
 
 # Copy the built jar from builder stage
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/statistics-service/build/libs/*.jar app.jar
 
 # Change ownership to non-root user
 RUN chown -R dnquest:dnquest /app
