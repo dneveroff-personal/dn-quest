@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.dto.request;
 
-import dn.quest.teammanagement.enums.TeamRole;
+import dn.quest.shared.enums.TeamRole;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

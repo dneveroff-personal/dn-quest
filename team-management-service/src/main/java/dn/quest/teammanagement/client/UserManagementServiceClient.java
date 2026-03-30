@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.client;
 
-import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;

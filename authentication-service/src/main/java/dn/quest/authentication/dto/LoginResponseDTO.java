@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import dn.quest.shared.dto.UserDTO;
 
 /**
  * DTO для ответа при успешном входе в систему

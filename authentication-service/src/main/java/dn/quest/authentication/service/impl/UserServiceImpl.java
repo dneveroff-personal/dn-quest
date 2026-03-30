@@ -1,8 +1,7 @@
 package dn.quest.authentication.service.impl;
 
-import dn.quest.authentication.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.authentication.entity.User;
-import dn.quest.authentication.entity.UserPermission;
 import dn.quest.authentication.repository.UserPermissionRepository;
 import dn.quest.authentication.repository.UserRepository;
 import dn.quest.authentication.service.UserService;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса управления пользователями

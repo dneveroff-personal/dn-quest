@@ -1,9 +1,9 @@
 package dn.quest.teammanagement.repository;
 
+import dn.quest.shared.enums.TeamRole;
 import dn.quest.teammanagement.entity.Team;
 import dn.quest.teammanagement.entity.TeamMember;
 import dn.quest.teammanagement.entity.User;
-import dn.quest.teammanagement.enums.TeamRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

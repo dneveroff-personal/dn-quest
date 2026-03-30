@@ -221,4 +221,37 @@ public final class JwtUtil {
         }
         return generateAccessToken(secret, subject, claims);
     }
+    
+    /**
+     * Валидирует токен
+     */
+    public static boolean validateToken(String token, String secret) {
+        return isTokenValid(token, secret);
+    }
+    
+    /**
+     * Извлекает имя пользователя из токена
+     */
+    public static String extractUsername(String token, String secret) {
+        return extractSubject(token, secret);
+    }
+    
+    /**
+     * Извлекает ID пользователя из токена
+     */
+    public static Long extractUserId(String token, String secret) {
+        Object userId = getCustomClaim(token, secret, "userId");
+        if (userId instanceof Number) {
+            return ((Number) userId).longValue();
+        }
+        return null;
+    }
+    
+    /**
+     * Извлекает роль пользователя из токена
+     */
+    public static String extractRole(String token, String secret) {
+        Object role = getCustomClaim(token, secret, "role");
+        return role != null ? role.toString() : null;
+    }
 }

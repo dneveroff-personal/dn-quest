@@ -1,6 +1,7 @@
 package dn.quest.authentication.controller;
 
 import dn.quest.authentication.dto.*;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.authentication.metrics.AuthenticationMetrics;
 import dn.quest.authentication.service.AuthService;
 import io.micrometer.core.instrument.Timer;

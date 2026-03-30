@@ -1,4 +1,4 @@
-package dn.quest.authentication.config;
+package dn.quest.shared.config;
 
 import dn.quest.shared.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -18,6 +18,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * JWT аутентификационный фильтр для всех микросервисов
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.entity;
 
-import dn.quest.teammanagement.enums.TeamRole;
+import dn.quest.shared.enums.TeamRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

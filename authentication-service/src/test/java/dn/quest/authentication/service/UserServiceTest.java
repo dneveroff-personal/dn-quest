@@ -1,6 +1,5 @@
 package dn.quest.authentication.service;
 
-import dn.quest.authentication.dto.UserDTO;
 import dn.quest.authentication.entity.User;
 import dn.quest.authentication.repository.UserPermissionRepository;
 import dn.quest.authentication.repository.UserRepository;
@@ -18,7 +17,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**

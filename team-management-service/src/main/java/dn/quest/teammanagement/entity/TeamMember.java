@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.entity;
 
-import dn.quest.teammanagement.enums.TeamRole;
+import dn.quest.shared.enums.TeamRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,28 +65,28 @@ public class TeamMember {
      * Проверяет, является ли участник модератором или капитаном
      */
     public boolean isModeratorOrAbove() {
-        return TeamRole.CAPTAIN.equals(role) || TeamRole.MODERATOR.equals(role);
+        return TeamRole.CAPTAIN.equals(role) || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверяет, может ли участник управлять командой
      */
     public boolean canManageTeam() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверяет, может ли участник приглашать новых членов
      */
     public boolean canInviteMembers() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**
      * Проверяет, может ли участник удалять других участников
      */
     public boolean canRemoveMembers() {
-        return isCaptain() || TeamRole.MODERATOR.equals(role);
+        return isCaptain() || TeamRole.DEPUTY.equals(role);
     }
 
     /**

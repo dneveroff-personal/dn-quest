@@ -1,6 +1,7 @@
 package dn.quest.authentication.config;
 
 import dn.quest.authentication.service.UserService;
+import dn.quest.shared.config.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

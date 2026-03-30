@@ -1,6 +1,7 @@
 package dn.quest.authentication.service.impl;
 
 import dn.quest.authentication.dto.*;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.authentication.entity.User;
 import dn.quest.authentication.service.AuthService;
 import dn.quest.authentication.service.UserService;

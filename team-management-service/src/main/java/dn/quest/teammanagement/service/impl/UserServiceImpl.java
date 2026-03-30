@@ -1,8 +1,8 @@
 package dn.quest.teammanagement.service.impl;
 
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.client.StatisticsServiceClient;
 import dn.quest.teammanagement.client.StatisticsServiceClient.UserStatisticsDataDTO;
-import dn.quest.teammanagement.dto.UserDTO;
 import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.entity.User;
 import dn.quest.teammanagement.mapper.TeamMapper;
@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -196,8 +195,7 @@ public class UserServiceImpl implements UserService {
             // Обновляем существующего пользователя
             user.setUsername(userDTO.getUsername());
             user.setEmail(userDTO.getEmail());
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
+            user.setFirstName(userDTO.getPublicName());
             user.setAvatarUrl(userDTO.getAvatarUrl());
             user.setIsActive(userDTO.getIsActive());
         } else {
@@ -317,8 +315,7 @@ public class UserServiceImpl implements UserService {
         return UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .publicName(user.getFirstName())
                 .avatarUrl(user.getAvatarUrl())
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -333,11 +330,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
         // Обновляем разрешенные поля
-        if (userDTO.getFirstName() != null) {
-            user.setFirstName(userDTO.getFirstName());
-        }
-        if (userDTO.getLastName() != null) {
-            user.setLastName(userDTO.getLastName());
+        if (userDTO.getPublicName() != null) {
+            user.setFirstName(userDTO.getPublicName());
         }
         if (userDTO.getAvatarUrl() != null) {
             user.setAvatarUrl(userDTO.getAvatarUrl());

@@ -1,6 +1,6 @@
 package dn.quest.teammanagement.service;
 
-import dn.quest.teammanagement.dto.UserDTO;
+import dn.quest.shared.dto.UserDTO;
 import dn.quest.teammanagement.dto.UserStatisticsDTO;
 import dn.quest.teammanagement.entity.User;
 
