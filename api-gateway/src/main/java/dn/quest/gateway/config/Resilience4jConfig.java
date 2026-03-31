@@ -58,15 +58,14 @@ public class Resilience4jConfig {
     @Bean
     public RetryConfig defaultRetryConfig() {
         return RetryConfig.custom()
-                .maxAttempts(3) // Максимальное количество попыток
-                .waitDuration(Duration.ofMillis(100)) // Начальная задержка
+                .maxAttempts(3)
                 .intervalFunction(attempt -> {
-                    // Экспоненциальный backoff
+                    // Экспоненциальный backoff начиная со 100ms
                     long delay = (long) (100 * Math.pow(2, attempt - 1));
-                    return Math.min(delay, 2000); // Максимум 2 секунды
+                    return Math.min(delay, 2000);
                 })
-                .retryExceptions(Exception.class) // Повторять при всех исключениях
-                .ignoreExceptions(IllegalArgumentException.class) // Игнорировать определенные исключения
+                .retryExceptions(Exception.class)
+                .ignoreExceptions(IllegalArgumentException.class)
                 .build();
     }
 

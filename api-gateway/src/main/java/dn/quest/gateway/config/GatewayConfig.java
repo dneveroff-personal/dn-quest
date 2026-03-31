@@ -3,9 +3,12 @@ package dn.quest.gateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
+
+import java.security.Principal;
 
 /**
  * Конфигурация API Gateway
@@ -17,12 +20,10 @@ public class GatewayConfig {
      * Key resolver для rate limiting по IP адресу
      */
     @Bean
+    @Primary  // ← добавить
     public KeyResolver ipKeyResolver() {
         return exchange -> Mono.just(
-            exchange.getRequest()
-                .getRemoteAddress()
-                .getAddress()
-                .getHostAddress()
+                exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
         );
     }
 
@@ -31,12 +32,9 @@ public class GatewayConfig {
      */
     @Bean
     public KeyResolver userKeyResolver() {
-        return exchange -> {
-            String username = exchange.getRequest()
-                .getHeaders()
-                .getFirst("X-Username");
-            return Mono.just(username != null ? username : "anonymous");
-        };
+        return exchange -> exchange.getPrincipal()
+                .map(Principal::getName)
+                .defaultIfEmpty("anonymous");
     }
 
     /**

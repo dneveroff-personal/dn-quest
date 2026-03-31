@@ -102,4 +102,9 @@ jib {
 
 tasks.bootJar {
     mainClass.set("dn.quest.notification.NotificationServiceApplication")
+    archiveFileName.set("app.jar")
+}
+
+tasks.jar {
+    enabled = false
 }

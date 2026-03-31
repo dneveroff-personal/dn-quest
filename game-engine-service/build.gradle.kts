@@ -109,4 +109,9 @@ jib {
 
 tasks.bootJar {
     mainClass.set("dn.quest.gameengine.GameEngineServiceApplication")
+    archiveFileName.set("app.jar")
+}
+
+tasks.jar {
+    enabled = false
 }

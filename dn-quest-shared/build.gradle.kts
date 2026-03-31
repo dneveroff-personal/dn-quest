@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("org.springframework.boot") version "3.2.0" apply false
-    id("io.spring.dependency-management") version "1.1.4" apply false
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "dn.quest"
@@ -70,4 +70,10 @@ tasks.withType<JavaCompile> {
 // Отключаем bootJar для общей библиотеки
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     enabled = false
+}
+
+// Явно включаем jar — нужен как зависимость для других сервисов
+tasks.named<Jar>("jar") {
+    enabled = true
+    archiveClassifier.set("")
 }

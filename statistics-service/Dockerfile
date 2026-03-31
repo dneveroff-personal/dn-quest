@@ -1,72 +1,22 @@
-# Multi-stage build for optimized production image
-FROM eclipse-temurin:21-jdk-alpine AS builder
-
-LABEL maintainer="DN Quest Team"
-LABEL description="DN Quest Statistics Service"
-LABEL version="1.0.0"
-
-# Install required packages for building
-RUN apk add --no-cache curl
-
-# Set working directory
-WORKDIR /app
-
-# Copy gradle wrapper and configuration files
-COPY gradlew .
-COPY gradle gradle/
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-
-# Make gradlew executable
-RUN chmod +x gradlew
-
-# Download dependencies first for better caching
-RUN ./gradlew dependencies --configuration compileClasspath --no-daemon
-
-# Copy shared module and source code
-COPY dn-quest-shared/build.gradle.kts dn-quest-shared/build.gradle.kts
-COPY dn-quest-shared/src dn-quest-shared/src
-COPY statistics-service/build.gradle.kts statistics-service/build.gradle.kts
-COPY statistics-service/src statistics-service/src
-
-# Build the application
-RUN ./gradlew :statistics-service:bootJar --no-daemon -x test
-
-# Production stage
 FROM eclipse-temurin:21-jre-alpine
 
-LABEL maintainer="DN Quest Team"
-LABEL description="DN Quest Statistics Service"
-LABEL version="1.0.0"
+ARG SERVICE_NAME
+ARG PORT=8080
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+RUN addgroup -g 1001 dnquest && adduser -D -s /bin/sh -u 1001 -G dnquest dnquest
 
-# Create non-root user
-RUN addgroup -g 1001 dnquest && \
-    adduser -D -s /bin/sh -u 1001 -G dnquest dnquest
-
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar from builder stage
-COPY --from=builder /app/statistics-service/build/libs/*.jar app.jar
+COPY ${SERVICE_NAME}/build/libs/app.jar app.jar
 
-# Change ownership to non-root user
-RUN chown -R dnquest:dnquest /app
+RUN chown -R dnquest:dnquest /app && chmod +x app.jar
 
-# Switch to non-root user
 USER dnquest
 
-# Expose port
-EXPOSE 8087
+EXPOSE ${PORT}
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8087/api/statistics/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/actuator/health || exit 1
 
-# JVM options optimized for containers
-ENV JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-
-# Run the application
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

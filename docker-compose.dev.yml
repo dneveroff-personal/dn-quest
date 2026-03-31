@@ -164,6 +164,9 @@ services:
     build:
       context: .
       dockerfile: ./api-gateway/Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+        PORT: 8080
     image: dn-quest/api-gateway:dev
     container_name: dn-quest-api-gateway-dev
     ports:
@@ -224,6 +227,9 @@ services:
     build:
       context: .
       dockerfile: ./authentication-service/Dockerfile
+      args:
+        SERVICE_NAME: authentication-service
+        PORT: 8081
     image: dn-quest/authentication-service:dev
     container_name: dn-quest-authentication-service-dev
     ports:
@@ -282,6 +288,9 @@ services:
     build:
       context: .
       dockerfile: ./user-management-service/Dockerfile
+      args:
+        SERVICE_NAME: user-management-service
+        PORT: 8082
     image: dn-quest/user-management-service:dev
     container_name: dn-quest-user-management-service-dev
     ports:
@@ -336,6 +345,9 @@ services:
     build:
       context: .
       dockerfile: ./quest-management-service/Dockerfile
+      args:
+        SERVICE_NAME: quest-management-service
+        PORT: 8083
     image: dn-quest/quest-management-service:dev
     container_name: dn-quest-quest-management-service-dev
     ports:
@@ -393,6 +405,9 @@ services:
     build:
       context: .
       dockerfile: ./game-engine-service/Dockerfile
+      args:
+        SERVICE_NAME: game-engine-service
+        PORT: 8084
     image: dn-quest/game-engine-service:dev
     container_name: dn-quest-game-engine-service-dev
     ports:
@@ -453,6 +468,9 @@ services:
     build:
       context: .
       dockerfile: ./team-management-service/Dockerfile
+      args:
+        SERVICE_NAME: team-management-service
+        PORT: 8085
     image: dn-quest/team-management-service:dev
     container_name: dn-quest-team-management-service-dev
     ports:
@@ -510,6 +528,9 @@ services:
     build:
       context: .
       dockerfile: ./notification-service/Dockerfile
+      args:
+        SERVICE_NAME: notification-service
+        PORT: 8086
     image: dn-quest/notification-service:dev
     container_name: dn-quest-notification-service-dev
     ports:
@@ -569,6 +590,9 @@ services:
     build:
       context: .
       dockerfile: ./statistics-service/Dockerfile
+      args:
+        SERVICE_NAME: statistics-service
+        PORT: 8087
     image: dn-quest/statistics-service:dev
     container_name: dn-quest-statistics-service-dev
     ports:
@@ -626,6 +650,9 @@ services:
     build:
       context: .
       dockerfile: ./file-storage-service/Dockerfile
+      args:
+        SERVICE_NAME: file-storage-service
+        PORT: 8088
     image: dn-quest/file-storage-service:dev
     container_name: dn-quest-file-storage-service-dev
     ports:

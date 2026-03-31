@@ -113,6 +113,18 @@ subprojects {
             html.required.set(true)
         }
     }
+
+    plugins.withId("org.springframework.boot") {
+        tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+            archiveFileName.set("app.jar")
+            enabled = true
+            dependsOn(":dn-quest-shared:jar")
+
+        }
+        tasks.named<Jar>("jar") {
+            enabled = false  // отключаем plain-*.jar
+        }
+    }
 }
 
 // Docker build task for all services

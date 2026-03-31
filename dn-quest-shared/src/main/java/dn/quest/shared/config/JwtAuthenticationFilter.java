@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret:defaultSecretKeyThatWillBeOverriddenByEnvVar}")
     private String jwtSecret;
 
     @Override
