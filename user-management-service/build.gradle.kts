@@ -45,6 +45,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers:1.19.3")
+    testImplementation("com.h2database:h2:2.2.224")
 }
 
 dependencyManagement {

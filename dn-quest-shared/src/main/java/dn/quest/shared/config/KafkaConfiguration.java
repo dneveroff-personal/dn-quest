@@ -65,6 +65,14 @@ public class KafkaConfiguration {
     @Value("${spring.kafka.consumer.concurrency:3}")
     private Integer consumerConcurrency;
 
+    // В dev = 1 брокер → replication factor = 1
+    // В prod = 3 брокера → replication factor = 3
+    @Value("${kafka.topics.replication-factor:1}")
+    private short replicationFactor;
+
+    @Value("${kafka.topics.partitions.default:1}")
+    private int defaultPartitions;
+
     /**
      * Конфигурация продюсера Kafka
      */
@@ -82,16 +90,16 @@ public class KafkaConfiguration {
         configProps.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, producerCompressionType);
         configProps.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         configProps.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
-        
+
         // Добавление доверенных пакетов для JsonDeserializer
         configProps.put(JsonSerializer.ADD_TYPE_INFO_HEADERS, false);
-        configProps.put(JsonSerializer.TYPE_MAPPINGS, 
+        configProps.put(JsonSerializer.TYPE_MAPPINGS,
                 "BaseEvent:dn.quest.shared.events.BaseEvent," +
-                "UserEvent:dn.quest.shared.events.user.UserEvent," +
-                "QuestEvent:dn.quest.shared.events.quest.QuestEvent," +
-                "GameEvent:dn.quest.shared.events.game.GameEvent," +
-                "TeamEvent:dn.quest.shared.events.team.TeamEvent," +
-                "FileEvent:dn.quest.shared.events.file.FileEvent");
+                        "UserEvent:dn.quest.shared.events.user.UserEvent," +
+                        "QuestEvent:dn.quest.shared.events.quest.QuestEvent," +
+                        "GameEvent:dn.quest.shared.events.game.GameEvent," +
+                        "TeamEvent:dn.quest.shared.events.team.TeamEvent," +
+                        "FileEvent:dn.quest.shared.events.file.FileEvent");
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }
@@ -122,15 +130,15 @@ public class KafkaConfiguration {
         configProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, consumerSessionTimeoutMs);
         configProps.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, consumerHeartbeatIntervalMs);
         configProps.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
-        
+
         // Добавление доверенных пакетов для JsonDeserializer
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, 
+        configProps.put(JsonDeserializer.TRUSTED_PACKAGES,
                 "dn.quest.shared.events," +
-                "dn.quest.shared.events.user," +
-                "dn.quest.shared.events.quest," +
-                "dn.quest.shared.events.game," +
-                "dn.quest.shared.events.team," +
-                "dn.quest.shared.events.file");
+                        "dn.quest.shared.events.user," +
+                        "dn.quest.shared.events.quest," +
+                        "dn.quest.shared.events.game," +
+                        "dn.quest.shared.events.team," +
+                        "dn.quest.shared.events.file");
         configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "dn.quest.shared.events.BaseEvent");
         configProps.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
 
@@ -142,17 +150,17 @@ public class KafkaConfiguration {
      */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = 
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(consumerConcurrency);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
         factory.getContainerProperties().setPollTimeout(3000);
         factory.getContainerProperties().setIdleBetweenPolls(1000);
-        
+
         // Настройка retry механизма
         factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler());
-        
+
         return factory;
     }
 
@@ -167,81 +175,84 @@ public class KafkaConfiguration {
     }
 
     /**
-     * Создание топиков при старте приложения
+     * Создание топиков при старте приложения.
+     * Партиции и replication factor берутся из конфига:
+     *   dev:  kafka.topics.replication-factor=1, kafka.topics.partitions.default=1
+     *   prod: kafka.topics.replication-factor=3, kafka.topics.partitions.default=6
      */
     @Bean
     public NewTopic userEventsTopic() {
-        return new NewTopic(KafkaTopics.USER_EVENTS, 6, (short) 3);
+        return new NewTopic(KafkaTopics.USER_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic questEventsTopic() {
-        return new NewTopic(KafkaTopics.QUEST_EVENTS, 4, (short) 3);
+        return new NewTopic(KafkaTopics.QUEST_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic gameEventsTopic() {
-        return new NewTopic(KafkaTopics.GAME_EVENTS, 12, (short) 3);
+        return new NewTopic(KafkaTopics.GAME_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic teamEventsTopic() {
-        return new NewTopic(KafkaTopics.TEAM_EVENTS, 4, (short) 3);
+        return new NewTopic(KafkaTopics.TEAM_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic fileEventsTopic() {
-        return new NewTopic(KafkaTopics.FILE_EVENTS, 4, (short) 3);
+        return new NewTopic(KafkaTopics.FILE_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic notificationEventsTopic() {
-        return new NewTopic(KafkaTopics.NOTIFICATION_EVENTS, 8, (short) 3);
+        return new NewTopic(KafkaTopics.NOTIFICATION_EVENTS, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic statisticsEventsTopic() {
-        return new NewTopic(KafkaTopics.STATISTICS_EVENTS, 6, (short) 3);
+        return new NewTopic(KafkaTopics.STATISTICS_EVENTS, defaultPartitions, replicationFactor);
     }
 
     // DLQ топики
     @Bean
     public NewTopic userEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.USER_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.USER_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic questEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.QUEST_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.QUEST_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic gameEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.GAME_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.GAME_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic teamEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.TEAM_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.TEAM_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic fileEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.FILE_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.FILE_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic notificationEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.NOTIFICATION_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.NOTIFICATION_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic statisticsEventsDlqTopic() {
-        return new NewTopic(KafkaTopics.STATISTICS_EVENTS_DLQ, 3, (short) 3);
+        return new NewTopic(KafkaTopics.STATISTICS_EVENTS_DLQ, defaultPartitions, replicationFactor);
     }
 
     @Bean
     public NewTopic generalDlqTopic() {
-        return new NewTopic(KafkaTopics.GENERAL_DLQ, 6, (short) 3);
+        return new NewTopic(KafkaTopics.GENERAL_DLQ, defaultPartitions, replicationFactor);
     }
 }

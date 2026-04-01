@@ -16,7 +16,7 @@ FROM base AS deps
 # Устанавливаем зависимости детерминированно с retry логикой
 RUN npm config set registry https://registry.npmmirror.com && for i in 1 2 3 4 5; do npm ci && break; done
 
-# ---------- Stage 2: Development ----------
+# ---------- Stage 2: Development (default for dev) ----------
 FROM base AS development
 
 # Копируем зависимости из deps stage
@@ -28,6 +28,9 @@ COPY . .
 # Создаем пользователя
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001
+
+# Устанавливаем права на директорию
+RUN chown -R nextjs:nodejs /app
 
 # Переключаемся на пользователя
 USER nextjs
@@ -80,6 +83,6 @@ EXPOSE 80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,49 +1,25 @@
-# Multi-stage build для оптимизации размера образа
-FROM openjdk:21-jdk-slim AS builder
+# DN Quest - Host-build Dockerfile (один на все сервисы)
+FROM eclipse-temurin:21-jre-alpine
 
-# Устанавливаем необходимые зависимости для сборки
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN addgroup -g 1001 dnquest && \
+    adduser -D -s /bin/sh -u 1001 -G dnquest dnquest
 
 WORKDIR /app
 
-# Копируем только необходимые файлы для сборки
-COPY build.gradle settings.gradle gradlew ./
-COPY gradle ./gradle
+# ARG должен быть объявлен ДО использования в COPY
+ARG SERVICE_NAME
+ARG PORT=8080
 
-# Делаем gradlew исполняемым
-RUN chmod +x gradlew
+COPY ${SERVICE_NAME}/build/libs/app.jar app.jar
 
-# Собираем приложение
-RUN ./gradlew clean build -x test --no-daemon
+RUN chown -R dnquest:dnquest /app && chmod +x app.jar
 
-# Production stage
-FROM openjdk:21-jre-slim
+USER dnquest
 
-# Устанавливаем необходимые пакеты и создаем пользователя
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd -r appuser && useradd -r -g appuser appuser
+EXPOSE ${PORT}
 
-WORKDIR /app
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/actuator/health || exit 1
 
-# Копируем JAR из builder stage
-COPY --from=builder /app/build/libs/dn-quest-*.jar app.jar
-
-# Создаем директорию для логов
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app
-
-# Переключаемся на непривилегированного пользователя
-USER appuser
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-# Настройки JVM для production
-ENV JAVA_OPTS="-Xms512m -Xmx1024m -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
-
-# Запуск приложения (без debug агента для production)
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

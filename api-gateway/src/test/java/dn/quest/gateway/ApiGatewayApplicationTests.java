@@ -1,15 +1,11 @@
 package dn.quest.gateway;
 
 import dn.quest.gateway.filter.AuthenticationFilter;
-import dn.quest.gateway.util.JwtUtil;
+import dn.quest.shared.utils.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.mock.web.server.MockServerWebExchange;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -212,3 +212,19 @@ MIT License
 ---
 
 **DN Quest** — современная платформа для онлайн-квестов с микросервисной архитектурой
+
+## Команды для разработки:
+- Показать статус запущенных сервисов 
+  - docker ps --format "table {{.Names}}\t{{.Status}}"
+
+- Билд jar файлов 
+  - ./gradlew clean build -x test
+
+- Запуск докер контейнеров 
+  - docker compose -f docker-compose.dev.yml up -d --build
+  
+- Правильная остановка всех контейнеров
+  - docker compose -f docker-compose.dev.yml down -v --remove-orphans
+
+- Перезапуск определенного контейнера 
+  - docker compose -f docker-compose.dev.yml up -d frontend-dev
