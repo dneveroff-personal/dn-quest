@@ -35,11 +35,14 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+        default_schema: files
   
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    schemas: files
+    default-schema: files
   
   cache:
     type: caffeine

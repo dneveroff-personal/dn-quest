@@ -37,6 +37,7 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+        default_schema: auth
   
   # Flyway Configuration
   flyway:
@@ -44,6 +45,8 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: false
+    schemas: auth
+    default-schema: auth
   
   # Cache Configuration
   cache:

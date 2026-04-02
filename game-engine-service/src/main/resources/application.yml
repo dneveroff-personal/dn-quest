@@ -43,6 +43,7 @@ spring:
           events:
             log:
               level: WARN
+        default_schema: game
   
   # Flyway configuration
   flyway:
@@ -50,6 +51,8 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
     locations: classpath:db/migration
+    schemas: game
+    default-schema: game
   
   # Kafka configuration
   kafka:

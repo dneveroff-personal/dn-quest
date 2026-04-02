@@ -7,7 +7,7 @@ CREATE TABLE user_permissions (
     granted_by VARCHAR(100),
     
     CONSTRAINT fk_user_permissions_user_id 
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_permissions_permission_id 
         FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
     CONSTRAINT uk_user_permissions_user_permission 

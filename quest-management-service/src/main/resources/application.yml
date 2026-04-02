@@ -1,35 +1,40 @@
 spring:
-  application:
-    name: quest-management-service
-  
-  profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
-  
-  config:
-    import: optional:file:./config/application.yml
-
-  # Database configuration
   datasource:
+    url: jdbc:postgresql://postgres-dev:5432/dnquest_quests
+    username: dn
+    password: dn
     driver-class-name: org.postgresql.Driver
-  
-  # JPA configuration
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 20000
+
   jpa:
-    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
     properties:
       hibernate:
-        generate_statistics: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
-          time_zone: UTC
-  
-  # Flyway configuration
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        default_schema: quests
+
   flyway:
     enabled: true
+    locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: true
-  
-  # Kafka configuration
+    schemas: quests
+    default-schema: quests
+
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
+    bootstrap-servers: kafka-dev:29092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -38,64 +43,49 @@ spring:
       batch-size: 16384
       linger-ms: 1
       buffer-memory: 33554432
-      compression-type: snappy
-      enable-idempotence: true
     consumer:
       group-id: quest-management-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.shared.events.user,dn.quest.shared.events.quest,dn.quest.shared.events.game,dn.quest.shared.events.team,dn.quest.shared.events.file,dn.quest.shared.events.notification"
-        spring.json.value.default.type: "dn.quest.shared.events.BaseEvent"
-        spring.json.use.type.headers: false
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: "dn.quest.questmanagement.event.QuestEvent"
       auto-offset-reset: earliest
       enable-auto-commit: false
-      max-poll-records: 500
-      session-timeout-ms: 30000
-      heartbeat-interval-ms: 10000
-      isolation-level: read_committed
-    listener:
-      ack-mode: manual_immediate
-      concurrency: 3
-      poll-timeout: 3000
-      idle-between-polls: 1000
-  
-  # Cache configuration
+      max-poll-records: 100
+
   cache:
     type: caffeine
-  
-  # Security configuration
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=5m
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+          issuer-uri: http://authentication-service-dev:8081
 
-# Feign configuration
+# Feign clients configuration
 feign:
   client:
     config:
-      default:
-        connectTimeout: 5000
-        readTimeout: 10000
-        loggerLevel: none
       authentication-service:
-        url: ${AUTH_SERVICE_URL:http://localhost:8081}
+        url: http://authentication-service-dev:8081
         connectTimeout: 5000
         readTimeout: 10000
         loggerLevel: basic
       user-management-service:
-        url: ${USER_SERVICE_URL:http://localhost:8082}
+        url: http://user-management-service:8082
         connectTimeout: 5000
         readTimeout: 10000
         loggerLevel: basic
       file-storage-service:
-        url: ${FILE_STORAGE_SERVICE_URL:http://localhost:8088}
+        url: http://file-storage-service:8088
         connectTimeout: 5000
         readTimeout: 15000
         loggerLevel: basic
       statistics-service:
-        url: ${STATISTICS_SERVICE_URL:http://localhost:8087}
+        url: http://statistics-service:8087
         connectTimeout: 5000
         readTimeout: 10000
         loggerLevel: basic
@@ -120,12 +110,13 @@ app:
 # Logging configuration
 logging:
   level:
-    dn.quest.questmanagement: INFO
-    org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.hibernate.SQL: WARN
+    dn.quest.questmanagement: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.kafka: INFO
-    feign: INFO
+    feign: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -135,10 +126,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
   metrics:
     export:
       prometheus:
@@ -146,7 +137,7 @@ management:
 
 # Server configuration
 server:
-  port: ${SERVER_PORT:8083}
+  port: 8083
   servlet:
     context-path: /api/quests
   compression:

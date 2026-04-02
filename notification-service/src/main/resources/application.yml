@@ -58,6 +58,15 @@ spring:
           starttls:
             enable: true
 
+  jpa:
+    properties:
+      hibernate:
+        default_schema: notifications
+
+  flyway:
+    schemas: notifications
+    default-schema: notifications
+
 # Telegram Configuration
 telegram:
   bot:
@@ -85,9 +94,9 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
+  prometheus:
+    metrics:
+      export:
         enabled: true
 
 logging:

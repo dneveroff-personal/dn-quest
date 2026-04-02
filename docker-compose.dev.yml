@@ -243,7 +243,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/auth/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -291,7 +291,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/api/users/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -340,7 +340,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/api/quests/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -392,7 +392,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/api/game/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -441,7 +441,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/api/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -489,7 +489,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8086/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8086/api/notifications/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -538,7 +538,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8087/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8087/api/stats/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -589,7 +589,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8088/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8088/api/files/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
