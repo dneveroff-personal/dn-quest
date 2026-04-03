@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * DTO для запроса пакетной отправки уведомлений
@@ -27,7 +28,7 @@ public class BatchNotificationRequest {
      * Список ID пользователей для отправки
      */
     @NotEmpty(message = "User IDs list cannot be empty")
-    private List<Long> userIds;
+    private List<UUID> userIds;
 
     /**
      * Тип уведомления

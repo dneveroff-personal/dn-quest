@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Сущность приглашения в команду
@@ -28,8 +29,8 @@ import java.time.Instant;
 public class TeamInvitation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
@@ -127,7 +128,7 @@ public class TeamInvitation {
     /**
      * Проверяет, может ли пользователь ответить на приглашение
      */
-    public boolean canRespond(Long userId) {
+    public boolean canRespond(UUID userId) {
         return user != null && user.getId().equals(userId) && isActive();
     }
 }

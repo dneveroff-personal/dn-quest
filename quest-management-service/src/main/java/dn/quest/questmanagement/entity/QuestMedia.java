@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import java.util.UUID;
+
 import dn.quest.shared.enums.FileType;
 
 /**
@@ -34,20 +36,20 @@ import dn.quest.shared.enums.FileType;
 public class QuestMedia {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID квеста (null если медиа относится к уровню)
      */
     @Column(name = "quest_id")
-    private Long questId;
+    private UUID questId;
 
     /**
      * ID уровня (null если медиа относится к квесту)
      */
     @Column(name = "level_id")
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Тип медиа

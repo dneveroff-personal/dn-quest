@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы со статистикой квестов
@@ -42,12 +43,12 @@ public interface QuestStatisticsRepository extends JpaRepository<QuestStatistics
     /**
      * Найти статистику по автору
      */
-    List<QuestStatistics> findByAuthorIdOrderByDateDesc(Long authorId);
+    List<QuestStatistics> findByAuthorIdOrderByDateDesc(UUID authorId);
 
     /**
      * Найти статистику по автору за период
      */
-    List<QuestStatistics> findByAuthorIdAndDateBetweenOrderByDateDesc(Long authorId, LocalDate startDate, LocalDate endDate);
+    List<QuestStatistics> findByAuthorIdAndDateBetweenOrderByDateDesc(UUID authorId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Получить количество созданных квестов за дату
@@ -90,23 +91,6 @@ public interface QuestStatisticsRepository extends JpaRepository<QuestStatistics
      */
     @Query("SELECT q FROM QuestStatistics q WHERE q.date = :date AND q.completionRate IS NOT NULL ORDER BY q.completionRate DESC")
     List<QuestStatistics> findTopQuestsByCompletionRate(@Param("date") LocalDate date, Pageable pageable);
-
-    /**
-     * Получить статистику по квестам за период
-     */
-    @Query("SELECT new dn.quest.statistics.dto.QuestPeriodStatsDTO(" +
-           "q.questId, " +
-           "q.questTitle, " +
-           "q.authorId, " +
-           "SUM(q.starts), " +
-           "SUM(q.completions), " +
-           "SUM(q.views), " +
-           "AVG(q.completionRate), " +
-           "AVG(q.avgRating)" +
-           ") FROM QuestStatistics q " +
-           "WHERE q.date BETWEEN :startDate AND :endDate " +
-           "GROUP BY q.questId, q.questTitle, q.authorId")
-    List<Object[]> getQuestPeriodStats(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     /**
      * Получить статистику по авторам за период

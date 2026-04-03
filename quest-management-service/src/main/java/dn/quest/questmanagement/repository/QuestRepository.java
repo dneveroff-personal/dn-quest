@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Repository для работы с квестами
@@ -59,14 +60,14 @@ public interface QuestRepository extends JpaRepository<Quest, Long>, JpaSpecific
      * Найти квесты по автору
      */
     @Query("SELECT q FROM Quest q WHERE :authorId MEMBER OF q.authorIds")
-    List<Quest> findByAuthorId(@Param("authorId") Long authorId);
+    List<Quest> findByAuthorId(@Param("authorId") UUID authorId);
 
     /**
      * Найти квесты по автору с пагинацией
      */
     @Query("SELECT q FROM Quest q WHERE :authorId MEMBER OF q.authorIds " +
            "ORDER BY q.createdAt DESC")
-    Page<Quest> findByAuthorId(@Param("authorId") Long authorId, Pageable pageable);
+    Page<Quest> findByAuthorId(@Param("authorId") UUID authorId, Pageable pageable);
 
     /**
      * Найти квесты по сложности
@@ -92,8 +93,8 @@ public interface QuestRepository extends JpaRepository<Quest, Long>, JpaSpecific
     /**
      * Найти квесты по нескольким тегам
      */
-    @Query("SELECT q FROM Quest q WHERE q.tags && :tags")
-    List<Quest> findByTags(@Param("tags") Set<String> tags);
+    @Query("SELECT q FROM Quest q WHERE FUNCTION('array_overlap', q.tags, :tags) = true")
+    List<Quest> findByTags(@Param("tags") String[] tags);
 
     /**
      * Поиск квестов по названию (без учета регистра)
@@ -162,7 +163,7 @@ public interface QuestRepository extends JpaRepository<Quest, Long>, JpaSpecific
      * Подсчет квестов автора
      */
     @Query("SELECT COUNT(q) FROM Quest q WHERE :authorId MEMBER OF q.authorIds")
-    long countByAuthorId(@Param("authorId") Long authorId);
+    long countByAuthorId(@Param("authorId") UUID authorId);
 
     /**
      * Проверить существование квеста с таким номером

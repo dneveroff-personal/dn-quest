@@ -84,7 +84,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
 
     @Override
     @Cacheable(value = "user-statistics", key = "{#userId, #date}")
-    public UserStatisticsDTO getUserStatistics(Long userId, LocalDate date) {
+    public UserStatisticsDTO getUserStatistics(UUID userId, LocalDate date) {
         log.debug("Getting statistics for user: {} for date: {}", userId, date);
         
         try {
@@ -137,7 +137,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
 
     @Override
     @Cacheable(value = "user-statistics-period", key = "{#userId, #startDate, #endDate, #pageable}")
-    public Page<UserStatisticsDTO> getUserStatisticsForPeriod(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public Page<UserStatisticsDTO> getUserStatisticsForPeriod(UUID userId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         log.debug("Getting statistics for user: {} for period: {} to {}", userId, startDate, endDate);
         
         try {
@@ -220,7 +220,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
 
     @Override
     @Cacheable(value = "team-statistics", key = "{#teamId, #date}")
-    public Map<String, Object> getTeamStatistics(Long teamId, LocalDate date) {
+    public Map<String, Object> getTeamStatistics(UUID teamId, LocalDate date) {
         log.debug("Getting statistics for team: {} for date: {}", teamId, date);
         
         Map<String, Object> statistics = new HashMap<>();

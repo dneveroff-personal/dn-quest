@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Реализация сервиса для управления командами
@@ -43,7 +44,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "teamLists"}, allEntries = true)
-    public TeamDTO createTeam(CreateTeamRequest request, Long captainId) {
+    public TeamDTO createTeam(CreateTeamRequest request, UUID captainId) {
         log.debug("Creating team: {} with captain: {}", request.getName(), captainId);
 
         // Проверяем существование пользователя
@@ -118,7 +119,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "teams", key = "#teamId")
-    public TeamDTO getTeamById(Long teamId) {
+    public TeamDTO getTeamById(UUID teamId) {
         log.debug("Getting team by id: {}", teamId);
 
         Team team = teamRepository.findById(teamId)
@@ -133,7 +134,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "fullTeams", key = "#teamId")
-    public TeamDTO getFullTeamById(Long teamId) {
+    public TeamDTO getFullTeamById(UUID teamId) {
         log.debug("Getting full team by id: {}", teamId);
 
         Team team = teamRepository.findById(teamId)
@@ -147,7 +148,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "teamLists"}, allEntries = true)
-    public TeamDTO updateTeam(Long teamId, UpdateTeamRequest request, Long userId) {
+    public TeamDTO updateTeam(UUID teamId, UpdateTeamRequest request, UUID userId) {
         log.debug("Updating team: {} by user: {}", teamId, userId);
 
         Team team = getTeamEntity(teamId);
@@ -196,7 +197,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "teamLists"}, allEntries = true)
-    public void deleteTeam(Long teamId, Long userId) {
+    public void deleteTeam(UUID teamId, UUID userId) {
         log.debug("Deleting team: {} by user: {}", teamId, userId);
 
         Team team = getTeamEntity(teamId);
@@ -307,7 +308,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "userTeams", key = "#userId")
-    public List<TeamDTO> getUserTeams(Long userId) {
+    public List<TeamDTO> getUserTeams(UUID userId) {
         log.debug("Getting teams for user: {}", userId);
 
         List<Team> teams = teamRepository.findTeamsByUserId(userId);
@@ -315,14 +316,14 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamListResponse getUserTeams(Long userId, Pageable pageable) {
+    public TeamListResponse getUserTeams(UUID userId, Pageable pageable) {
         return null;
     }
 
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "userActiveTeams", key = "#userId")
-    public List<TeamDTO> getUserActiveTeams(Long userId) {
+    public List<TeamDTO> getUserActiveTeams(UUID userId) {
         log.debug("Getting active teams for user: {}", userId);
 
         List<Team> teams = teamRepository.findActiveTeamsByUserId(userId);
@@ -331,7 +332,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isTeamCaptain(Long teamId, Long userId) {
+    public boolean isTeamCaptain(UUID teamId, UUID userId) {
         log.debug("Checking if user {} is captain of team: {}", userId, teamId);
 
         return teamRepository.existsByIdAndCaptainId(teamId, userId);
@@ -339,7 +340,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isTeamMember(Long teamId, Long userId) {
+    public boolean isTeamMember(UUID teamId, UUID userId) {
         log.debug("Checking if user {} is member of team: {}", userId, teamId);
 
         Team team = getTeamEntity(teamId);
@@ -351,7 +352,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public String getUserRoleInTeam(Long teamId, Long userId) {
+    public String getUserRoleInTeam(UUID teamId, UUID userId) {
         log.debug("Getting role of user {} in team: {}", userId, teamId);
 
         Team team = getTeamEntity(teamId);
@@ -365,7 +366,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canManageTeam(Long teamId, Long userId) {
+    public boolean canManageTeam(UUID teamId, UUID userId) {
         log.debug("Checking if user {} can manage team: {}", userId, teamId);
 
         Team team = getTeamEntity(teamId);
@@ -379,7 +380,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public TeamMember transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId) {
+    public TeamMember transferCaptain(UUID teamId, UUID newCaptainId, UUID currentCaptainId) {
         log.debug("Transferring captain in team: {} from {} to {}", teamId, currentCaptainId, newCaptainId);
 
         Team team = getTeamEntity(teamId);
@@ -419,7 +420,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public TeamMember addMember(Long teamId, Long userId, Long requesterId) {
+    public TeamMember addMember(UUID teamId, UUID userId, UUID requesterId) {
         log.debug("Adding member {} to team: {} by requester: {}", userId, teamId, requesterId);
 
         Team team = getTeamEntity(teamId);
@@ -459,7 +460,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public void removeMember(Long teamId, Long userId, Long requesterId) {
+    public void removeMember(UUID teamId, UUID userId, UUID requesterId) {
         log.debug("Removing member {} from team: {} by requester: {}", userId, teamId, requesterId);
 
         Team team = getTeamEntity(teamId);
@@ -489,7 +490,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @CacheEvict(value = {"teams", "userTeams"}, allEntries = true)
-    public TeamMember changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId) {
+    public TeamMember changeMemberRole(UUID teamId, UUID userId, String newRole, UUID requesterId) {
         log.debug("Changing role of member {} in team: {} to {} by requester: {}", 
                 userId, teamId, newRole, requesterId);
 
@@ -527,52 +528,52 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamInvitationDTO inviteUser(Long teamId, InviteUserRequest request, Long inviterId) {
+    public TeamInvitationDTO inviteUser(UUID teamId, InviteUserRequest request, Long inviterId) {
         return null;
     }
 
     @Override
-    public List<TeamInvitationDTO> getTeamInvitations(Long teamId, Long userId) {
+    public List<TeamInvitationDTO> getTeamInvitations(UUID teamId, UUID userId) {
         return List.of();
     }
 
     @Override
-    public List<TeamInvitationDTO> getTeamActiveInvitations(Long teamId, Long userId) {
+    public List<TeamInvitationDTO> getTeamActiveInvitations(UUID teamId, UUID userId) {
         return List.of();
     }
 
     @Override
-    public void revokeInvitation(Long teamId, Long invitationId, Long userId) {
+    public void revokeInvitation(UUID teamId, Long invitationId, UUID userId) {
 
     }
 
     @Override
-    public TeamSettingsDTO getTeamSettings(Long teamId) {
+    public TeamSettingsDTO getTeamSettings(UUID teamId) {
         return null;
     }
 
     @Override
-    public TeamSettingsDTO updateTeamSettings(Long teamId, UpdateTeamSettingsRequest request, Long userId) {
+    public TeamSettingsDTO updateTeamSettings(UUID teamId, UpdateTeamSettingsRequest request, UUID userId) {
         return null;
     }
 
     @Override
-    public TeamStatisticsDTO getTeamStatistics(Long teamId) {
+    public TeamStatisticsDTO getTeamStatistics(UUID teamId) {
         return null;
     }
 
     @Override
-    public void updateTeamStatistics(Long teamId) {
+    public void updateTeamStatistics(UUID teamId) {
 
     }
 
     @Override
-    public List<TeamMemberDTO> getTeamMembers(Long teamId) {
+    public List<TeamMemberDTO> getTeamMembers(UUID teamId) {
         return List.of();
     }
 
     @Override
-    public List<TeamMemberDTO> getTeamActiveMembers(Long teamId, Long userId) {
+    public List<TeamMemberDTO> getTeamActiveMembers(UUID teamId, UUID userId) {
         return List.of();
     }
 
@@ -602,17 +603,17 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void activateTeam(Long teamId, Long userId) {
+    public void activateTeam(UUID teamId, UUID userId) {
 
     }
 
     @Override
-    public void deactivateTeam(Long teamId, Long userId) {
+    public void deactivateTeam(UUID teamId, UUID userId) {
 
     }
 
     @Override
-    public boolean teamExists(Long teamId) {
+    public boolean teamExists(UUID teamId) {
         return false;
     }
 
@@ -624,18 +625,18 @@ public class TeamServiceImpl implements TeamService {
     // Остальные методы будут реализованы в следующей части...
 
     @Override
-    public Team getTeamEntity(Long teamId) {
+    public Team getTeamEntity(UUID teamId) {
         return teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found: " + teamId));
     }
 
     @Override
-    public void updateTeamRating(Long teamId, Double newRating) {
+    public void updateTeamRating(UUID teamId, Double newRating) {
 
     }
 
     @Override
-    public void updateTeamRank(Long teamId, Integer newRank) {
+    public void updateTeamRank(UUID teamId, Integer newRank) {
 
     }
 
@@ -671,7 +672,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void updateGameSessionStatistics(Long teamId, String sessionId, String status) {
+    public void updateGameSessionStatistics(UUID teamId, String sessionId, String status) {
         log.info("Updating game session statistics: teamId={}, sessionId={}, status={}", 
                 teamId, sessionId, status);
         // Логика обновления статистики игровой сессии
@@ -687,7 +688,7 @@ public class TeamServiceImpl implements TeamService {
         }
     }
 
-    private void validateUser(Long userId) {
+    private void validateUser(UUID userId) {
         if (!userService.userExists(userId)) {
             throw new RuntimeException("User not found: " + userId);
         }

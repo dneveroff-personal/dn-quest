@@ -14,12 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с уведомлениями
  */
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, Long> {
+public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
     /**
      * Найти уведомление по ID
@@ -29,22 +30,22 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     /**
      * Найти все уведомления пользователя
      */
-    Page<Notification> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+    Page<Notification> findByUserIdOrderByCreatedAtDesc(UUID userId, Pageable pageable);
 
     /**
      * Найти уведомления пользователя по статусу
      */
-    Page<Notification> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, NotificationStatus status, Pageable pageable);
+    Page<Notification> findByUserIdAndStatusOrderByCreatedAtDesc(UUID userId, NotificationStatus status, Pageable pageable);
 
     /**
      * Найти уведомления пользователя по типу
      */
-    Page<Notification> findByUserIdAndTypeOrderByCreatedAtDesc(Long userId, NotificationType type, Pageable pageable);
+    Page<Notification> findByUserIdAndTypeOrderByCreatedAtDesc(UUID userId, NotificationType type, Pageable pageable);
 
     /**
      * Найти непрочитанные уведомления пользователя
      */
-    List<Notification> findByUserIdAndStatusNotOrderByCreatedAtDesc(Long userId, NotificationStatus status);
+    List<Notification> findByUserIdAndStatusNotOrderByCreatedAtDesc(UUID userId, NotificationStatus status);
 
     /**
      * Найти уведомления для отправки (статус PENDING и время отправки наступило)
@@ -105,13 +106,13 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
      * Подсчитать количество уведомлений пользователя по статусу
      */
     @Query("SELECT COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.status = :status")
-    long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") NotificationStatus status);
+    long countByUserIdAndStatus(@Param("userId") UUID userId, @Param("status") NotificationStatus status);
 
     /**
      * Подсчитать количество уведомлений пользователя за период
      */
     @Query("SELECT COUNT(n) FROM Notification n WHERE n.userId = :userId AND n.createdAt BETWEEN :start AND :end")
-    long countByUserIdAndCreatedAtBetween(@Param("userId") Long userId, 
+    long countByUserIdAndCreatedAtBetween(@Param("userId") UUID userId, 
                                          @Param("start") Instant start, 
                                          @Param("end") Instant end);
 
@@ -146,7 +147,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     /**
      * Найти уведомления по ID пользователя
      */
-    List<Notification> findByUserId(Long userId);
+    List<Notification> findByUserId(UUID userId);
 
     /**
      * Подсчитать количество уведомлений по типу

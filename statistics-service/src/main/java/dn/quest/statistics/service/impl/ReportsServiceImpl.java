@@ -66,7 +66,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportUserStatistics(LocalDate startDate, LocalDate endDate, String format, Long userId) {
+    public byte[] exportUserStatistics(LocalDate startDate, LocalDate endDate, String format, UUID userId) {
         log.info("Exporting user statistics from {} to {} format: {} user: {}", startDate, endDate, format, userId);
         
         try {
@@ -102,7 +102,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, Long authorId) {
+    public byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID authorId) {
         log.info("Exporting quest statistics from {} to {} format: {} quest: {} author: {}", startDate, endDate, format, questId, authorId);
         
         try {
@@ -146,7 +146,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, Long userId) {
+    public byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID userId) {
         log.info("Exporting game statistics from {} to {} format: {} quest: {} user: {}", startDate, endDate, format, questId, userId);
         
         try {
@@ -427,7 +427,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportTeamStatistics(LocalDate startDate, LocalDate endDate, String format, Long teamId) {
+    public byte[] exportTeamStatistics(LocalDate startDate, LocalDate endDate, String format, UUID teamId) {
         log.info("Exporting team statistics from {} to {} format: {} team: {}", startDate, endDate, format, teamId);
         
         try {
@@ -943,7 +943,7 @@ public class ReportsServiceImpl implements ReportsService {
                 request.setEndDate((LocalDate) parameters.get("endDate"));
                 request.setStatisticsType("user");
                 if (parameters.containsKey("userId")) {
-                    request.setUserId((Long) parameters.get("userId"));
+                    request.setUserId((UUID) parameters.get("userId"));
                 }
             }
             case "quest_performance_report" -> {

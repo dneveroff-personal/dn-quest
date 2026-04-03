@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для участника команды
@@ -18,7 +19,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TeamMemberDTO {
 
-    private Long id;
+    private UUID id;
     private UserDTO user;
     private TeamRole role;
     private Instant joinedAt;

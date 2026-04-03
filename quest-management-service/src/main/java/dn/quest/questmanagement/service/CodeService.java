@@ -4,6 +4,7 @@ import dn.quest.questmanagement.dto.CodeDTO;
 import dn.quest.shared.enums.CodeType;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис для управления кодами уровней
@@ -17,7 +18,7 @@ public interface CodeService {
      * @param levelId ID уровня
      * @return созданный код
      */
-    CodeDTO createCode(CodeDTO dto, Long levelId);
+    CodeDTO createCode(CodeDTO dto, UUID levelId);
 
     /**
      * Обновить существующий код
@@ -26,14 +27,14 @@ public interface CodeService {
      * @param dto DTO для обновления кода
      * @return обновленный код
      */
-    CodeDTO updateCode(Long id, CodeDTO dto);
+    CodeDTO updateCode(UUID id, CodeDTO dto);
 
     /**
      * Удалить код
      *
      * @param id ID кода
      */
-    void deleteCode(Long id);
+    void deleteCode(UUID id);
 
     /**
      * Получить код по ID
@@ -41,7 +42,7 @@ public interface CodeService {
      * @param id ID кода
      * @return код
      */
-    CodeDTO getCodeById(Long id);
+    CodeDTO getCodeById(UUID id);
 
     /**
      * Получить все коды уровня
@@ -49,7 +50,7 @@ public interface CodeService {
      * @param levelId ID уровня
      * @return список кодов
      */
-    List<CodeDTO> getCodesByLevelId(Long levelId);
+    List<CodeDTO> getCodesByLevelId(UUID levelId);
 
     /**
      * Получить коды по типу
@@ -58,7 +59,7 @@ public interface CodeService {
      * @param type тип кода
      * @return список кодов
      */
-    List<CodeDTO> getCodesByType(Long levelId, CodeType type);
+    List<CodeDTO> getCodesByType(UUID levelId, CodeType type);
 
     /**
      * Проверить код
@@ -67,7 +68,7 @@ public interface CodeService {
      * @param codeValue значение кода
      * @return результат проверки
      */
-    CodeValidationResult validateCode(Long levelId, String codeValue);
+    CodeValidationResult validateCode(UUID levelId, String codeValue);
 
     /**
      * Копировать коды из одного уровня в другой
@@ -75,7 +76,7 @@ public interface CodeService {
      * @param sourceLevelId ID исходного уровня
      * @param targetLevelId ID целевого уровня
      */
-    void copyCodesForLevel(Long sourceLevelId, Long targetLevelId);
+    void copyCodesForLevel(UUID sourceLevelId, UUID targetLevelId);
 
     /**
      * Получить статистику использования кодов уровня
@@ -83,14 +84,14 @@ public interface CodeService {
      * @param levelId ID уровня
      * @return статистика
      */
-    CodeUsageStatistics getCodeUsageStatistics(Long levelId);
+    CodeUsageStatistics getCodeUsageStatistics(UUID levelId);
 
     /**
      * Сбросить использование кодов уровня
      *
      * @param levelId ID уровня
      */
-    void resetCodeUsage(Long levelId);
+    void resetCodeUsage(UUID levelId);
 
     /**
      * Активировать/деактивировать код
@@ -99,7 +100,7 @@ public interface CodeService {
      * @param active флаг активности
      * @return обновленный код
      */
-    CodeDTO toggleCodeActive(Long codeId, boolean active);
+    CodeDTO toggleCodeActive(UUID codeId, boolean active);
 
     /**
      * Результат проверки кода
@@ -107,9 +108,9 @@ public interface CodeService {
     class CodeValidationResult {
         private final boolean valid;
         private final String message;
-        private final Long codeId;
+        private final UUID codeId;
 
-        public CodeValidationResult(boolean valid, String message, Long codeId) {
+        public CodeValidationResult(boolean valid, String message, UUID codeId) {
             this.valid = valid;
             this.message = message;
             this.codeId = codeId;
@@ -123,7 +124,7 @@ public interface CodeService {
             return message;
         }
 
-        public Long getCodeId() {
+        public UUID getCodeId() {
             return codeId;
         }
     }

@@ -3,6 +3,7 @@ package dn.quest.notification.service;
 import dn.quest.shared.events.notification.NotificationEvent;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
 
 /**
  * Сервис для обработки и отправки уведомлений
@@ -17,67 +18,67 @@ public interface NotificationService {
     /**
      * Отправка приветственного уведомления
      */
-    CompletableFuture<Void> sendWelcomeNotification(Long userId, String username, String email);
+    CompletableFuture<Void> sendWelcomeNotification(UUID userId, String username, String email);
 
     /**
      * Отправка уведомления об обновлении профиля
      */
-    CompletableFuture<Void> sendProfileUpdatedNotification(Long userId, String username);
+    CompletableFuture<Void> sendProfileUpdatedNotification(UUID userId, String username);
 
     /**
      * Отправка уведомления о создании квеста
      */
-    CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, Long authorId);
+    CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления об обновлении квеста
      */
-    CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, Long authorId);
+    CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления о публикации квеста
      */
-    CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, Long authorId);
+    CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления о начале игровой сессии
      */
-    CompletableFuture<Void> sendGameSessionStartedNotification(Long userId, Long sessionId, Long questId);
+    CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, Long sessionId, Long questId);
 
     /**
      * Отправка уведомления о завершении игровой сессии
      */
-    CompletableFuture<Void> sendGameSessionFinishedNotification(Long userId, Long sessionId, boolean completed);
+    CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, Long sessionId, boolean completed);
 
     /**
      * Отправка уведомления о завершении уровня
      */
-    CompletableFuture<Void> sendLevelCompletedNotification(Long userId, Long sessionId, Integer levelNumber);
+    CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, Long sessionId, Integer levelNumber);
 
     /**
      * Отправка уведомления о создании команды
      */
-    CompletableFuture<Void> sendTeamCreatedNotification(Long teamId, String teamName, Long captainId);
+    CompletableFuture<Void> sendTeamCreatedNotification(UUID teamId, String teamName, UUID captainId);
 
     /**
      * Отправка уведомления об обновлении команды
      */
-    CompletableFuture<Void> sendTeamUpdatedNotification(Long teamId, String teamName);
+    CompletableFuture<Void> sendTeamUpdatedNotification(UUID teamId, String teamName);
 
     /**
      * Отправка уведомления о добавлении участника в команду
      */
-    CompletableFuture<Void> sendTeamMemberAddedNotification(Long teamId, String teamName, Long userId, String userName);
+    CompletableFuture<Void> sendTeamMemberAddedNotification(UUID teamId, String teamName, UUID userId, String userName);
 
     /**
      * Отправка уведомления об удалении участника из команды
      */
-    CompletableFuture<Void> sendTeamMemberRemovedNotification(Long teamId, String teamName, Long userId, String userName);
+    CompletableFuture<Void> sendTeamMemberRemovedNotification(UUID teamId, String teamName, UUID userId, String userName);
 
     /**
      * Отправка уведомления о загрузке файла
      */
-    CompletableFuture<Void> sendFileUploadedNotification(Long userId, String fileName);
+    CompletableFuture<Void> sendFileUploadedNotification(UUID userId, String fileName);
 
     /**
      * Отправка email уведомления
@@ -87,5 +88,5 @@ public interface NotificationService {
     /**
      * Отправка Telegram уведомления
      */
-    CompletableFuture<Void> sendTelegramNotification(Long userId, String message);
+    CompletableFuture<Void> sendTelegramNotification(UUID userId, String message);
 }

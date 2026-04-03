@@ -9,6 +9,7 @@ import dn.quest.teammanagement.dto.response.InvitationListResponse;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис для управления приглашениями в команды
@@ -18,87 +19,87 @@ public interface TeamInvitationService {
     /**
      * Пригласить пользователя в команду
      */
-    TeamInvitationDTO inviteUser(Long teamId, InviteUserRequest request, Long inviterId);
+    TeamInvitationDTO inviteUser(UUID teamId, InviteUserRequest request, UUID inviterId);
 
     /**
      * Пригласить пользователя по ID
      */
-    TeamInvitationDTO inviteUserById(Long teamId, Long userId, String message, Long inviterId);
+    TeamInvitationDTO inviteUserById(UUID teamId, UUID userId, String message, UUID inviterId);
 
     /**
      * Ответить на приглашение
      */
-    TeamInvitationDTO respondToInvitation(Long invitationId, RespondToInvitationRequest request, Long userId);
+    TeamInvitationDTO respondToInvitation(Long invitationId, RespondToInvitationRequest request, UUID userId);
 
     /**
      * Принять приглашение
      */
-    TeamInvitationDTO acceptInvitation(Long invitationId, Long userId, String message);
+    TeamInvitationDTO acceptInvitation(Long invitationId, UUID userId, String message);
 
     /**
      * Отклонить приглашение
      */
-    TeamInvitationDTO declineInvitation(Long invitationId, Long userId, String message);
+    TeamInvitationDTO declineInvitation(Long invitationId, UUID userId, String message);
 
     /**
      * Отозвать приглашение
      */
-    void revokeInvitation(Long invitationId, Long revokerId);
+    void revokeInvitation(Long invitationId, UUID revokerId);
 
     /**
      * Получить приглашение по ID
      */
-    TeamInvitationDTO getInvitationById(Long invitationId, Long userId);
+    TeamInvitationDTO getInvitationById(Long invitationId, UUID userId);
 
     /**
      * Получить приглашения пользователя
      */
-    InvitationListResponse getUserInvitations(Long userId, Pageable pageable);
+    InvitationListResponse getUserInvitations(UUID userId, Pageable pageable);
 
     /**
      * Получить активные приглашения пользователя
      */
-    List<TeamInvitationDTO> getUserActiveInvitations(Long userId);
+    List<TeamInvitationDTO> getUserActiveInvitations(UUID userId);
 
     /**
      * Получить приглашения команды
      */
-    InvitationListResponse getTeamInvitations(Long teamId, Long requesterId, Pageable pageable);
+    InvitationListResponse getTeamInvitations(UUID teamId, UUID requesterId, Pageable pageable);
 
     /**
      * Получить активные приглашения команды
      */
-    List<TeamInvitationDTO> getTeamActiveInvitations(Long teamId, Long requesterId);
+    List<TeamInvitationDTO> getTeamActiveInvitations(UUID teamId, UUID requesterId);
 
     /**
      * Получить приглашения, отправленные пользователем
      */
-    List<TeamInvitationDTO> getInvitationsSentByUser(Long userId, Pageable pageable);
+    List<TeamInvitationDTO> getInvitationsSentByUser(UUID userId, Pageable pageable);
 
     /**
      * Получить количество активных приглашений пользователя
      */
-    long getUserActiveInvitationsCount(Long userId);
+    long getUserActiveInvitationsCount(UUID userId);
 
     /**
      * Получить количество активных приглашений команды
      */
-    long getTeamActiveInvitationsCount(Long teamId, Long requesterId);
+    long getTeamActiveInvitationsCount(UUID teamId, UUID requesterId);
 
     /**
      * Проверить, существует ли активное приглашение
      */
-    boolean hasActiveInvitation(Long teamId, Long userId);
+    boolean hasActiveInvitation(UUID teamId, UUID userId);
 
     /**
      * Проверить, может ли пользователь ответить на приглашение
      */
-    boolean canRespondToInvitation(Long invitationId, Long userId);
+    boolean canRespondToInvitation(Long invitationId, UUID userId);
 
     /**
      * Проверить, может ли пользователь отозвать приглашение
      */
-    boolean canRevokeInvitation(Long invitationId, Long userId);
+    boolean canRevokeInvitation(Long invitationId, UUID userId);
 
     /**
      * Обновить статус истекших приглашений
@@ -118,7 +119,7 @@ public interface TeamInvitationService {
     /**
      * Получить статистику по приглашениям
      */
-    InvitationStatisticsDTO getInvitationStatistics(Long teamId, Long requesterId);
+    InvitationStatisticsDTO getInvitationStatistics(UUID teamId, UUID requesterId);
 
     /**
      * Получить общую статистику по приглашениям
@@ -128,12 +129,12 @@ public interface TeamInvitationService {
     /**
      * Массовая отправка приглашений
      */
-    List<TeamInvitationDTO> bulkInviteUsers(Long teamId, List<Long> userIds, String message, Long inviterId);
+    List<TeamInvitationDTO> bulkInviteUsers(UUID teamId, List<UUID> userIds, String message, UUID inviterId);
 
     /**
      * Массовый отзыв приглашений
      */
-    void bulkRevokeInvitations(Long teamId, List<Long> invitationIds, Long revokerId);
+    void bulkRevokeInvitations(UUID teamId, List<Long> invitationIds, UUID revokerId);
 
     /**
      * Получить приглашения, созданные за период
@@ -150,17 +151,17 @@ public interface TeamInvitationService {
     /**
      * Получить последние приглашения пользователя
      */
-    List<TeamInvitationDTO> getRecentInvitations(Long userId, int limit);
+    List<TeamInvitationDTO> getRecentInvitations(UUID userId, int limit);
 
     /**
      * Проверить лимит приглашений для команды
      */
-    boolean checkTeamInvitationLimit(Long teamId);
+    boolean checkTeamInvitationLimit(UUID teamId);
 
     /**
      * Проверить лимит приглашений для пользователя
      */
-    boolean checkUserInvitationLimit(Long userId);
+    boolean checkUserInvitationLimit(UUID userId);
 
     /**
      * Получить приглашения, которые скоро истекут

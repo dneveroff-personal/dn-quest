@@ -138,7 +138,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public Map<String, Object> getQuestPerformanceReport(LocalDate startDate, LocalDate endDate, String category, Long authorId) {
+    public Map<String, Object> getQuestPerformanceReport(LocalDate startDate, LocalDate endDate, String category, UUID authorId) {
         log.info("Getting quest performance report from {} to {} category: {} author: {}", startDate, endDate, category, authorId);
         
         try {
@@ -203,7 +203,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, Long userId) {
+    public Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, UUID userId) {
         log.info("Getting game session report from {} to {} quest: {} user: {}", startDate, endDate, questId, userId);
         
         try {
@@ -1042,7 +1042,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public Map<String, Object> getBehavioralPatternsAnalysis(LocalDate startDate, LocalDate endDate, Long userId) {
+    public Map<String, Object> getBehavioralPatternsAnalysis(LocalDate startDate, LocalDate endDate, UUID userId) {
         // Реализация анализа паттернов поведения
         Map<String, Object> analysis = new HashMap<>();
         analysis.put("behavioralData", "implementation_required");
@@ -1517,7 +1517,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .collect(Collectors.groupingBy(TeamStatistics::getTeamId))
                 .entrySet().stream()
                 .map(entry -> {
-                    Long teamId = entry.getKey();
+                    UUID teamId = entry.getKey();
                     List<TeamStatistics> stats = entry.getValue();
                     long totalWins = stats.stream().mapToLong(TeamStatistics::getQuestWins).sum();
                     String teamName = stats.get(0).getTeamName();

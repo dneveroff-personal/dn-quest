@@ -91,7 +91,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         // When & Then - Получаем команду
         mockMvc.perform(get("/api/teams/" + teamId))
@@ -123,7 +123,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         // When & Then - Обновляем команду
         var updateRequest = new java.util.HashMap<String, Object>();
@@ -153,7 +153,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         // When & Then - Генерируем приглашение
         mockMvc.perform(post("/api/teams/" + teamId + "/invitations"))
@@ -176,7 +176,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         String inviteResponse = mockMvc.perform(post("/api/teams/" + teamId + "/invitations"))
                 .andExpect(status().isCreated())
@@ -203,7 +203,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testJoinTeam_InvalidInviteCode_ReturnsBadRequest() throws Exception {
         // Given
-        Long teamId = 1L;
+        UUID teamId = 1L;
         var joinRequest = new java.util.HashMap<String, Object>();
         joinRequest.put("inviteCode", "INVALID_CODE");
 
@@ -227,7 +227,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         String inviteResponse = mockMvc.perform(post("/api/teams/" + teamId + "/invitations"))
                 .andExpect(status().isCreated())
@@ -264,7 +264,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         String inviteResponse = mockMvc.perform(post("/api/teams/" + teamId + "/invitations"))
                 .andExpect(status().isCreated())
@@ -302,7 +302,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         String inviteResponse = mockMvc.perform(post("/api/teams/" + teamId + "/invitations"))
                 .andExpect(status().isCreated())
@@ -409,7 +409,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         // When & Then - Получаем статистику команды
         mockMvc.perform(get("/api/teams/" + teamId + "/statistics"))
@@ -462,7 +462,7 @@ class TeamManagementIntegrationTest extends AbstractIntegrationTestBase {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        Long teamId = objectMapper.readTree(createResponse).get("id").asLong();
+        UUID teamId = objectMapper.readTree(createResponse).get("id").asLong();
 
         // When & Then - Удаляем команду
         mockMvc.perform(delete("/api/teams/" + teamId))

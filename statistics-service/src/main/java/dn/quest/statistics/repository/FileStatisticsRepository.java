@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с файловой статистикой
@@ -38,12 +39,12 @@ public interface FileStatisticsRepository extends JpaRepository<FileStatistics, 
     /**
      * Найти статистику по владельцу
      */
-    List<FileStatistics> findByOwnerIdOrderByDateDesc(Long ownerId);
+    List<FileStatistics> findByOwnerIdOrderByDateDesc(UUID ownerId);
 
     /**
      * Найти статистику по владельцу за период
      */
-    List<FileStatistics> findByOwnerIdAndDateBetweenOrderByDateDesc(Long ownerId, LocalDate startDate, LocalDate endDate);
+    List<FileStatistics> findByOwnerIdAndDateBetweenOrderByDateDesc(UUID ownerId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику по типу сущности

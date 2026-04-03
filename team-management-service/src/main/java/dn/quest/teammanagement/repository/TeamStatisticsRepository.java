@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы со статистикой команд
@@ -188,13 +189,13 @@ public interface TeamStatisticsRepository extends JpaRepository<TeamStatistics, 
      * Обновить ранги команд на основе рейтинга
      */
     @Query("UPDATE TeamStatistics ts SET ts.rank = :rank WHERE ts.team.id = :teamId")
-    void updateTeamRank(@Param("teamId") Long teamId, @Param("rank") Integer rank);
+    void updateTeamRank(@Param("teamId") UUID teamId, @Param("rank") Integer rank);
 
     /**
      * Получить ранг команды
      */
     @Query("SELECT COUNT(ts) + 1 FROM TeamStatistics ts WHERE ts.rating > (SELECT ts2.rating FROM TeamStatistics ts2 WHERE ts2.team.id = :teamId) AND ts.team.isActive = true")
-    Integer getTeamRank(@Param("teamId") Long teamId);
+    Integer getTeamRank(@Param("teamId") UUID teamId);
 
     /**
      * Найти команды с определенным рангом

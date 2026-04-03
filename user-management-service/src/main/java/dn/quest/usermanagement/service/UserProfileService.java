@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления профилями пользователей
@@ -19,12 +20,12 @@ public interface UserProfileService {
     /**
      * Создает профиль пользователя
      */
-    UserProfileDTO createUserProfile(Long userId, String username, String email, String publicName, String role);
+    UserProfileDTO createUserProfile(UUID userId, String username, String email, String publicName, String role);
 
     /**
      * Получает профиль пользователя по ID
      */
-    Optional<UserProfileDTO> getUserProfileByUserId(Long userId);
+    Optional<UserProfileDTO> getUserProfileByUserId(UUID userId);
 
     /**
      * Получает профиль пользователя по ID профиля
@@ -44,57 +45,57 @@ public interface UserProfileService {
     /**
      * Обновляет профиль пользователя
      */
-    UserProfileDTO updateUserProfile(Long userId, UpdateProfileRequestDTO request);
+    UserProfileDTO updateUserProfile(UUID userId, UpdateProfileRequestDTO request);
 
     /**
      * Обновляет профиль пользователя из событий Authentication Service
      */
-    void updateUserProfileFromAuth(Long userId, String username, String email, String publicName, String role, Boolean isActive);
+    void updateUserProfileFromAuth(UUID userId, String username, String email, String publicName, String role, Boolean isActive);
 
     /**
      * Обновляет роль пользователя
      */
-    void updateUserRole(Long userId, String newRole);
+    void updateUserRole(UUID userId, String newRole);
 
     /**
      * Обновляет аватар пользователя
      */
-    UserProfileDTO updateUserAvatar(Long userId, String avatarUrl);
+    UserProfileDTO updateUserAvatar(UUID userId, String avatarUrl);
 
     /**
      * Удаляет аватар пользователя
      */
-    UserProfileDTO removeUserAvatar(Long userId);
+    UserProfileDTO removeUserAvatar(UUID userId);
 
     /**
      * Блокирует пользователя
      */
-    UserProfileDTO blockUser(Long userId, BlockUserRequestDTO request);
+    UserProfileDTO blockUser(UUID userId, BlockUserRequestDTO request);
 
     /**
      * Разблокирует пользователя
      */
-    UserProfileDTO unblockUser(Long userId);
+    UserProfileDTO unblockUser(UUID userId);
 
     /**
      * Активирует пользователя
      */
-    UserProfileDTO activateUser(Long userId);
+    UserProfileDTO activateUser(UUID userId);
 
     /**
      * Деактивирует пользователя
      */
-    UserProfileDTO deactivateUser(Long userId);
+    UserProfileDTO deactivateUser(UUID userId);
 
     /**
      * Удаляет профиль пользователя
      */
-    void deleteUserProfile(Long userId);
+    void deleteUserProfile(UUID userId);
 
     /**
      * Обновляет время последней активности
      */
-    void updateLastActivity(Long userId);
+    void updateLastActivity(UUID userId);
 
     /**
      * Поиск пользователей по критериям
@@ -139,7 +140,7 @@ public interface UserProfileService {
     /**
      * Проверяет существование профиля пользователя
      */
-    boolean existsByUserId(Long userId);
+    boolean existsByUserId(UUID userId);
 
     /**
      * Проверяет существование пользователя по имени

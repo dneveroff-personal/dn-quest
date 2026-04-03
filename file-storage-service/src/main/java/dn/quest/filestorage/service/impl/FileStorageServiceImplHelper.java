@@ -35,7 +35,7 @@ public class FileStorageServiceImplHelper {
     /**
      * Получить ID пользователя по имени
      */
-    protected Long getUserIdByUsername(String username) {
+    protected UUID getUserIdByUsername(String username) {
         try {
             UserDTO user = authServiceClient.getUserByUsername(username);
             return user.getId();
@@ -112,7 +112,7 @@ public class FileStorageServiceImplHelper {
     /**
      * Проверить, можно ли переиспользовать существующий файл
      */
-    protected boolean shouldReuseExistingFile(FileMetadata existingFile, FileUploadRequestDTO request, Long ownerId) {
+    protected boolean shouldReuseExistingFile(FileMetadata existingFile, FileUploadRequestDTO request, UUID ownerId) {
         return existingFile.getOwnerId().equals(ownerId) &&
                existingFile.getFileType().equals(request.getFileType()) &&
                Objects.equals(existingFile.getIsPublic(), request.getIsPublic()) &&
@@ -216,7 +216,7 @@ public class FileStorageServiceImplHelper {
         
         // Владелец имеет доступ
         try {
-            Long userId = getUserIdByUsername(username);
+            UUID userId = getUserIdByUsername(username);
             return metadata.getOwnerId().equals(userId);
         } catch (Exception e) {
             return false;
@@ -264,7 +264,7 @@ public class FileStorageServiceImplHelper {
             
             // Фильтр по владельцу (если не администратор)
             try {
-                Long userId = getUserIdByUsername(username);
+                UUID userId = getUserIdByUsername(username);
                 predicates.add(criteriaBuilder.equal(root.get("ownerId"), userId));
             } catch (Exception e) {
                 // Если не удалось получить ID пользователя, возвращаем пустой результат

@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с командной статистикой
@@ -23,27 +24,27 @@ public interface TeamStatisticsRepository extends JpaRepository<TeamStatistics, 
     /**
      * Найти статистику команды по ID и дате
      */
-    Optional<TeamStatistics> findByTeamIdAndDate(Long teamId, LocalDate date);
+    Optional<TeamStatistics> findByTeamIdAndDate(UUID teamId, LocalDate date);
 
     /**
      * Найти всю статистику команды по ID
      */
-    List<TeamStatistics> findByTeamIdOrderByDateDesc(Long teamId);
+    List<TeamStatistics> findByTeamIdOrderByDateDesc(UUID teamId);
 
     /**
      * Найти статистику команды за период
      */
-    List<TeamStatistics> findByTeamIdAndDateBetweenOrderByDateDesc(Long teamId, LocalDate startDate, LocalDate endDate);
+    List<TeamStatistics> findByTeamIdAndDateBetweenOrderByDateDesc(UUID teamId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику по капитану
      */
-    List<TeamStatistics> findByCaptainIdOrderByDateDesc(Long captainId);
+    List<TeamStatistics> findByCaptainIdOrderByDateDesc(UUID captainId);
 
     /**
      * Найти статистику по капитану за период
      */
-    List<TeamStatistics> findByCaptainIdAndDateBetweenOrderByDateDesc(Long captainId, LocalDate startDate, LocalDate endDate);
+    List<TeamStatistics> findByCaptainIdAndDateBetweenOrderByDateDesc(UUID captainId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Получить количество созданных команд за дату
@@ -162,77 +163,77 @@ public interface TeamStatisticsRepository extends JpaRepository<TeamStatistics, 
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.playedQuests = t.playedQuests + 1, t.lastActivityAt = :lastActivityAt WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementPlayedQuests(@Param("teamId") Long teamId, @Param("date") LocalDate date, @Param("lastActivityAt") LocalDateTime lastActivityAt);
+    int incrementPlayedQuests(@Param("teamId") UUID teamId, @Param("date") LocalDate date, @Param("lastActivityAt") LocalDateTime lastActivityAt);
 
     /**
      * Увеличить количество завершенных квестов
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.completedQuests = t.completedQuests + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementCompletedQuests(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementCompletedQuests(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество побед в квестах
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.questWins = t.questWins + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementQuestWins(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementQuestWins(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество добавлений участников
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.memberAdditions = t.memberAdditions + 1, t.currentMembersCount = t.currentMembersCount + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementMemberAdditions(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementMemberAdditions(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество удалений участников
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.memberRemovals = t.memberRemovals + 1, t.currentMembersCount = t.currentMembersCount - 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementMemberRemovals(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementMemberRemovals(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Обновить количество участников
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.currentMembersCount = :count WHERE t.teamId = :teamId AND t.date = :date")
-    int updateMembersCount(@Param("teamId") Long teamId, @Param("date") LocalDate date, @Param("count") Integer count);
+    int updateMembersCount(@Param("teamId") UUID teamId, @Param("date") LocalDate date, @Param("count") Integer count);
 
     /**
      * Обновить рейтинг команды
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.currentRating = :rating, t.ratingChange = :change WHERE t.teamId = :teamId AND t.date = :date")
-    int updateTeamRating(@Param("teamId") Long teamId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("change") Double change);
+    int updateTeamRating(@Param("teamId") UUID teamId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("change") Double change);
 
     /**
      * Добавить время игры
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.totalGameTimeMinutes = t.totalGameTimeMinutes + :minutes WHERE t.teamId = :teamId AND t.date = :date")
-    int addGameTime(@Param("teamId") Long teamId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
+    int addGameTime(@Param("teamId") UUID teamId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
 
     /**
      * Увеличить количество успешных отправок кода
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.successfulCodeSubmissions = t.successfulCodeSubmissions + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementSuccessfulCodeSubmissions(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementSuccessfulCodeSubmissions(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество неудачных отправок кода
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.failedCodeSubmissions = t.failedCodeSubmissions + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementFailedCodeSubmissions(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementFailedCodeSubmissions(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество завершенных уровней
      */
     @Modifying
     @Query("UPDATE TeamStatistics t SET t.completedLevels = t.completedLevels + 1 WHERE t.teamId = :teamId AND t.date = :date")
-    int incrementCompletedLevels(@Param("teamId") Long teamId, @Param("date") LocalDate date);
+    int incrementCompletedLevels(@Param("teamId") UUID teamId, @Param("date") LocalDate date);
 
     /**
      * Получить количество команд с рейтингом

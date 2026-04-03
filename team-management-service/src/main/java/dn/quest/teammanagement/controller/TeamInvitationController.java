@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления приглашениями в команды
@@ -38,7 +39,7 @@ public class TeamInvitationController {
 
     @GetMapping
     public ResponseEntity<InvitationListResponse> getTeamInvitations(
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -51,7 +52,7 @@ public class TeamInvitationController {
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         InvitationListResponse response = invitationService.getTeamInvitations(teamId, userId, pageable);
         
         return ResponseEntity.ok(response);
@@ -59,12 +60,12 @@ public class TeamInvitationController {
 
     @GetMapping("/active")
     public ResponseEntity<List<TeamInvitationDTO>> getTeamActiveInvitations(
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Getting active invitations for team: {}", teamId);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         List<TeamInvitationDTO> invitations = invitationService.getTeamActiveInvitations(teamId, userId);
         
         return ResponseEntity.ok(invitations);
@@ -73,14 +74,14 @@ public class TeamInvitationController {
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamInvitationDTO> inviteUser(
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             @Valid @RequestBody InviteUserRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Inviting user {} to team: {} by user: {}", 
                 request.getUsername(), teamId, userDetails.getUsername());
         
-        Long inviterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID inviterId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.inviteUser(teamId, request, inviterId);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(invitation);
@@ -89,15 +90,15 @@ public class TeamInvitationController {
     @PostMapping("/by-id/{userId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamInvitationDTO> inviteUserById(
-            @PathVariable Long teamId,
-            @PathVariable Long userId,
+            @PathVariable UUID teamId,
+            @PathVariable UUID userId,
             @RequestParam(required = false) String message,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Inviting user {} to team: {} by user: {}", 
                 userId, teamId, userDetails.getUsername());
         
-        Long inviterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID inviterId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.inviteUserById(teamId, userId, message, inviterId);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(invitation);
@@ -106,15 +107,15 @@ public class TeamInvitationController {
     @PostMapping("/bulk")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<TeamInvitationDTO>> bulkInviteUsers(
-            @PathVariable Long teamId,
-            @RequestParam List<Long> userIds,
+            @PathVariable UUID teamId,
+            @RequestParam List<UUID> userIds,
             @RequestParam(required = false) String message,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Bulk inviting users {} to team: {} by user: {}", 
                 userIds, teamId, userDetails.getUsername());
         
-        Long inviterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID inviterId = userService.getUserIdByUsername(userDetails.getUsername());
         List<TeamInvitationDTO> invitations = invitationService.bulkInviteUsers(teamId, userIds, message, inviterId);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(invitations);
@@ -122,12 +123,12 @@ public class TeamInvitationController {
 
     @GetMapping("/statistics")
     public ResponseEntity<InvitationStatisticsDTO> getInvitationStatistics(
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Getting invitation statistics for team: {}", teamId);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         InvitationStatisticsDTO statistics = invitationService.getInvitationStatistics(teamId, userId);
         
         return ResponseEntity.ok(statistics);
@@ -135,19 +136,19 @@ public class TeamInvitationController {
 
     @GetMapping("/count/active")
     public ResponseEntity<Long> getActiveInvitationsCount(
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Getting active invitations count for team: {}", teamId);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         long count = invitationService.getTeamActiveInvitationsCount(teamId, userId);
         
         return ResponseEntity.ok(count);
     }
 
     @GetMapping("/check-limit")
-    public ResponseEntity<Boolean> checkInvitationLimit(@PathVariable Long teamId) {
+    public ResponseEntity<Boolean> checkInvitationLimit(@PathVariable UUID teamId) {
         log.debug("Checking invitation limit for team: {}", teamId);
         
         boolean canInvite = invitationService.checkTeamInvitationLimit(teamId);
@@ -181,7 +182,7 @@ class UserInvitationController {
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         InvitationListResponse response = invitationService.getUserInvitations(userId, pageable);
         
         return ResponseEntity.ok(response);
@@ -193,7 +194,7 @@ class UserInvitationController {
         
         log.debug("Getting active invitations for user: {}", userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         List<TeamInvitationDTO> invitations = invitationService.getUserActiveInvitations(userId);
         
         return ResponseEntity.ok(invitations);
@@ -205,7 +206,7 @@ class UserInvitationController {
         
         log.debug("Getting active invitations count for user: {}", userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         long count = invitationService.getUserActiveInvitationsCount(userId);
         
         return ResponseEntity.ok(count);
@@ -222,7 +223,7 @@ class UserInvitationController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         List<TeamInvitationDTO> invitations = invitationService.getInvitationsSentByUser(userId, pageable);
         
         return ResponseEntity.ok(invitations);
@@ -235,7 +236,7 @@ class UserInvitationController {
         
         log.debug("Getting recent invitations for user: {} with limit: {}", userDetails.getUsername(), limit);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         List<TeamInvitationDTO> invitations = invitationService.getRecentInvitations(userId, limit);
         
         return ResponseEntity.ok(invitations);
@@ -261,7 +262,7 @@ class InvitationController {
         
         log.debug("Getting invitation: {} by user: {}", invitationId, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.getInvitationById(invitationId, userId);
         
         return ResponseEntity.ok(invitation);
@@ -277,7 +278,7 @@ class InvitationController {
         log.debug("Responding to invitation: {} by user: {} with accept: {}", 
                 invitationId, userDetails.getUsername(), request.getAccept());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.respondToInvitation(invitationId, request, userId);
         
         return ResponseEntity.ok(invitation);
@@ -292,7 +293,7 @@ class InvitationController {
         
         log.debug("Accepting invitation: {} by user: {}", invitationId, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.acceptInvitation(invitationId, userId, message);
         
         return ResponseEntity.ok(invitation);
@@ -307,7 +308,7 @@ class InvitationController {
         
         log.debug("Declining invitation: {} by user: {}", invitationId, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamInvitationDTO invitation = invitationService.declineInvitation(invitationId, userId, message);
         
         return ResponseEntity.ok(invitation);
@@ -321,7 +322,7 @@ class InvitationController {
         
         log.debug("Revoking invitation: {} by user: {}", invitationId, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         invitationService.revokeInvitation(invitationId, userId);
         
         return ResponseEntity.noContent().build();
@@ -347,7 +348,7 @@ class InvitationController {
         
         log.debug("Checking if user {} can respond to invitation: {}", userDetails.getUsername(), invitationId);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         boolean canRespond = invitationService.canRespondToInvitation(invitationId, userId);
         
         return ResponseEntity.ok(canRespond);
@@ -360,7 +361,7 @@ class InvitationController {
         
         log.debug("Checking if user {} can revoke invitation: {}", userDetails.getUsername(), invitationId);
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         boolean canRevoke = invitationService.canRevokeInvitation(invitationId, userId);
         
         return ResponseEntity.ok(canRevoke);

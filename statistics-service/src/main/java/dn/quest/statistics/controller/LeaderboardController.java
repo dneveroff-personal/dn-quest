@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Контроллер для работы с лидербордами
@@ -135,7 +136,7 @@ public class LeaderboardController {
     @Operation(summary = "Получить позицию пользователя в лидерборде", description = "Возвращает позицию и статистику пользователя в различных лидербордах")
     public ResponseEntity<Map<String, Object>> getUserLeaderboardPosition(
             @Parameter(description = "ID пользователя") 
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             
             @Parameter(description = "Период (daily, weekly, monthly, all_time)") 
             @RequestParam(defaultValue = "all_time") String period,
@@ -182,7 +183,7 @@ public class LeaderboardController {
     @Operation(summary = "Получить позицию команды в лидерборде", description = "Возвращает позицию и статистику команды в различных лидербордах")
     public ResponseEntity<Map<String, Object>> getTeamLeaderboardPosition(
             @Parameter(description = "ID команды") 
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             
             @Parameter(description = "Период (daily, weekly, monthly, all_time)") 
             @RequestParam(defaultValue = "all_time") String period,
@@ -207,7 +208,7 @@ public class LeaderboardController {
     @Operation(summary = "Получить окружение пользователя в лидерборде", description = "Возвращает пользователей вокруг указанного в лидерборде")
     public ResponseEntity<List<LeaderboardDTO>> getUserSurroundingInLeaderboard(
             @Parameter(description = "ID пользователя") 
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             
             @Parameter(description = "Период (daily, weekly, monthly, all_time)") 
             @RequestParam(defaultValue = "all_time") String period,
@@ -232,7 +233,7 @@ public class LeaderboardController {
     @Operation(summary = "Получить историю позиций в лидерборде", description = "Возвращает историю позиций пользователя в лидерборде за период")
     public ResponseEntity<Map<String, Object>> getUserLeaderboardHistory(
             @Parameter(description = "ID пользователя") 
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             
             @Parameter(description = "Период (daily, weekly, monthly)") 
             @RequestParam(defaultValue = "daily") String period,

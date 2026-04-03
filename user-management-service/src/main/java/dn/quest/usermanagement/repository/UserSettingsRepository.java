@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с настройками пользователей
@@ -16,8 +17,8 @@ import java.util.Optional;
 public interface UserSettingsRepository extends JpaRepository<UserSettings, Long> {
 
     // Базовые запросы
-    Optional<UserSettings> findByUserId(Long userId);
-    boolean existsByUserId(Long userId);
+    Optional<UserSettings> findByUserId(UUID userId);
+    boolean existsByUserId(UUID userId);
 
     // Поиск по настройкам приватности
     List<UserSettings> findByProfilePublic(Boolean profilePublic);

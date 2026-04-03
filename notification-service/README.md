@@ -130,7 +130,7 @@ sms:
 @Entity
 public class Notification {
     private String notificationId;
-    private Long userId;
+    private UUID userId;
     private NotificationType type;
     private NotificationCategory category;
     private NotificationPriority priority;
@@ -148,7 +148,7 @@ public class Notification {
 @Entity
 public class NotificationQueue {
     private Long notificationId;
-    private Long userId;
+    private UUID userId;
     private String channelType;
     private NotificationPriority priority;
     private NotificationStatus status;

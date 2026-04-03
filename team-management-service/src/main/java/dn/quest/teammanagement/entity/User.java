@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Сущность пользователя (упрощенная версия для Team Management Service)
@@ -25,7 +26,7 @@ import java.time.Instant;
 public class User {
 
     @Id
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false, length = 50, unique = true)
     private String username;

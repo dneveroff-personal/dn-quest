@@ -30,7 +30,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional
-    public LevelHintDTO createHint(LevelHintDTO dto, Long levelId) {
+    public LevelHintDTO createHint(LevelHintDTO dto, UUID levelId) {
         log.info("Creating new hint for level with ID: {}", levelId);
 
         // Проверка существования уровня
@@ -108,7 +108,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LevelHintDTO> getHintsByLevelId(Long levelId) {
+    public List<LevelHintDTO> getHintsByLevelId(UUID levelId) {
         List<LevelHint> hints = levelHintRepository.findByLevelIdOrderByOrderIndex(levelId);
         return hints.stream()
                 .map(this::convertToDTO)
@@ -117,7 +117,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LevelHintDTO> getAvailableHintsByLevelId(Long levelId, Long userId) {
+    public List<LevelHintDTO> getAvailableHintsByLevelId(UUID levelId, UUID userId) {
         List<LevelHint> hints = levelHintRepository.findByLevelIdOrderByOrderIndex(levelId);
         LocalDateTime now = LocalDateTime.now();
 
@@ -129,7 +129,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional(readOnly = true)
-    public HintAvailabilityResult checkHintAvailability(Long hintId, Long userId) {
+    public HintAvailabilityResult checkHintAvailability(Long hintId, UUID userId) {
         LevelHint hint = getHintEntityById(hintId);
         LocalDateTime now = LocalDateTime.now();
 
@@ -143,7 +143,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional
-    public void copyHintsForLevel(Long sourceLevelId, Long targetLevelId) {
+    public void copyHintsForLevel(UUID sourceLevelId, UUID targetLevelId) {
         log.info("Copying hints from level {} to level {}", sourceLevelId, targetLevelId);
 
         List<LevelHint> sourceHints = levelHintRepository.findByLevelIdOrderByOrderIndex(sourceLevelId);

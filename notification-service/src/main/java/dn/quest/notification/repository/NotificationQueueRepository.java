@@ -14,12 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с очередью уведомлений
  */
 @Repository
-public interface NotificationQueueRepository extends JpaRepository<NotificationQueue, Long> {
+public interface NotificationQueueRepository extends JpaRepository<NotificationQueue, UUID> {
 
     /**
      * Находит уведомления в очереди по статусу
@@ -51,12 +52,12 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
     /**
      * Находит уведомления по ID пользователя
      */
-    Page<NotificationQueue> findByUserId(Long userId, Pageable pageable);
+    Page<NotificationQueue> findByUserId(UUID userId, Pageable pageable);
 
     /**
      * Находит уведомления по ID пользователя и статусу
      */
-    List<NotificationQueue> findByUserIdAndStatus(Long userId, NotificationStatus status);
+    List<NotificationQueue> findByUserIdAndStatus(UUID userId, NotificationStatus status);
 
     /**
      * Подсчитывает количество уведомлений по статусу
@@ -127,5 +128,5 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
     /**
      * Находит уведомления по ID пользователя (без пагинации)
      */
-    List<NotificationQueue> findByUserId(Long userId);
+    List<NotificationQueue> findByUserId(UUID userId);
 }

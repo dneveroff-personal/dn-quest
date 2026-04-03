@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для представления пользователя
@@ -21,7 +22,7 @@ import java.util.List;
 public class UserDTO extends BaseDTO {
 
     @Schema(description = "ID пользователя", example = "1")
-    private Long id;
+    private UUID id;
 
     @Schema(description = "Имя пользователя", example = "player123")
     private String username;

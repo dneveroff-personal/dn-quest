@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для представления кода уровня
@@ -30,7 +31,7 @@ public class CodeDTO extends BaseDTO {
      * ID уровня, к которому относится код
      */
     @NotNull(message = "ID уровня обязателен")
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Тип кода
@@ -242,7 +243,7 @@ public class CodeDTO extends BaseDTO {
      */
     public boolean isValid() {
         // Проверка обязательных полей
-        if (levelId == null || levelId <= 0) {
+        if (levelId == null) {
             return false;
         }
         

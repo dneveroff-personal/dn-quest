@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для профиля пользователя
@@ -20,10 +21,10 @@ import java.time.Instant;
 public class UserProfileDTO {
     
     @Schema(description = "ID профиля", example = "1")
-    private Long id;
+    private UUID id;
     
     @Schema(description = "ID пользователя", example = "1")
-    private Long userId;
+    private UUID userId;
     
     @Schema(description = "Имя пользователя", example = "player123")
     private String username;

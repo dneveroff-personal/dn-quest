@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления пользователями
@@ -32,7 +33,7 @@ public class UserController {
     private final TeamService teamService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable UUID userId) {
         log.debug("Getting user by id: {}", userId);
 
         return ResponseEntity.ok(userService.getUserById(userId));
@@ -47,7 +48,7 @@ public class UserController {
 
     @GetMapping("/{userId}/teams")
     public ResponseEntity<TeamListResponse> getUserTeams(
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "joinedAt") String sortBy,
@@ -64,7 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/teams/active")
-    public ResponseEntity<List<TeamDTO>> getUserActiveTeams(@PathVariable Long userId) {
+    public ResponseEntity<List<TeamDTO>> getUserActiveTeams(@PathVariable UUID userId) {
         log.debug("Getting active teams for user: {}", userId);
         
         List<TeamDTO> teams = teamService.getUserActiveTeams(userId);
@@ -73,8 +74,8 @@ public class UserController {
 
     @GetMapping("/{userId}/is-member/{teamId}")
     public ResponseEntity<Boolean> isUserTeamMember(
-            @PathVariable Long userId,
-            @PathVariable Long teamId) {
+            @PathVariable UUID userId,
+            @PathVariable UUID teamId) {
         
         log.debug("Checking if user {} is member of team {}", userId, teamId);
         
@@ -84,8 +85,8 @@ public class UserController {
 
     @GetMapping("/{userId}/is-captain/{teamId}")
     public ResponseEntity<Boolean> isUserTeamCaptain(
-            @PathVariable Long userId,
-            @PathVariable Long teamId) {
+            @PathVariable UUID userId,
+            @PathVariable UUID teamId) {
         
         log.debug("Checking if user {} is captain of team {}", userId, teamId);
         
@@ -155,7 +156,7 @@ public class UserController {
         log.debug("Getting current user teams with pagination: page={}, size={}, sortBy={}, sortDir={}", 
                 page, size, sortBy, sortDir);
 
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));

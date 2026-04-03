@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления командами
@@ -24,101 +25,101 @@ public interface TeamService {
     void deleteTeam(Long id);
     
     // Управление командами
-    Team createTeam(String name, String description, Long captainId);
-    Team updateTeamInfo(Long teamId, String name, String description);
-    Team setTeamCaptain(Long teamId, Long newCaptainId);
-    Team activateTeam(Long teamId);
-    Team deactivateTeam(Long teamId);
+    Team createTeam(String name, String description, UUID captainId);
+    Team updateTeamInfo(UUID teamId, String name, String description);
+    Team setTeamCaptain(UUID teamId, Long newCaptainId);
+    Team activateTeam(UUID teamId);
+    Team deactivateTeam(UUID teamId);
     
     // Управление участниками
-    TeamMember addMember(Long teamId, Long userId, TeamRole role);
-    TeamMember removeMember(Long teamId, Long userId);
-    TeamMember updateMemberRole(Long teamId, Long userId, TeamRole newRole);
-    TeamMember activateMember(Long teamId, Long userId);
-    TeamMember deactivateMember(Long teamId, Long userId);
+    TeamMember addMember(UUID teamId, UUID userId, TeamRole role);
+    TeamMember removeMember(UUID teamId, UUID userId);
+    TeamMember updateMemberRole(UUID teamId, UUID userId, TeamRole newRole);
+    TeamMember activateMember(UUID teamId, UUID userId);
+    TeamMember deactivateMember(UUID teamId, UUID userId);
     
     // Поиск и фильтрация команд
     Page<Team> getAllTeams(Pageable pageable);
-    List<Team> getTeamsByCaptain(Long captainId);
+    List<Team> getTeamsByCaptain(UUID captainId);
     List<Team> getTeamsByNameContaining(String name);
     List<Team> getTeamsByRating(Double minRating, Double maxRating);
     List<Team> getTeamsByMemberCount(int minMembers, int maxMembers);
     
     // Поиск участников
-    List<TeamMember> getTeamMembers(Long teamId);
-    List<TeamMember> getActiveTeamMembers(Long teamId);
-    List<TeamMember> getMembersByRole(Long teamId, TeamRole role);
-    Optional<TeamMember> getTeamMember(Long teamId, Long userId);
-    List<TeamMember> getUserTeams(Long userId);
-    List<TeamMember> getUserActiveTeams(Long userId);
+    List<TeamMember> getTeamMembers(UUID teamId);
+    List<TeamMember> getActiveTeamMembers(UUID teamId);
+    List<TeamMember> getMembersByRole(UUID teamId, TeamRole role);
+    Optional<TeamMember> getTeamMember(UUID teamId, UUID userId);
+    List<TeamMember> getUserTeams(UUID userId);
+    List<TeamMember> getUserActiveTeams(UUID userId);
     
     // Статистика команд
     long getTotalTeamsCount();
-    long getTeamsCountByCaptain(Long captainId);
-    int getTeamMemberCount(Long teamId);
-    int getActiveTeamMemberCount(Long teamId);
+    long getTeamsCountByCaptain(UUID captainId);
+    int getTeamMemberCount(UUID teamId);
+    int getActiveTeamMemberCount(UUID teamId);
     double getAverageTeamRating();
     double getAverageTeamSize();
     
     // Рейтинги и статистика
-    Team updateTeamRating(Long teamId, Double newRating);
-    Double calculateTeamRating(Long teamId);
+    Team updateTeamRating(UUID teamId, Double newRating);
+    Double calculateTeamRating(UUID teamId);
     List<Team> getTopTeamsByRating(int limit);
     List<Team> getTopTeamsByGamesPlayed(int limit);
     List<Team> getTopTeamsByWinRate(int limit);
-    Integer getTeamRanking(Long teamId);
+    Integer getTeamRanking(UUID teamId);
     
     // Игровая статистика
-    Team updateGameStats(Long teamId, int gamesPlayed, int gamesWon, long playtimeSeconds);
-    Double getTeamWinRate(Long teamId);
-    Long getTeamTotalPlaytime(Long teamId);
+    Team updateGameStats(UUID teamId, int gamesPlayed, int gamesWon, long playtimeSeconds);
+    Double getTeamWinRate(UUID teamId);
+    Long getTeamTotalPlaytime(UUID teamId);
     List<Team> getMostActiveTeams(int limit);
     List<Team> getMostExperiencedTeams(int limit);
     
     // Валидация и бизнес-логика
-    boolean canCreateTeam(Long userId);
-    boolean canJoinTeam(Long teamId, Long userId);
-    boolean canLeaveTeam(Long teamId, Long userId);
-    boolean canRemoveMember(Long teamId, Long captainId, Long memberUserId);
-    boolean canChangeCaptain(Long teamId, Long currentCaptainId, Long newCaptainId);
-    boolean isTeamFull(Long teamId);
-    boolean isUserCaptain(Long teamId, Long userId);
-    boolean isUserMember(Long teamId, Long userId);
+    boolean canCreateTeam(UUID userId);
+    boolean canJoinTeam(UUID teamId, UUID userId);
+    boolean canLeaveTeam(UUID teamId, UUID userId);
+    boolean canRemoveMember(UUID teamId, UUID captainId, Long memberUserId);
+    boolean canChangeCaptain(UUID teamId, Long currentCaptainId, Long newCaptainId);
+    boolean isTeamFull(UUID teamId);
+    boolean isUserCaptain(UUID teamId, UUID userId);
+    boolean isUserMember(UUID teamId, UUID userId);
     
     // Управление лимитами
-    boolean isTeamMemberLimitReached(Long teamId);
-    int getAvailableSlots(Long teamId);
-    boolean canAddMoreMembers(Long teamId);
-    Team updateMemberLimit(Long teamId, Integer newLimit);
+    boolean isTeamMemberLimitReached(UUID teamId);
+    int getAvailableSlots(UUID teamId);
+    boolean canAddMoreMembers(UUID teamId);
+    Team updateMemberLimit(UUID teamId, Integer newLimit);
     
     // Операции с приглашениями
-    TeamMember inviteMember(Long teamId, Long userId, Long invitedBy);
-    TeamMember acceptInvitation(Long teamId, Long userId);
-    TeamMember rejectInvitation(Long teamId, Long userId);
-    TeamMember cancelInvitation(Long teamId, Long userId);
-    List<TeamMember> getPendingInvitations(Long teamId);
-    List<TeamMember> getUserPendingInvitations(Long userId);
+    TeamMember inviteMember(UUID teamId, UUID userId, Long invitedBy);
+    TeamMember acceptInvitation(UUID teamId, UUID userId);
+    TeamMember rejectInvitation(UUID teamId, UUID userId);
+    TeamMember cancelInvitation(UUID teamId, UUID userId);
+    List<TeamMember> getPendingInvitations(UUID teamId);
+    List<TeamMember> getUserPendingInvitations(UUID userId);
     
     // Командные операции
     List<Team> getTeamsByGameSession(Long sessionId);
-    Team assignToGameSession(Long teamId, Long sessionId);
-    Team removeFromGameSession(Long teamId, Long sessionId);
+    Team assignToGameSession(UUID teamId, Long sessionId);
+    Team removeFromGameSession(UUID teamId, Long sessionId);
     List<Team> getAvailableTeamsForSession(Long sessionId);
     
     // Операции для администрирования
     List<Team> getAllTeamsForAdmin();
-    void forceRemoveMember(Long teamId, Long userId, String reason);
-    void suspendTeam(Long teamId, String reason);
-    void unsuspendTeam(Long teamId);
+    void forceRemoveMember(UUID teamId, UUID userId, String reason);
+    void suspendTeam(UUID teamId, String reason);
+    void unsuspendTeam(UUID teamId);
     void deleteInactiveTeams(int inactiveDays);
     List<Team> getSuspiciousTeams(int limit);
     
     // Операции с кэшированием
     void cacheTeam(Team team);
-    void evictTeamFromCache(Long teamId);
-    Optional<Team> getCachedTeam(Long teamId);
-    void cacheTeamMembers(Long teamId, List<TeamMember> members);
-    void evictTeamMembersFromCache(Long teamId);
+    void evictTeamFromCache(UUID teamId);
+    Optional<Team> getCachedTeam(UUID teamId);
+    void cacheTeamMembers(UUID teamId, List<TeamMember> members);
+    void evictTeamMembersFromCache(UUID teamId);
     
     // Операции с событиями
     void publishTeamCreatedEvent(Team team);
@@ -137,10 +138,10 @@ public interface TeamService {
     
     // Аналитика и отчеты
     List<Object[]> getTeamStatisticsByDay(Instant start, Instant end);
-    List<Object[]> getTeamMemberStatistics(Long teamId);
-    List<Object[]> getTeamPerformanceAnalysis(Long teamId);
+    List<Object[]> getTeamMemberStatistics(UUID teamId);
+    List<Object[]> getTeamPerformanceAnalysis(UUID teamId);
     List<Object[]> getTeamGrowthMetrics();
-    List<Object[]> getTeamActivityReport(Long teamId, Instant start, Instant end);
+    List<Object[]> getTeamActivityReport(UUID teamId, Instant start, Instant end);
     
     // Операции для оптимизации
     void batchCreateTeams(List<Team> teams);
@@ -149,61 +150,61 @@ public interface TeamService {
     
     // Вспомогательные методы
     String generateTeamId();
-    void logTeamOperation(String operation, Long teamId, Long userId);
+    void logTeamOperation(String operation, UUID teamId, UUID userId);
     boolean isValidTeamName(String name);
     String sanitizeTeamDescription(String description);
     
     // Операции с ролями
     List<TeamRole> getAvailableRoles();
     boolean isValidRoleTransition(TeamRole currentRole, TeamRole newRole);
-    List<TeamMember> getMembersByRoleHierarchy(Long teamId);
+    List<TeamMember> getMembersByRoleHierarchy(UUID teamId);
     
     // Операции с историей
-    List<String> getTeamHistory(Long teamId);
-    void addTeamNote(Long teamId, String note, Long authorId);
-    List<String> getTeamNotes(Long teamId);
-    List<TeamMember> getFormerMembers(Long teamId);
+    List<String> getTeamHistory(UUID teamId);
+    void addTeamNote(UUID teamId, String note, UUID authorId);
+    List<String> getTeamNotes(UUID teamId);
+    List<TeamMember> getFormerMembers(UUID teamId);
     
     // Операции с поиском
     Page<Team> searchTeams(String keyword, Pageable pageable);
-    List<Team> getRecommendedTeams(Long userId, int limit);
-    List<Team> getSimilarTeams(Long teamId, int limit);
+    List<Team> getRecommendedTeams(UUID userId, int limit);
+    List<Team> getSimilarTeams(UUID teamId, int limit);
     List<Team> getTeamsBySkillLevel(String skillLevel);
     
     // Операции с настройками
-    Team updateTeamSettings(Long teamId, Map<String, Object> settings);
-    Map<String, Object> getTeamSettings(Long teamId);
-    Team enableAutoApproval(Long teamId);
-    Team disableAutoApproval(Long teamId);
-    boolean isAutoApprovalEnabled(Long teamId);
+    Team updateTeamSettings(UUID teamId, Map<String, Object> settings);
+    Map<String, Object> getTeamSettings(UUID teamId);
+    Team enableAutoApproval(UUID teamId);
+    Team disableAutoApproval(UUID teamId);
+    boolean isAutoApprovalEnabled(UUID teamId);
     
     // Операции с соревнованиями
     List<Team> getTeamsInCompetition(Long competitionId);
-    Team registerForCompetition(Long teamId, Long competitionId);
-    Team unregisterFromCompetition(Long teamId, Long competitionId);
+    Team registerForCompetition(UUID teamId, Long competitionId);
+    Team unregisterFromCompetition(UUID teamId, Long competitionId);
     List<Team> getTopTeamsInCompetition(Long competitionId, int limit);
     
     // Операции с достижениями
-    List<String> getTeamAchievements(Long teamId);
-    void addTeamAchievement(Long teamId, String achievementCode);
-    void removeTeamAchievement(Long teamId, String achievementCode);
-    boolean hasTeamAchievement(Long teamId, String achievementCode);
+    List<String> getTeamAchievements(UUID teamId);
+    void addTeamAchievement(UUID teamId, String achievementCode);
+    void removeTeamAchievement(UUID teamId, String achievementCode);
+    boolean hasTeamAchievement(UUID teamId, String achievementCode);
     
     // Операции с безопасностью
-    boolean isTeamAccessAllowed(Long userId, Long teamId);
-    boolean isTeamModificationAllowed(Long userId, Long teamId);
+    boolean isTeamAccessAllowed(UUID userId, UUID teamId);
+    boolean isTeamModificationAllowed(UUID userId, UUID teamId);
     void validateTeamData(Team team);
     void sanitizeTeamData(Team team);
     
     // Операции с мониторингом
-    Map<String, Object> getTeamHealthMetrics(Long teamId);
-    List<String> getTeamErrors(Long teamId);
-    Map<String, Object> getTeamPerformanceStats(Long teamId);
-    void monitorTeamActivity(Long teamId);
+    Map<String, Object> getTeamHealthMetrics(UUID teamId);
+    List<String> getTeamErrors(UUID teamId);
+    Map<String, Object> getTeamPerformanceStats(UUID teamId);
+    void monitorTeamActivity(UUID teamId);
     
     // Операции с экспортом
     List<Team> exportTeams();
-    List<TeamMember> exportTeamMembers(Long teamId);
-    String generateTeamReport(Long teamId);
+    List<TeamMember> exportTeamMembers(UUID teamId);
+    String generateTeamReport(UUID teamId);
     String generateTeamsReport();
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Контроллер для управления статистикой пользователей
@@ -36,7 +37,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Получить статистику пользователя", description = "Возвращает статистику пользователя по ID")
     public ResponseEntity<UserStatisticsDTO> getUserStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         return userStatisticsService.getUserStatisticsByUserId(userId)
                 .map(ResponseEntity::ok)
@@ -47,7 +48,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Добавить опыт пользователю", description = "Добавляет опыт пользователю и проверяет переход на новый уровень")
     public ResponseEntity<UserStatisticsDTO> addExperience(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Количество опыта") @RequestParam Long experience) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.addExperience(userId, experience);
@@ -58,7 +59,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Добавить очки пользователю", description = "Добавляет очки пользователю")
     public ResponseEntity<UserStatisticsDTO> addScore(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Количество очков") @RequestParam Long score) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.addScore(userId, score);
@@ -69,7 +70,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить статистику квестов", description = "Обновляет статистику квестов пользователя")
     public ResponseEntity<UserStatisticsDTO> updateQuestStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Квест завершен") @RequestParam Boolean completed,
             @Parameter(description = "Время игры в минутах") @RequestParam(required = false) Long playtimeMinutes) {
         
@@ -81,7 +82,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить статистику уровней", description = "Обновляет статистику уровней пользователя")
     public ResponseEntity<UserStatisticsDTO> updateLevelStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Уровень завершен") @RequestParam Boolean levelCompleted,
             @Parameter(description = "Код решен") @RequestParam(required = false) Boolean codeSolved,
             @Parameter(description = "Подсказка использована") @RequestParam(required = false) Boolean hintUsed,
@@ -96,7 +97,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить статистику команд", description = "Обновляет статистику команд пользователя")
     public ResponseEntity<UserStatisticsDTO> updateTeamStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Тип действия") @RequestParam String actionType) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.updateTeamStatistics(userId, actionType);
@@ -107,7 +108,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить статистику достижений", description = "Обновляет статистику достижений пользователя")
     public ResponseEntity<UserStatisticsDTO> updateAchievementStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Тип достижения") @RequestParam String achievementType) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.updateAchievementStatistics(userId, achievementType);
@@ -118,7 +119,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Обновить статистику входов", description = "Обновляет статистику входов пользователя")
     public ResponseEntity<UserStatisticsDTO> updateLoginStatistics(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.updateLoginStatistics(userId);
         return ResponseEntity.ok(updatedStatistics);
@@ -128,7 +129,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить активность пользователя", description = "Обновляет время последней активности пользователя")
     public ResponseEntity<UserStatisticsDTO> updateLastActivity(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserStatisticsDTO updatedStatistics = userStatisticsService.updateLastActivity(userId);
         return ResponseEntity.ok(updatedStatistics);
@@ -324,7 +325,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Получить ранг по очкам", description = "Возвращает ранг пользователя по очкам")
     public ResponseEntity<Long> getUserRankByScore(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         Long rank = userStatisticsService.getUserRankByScore(userId);
         return ResponseEntity.ok(rank);
@@ -334,7 +335,7 @@ public class UserStatisticsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Получить ранг по уровню", description = "Возвращает ранг пользователя по уровню")
     public ResponseEntity<Long> getUserRankByLevel(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         Long rank = userStatisticsService.getUserRankByLevel(userId);
         return ResponseEntity.ok(rank);

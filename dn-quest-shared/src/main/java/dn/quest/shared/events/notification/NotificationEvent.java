@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * Событие уведомления
  */
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class NotificationEvent {
 
     private String eventId;
-    private Long userId;
+    private UUID userId;
     private String title;
     private String message;
     private String type;

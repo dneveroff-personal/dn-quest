@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "users", key = "#userId")
-    public UserDTO getUserById(Long userId) {
+    public UserDTO getUserById(UUID userId) {
         log.debug("Getting user by id: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -82,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserEntityById(Long userId) {
+    public Optional<User> getUserEntityById(UUID userId) {
         log.debug("Getting user entity by id: {}", userId);
         return userRepository.findById(userId);
     }
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean userExists(Long userId) {
+    public boolean userExists(UUID userId) {
         log.debug("Checking if user exists: {}", userId);
         return userRepository.existsById(userId);
     }
@@ -117,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isUserActive(Long userId) {
+    public boolean isUserActive(UUID userId) {
         log.debug("Checking if user is active: {}", userId);
         return userRepository.findById(userId)
                 .map(user -> Boolean.TRUE.equals(user.getIsActive()))
@@ -152,7 +153,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserDTO> getUsersForTeamInvitation(Long teamId, String search, int limit) {
+    public List<UserDTO> getUsersForTeamInvitation(UUID teamId, String search, int limit) {
         log.debug("Getting users for team invitation: {} with search: {} and limit: {}", teamId, search, limit);
 
         Pageable pageable = PageRequest.of(0, limit);
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "usersByIds", key = "#userIds.hashCode()")
-    public List<UserDTO> getUsersByIds(List<Long> userIds) {
+    public List<UserDTO> getUsersByIds(List<UUID> userIds) {
         log.debug("Getting users by ids: {}", userIds);
 
         List<User> users = userRepository.findByIdInAndIsActiveTrue(userIds);
@@ -177,7 +178,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> getUserEntitiesByIds(List<Long> userIds) {
+    public List<User> getUserEntitiesByIds(List<UUID> userIds) {
         log.debug("Getting user entities by ids: {}", userIds);
         return userRepository.findByIdInAndIsActiveTrue(userIds);
     }
@@ -294,7 +295,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean validateUser(Long userId) {
+    public boolean validateUser(UUID userId) {
         log.debug("Validating user: {}", userId);
         
         return userRepository.findById(userId)
@@ -305,7 +306,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "publicUsers", key = "#userId")
-    public UserDTO getPublicUserInfo(Long userId) {
+    public UserDTO getPublicUserInfo(UUID userId) {
         log.debug("Getting public user info: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -323,7 +324,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CacheEvict(value = {"users", "usersByUsername", "usersByEmail"}, allEntries = true)
-    public UserDTO updateUser(Long userId, UserDTO userDTO) {
+    public UserDTO updateUser(UUID userId, UserDTO userDTO) {
         log.debug("Updating user: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -343,7 +344,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CacheEvict(value = {"users", "usersByUsername", "usersByEmail"}, allEntries = true)
-    public void deactivateUser(Long userId) {
+    public void deactivateUser(UUID userId) {
         log.debug("Deactivating user: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -355,7 +356,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @CacheEvict(value = {"users", "usersByUsername", "usersByEmail"}, allEntries = true)
-    public void activateUser(Long userId) {
+    public void activateUser(UUID userId) {
         log.debug("Activating user: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -367,7 +368,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canUserBeInvited(Long userId, Long teamId) {
+    public boolean canUserBeInvited(UUID userId, UUID teamId) {
         log.debug("Checking if user {} can be invited to team: {}", userId, teamId);
 
         // Проверяем, что пользователь существует и активен
@@ -439,7 +440,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Получить ID пользователя по имени
      */
-    public Long getUserIdByUsername(String username) {
+    public UUID getUserIdByUsername(String username) {
        return getUserByUsername(username).getId();
     }
 
@@ -474,7 +475,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateCodeSubmissionStatistics(Long userId, String sessionId) {
+    public void updateCodeSubmissionStatistics(UUID userId, String sessionId) {
         log.info("Updating code submission statistics: userId={}, sessionId={}", userId, sessionId);
         
         try {
@@ -499,7 +500,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateLevelCompletionStatistics(Long userId, String sessionId, int levelNumber) {
+    public void updateLevelCompletionStatistics(UUID userId, String sessionId, int levelNumber) {
         log.info("Updating level completion statistics: userId={}, sessionId={}, level={}", 
                 userId, sessionId, levelNumber);
         
@@ -527,7 +528,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateFileStatistics(Long userId, Long fileId, String action) {
+    public void updateFileStatistics(UUID userId, Long fileId, String action) {
         log.info("Updating file statistics: userId={}, fileId={}, action={}", userId, fileId, action);
         
         try {

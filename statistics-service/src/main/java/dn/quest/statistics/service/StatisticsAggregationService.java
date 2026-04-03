@@ -1,5 +1,7 @@
 package dn.quest.statistics.service;
 
+import java.util.UUID;
+
 /**
  * Сервис для агрегации статистических данных
  */
@@ -58,7 +60,7 @@ public interface StatisticsAggregationService {
     /**
      * Агрегация статистики пользователя
      */
-    void aggregateUserStatistics(Long userId, java.time.LocalDate date);
+    void aggregateUserStatistics(UUID userId, java.time.LocalDate date);
 
     /**
      * Агрегация статистики квеста
@@ -68,7 +70,7 @@ public interface StatisticsAggregationService {
     /**
      * Агрегация статистики команды
      */
-    void aggregateTeamStatistics(Long teamId, java.time.LocalDate date);
+    void aggregateTeamStatistics(UUID teamId, java.time.LocalDate date);
 
     /**
      * Агрегация игровой статистики

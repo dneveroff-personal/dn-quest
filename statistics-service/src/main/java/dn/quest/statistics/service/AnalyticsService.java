@@ -6,6 +6,7 @@ import dn.quest.statistics.dto.StatisticsRequestDTO;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для аналитики и отчетов
@@ -25,12 +26,12 @@ public interface AnalyticsService {
     /**
      * Получить отчет по производительности квестов
      */
-    Map<String, Object> getQuestPerformanceReport(LocalDate startDate, LocalDate endDate, String category, Long authorId);
+    Map<String, Object> getQuestPerformanceReport(LocalDate startDate, LocalDate endDate, String category, UUID authorId);
 
     /**
      * Получить отчет по игровым сессиям
      */
-    Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, Long userId);
+    Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, UUID userId);
 
     /**
      * Получить отчет по командной активности
@@ -101,7 +102,7 @@ public interface AnalyticsService {
     /**
      * Получить анализ паттернов поведения
      */
-    Map<String, Object> getBehavioralPatternsAnalysis(LocalDate startDate, LocalDate endDate, Long userId);
+    Map<String, Object> getBehavioralPatternsAnalysis(LocalDate startDate, LocalDate endDate, UUID userId);
 
     /**
      * Получить прогноз оттока пользователей

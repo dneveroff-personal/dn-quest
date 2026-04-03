@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Контроллер для работы с отчетами и экспортом данных
@@ -80,7 +81,7 @@ public class ReportsController {
             @RequestParam(defaultValue = "csv") String format,
             
             @Parameter(description = "ID пользователя для фильтрации") 
-            @RequestParam(required = false) Long userId) {
+            @RequestParam(required = false) UUID userId) {
         
         log.info("Exporting user statistics from {} to {} format: {} user: {}", 
                 startDate, endDate, format, userId);
@@ -123,7 +124,7 @@ public class ReportsController {
             @RequestParam(required = false) Long questId,
             
             @Parameter(description = "ID автора для фильтрации") 
-            @RequestParam(required = false) Long authorId) {
+            @RequestParam(required = false) UUID authorId) {
         
         log.info("Exporting quest statistics from {} to {} format: {} quest: {} author: {}", 
                 startDate, endDate, format, questId, authorId);
@@ -166,7 +167,7 @@ public class ReportsController {
             @RequestParam(required = false) Long questId,
             
             @Parameter(description = "ID пользователя для фильтрации") 
-            @RequestParam(required = false) Long userId) {
+            @RequestParam(required = false) UUID userId) {
         
         log.info("Exporting game statistics from {} to {} format: {} quest: {} user: {}", 
                 startDate, endDate, format, questId, userId);

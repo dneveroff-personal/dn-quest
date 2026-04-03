@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для статистики команды
@@ -16,8 +17,8 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TeamStatisticsDTO {
 
-    private Long id;
-    private Long teamId;
+    private UUID id;
+    private UUID teamId;
     private Integer totalMembers;
     private Integer activeMembers;
     private Long totalInvitationsSent;

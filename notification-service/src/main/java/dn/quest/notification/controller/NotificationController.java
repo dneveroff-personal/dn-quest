@@ -73,7 +73,7 @@ public class NotificationController {
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<PagedResponse<NotificationDTO>>> getUserNotifications(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "20") int size,
             @Parameter(description = "Статус уведомления") @RequestParam(required = false) NotificationStatus status,
@@ -131,7 +131,7 @@ public class NotificationController {
                 List<String> sentNotifications = new ArrayList<>();
                 List<String> failedNotifications = new ArrayList<>();
                 
-                for (Long userId : request.getUserIds()) {
+                for (UUID userId : request.getUserIds()) {
                     try {
                         Notification notification = createNotificationFromBatchRequest(request, userId);
                         notificationService.processNotificationEvent(createNotificationEvent(notification));
@@ -242,7 +242,7 @@ public class NotificationController {
     /**
      * Создать уведомление из пакетного запроса
      */
-    private Notification createNotificationFromBatchRequest(BatchNotificationRequest request, Long userId) {
+    private Notification createNotificationFromBatchRequest(BatchNotificationRequest request, UUID userId) {
         return Notification.builder()
                 .notificationId(UUID.randomUUID().toString())
                 .userId(userId)

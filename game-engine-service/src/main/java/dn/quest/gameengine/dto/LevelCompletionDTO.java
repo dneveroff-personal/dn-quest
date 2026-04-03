@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для отображения данных о завершении уровня в лидерборде
@@ -27,7 +28,7 @@ public class LevelCompletionDTO {
     /**
      * ID команды
      */
-    private Long teamId;
+    private UUID teamId;
 
     /**
      * Название команды
@@ -37,7 +38,7 @@ public class LevelCompletionDTO {
     /**
      * ID пользователя
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Отображаемое имя пользователя

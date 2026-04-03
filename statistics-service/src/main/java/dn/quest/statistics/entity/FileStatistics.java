@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения файловой статистики
@@ -30,8 +31,8 @@ import java.time.LocalDateTime;
 public class FileStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID файла
@@ -43,7 +44,7 @@ public class FileStatistics {
      * ID владельца файла
      */
     @Column(name = "owner_id")
-    private Long ownerId;
+    private UUID ownerId;
 
     /**
      * ID сущности, к которой привязан файл

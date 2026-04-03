@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с завершениями уровней
@@ -106,17 +107,17 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
 
     // Запросы для анализа по пользователям
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.passedByUser.id = :userId ORDER BY lc.passTime DESC")
-    List<LevelCompletion> findByPassedByUser(@Param("userId") Long userId);
+    List<LevelCompletion> findByPassedByUser(@Param("userId") UUID userId);
 
     @Query("SELECT COUNT(lc) FROM LevelCompletion lc WHERE lc.passedByUser.id = :userId")
-    long countByPassedByUser(@Param("userId") Long userId);
+    long countByPassedByUser(@Param("userId") UUID userId);
 
     // Запросы для анализа по командам
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.session.team.id = :teamId ORDER BY lc.passTime DESC")
-    List<LevelCompletion> findByTeam(@Param("teamId") Long teamId);
+    List<LevelCompletion> findByTeam(@Param("teamId") UUID teamId);
 
     @Query("SELECT COUNT(lc) FROM LevelCompletion lc WHERE lc.session.team.id = :teamId")
-    long countByTeam(@Param("teamId") Long teamId);
+    long countByTeam(@Param("teamId") UUID teamId);
 
     // Запросы для анализа по уровням
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.id = :levelId ORDER BY lc.passTime DESC")

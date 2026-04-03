@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для ответа на отправку кода
@@ -172,7 +173,7 @@ public record SubmitCodeResponse(
             Integer rank,
             
             @Schema(description = "ID пользователя", example = "123")
-            Long userId,
+            UUID userId,
             
             @Schema(description = "Имя пользователя", example = "player1")
             String username,
@@ -187,7 +188,7 @@ public record SubmitCodeResponse(
             Integer rank,
             
             @Schema(description = "ID пользователя", example = "456")
-            Long userId,
+            UUID userId,
             
             @Schema(description = "Имя пользователя", example = "player2")
             String username,
@@ -245,7 +246,7 @@ public record SubmitCodeResponse(
         Long sessionId,
         
         @Schema(description = "ID пользователя", example = "123")
-        Long userId,
+        UUID userId,
         
         @Schema(description = "Версия API", example = "v1.0")
         String apiVersion,

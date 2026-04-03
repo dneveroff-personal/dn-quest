@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * Событие завершения уровня
  */
@@ -17,7 +19,7 @@ public class LevelCompletedEvent extends BaseEvent {
 
     private Long questId;
     private Long sessionId;
-    private Long userId;
+    private UUID userId;
     private Long levelId;
     private Integer levelNumber;
     private Integer score;

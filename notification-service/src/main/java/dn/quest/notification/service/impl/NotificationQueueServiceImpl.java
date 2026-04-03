@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -59,15 +60,15 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
     }
 
     @Override
-    public NotificationQueue addToQueue(Long notificationId, Long userId, String channelType, 
+    public NotificationQueue addToQueue(String notificationId, UUID userId, String channelType,
                                       NotificationPriority priority, String payload) {
         return addToQueue(notificationId, userId, channelType, priority, payload, null);
     }
 
     @Override
-    public NotificationQueue addToQueue(Long notificationId, Long userId, String channelType, 
-                                      NotificationPriority priority, String payload, 
-                                      LocalDateTime scheduledAt) {
+    public NotificationQueue addToQueue(String notificationId, UUID userId, String channelType,
+                                        NotificationPriority priority, String payload,
+                                        LocalDateTime scheduledAt) {
         try {
             NotificationQueue queueItem = NotificationQueue.builder()
                 .notificationId(notificationId)
@@ -115,7 +116,7 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
             queueRepository.save(queueItem);
 
             // Получаем уведомление
-            Optional<Notification> notificationOpt = notificationRepository.findById(queueItem.getNotificationId());
+            Optional<Notification> notificationOpt = notificationRepository.findById(queueItem.getId());
             if (notificationOpt.isEmpty()) {
                 markAsFailed(queueItem.getId(), "Уведомление не найдено");
                 return CompletableFuture.completedFuture(null);
@@ -149,7 +150,7 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
     }
 
     @Override
-    public void markAsSent(Long queueItemId) {
+    public void markAsSent(UUID queueItemId) {
         Optional<NotificationQueue> queueItemOpt = queueRepository.findById(queueItemId);
         if (queueItemOpt.isPresent()) {
             NotificationQueue queueItem = queueItemOpt.get();
@@ -157,7 +158,7 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
             queueRepository.save(queueItem);
             
             // Обновляем статус основного уведомления
-            notificationRepository.findById(queueItem.getNotificationId())
+            notificationRepository.findById(queueItem.getId())
                 .ifPresent(notification -> {
                     notification.setStatus(NotificationStatus.SENT);
                     notificationRepository.save(notification);
@@ -166,7 +167,7 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
     }
 
     @Override
-    public void markAsFailed(Long queueItemId, String errorMessage) {
+    public void markAsFailed(UUID queueItemId, String errorMessage) {
         Optional<NotificationQueue> queueItemOpt = queueRepository.findById(queueItemId);
         if (queueItemOpt.isPresent()) {
             NotificationQueue queueItem = queueItemOpt.get();
@@ -225,12 +226,12 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationQueue> getUserNotifications(Long userId) {
+    public List<NotificationQueue> getUserNotifications(UUID userId) {
         return queueRepository.findByUserId(userId);
     }
 
     @Override
-    public boolean cancelScheduledNotification(Long queueItemId) {
+    public boolean cancelScheduledNotification(UUID queueItemId) {
         Optional<NotificationQueue> queueItemOpt = queueRepository.findById(queueItemId);
         if (queueItemOpt.isPresent()) {
             NotificationQueue queueItem = queueItemOpt.get();
@@ -248,7 +249,7 @@ public class NotificationQueueServiceImpl implements NotificationQueueService {
     }
 
     @Override
-    public boolean updatePriority(Long queueItemId, NotificationPriority newPriority) {
+    public boolean updatePriority(UUID queueItemId, NotificationPriority newPriority) {
         Optional<NotificationQueue> queueItemOpt = queueRepository.findById(queueItemId);
         if (queueItemOpt.isPresent()) {
             NotificationQueue queueItem = queueItemOpt.get();

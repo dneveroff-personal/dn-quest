@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * DTO для ответа с информацией о файле
@@ -61,7 +62,7 @@ public class FileResponseDTO {
     /**
      * ID владельца файла
      */
-    private Long ownerId;
+    private UUID ownerId;
 
     /**
      * Является ли файл публичным

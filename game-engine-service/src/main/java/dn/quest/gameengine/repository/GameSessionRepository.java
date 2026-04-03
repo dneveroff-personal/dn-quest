@@ -15,12 +15,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с игровыми сессиями
  */
 @Repository
-public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
+public interface GameSessionRepository extends JpaRepository<GameSession, UUID> {
 
     // Базовые запросы
     List<GameSession> findByQuest(Quest quest);
@@ -143,7 +144,7 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
     @Query("SELECT gs FROM GameSession gs WHERE (gs.user = :user OR EXISTS (SELECT 1 FROM TeamMember tm WHERE tm.team = gs.team AND tm.user = :user AND tm.isActive = true)) AND gs.status IN ('ACTIVE', 'PAUSED', 'IN_PROGRESS')")
     List<GameSession> findActiveByParticipant(@Param("user") User user);
 
-    List<GameSession> findByQuestId(Long questId);
+    List<GameSession> findByQuestId(UUID questId);
 
     @Query("SELECT gs FROM GameSession gs WHERE gs.status IN ('ACTIVE', 'PAUSED', 'IN_PROGRESS')")
     List<GameSession> findActiveSessions();
@@ -154,12 +155,12 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
     List<GameSession> findRecentSessions(@Param("limit") int limit);
 
     @Query("SELECT CASE WHEN COUNT(gs) > 0 THEN true ELSE false END FROM GameSession gs WHERE gs.id = :sessionId AND (gs.user = :user OR EXISTS (SELECT 1 FROM TeamMember tm WHERE tm.team = gs.team AND tm.user = :user AND tm.isActive = true))")
-    boolean existsByIdAndParticipantsContaining(@Param("sessionId") Long sessionId, @Param("user") User user);
+    boolean existsByIdAndParticipantsContaining(@Param("sessionId") UUID sessionId, @Param("user") User user);
 
     List<GameSession> findByCreatedAtBetween(Instant start, Instant end);
 
     // Дополнительные методы
-    List<GameSession> findByTeamId(Long teamId);
+    List<GameSession> findByTeamId(UUID teamId);
 
     @Query("SELECT gs FROM GameSession gs WHERE gs.quest.type = :questType")
     List<GameSession> findByQuestType(@Param("questType") String questType);
@@ -180,9 +181,9 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
            "(:endDate IS NULL OR gs.createdAt <= :endDate)")
     Page<GameSession> findSessionsWithFilters(
         @Param("status") SessionStatus status,
-        @Param("questId") Long questId,
-        @Param("userId") Long userId,
-        @Param("teamId") Long teamId,
+        @Param("questId") UUID questId,
+        @Param("userId") UUID userId,
+        @Param("teamId") UUID teamId,
         @Param("startDate") Instant startDate,
         @Param("endDate") Instant endDate,
         Pageable pageable

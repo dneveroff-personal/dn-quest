@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для запросов статистики
@@ -22,12 +23,12 @@ public interface StatisticsQueryService {
     /**
      * Получить статистику пользователя
      */
-    UserStatisticsDTO getUserStatistics(Long userId, LocalDate date);
+    UserStatisticsDTO getUserStatistics(UUID userId, LocalDate date);
 
     /**
      * Получить статистику пользователя за период
      */
-    Page<UserStatisticsDTO> getUserStatisticsForPeriod(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<UserStatisticsDTO> getUserStatisticsForPeriod(UUID userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     /**
      * Получить статистику квеста
@@ -37,7 +38,7 @@ public interface StatisticsQueryService {
     /**
      * Получить статистику команды
      */
-    Map<String, Object> getTeamStatistics(Long teamId, LocalDate date);
+    Map<String, Object> getTeamStatistics(UUID teamId, LocalDate date);
 
     /**
      * Получить кастомную статистику

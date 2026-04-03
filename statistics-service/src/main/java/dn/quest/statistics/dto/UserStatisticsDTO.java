@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для статистики пользователей
@@ -20,12 +21,12 @@ public class UserStatisticsDTO {
     /**
      * ID записи статистики
      */
-    private Long id;
+    private UUID id;
 
     /**
      * ID пользователя
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Дата статистики

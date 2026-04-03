@@ -3,7 +3,6 @@ package dn.quest.questmanagement.dto;
 import dn.quest.questmanagement.entity.QuestMedia;
 import dn.quest.shared.dto.BaseDTO;
 import dn.quest.shared.enums.FileType;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -12,6 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Квест - основная игровая сущность
@@ -33,8 +34,8 @@ import java.util.Set;
 public class Quest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "quest_number", unique = true)
     private Long number;
@@ -193,7 +194,7 @@ public class Quest {
     /**
      * Получает список ID уровней
      */
-    public java.util.List<Long> getLevelIds() {
+    public java.util.List<java.util.UUID> getLevelIds() {
         if (levels == null) {
             return java.util.Collections.emptyList();
         }

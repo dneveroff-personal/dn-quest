@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.exception;
 
+import java.util.UUID;
+
 /**
  * Исключение, выбрасываемое при попытке создать дублирующийся ресурс
  */
@@ -21,19 +23,19 @@ public class DuplicateResourceException extends RuntimeException {
         return new DuplicateResourceException("Team with tag '" + tag + "' already exists");
     }
     
-    public static DuplicateResourceException teamMemberExists(Long teamId, Long userId) {
+    public static DuplicateResourceException teamMemberExists(UUID teamId, UUID userId) {
         return new DuplicateResourceException("User " + userId + " is already a member of team " + teamId);
     }
     
-    public static DuplicateResourceException invitationExists(Long teamId, Long userId) {
+    public static DuplicateResourceException invitationExists(UUID teamId, UUID userId) {
         return new DuplicateResourceException("Invitation already exists for team " + teamId + " and user " + userId);
     }
     
-    public static DuplicateResourceException teamSettingsExist(Long teamId) {
+    public static DuplicateResourceException teamSettingsExist(UUID teamId) {
         return new DuplicateResourceException("Team settings already exist for team " + teamId);
     }
     
-    public static DuplicateResourceException teamStatisticsExist(Long teamId) {
+    public static DuplicateResourceException teamStatisticsExist(UUID teamId) {
         return new DuplicateResourceException("Team statistics already exist for team " + teamId);
     }
 }

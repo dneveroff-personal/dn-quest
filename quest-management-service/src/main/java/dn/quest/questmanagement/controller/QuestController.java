@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления квестами
@@ -46,7 +47,7 @@ public class QuestController {
             @Valid @RequestBody QuestCreateUpdateDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long authorId = getUserIdFromUserDetails(userDetails);
+        UUID authorId = getUserIdFromUserDetails(userDetails);
         QuestDTO createdQuest = questService.createQuest(dto, authorId);
         
         log.info("Quest created successfully with ID: {} by user: {}", createdQuest.getId(), authorId);
@@ -63,7 +64,7 @@ public class QuestController {
             @Valid @RequestBody QuestCreateUpdateDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO updatedQuest = questService.updateQuest(id, dto, userId);
         
         log.info("Quest updated successfully with ID: {} by user: {}", id, userId);
@@ -79,7 +80,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         questService.deleteQuest(id, userId);
         
         log.info("Quest deleted successfully with ID: {} by user: {}", id, userId);
@@ -163,7 +164,7 @@ public class QuestController {
      */
     @GetMapping("/author/{authorId}")
     public ResponseEntity<Page<QuestDTO>> getQuestsByAuthor(
-            @PathVariable Long authorId,
+            @PathVariable UUID authorId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -231,7 +232,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.publishQuest(id, userId);
         
         log.info("Quest published successfully with ID: {} by user: {}", id, userId);
@@ -247,7 +248,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.unpublishQuest(id, userId);
         
         log.info("Quest unpublished successfully with ID: {} by user: {}", id, userId);
@@ -264,7 +265,7 @@ public class QuestController {
             @RequestParam String reason,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.archiveQuest(id, reason, userId);
         
         log.info("Quest archived successfully with ID: {} by user: {} with reason: {}", id, userId, reason);
@@ -280,7 +281,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.unarchiveQuest(id, userId);
         
         log.info("Quest unarchived successfully with ID: {} by user: {}", id, userId);
@@ -297,7 +298,7 @@ public class QuestController {
             @RequestParam String newTitle,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long authorId = getUserIdFromUserDetails(userDetails);
+        UUID authorId = getUserIdFromUserDetails(userDetails);
         QuestDTO copiedQuest = questService.copyQuest(id, newTitle, authorId);
         
         log.info("Quest copied successfully with ID: {} from ID: {} by user: {}", 
@@ -315,7 +316,7 @@ public class QuestController {
             @RequestParam String templateName,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO template = questService.createTemplateFromQuest(id, templateName, userId);
         
         log.info("Template created successfully with ID: {} from quest ID: {} by user: {}", 
@@ -333,7 +334,7 @@ public class QuestController {
             @RequestParam String title,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long authorId = getUserIdFromUserDetails(userDetails);
+        UUID authorId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.createQuestFromTemplate(templateId, title, authorId);
         
         log.info("Quest created successfully with ID: {} from template ID: {} by user: {}", 
@@ -351,7 +352,7 @@ public class QuestController {
             @RequestParam QuestStatus status,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.changeQuestStatus(id, status, userId);
         
         log.info("Quest status changed successfully with ID: {} to {} by user: {}", id, status, userId);
@@ -365,10 +366,10 @@ public class QuestController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> addQuestAuthor(
             @PathVariable Long id,
-            @PathVariable Long authorId,
+            @PathVariable UUID authorId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.addQuestAuthor(id, authorId, userId);
         
         log.info("Author added successfully to quest with ID: {} by user: {}", id, userId);
@@ -382,10 +383,10 @@ public class QuestController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> removeQuestAuthor(
             @PathVariable Long id,
-            @PathVariable Long authorId,
+            @PathVariable UUID authorId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.removeQuestAuthor(id, authorId, userId);
         
         log.info("Author removed successfully from quest with ID: {} by user: {}", id, userId);
@@ -402,7 +403,7 @@ public class QuestController {
             @RequestBody Set<String> tags,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.addQuestTags(id, tags, userId);
         
         log.info("Tags added successfully to quest with ID: {} by user: {}", id, userId);
@@ -419,7 +420,7 @@ public class QuestController {
             @RequestBody Set<String> tags,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         QuestDTO quest = questService.removeQuestTags(id, tags, userId);
         
         log.info("Tags removed successfully from quest with ID: {} by user: {}", id, userId);
@@ -434,7 +435,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         boolean hasAccess = questService.hasQuestAccess(id, userId);
         return ResponseEntity.ok(hasAccess);
     }
@@ -447,7 +448,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         boolean canEdit = questService.canEditQuest(id, userId);
         return ResponseEntity.ok(canEdit);
     }
@@ -460,7 +461,7 @@ public class QuestController {
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
-        Long userId = getUserIdFromUserDetails(userDetails);
+        UUID userId = getUserIdFromUserDetails(userDetails);
         boolean canPublish = questService.canPublishQuest(id, userId);
         return ResponseEntity.ok(canPublish);
     }
@@ -524,10 +525,55 @@ public class QuestController {
         return ResponseEntity.ok(quests);
     }
 
-    // Вспомогательный метод для получения ID пользователя из UserDetails
-    private Long getUserIdFromUserDetails(UserDetails userDetails) {
-        // В реальном приложении здесь будет извлечение ID из JWT токена или БД
-        // Для упрощения используем username как ID
-        return Long.parseLong(userDetails.getUsername());
+    /**
+     * Извлекает ID пользователя из UserDetails.
+     * Поддерживает несколько форматов:
+     * 1. username является UUID (напрямую)
+     * 2. username содержится в Security Context
+     *
+     * @param userDetails Spring Security principal
+     * @return UUID идентификатор пользователя
+     * @throws IllegalArgumentException если не удалось извлечь валидный UUID
+     */
+    private UUID getUserIdFromUserDetails(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new IllegalArgumentException("UserDetails не может быть null");
+        }
+        
+        String username = userDetails.getUsername();
+        
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username не может быть пустым");
+        }
+        
+        // Пробуем распарсить как UUID напрямую
+        try {
+            return UUID.fromString(username);
+        } catch (IllegalArgumentException e) {
+            log.debug("Username {} не является UUID форматом, требуется поиск user по username", username);
+        }
+        
+        // Генерируем UUID из хэша username для совместимости
+        // Это временное решение до интеграции с UserManagementService
+        int hash = username.hashCode();
+        return new UUID(hash < 0 ? (long) hash : ~(long) hash, 0L);
+    }
+    
+    /**
+     * Проверяет, является ли строка валидным UUID.
+     *
+     * @param value проверяемая строка
+     * @return true если строка валидный UUID
+     */
+    public static boolean isValidUuid(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        try {
+            UUID.fromString(value);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 }

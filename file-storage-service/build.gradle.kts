@@ -22,6 +22,7 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.opentelemetry:opentelemetry-api:1.32.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")

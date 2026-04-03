@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,7 +34,7 @@ public class InAppNotificationChannel implements NotificationChannel {
     private String userNotificationDestination;
 
     // Кэш активных подключений пользователей
-    private final Map<Long, Boolean> activeUsers = new ConcurrentHashMap<>();
+    private final Map<UUID, Boolean> activeUsers = new ConcurrentHashMap<>();
 
     @Override
     public String getChannelType() {
@@ -155,14 +156,14 @@ public class InAppNotificationChannel implements NotificationChannel {
     /**
      * Проверка, активен ли пользователь
      */
-    private boolean isUserActive(Long userId) {
+    private boolean isUserActive(UUID userId) {
         return activeUsers.getOrDefault(userId, false);
     }
 
     /**
      * Регистрация пользователя как активного
      */
-    public void registerUser(Long userId) {
+    public void registerUser(UUID userId) {
         activeUsers.put(userId, true);
         log.debug("User {} registered as active for in-app notifications", userId);
     }
@@ -170,7 +171,7 @@ public class InAppNotificationChannel implements NotificationChannel {
     /**
      * Удаление пользователя из активных
      */
-    public void unregisterUser(Long userId) {
+    public void unregisterUser(UUID userId) {
         activeUsers.remove(userId);
         log.debug("User {} unregistered from in-app notifications", userId);
     }

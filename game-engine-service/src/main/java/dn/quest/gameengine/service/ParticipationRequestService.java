@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления запросами на участие в игровых сессиях
@@ -23,7 +24,7 @@ public interface ParticipationRequestService {
     void deleteRequest(Long id);
     
     // Управление запросами
-    ParticipationRequest submitRequest(Long sessionId, Long userId, String message);
+    ParticipationRequest submitRequest(Long sessionId, UUID userId, String message);
     ParticipationRequest approveRequest(Long requestId, Long approvedBy);
     ParticipationRequest rejectRequest(Long requestId, Long rejectedBy, String reason);
     ParticipationRequest cancelRequest(Long requestId, Long cancelledBy);
@@ -32,10 +33,10 @@ public interface ParticipationRequestService {
     // Поиск и фильтрация запросов
     Page<ParticipationRequest> getAllRequests(Pageable pageable);
     List<ParticipationRequest> getRequestsBySession(Long sessionId);
-    List<ParticipationRequest> getRequestsByUser(Long userId);
+    List<ParticipationRequest> getRequestsByUser(UUID userId);
     List<ParticipationRequest> getRequestsByStatus(ParticipationStatus status);
     List<ParticipationRequest> getRequestsBySessionAndStatus(Long sessionId, ParticipationStatus status);
-    List<ParticipationRequest> getRequestsByUserAndStatus(Long userId, ParticipationStatus status);
+    List<ParticipationRequest> getRequestsByUserAndStatus(UUID userId, ParticipationStatus status);
     
     // Статус запросов
     List<ParticipationRequest> getPendingRequests();
@@ -47,13 +48,13 @@ public interface ParticipationRequestService {
     // Статистика запросов
     long getTotalRequestsCount();
     long getRequestsCountBySession(Long sessionId);
-    long getRequestsCountByUser(Long userId);
+    long getRequestsCountByUser(UUID userId);
     long getRequestsCountByStatus(ParticipationStatus status);
     long getPendingRequestsCount();
     long getApprovedRequestsCount();
     long getRejectedRequestsCount();
     double getApprovalRate(Long sessionId);
-    double getApprovalRateByUser(Long userId);
+    double getApprovalRateByUser(UUID userId);
     
     // Анализ запросов
     List<ParticipationRequest> getRecentRequests(int limit);
@@ -70,34 +71,34 @@ public interface ParticipationRequestService {
     Double getAverageProcessingTimeByStatus(ParticipationStatus status);
     
     // Валидация и бизнес-логика
-    boolean canSubmitRequest(Long sessionId, Long userId);
-    boolean canApproveRequest(Long requestId, Long userId);
-    boolean canRejectRequest(Long requestId, Long userId);
-    boolean canCancelRequest(Long requestId, Long userId);
-    boolean canWithdrawRequest(Long requestId, Long userId);
+    boolean canSubmitRequest(Long sessionId, UUID userId);
+    boolean canApproveRequest(Long requestId, UUID userId);
+    boolean canRejectRequest(Long requestId, UUID userId);
+    boolean canCancelRequest(Long requestId, UUID userId);
+    boolean canWithdrawRequest(Long requestId, UUID userId);
     boolean isRequestPending(Long requestId);
     boolean isRequestProcessed(Long requestId);
-    boolean hasActiveRequest(Long sessionId, Long userId);
-    boolean hasPendingRequest(Long sessionId, Long userId);
+    boolean hasActiveRequest(Long sessionId, UUID userId);
+    boolean hasPendingRequest(Long sessionId, UUID userId);
     
     // Управление лимитами
-    boolean isRequestLimitReached(Long sessionId, Long userId);
-    int getRemainingRequests(Long sessionId, Long userId);
+    boolean isRequestLimitReached(Long sessionId, UUID userId);
+    int getRemainingRequests(Long sessionId, UUID userId);
     boolean isSessionFull(Long sessionId);
-    boolean isUserBanned(Long sessionId, Long userId);
-    boolean isUserEligible(Long sessionId, Long userId);
+    boolean isUserBanned(Long sessionId, UUID userId);
+    boolean isUserEligible(Long sessionId, UUID userId);
     
     // Операции с сессиями
     List<ParticipationRequest> getSessionRequestsSummary(Long sessionId);
-    ParticipationRequest getLatestRequestByUser(Long sessionId, Long userId);
+    ParticipationRequest getLatestRequestByUser(Long sessionId, UUID userId);
     List<ParticipationRequest> getPendingRequestsForSession(Long sessionId);
     List<ParticipationRequest> getApprovedRequestsForSession(Long sessionId);
     int getApprovedParticipantsCount(Long sessionId);
     int getAvailableSlots(Long sessionId);
     
     // Командные операции
-    List<ParticipationRequest> getTeamRequests(Long sessionId, Long teamId);
-    ParticipationRequest submitTeamRequest(Long sessionId, Long teamId, Long submittedBy, String message);
+    List<ParticipationRequest> getTeamRequests(Long sessionId, UUID teamId);
+    ParticipationRequest submitTeamRequest(Long sessionId, UUID teamId, Long submittedBy, String message);
     ParticipationRequest approveTeamRequest(Long requestId, Long approvedBy);
     List<ParticipationRequest> getPendingTeamRequests(Long sessionId);
     
@@ -134,7 +135,7 @@ public interface ParticipationRequestService {
     List<Object[]> getRequestStatisticsByHour(Long sessionId, Instant start, Instant end);
     List<Object[]> getRequestStatisticsByDay(Long sessionId, Instant start, Instant end);
     List<Object[]> getRequestStatusAnalysis(Long sessionId);
-    List<Object[]> getUserRequestSummary(Long userId);
+    List<Object[]> getUserRequestSummary(UUID userId);
     List<Object[]> getSessionRequestAnalysis(Long sessionId);
     List<Object[]> getProcessingTimeAnalysis(Long sessionId);
     
@@ -169,14 +170,14 @@ public interface ParticipationRequestService {
     boolean isAutoApprovalEnabled(Long sessionId);
     
     // Операции с условиями
-    boolean meetsParticipationConditions(Long sessionId, Long userId);
+    boolean meetsParticipationConditions(Long sessionId, UUID userId);
     List<String> getParticipationConditions(Long sessionId);
-    boolean hasRequiredPrerequisites(Long sessionId, Long userId);
-    List<String> getMissingPrerequisites(Long sessionId, Long userId);
+    boolean hasRequiredPrerequisites(Long sessionId, UUID userId);
+    List<String> getMissingPrerequisites(Long sessionId, UUID userId);
     
     // Операции с историей
     List<String> getRequestHistory(Long requestId);
-    void addRequestNote(Long requestId, String note, Long authorId);
+    void addRequestNote(Long requestId, String note, UUID authorId);
     List<String> getRequestNotes(Long requestId);
     
     // Операции с пакетной обработкой
@@ -187,7 +188,7 @@ public interface ParticipationRequestService {
     // Операции с фильтрацией
     Page<ParticipationRequest> getRequestsWithFilters(
         Long sessionId,
-        Long userId,
+        UUID userId,
         ParticipationStatus status,
         Instant startDate,
         Instant endDate,
@@ -197,7 +198,7 @@ public interface ParticipationRequestService {
     
     // Операции с экспортом
     List<ParticipationRequest> exportRequests(Long sessionId);
-    List<ParticipationRequest> exportUserRequests(Long userId);
+    List<ParticipationRequest> exportUserRequests(UUID userId);
     String generateRequestReport(Long sessionId);
-    String generateUserRequestReport(Long userId);
+    String generateUserRequestReport(UUID userId);
 }

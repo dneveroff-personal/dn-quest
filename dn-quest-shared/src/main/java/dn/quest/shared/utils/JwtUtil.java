@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -239,11 +240,14 @@ public final class JwtUtil {
     /**
      * Извлекает ID пользователя из токена
      */
-    public static Long extractUserId(String token, String secret) {
+    public static UUID extractUserId(String token, String secret) {
         Object userId = getCustomClaim(token, secret, "userId");
-        if (userId instanceof Number) {
-            return ((Number) userId).longValue();
-        }
+        if (userId instanceof String) {
+            try {
+                return UUID.fromString((String) userId);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }        }
         return null;
     }
     

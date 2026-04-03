@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с пользовательскими предпочтениями уведомлений
@@ -19,12 +20,12 @@ public interface UserNotificationPreferencesRepository extends JpaRepository<Use
     /**
      * Найти предпочтения пользователя по ID
      */
-    Optional<UserNotificationPreferences> findByUserId(Long userId);
+    Optional<UserNotificationPreferences> findByUserId(UUID userId);
 
     /**
      * Проверить существование предпочтений для пользователя
      */
-    boolean existsByUserId(Long userId);
+    boolean existsByUserId(UUID userId);
 
     /**
      * Найти пользователей с включенными email уведомлениями
@@ -92,28 +93,28 @@ public interface UserNotificationPreferencesRepository extends JpaRepository<Use
      */
     @Modifying
     @Query("UPDATE UserNotificationPreferences p SET p.fcmToken = :fcmToken WHERE p.userId = :userId")
-    int updateFcmToken(@Param("userId") Long userId, @Param("fcmToken") String fcmToken);
+    int updateFcmToken(@Param("userId") UUID userId, @Param("fcmToken") String fcmToken);
 
     /**
      * Обновить Telegram chat ID пользователя
      */
     @Modifying
     @Query("UPDATE UserNotificationPreferences p SET p.telegramChatId = :telegramChatId WHERE p.userId = :userId")
-    int updateTelegramChatId(@Param("userId") Long userId, @Param("telegramChatId") String telegramChatId);
+    int updateTelegramChatId(@Param("userId") UUID userId, @Param("telegramChatId") String telegramChatId);
 
     /**
      * Обновить email пользователя
      */
     @Modifying
     @Query("UPDATE UserNotificationPreferences p SET p.email = :email WHERE p.userId = :userId")
-    int updateEmail(@Param("userId") Long userId, @Param("email") String email);
+    int updateEmail(@Param("userId") UUID userId, @Param("email") String email);
 
     /**
      * Обновить телефон пользователя
      */
     @Modifying
     @Query("UPDATE UserNotificationPreferences p SET p.phone = :phone WHERE p.userId = :userId")
-    int updatePhone(@Param("userId") Long userId, @Param("phone") String phone);
+    int updatePhone(@Param("userId") UUID userId, @Param("phone") String phone);
 
     /**
      * Подсчитать количество пользователей с включенными уведомлениями по типу

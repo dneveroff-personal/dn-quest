@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для настроек команды
@@ -18,8 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamSettingsDTO {
 
-    private Long id;
-    private Long teamId;
+    private UUID id;
+    private UUID teamId;
     private Boolean allowMemberInvites;
     private Boolean requireCaptainApproval;
     private Boolean autoAcceptInvites;

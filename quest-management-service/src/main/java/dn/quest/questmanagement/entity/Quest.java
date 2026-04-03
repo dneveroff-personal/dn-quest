@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сущность квеста в системе управления квестами
@@ -91,7 +92,7 @@ public class Quest {
                     uniqueConstraints = @UniqueConstraint(name = "uk_quest_author", columnNames = {"quest_id", "author_id"}))
     @Column(name = "author_id", nullable = false)
     @Builder.Default
-    private Set<Long> authorIds = new HashSet<>();
+    private Set<UUID> authorIds = new HashSet<>();
 
     /**
      * Дата начала квеста
@@ -289,7 +290,7 @@ public class Quest {
     /**
      * Добавляет автора квеста
      */
-    public void addAuthor(Long authorId) {
+    public void addAuthor(UUID authorId) {
         if (authorId != null) {
             authorIds.add(authorId);
         }
@@ -298,7 +299,7 @@ public class Quest {
     /**
      * Удаляет автора квеста
      */
-    public void removeAuthor(Long authorId) {
+    public void removeAuthor(UUID authorId) {
         authorIds.remove(authorId);
     }
 

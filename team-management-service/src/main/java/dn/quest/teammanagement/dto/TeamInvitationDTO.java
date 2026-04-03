@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для приглашения в команду
@@ -18,7 +19,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class TeamInvitationDTO {
 
-    private Long id;
+    private UUID id;
     private TeamDTO team;
     private UserDTO user;
     private UserDTO invitedBy;

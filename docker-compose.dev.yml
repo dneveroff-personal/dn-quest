@@ -221,7 +221,7 @@ services:
       - "${AUTHENTICATION_SERVICE_DEBUG_PORT:-5006}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_AUTH_DB:-dnquest_auth}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -270,7 +270,7 @@ services:
       - "${USER_MANAGEMENT_SERVICE_DEBUG_PORT:-5007}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_USERS_DB:-dnquest_users}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -318,7 +318,7 @@ services:
       - "${QUEST_MANAGEMENT_SERVICE_DEBUG_PORT:-5008}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_QUESTS_DB:-dnquest_quests}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -367,7 +367,7 @@ services:
       - "${GAME_ENGINE_SERVICE_DEBUG_PORT:-5009}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_GAME_DB:-dnquest_game}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -419,7 +419,7 @@ services:
       - "${TEAM_MANAGEMENT_SERVICE_DEBUG_PORT:-5010}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_TEAMS_DB:-dnquest_teams}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -516,7 +516,7 @@ services:
       - "${STATISTICS_SERVICE_DEBUG_PORT:-5012}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_STATISTICS_DB:-dnquest_statistics}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
@@ -565,7 +565,7 @@ services:
       - "${FILE_STORAGE_SERVICE_DEBUG_PORT:-5013}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_DEV_DB:-dnquest_dev}
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_FILES_DB:-dnquest_files}
       DATABASE_USERNAME: ${POSTGRES_USER:-dn}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 /**
  * DTO для запроса валидации токена
  */
@@ -25,7 +27,7 @@ public class ValidateTokenRequest {
     /**
      * ID пользователя (опционально)
      */
-    private Long userId;
+    private UUID userId;
     
     /**
      * Имя пользователя (опционально)

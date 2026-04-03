@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * Событие отправки кода
  */
@@ -20,7 +22,7 @@ public class CodeSubmittedEvent extends BaseEvent {
     private String eventId;
     private Long attemptId;
     private Long sessionId;
-    private Long userId;
+    private UUID userId;
     private Long levelId;
     private String submittedCode;
     private String codeSector;

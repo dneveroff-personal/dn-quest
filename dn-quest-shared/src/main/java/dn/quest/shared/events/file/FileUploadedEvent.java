@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * Событие загрузки файла
  */
@@ -16,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 public class FileUploadedEvent extends BaseEvent {
 
     private Long fileId;
-    private Long userId;
+    private UUID userId;
     private String fileName;
     private String originalFileName;
     private String contentType;

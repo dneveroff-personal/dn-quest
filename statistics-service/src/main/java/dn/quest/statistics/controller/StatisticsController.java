@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Контроллер для работы со статистикой
@@ -64,7 +65,7 @@ public class StatisticsController {
     @Operation(summary = "Получить статистику пользователя", description = "Возвращает детальную статистику по указанному пользователю")
     public ResponseEntity<UserStatisticsDTO> getUserStatistics(
             @Parameter(description = "ID пользователя") 
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             
             @Parameter(description = "Дата статистики") 
             @RequestParam(required = false) 
@@ -83,7 +84,7 @@ public class StatisticsController {
     @Operation(summary = "Получить статистику пользователя за период", description = "Возвращает статистику пользователя за указанный период")
     public ResponseEntity<Page<UserStatisticsDTO>> getUserStatisticsForPeriod(
             @Parameter(description = "ID пользователя") 
-            @PathVariable Long userId,
+            @PathVariable UUID userId,
             
             @Parameter(description = "Начальная дата периода") 
             @RequestParam 
@@ -132,7 +133,7 @@ public class StatisticsController {
     @Operation(summary = "Получить статистику команды", description = "Возвращает детальную статистику по указанной команде")
     public ResponseEntity<Map<String, Object>> getTeamStatistics(
             @Parameter(description = "ID команды") 
-            @PathVariable Long teamId,
+            @PathVariable UUID teamId,
             
             @Parameter(description = "Дата статистики") 
             @RequestParam(required = false) 

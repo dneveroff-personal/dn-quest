@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * Событие начала игровой сессии
  */
@@ -16,8 +18,8 @@ import lombok.NoArgsConstructor;
 public class GameSessionStartedEvent extends BaseEvent {
 
     private Long sessionId;
-    private Long userId;
-    private Long teamId;
+    private UUID userId;
+    private UUID teamId;
     private Long questId;
     private String difficulty;
 }

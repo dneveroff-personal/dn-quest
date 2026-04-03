@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Базовый DTO класс с общими полями
@@ -19,17 +20,17 @@ public abstract class BaseDTO {
 
     /**
      * Создает новый BaseDTO с указанным ID
-     * @param id идентификатор
+     * @param id идентификатор UUID
      * @return новый объект BaseDTO
      */
-    public static BaseDTO create(Long id) {
+    public static BaseDTO create(UUID id) {
         return new BaseDTO() {{ setId(id); }};
     }
 
     /**
      * Идентификатор сущности
      */
-    private Long id;
+    private UUID id;
     
     /**
      * Дата и время создания

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие удаления команды
  */
@@ -16,5 +18,5 @@ public class TeamDeletedEvent extends BaseEvent {
     /**
      * ID удалённой команды
      */
-    private Long teamId;
+    private UUID teamId;
 }

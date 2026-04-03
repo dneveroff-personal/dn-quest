@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления статистикой пользователей
@@ -15,12 +16,12 @@ public interface UserStatisticsService {
     /**
      * Создает статистику пользователя по умолчанию
      */
-    UserStatisticsDTO createUserStatistics(Long userId);
+    UserStatisticsDTO createUserStatistics(UUID userId);
 
     /**
      * Получает статистику пользователя по ID пользователя
      */
-    Optional<UserStatisticsDTO> getUserStatisticsByUserId(Long userId);
+    Optional<UserStatisticsDTO> getUserStatisticsByUserId(UUID userId);
 
     /**
      * Получает статистику пользователя по ID статистики
@@ -30,53 +31,53 @@ public interface UserStatisticsService {
     /**
      * Добавляет опыт пользователю
      */
-    UserStatisticsDTO addExperience(Long userId, Long experience);
+    UserStatisticsDTO addExperience(UUID userId, Long experience);
 
     /**
      * Добавляет очки пользователю
      */
-    UserStatisticsDTO addScore(Long userId, Long score);
+    UserStatisticsDTO addScore(UUID userId, Long score);
 
     /**
      * Обновляет статистику квестов
      */
-    UserStatisticsDTO updateQuestStatistics(Long userId, Boolean completed, Long playtimeMinutes);
+    UserStatisticsDTO updateQuestStatistics(UUID userId, Boolean completed, Long playtimeMinutes);
 
     /**
      * Обновляет статистику уровней
      */
-    UserStatisticsDTO updateLevelStatistics(Long userId, Boolean levelCompleted, 
+    UserStatisticsDTO updateLevelStatistics(UUID userId, Boolean levelCompleted, 
                                            Boolean codeSolved, Boolean hintUsed, Boolean attemptMade);
 
     /**
      * Обновляет статистику команд
      */
-    UserStatisticsDTO updateTeamStatistics(Long userId, String actionType);
+    UserStatisticsDTO updateTeamStatistics(UUID userId, String actionType);
 
     /**
      * Обновляет статистику достижений
      */
-    UserStatisticsDTO updateAchievementStatistics(Long userId, String achievementType);
+    UserStatisticsDTO updateAchievementStatistics(UUID userId, String achievementType);
 
     /**
      * Обновляет статистику входов
      */
-    UserStatisticsDTO updateLoginStatistics(Long userId);
+    UserStatisticsDTO updateLoginStatistics(UUID userId);
 
     /**
      * Обновляет серию дней
      */
-    UserStatisticsDTO updateStreakStatistics(Long userId);
+    UserStatisticsDTO updateStreakStatistics(UUID userId);
 
     /**
      * Обновляет время последней активности
      */
-    UserStatisticsDTO updateLastActivity(Long userId);
+    UserStatisticsDTO updateLastActivity(UUID userId);
 
     /**
      * Удаляет статистику пользователя
      */
-    void deleteUserStatistics(Long userId);
+    void deleteUserStatistics(UUID userId);
 
     /**
      * Получает топ пользователей по очкам
@@ -141,17 +142,17 @@ public interface UserStatisticsService {
     /**
      * Получает ранг пользователя по очкам
      */
-    Long getUserRankByScore(Long userId);
+    Long getUserRankByScore(UUID userId);
 
     /**
      * Получает ранг пользователя по уровню
      */
-    Long getUserRankByLevel(Long userId);
+    Long getUserRankByLevel(UUID userId);
 
     /**
      * Проверяет существование статистики пользователя
      */
-    boolean existsByUserId(Long userId);
+    boolean existsByUserId(UUID userId);
 
     /**
      * Получает общую статистику сервиса
@@ -161,15 +162,15 @@ public interface UserStatisticsService {
     /**
      * Обновляет статистику игровых сессий
      */
-    void updateGameSessionStatistics(Long userId, Long sessionId, String status);
+    void updateGameSessionStatistics(UUID userId, Long sessionId, String status);
 
     /**
      * Обновляет статистику прохождения уровней
      */
-    void updateLevelCompletionStatistics(Long userId, Integer levelNumber);
+    void updateLevelCompletionStatistics(UUID userId, Integer levelNumber);
 
     /**
      * Обновляет статистику файлов
      */
-    void updateFileStatistics(Long userId, Long fileId, String action);
+    void updateFileStatistics(UUID userId, Long fileId, String action);
 }

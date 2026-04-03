@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения командной статистики
@@ -29,14 +30,14 @@ import java.time.LocalDateTime;
 public class TeamStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID команды
      */
     @Column(name = "team_id", nullable = false)
-    private Long teamId;
+    private UUID teamId;
 
     /**
      * Название команды
@@ -48,7 +49,7 @@ public class TeamStatistics {
      * ID капитана команды
      */
     @Column(name = "captain_id")
-    private Long captainId;
+    private UUID captainId;
 
     /**
      * Дата статистики

@@ -8,6 +8,7 @@ import dn.quest.teammanagement.entity.TeamMember;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис для управления командами
@@ -17,27 +18,27 @@ public interface TeamService {
     /**
      * Создать новую команду
      */
-    TeamDTO createTeam(CreateTeamRequest request, Long captainId);
+    TeamDTO createTeam(CreateTeamRequest request, UUID captainId);
 
     /**
      * Получить команду по ID
      */
-    TeamDTO getTeamById(Long teamId);
+    TeamDTO getTeamById(UUID teamId);
 
     /**
      * Получить полную информацию о команде
      */
-    TeamDTO getFullTeamById(Long teamId);
+    TeamDTO getFullTeamById(UUID teamId);
 
     /**
      * Обновить информацию о команде
      */
-    TeamDTO updateTeam(Long teamId, UpdateTeamRequest request, Long userId);
+    TeamDTO updateTeam(UUID teamId, UpdateTeamRequest request, UUID userId);
 
     /**
      * Удалить команду
      */
-    void deleteTeam(Long teamId, Long userId);
+    void deleteTeam(UUID teamId, UUID userId);
 
     /**
      * Получить список команд с пагинацией
@@ -62,107 +63,107 @@ public interface TeamService {
     /**
      * Получить команды пользователя
      */
-    List<TeamDTO> getUserTeams(Long userId);
+    List<TeamDTO> getUserTeams(UUID userId);
 
     /**
      * Получить команды пользователя постранично
      */
-    TeamListResponse getUserTeams(Long userId, Pageable pageable);
+    TeamListResponse getUserTeams(UUID userId, Pageable pageable);
 
     /**
      * Получить активные команды пользователя
      */
-    List<TeamDTO> getUserActiveTeams(Long userId);
+    List<TeamDTO> getUserActiveTeams(UUID userId);
 
     /**
      * Проверить, является ли пользователь капитаном команды
      */
-    boolean isTeamCaptain(Long teamId, Long userId);
+    boolean isTeamCaptain(UUID teamId, UUID userId);
 
     /**
      * Проверить, состоит ли пользователь в команде
      */
-    boolean isTeamMember(Long teamId, Long userId);
+    boolean isTeamMember(UUID teamId, UUID userId);
 
     /**
      * Получить роль пользователя в команде
      */
-    String getUserRoleInTeam(Long teamId, Long userId);
+    String getUserRoleInTeam(UUID teamId, UUID userId);
 
     /**
      * Проверить, может ли пользователь управлять командой
      */
-    boolean canManageTeam(Long teamId, Long userId);
+    boolean canManageTeam(UUID teamId, UUID userId);
 
     /**
      * Передать права капитана
      */
-    TeamMember transferCaptain(Long teamId, Long newCaptainId, Long currentCaptainId);
+    TeamMember transferCaptain(UUID teamId, UUID newCaptainId, UUID currentCaptainId);
 
     /**
      * Добавить участника в команду
      */
-    TeamMember addMember(Long teamId, Long userId, Long requesterId);
+    TeamMember addMember(UUID teamId, UUID userId, UUID requesterId);
 
     /**
      * Удалить участника из команды
      */
-    void removeMember(Long teamId, Long userId, Long requesterId);
+    void removeMember(UUID teamId, UUID userId, UUID requesterId);
 
     /**
      * Изменить роль участника
      */
-    TeamMember changeMemberRole(Long teamId, Long userId, String newRole, Long requesterId);
+    TeamMember changeMemberRole(UUID teamId, UUID userId, String newRole, UUID requesterId);
 
     /**
      * Пригласить пользователя в команду
      */
-    TeamInvitationDTO inviteUser(Long teamId, InviteUserRequest request, Long inviterId);
+    TeamInvitationDTO inviteUser(UUID teamId, InviteUserRequest request, Long inviterId);
 
     /**
      * Получить приглашения команды
      */
-    List<TeamInvitationDTO> getTeamInvitations(Long teamId, Long userId);
+    List<TeamInvitationDTO> getTeamInvitations(UUID teamId, UUID userId);
 
     /**
      * Получить активные приглашения команды
      */
-    List<TeamInvitationDTO> getTeamActiveInvitations(Long teamId, Long userId);
+    List<TeamInvitationDTO> getTeamActiveInvitations(UUID teamId, UUID userId);
 
     /**
      * Отозвать приглашение
      */
-    void revokeInvitation(Long teamId, Long invitationId, Long userId);
+    void revokeInvitation(UUID teamId, Long invitationId, UUID userId);
 
     /**
      * Получить настройки команды
      */
-    TeamSettingsDTO getTeamSettings(Long teamId);
+    TeamSettingsDTO getTeamSettings(UUID teamId);
 
     /**
      * Обновить настройки команды
      */
-    TeamSettingsDTO updateTeamSettings(Long teamId, UpdateTeamSettingsRequest request, Long userId);
+    TeamSettingsDTO updateTeamSettings(UUID teamId, UpdateTeamSettingsRequest request, UUID userId);
 
     /**
      * Получить статистику команды
      */
-    TeamStatisticsDTO getTeamStatistics(Long teamId);
+    TeamStatisticsDTO getTeamStatistics(UUID teamId);
 
     /**
      * Обновить статистику команды
      */
-    void updateTeamStatistics(Long teamId);
+    void updateTeamStatistics(UUID teamId);
 
     /**
      * Получить участников команды
      */
-    List<TeamMemberDTO> getTeamMembers(Long teamId);
+    List<TeamMemberDTO> getTeamMembers(UUID teamId);
 
     /**
      * Получить активных участников команды
      */
-    List<TeamMemberDTO> getTeamActiveMembers(Long teamId, Long userId);
+    List<TeamMemberDTO> getTeamActiveMembers(UUID teamId, UUID userId);
 
     /**
      * Получить команды по названию
@@ -192,17 +193,17 @@ public interface TeamService {
     /**
      * Активировать команду
      */
-    void activateTeam(Long teamId, Long userId);
+    void activateTeam(UUID teamId, UUID userId);
 
     /**
      * Деактивировать команду
      */
-    void deactivateTeam(Long teamId, Long userId);
+    void deactivateTeam(UUID teamId, UUID userId);
 
     /**
      * Проверить, существует ли команда
      */
-    boolean teamExists(Long teamId);
+    boolean teamExists(UUID teamId);
 
     /**
      * Проверить, существует ли команда с таким названием
@@ -212,17 +213,17 @@ public interface TeamService {
     /**
      * Получить Entity команды (для внутреннего использования)
      */
-    Team getTeamEntity(Long teamId);
+    Team getTeamEntity(UUID teamId);
 
     /**
      * Обновить рейтинг команды
      */
-    void updateTeamRating(Long teamId, Double newRating);
+    void updateTeamRating(UUID teamId, Double newRating);
 
     /**
      * Обновить ранг команды
      */
-    void updateTeamRank(Long teamId, Integer newRank);
+    void updateTeamRank(UUID teamId, Integer newRank);
 
     /**
      * Получить команды для обновления рейтингов
@@ -254,5 +255,5 @@ public interface TeamService {
     /**
      * Обновить статистику игровой сессии
      */
-    void updateGameSessionStatistics(Long teamId, String sessionId, String status);
+    void updateGameSessionStatistics(UUID teamId, String sessionId, String status);
 }

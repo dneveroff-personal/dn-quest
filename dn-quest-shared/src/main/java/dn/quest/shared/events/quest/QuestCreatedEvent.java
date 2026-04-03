@@ -4,6 +4,8 @@ import dn.quest.shared.events.BaseEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие создания квеста
  */
@@ -39,7 +41,7 @@ public class QuestCreatedEvent extends BaseEvent {
     /**
      * ID автора квеста
      */
-    private Long authorId;
+    private UUID authorId;
 
     /**
      * Опубликован ли квест

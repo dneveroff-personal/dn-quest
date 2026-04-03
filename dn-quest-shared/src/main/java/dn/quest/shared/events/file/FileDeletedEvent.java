@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * Событие удаления файла
  */
@@ -16,6 +18,6 @@ import lombok.experimental.SuperBuilder;
 public class FileDeletedEvent extends BaseEvent {
 
     private Long fileId;
-    private Long userId;
+    private UUID userId;
     private String fileName;
 }

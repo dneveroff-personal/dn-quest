@@ -60,7 +60,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     private int defaultMaxPerDay;
 
     @Override
-    public UserNotificationPreferences createPreferences(Long userId) {
+    public UserNotificationPreferences createPreferences(UUID userId) {
         log.info("Creating notification preferences for user: {}", userId);
 
         if (preferencesRepository.existsByUserId(userId)) {
@@ -97,12 +97,12 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserNotificationPreferences> getPreferences(Long userId) {
+    public Optional<UserNotificationPreferences> getPreferences(UUID userId) {
         return preferencesRepository.findByUserId(userId);
     }
 
     @Override
-    public UserNotificationPreferences updatePreferences(Long userId, UserNotificationPreferences preferences) {
+    public UserNotificationPreferences updatePreferences(UUID userId, UserNotificationPreferences preferences) {
         log.info("Updating notification preferences for user: {}", userId);
 
         UserNotificationPreferences existing = preferencesRepository.findByUserId(userId)
@@ -142,7 +142,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public UserNotificationPreferences updatePreferences(Long userId, Map<String, Object> updates) {
+    public UserNotificationPreferences updatePreferences(UUID userId, Map<String, Object> updates) {
         log.info("Updating specific preferences for user: {}", userId);
 
         UserNotificationPreferences existing = preferencesRepository.findByUserId(userId)
@@ -232,7 +232,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public void deletePreferences(Long userId) {
+    public void deletePreferences(UUID userId) {
         log.info("Deleting notification preferences for user: {}", userId);
         
         UserNotificationPreferences preferences = preferencesRepository.findByUserId(userId)
@@ -244,7 +244,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isNotificationTypeEnabled(Long userId, NotificationType type) {
+    public boolean isNotificationTypeEnabled(UUID userId, NotificationType type) {
         Optional<UserNotificationPreferences> preferences = getPreferences(userId);
         if (preferences.isEmpty()) {
             // Если предпочтений нет, используем значения по умолчанию
@@ -263,7 +263,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isNotificationCategoryEnabled(Long userId, String category) {
+    public boolean isNotificationCategoryEnabled(UUID userId, String category) {
         Optional<UserNotificationPreferences> preferences = getPreferences(userId);
         if (preferences.isEmpty()) {
             return getDefaultCategoryEnabled(category);
@@ -285,7 +285,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isDoNotDisturbActive(Long userId) {
+    public boolean isDoNotDisturbActive(UUID userId) {
         Optional<UserNotificationPreferences> preferences = getPreferences(userId);
         if (preferences.isEmpty()) {
             return false;
@@ -318,45 +318,45 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public void updateFcmToken(Long userId, String fcmToken) {
+    public void updateFcmToken(UUID userId, String fcmToken) {
         preferencesRepository.updateFcmToken(userId, fcmToken);
         log.debug("Updated FCM token for user: {}", userId);
     }
 
     @Override
-    public void updateTelegramChatId(Long userId, String telegramChatId) {
+    public void updateTelegramChatId(UUID userId, String telegramChatId) {
         preferencesRepository.updateTelegramChatId(userId, telegramChatId);
         log.debug("Updated Telegram chat ID for user: {}", userId);
     }
 
     @Override
-    public void updateEmail(Long userId, String email) {
+    public void updateEmail(UUID userId, String email) {
         preferencesRepository.updateEmail(userId, email);
         log.debug("Updated email for user: {}", userId);
     }
 
     @Override
-    public void updatePhone(Long userId, String phone) {
+    public void updatePhone(UUID userId, String phone) {
         preferencesRepository.updatePhone(userId, phone);
         log.debug("Updated phone for user: {}", userId);
     }
 
     @Override
-    public UserNotificationPreferences toggleNotificationType(Long userId, NotificationType type, boolean enabled) {
+    public UserNotificationPreferences toggleNotificationType(UUID userId, NotificationType type, boolean enabled) {
         Map<String, Object> updates = new HashMap<>();
         updates.put(type.getValue() + "Enabled", enabled);
         return updatePreferences(userId, updates);
     }
 
     @Override
-    public UserNotificationPreferences toggleNotificationCategory(Long userId, String category, boolean enabled) {
+    public UserNotificationPreferences toggleNotificationCategory(UUID userId, String category, boolean enabled) {
         Map<String, Object> updates = new HashMap<>();
         updates.put(category + "Enabled", enabled);
         return updatePreferences(userId, updates);
     }
 
     @Override
-    public UserNotificationPreferences setDoNotDisturb(Long userId, boolean enabled, Integer startHour, Integer endHour) {
+    public UserNotificationPreferences setDoNotDisturb(UUID userId, boolean enabled, Integer startHour, Integer endHour) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("doNotDisturbEnabled", enabled);
         if (enabled) {
@@ -367,7 +367,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public UserNotificationPreferences setNotificationLimits(Long userId, Integer perHour, Integer perDay) {
+    public UserNotificationPreferences setNotificationLimits(UUID userId, Integer perHour, Integer perDay) {
         Map<String, Object> updates = new HashMap<>();
         if (perHour != null) {
             updates.put("maxNotificationsPerHour", perHour);
@@ -379,14 +379,14 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public UserNotificationPreferences setPreferredLanguage(Long userId, String language) {
+    public UserNotificationPreferences setPreferredLanguage(UUID userId, String language) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("preferredLanguage", language);
         return updatePreferences(userId, updates);
     }
 
     @Override
-    public UserNotificationPreferences setTimeZone(Long userId, String timeZone) {
+    public UserNotificationPreferences setTimeZone(UUID userId, String timeZone) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("timeZone", timeZone);
         return updatePreferences(userId, updates);
@@ -417,7 +417,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public UserNotificationPreferences resetToDefaults(Long userId) {
+    public UserNotificationPreferences resetToDefaults(UUID userId) {
         log.info("Resetting notification preferences to defaults for user: {}", userId);
 
         UserNotificationPreferences existing = preferencesRepository.findByUserId(userId)
@@ -449,7 +449,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public Map<String, Object> exportPreferences(Long userId) {
+    public Map<String, Object> exportPreferences(UUID userId) {
         UserNotificationPreferences preferences = getPreferences(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Preferences not found for user: " + userId));
 
@@ -480,7 +480,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
     }
 
     @Override
-    public UserNotificationPreferences importPreferences(Long userId, Map<String, Object> data) {
+    public UserNotificationPreferences importPreferences(UUID userId, Map<String, Object> data) {
         log.info("Importing notification preferences for user: {}", userId);
 
         UserNotificationPreferences preferences = getPreferences(userId)
@@ -491,7 +491,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public boolean checkNotificationLimits(Long userId) {
+    public boolean checkNotificationLimits(UUID userId) {
         Optional<UserNotificationPreferences> preferences = getPreferences(userId);
         if (preferences.isEmpty()) {
             return true; // Если предпочтений нет, лимиты не применяются
@@ -520,7 +520,7 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationType> getAvailableChannels(Long userId) {
+    public List<NotificationType> getAvailableChannels(UUID userId) {
         Optional<UserNotificationPreferences> preferences = getPreferences(userId);
         if (preferences.isEmpty()) {
             return Arrays.asList(NotificationType.EMAIL, NotificationType.PUSH, NotificationType.IN_APP);

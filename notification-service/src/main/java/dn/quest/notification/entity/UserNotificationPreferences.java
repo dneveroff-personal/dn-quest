@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Сущность пользовательских предпочтений уведомлений
@@ -26,14 +27,14 @@ import java.time.Instant;
 public class UserNotificationPreferences {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
-     * ID пользователя
+     * ID пользователя (UUID)
      */
-    @Column(nullable = false, unique = true)
-    private Long userId;
+    @Column(nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    private UUID userId;
 
     /**
      * Email уведомления включены
@@ -190,9 +191,9 @@ public class UserNotificationPreferences {
     private Instant updatedAt;
 
     /**
-     * ID пользователя, обновившего настройки
+     * ID пользователя, обновившего настройки (UUID)
      */
-    private Long updatedBy;
+    private UUID updatedBy;
 
     /**
      * Дополнительные настройки в JSON формате

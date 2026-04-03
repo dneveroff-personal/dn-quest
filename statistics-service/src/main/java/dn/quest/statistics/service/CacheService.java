@@ -3,6 +3,7 @@ package dn.quest.statistics.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для кэширования статистических данных
@@ -12,12 +13,12 @@ public interface CacheService {
     /**
      * Получить кэшированную статистику пользователя
      */
-    Map<String, Object> getUserStatistics(Long userId, LocalDate date);
+    Map<String, Object> getUserStatistics(UUID userId, LocalDate date);
 
     /**
      * Сохранить статистику пользователя в кэш
      */
-    void cacheUserStatistics(Long userId, LocalDate date, Map<String, Object> statistics);
+    void cacheUserStatistics(UUID userId, LocalDate date, Map<String, Object> statistics);
 
     /**
      * Получить кэшированную статистику квеста
@@ -32,12 +33,12 @@ public interface CacheService {
     /**
      * Получить кэшированную статистику команды
      */
-    Map<String, Object> getTeamStatistics(Long teamId, LocalDate date);
+    Map<String, Object> getTeamStatistics(UUID teamId, LocalDate date);
 
     /**
      * Сохранить статистику команды в кэш
      */
-    void cacheTeamStatistics(Long teamId, LocalDate date, Map<String, Object> statistics);
+    void cacheTeamStatistics(UUID teamId, LocalDate date, Map<String, Object> statistics);
 
     /**
      * Получить кэшированный лидерборд
@@ -122,7 +123,7 @@ public interface CacheService {
     /**
      * Инвалидировать кэш пользователя
      */
-    void invalidateUserCache(Long userId);
+    void invalidateUserCache(UUID userId);
 
     /**
      * Инвалидировать кэш квеста
@@ -132,7 +133,7 @@ public interface CacheService {
     /**
      * Инвалидировать кэш команды
      */
-    void invalidateTeamCache(Long teamId);
+    void invalidateTeamCache(UUID teamId);
 
     /**
      * Инвалидировать кэш лидербордов

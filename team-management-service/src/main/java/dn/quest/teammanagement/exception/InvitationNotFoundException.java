@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.exception;
 
+import java.util.UUID;
+
 /**
  * Исключение, выбрасываемое когда приглашение не найдено
  */
@@ -17,7 +19,7 @@ public class InvitationNotFoundException extends RuntimeException {
         super("Invitation not found with id: " + invitationId);
     }
     
-    public static InvitationNotFoundException byTeamAndUser(Long teamId, Long userId) {
+    public static InvitationNotFoundException byTeamAndUser(UUID teamId, UUID userId) {
         return new InvitationNotFoundException("Invitation not found for team id: " + teamId + " and user id: " + userId);
     }
 }

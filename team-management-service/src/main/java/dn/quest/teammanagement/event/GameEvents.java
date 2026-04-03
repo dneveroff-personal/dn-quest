@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * События связанные с игровыми сессиями
  */
@@ -24,7 +26,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long startedBy;
         private String startedByUsername;
@@ -46,7 +48,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String finishTime;
         private String duration;
@@ -71,7 +73,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long participantId;
         private String participantUsername;
@@ -91,7 +93,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long participantId;
         private String participantUsername;
@@ -114,7 +116,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long levelId;
         private String levelName;
@@ -141,7 +143,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long levelId;
         private String levelName;
@@ -167,7 +169,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long levelId;
         private String levelName;
@@ -195,7 +197,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long pausedBy;
         private String pausedByUsername;
@@ -216,7 +218,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long resumedBy;
         private String resumedByUsername;
@@ -236,7 +238,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String previousStatus;
         private String newStatus;
@@ -258,7 +260,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String sessionDuration;
         private Integer totalAttempts;
@@ -286,7 +288,7 @@ public class GameEvents {
         private Long sessionId;
         private Long questId;
         private String questName;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long achievementId;
         private String achievementName;

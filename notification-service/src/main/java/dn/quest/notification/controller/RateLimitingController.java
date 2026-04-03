@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Контроллер для управления Rate Limiting
  */
@@ -26,7 +28,7 @@ public class RateLimitingController {
     @Operation(summary = "Получить статус rate limiting для пользователя")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RateLimitingService.UserRateLimitStatus> getUserRateLimitStatus(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         return ResponseEntity.ok(rateLimitingService.getUserRateLimitStatus(userId));
     }
 
@@ -49,7 +51,7 @@ public class RateLimitingController {
     @Operation(summary = "Сбросить счетчики для пользователя")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> resetUserCounters(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         rateLimitingService.resetUserCounters(userId);
         return ResponseEntity.ok().build();
     }
@@ -67,7 +69,7 @@ public class RateLimitingController {
     @Operation(summary = "Добавить пользователя в черный список")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> blacklistUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Причина") @RequestParam String reason,
             @Parameter(description = "Длительность в минутах") @RequestParam(defaultValue = "60") long durationMinutes) {
         rateLimitingService.blacklistUser(userId, reason, durationMinutes);
@@ -78,7 +80,7 @@ public class RateLimitingController {
     @Operation(summary = "Удалить пользователя из черного списка")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> removeFromBlacklist(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         rateLimitingService.removeFromBlacklist(userId);
         return ResponseEntity.ok().build();
     }
@@ -87,7 +89,7 @@ public class RateLimitingController {
     @Operation(summary = "Проверить, находится ли пользователь в черном списке")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean> isUserBlacklisted(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         return ResponseEntity.ok(rateLimitingService.isUserBlacklisted(userId));
     }
 
@@ -95,7 +97,7 @@ public class RateLimitingController {
     @Operation(summary = "Проверить, может ли пользователь отправить уведомление")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Boolean> canSendNotification(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Тип уведомления") @RequestParam String notificationType) {
         return ResponseEntity.ok(rateLimitingService.canSendNotification(userId, notificationType));
     }

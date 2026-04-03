@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для запроса поиска квестов
@@ -52,7 +53,7 @@ public class QuestSearchRequestDTO {
     /**
      * Фильтр по ID автора
      */
-    private Long authorId;
+    private UUID authorId;
 
     /**
      * Фильтр по тегам
@@ -166,7 +167,7 @@ public class QuestSearchRequestDTO {
     /**
      * ID пользователя для получения рекомендаций
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Тип поиска

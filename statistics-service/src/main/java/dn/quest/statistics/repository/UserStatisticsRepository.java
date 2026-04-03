@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы со статистикой пользователей
@@ -23,22 +24,22 @@ public interface UserStatisticsRepository extends JpaRepository<UserStatistics, 
     /**
      * Найти статистику пользователя по ID и дате
      */
-    Optional<UserStatistics> findByUserIdAndDate(Long userId, LocalDate date);
+    Optional<UserStatistics> findByUserIdAndDate(UUID userId, LocalDate date);
 
     /**
      * Найти всю статистику пользователя по ID
      */
-    List<UserStatistics> findByUserIdOrderByDateDesc(Long userId);
+    List<UserStatistics> findByUserIdOrderByDateDesc(UUID userId);
 
     /**
      * Найти статистику пользователя за период
      */
-    List<UserStatistics> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
+    List<UserStatistics> findByUserIdAndDateBetweenOrderByDateDesc(UUID userId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику пользователя за период с пагинацией
      */
-    Page<UserStatistics> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<UserStatistics> findByUserIdAndDateBetweenOrderByDateDesc(UUID userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     /**
      * Получить активных пользователей за дату
@@ -77,21 +78,6 @@ public interface UserStatisticsRepository extends JpaRepository<UserStatistics, 
     List<UserStatistics> findTopUsersByRating(@Param("date") LocalDate date, Pageable pageable);
 
     /**
-     * Получить статистику по пользователям за период
-     */
-    @Query("SELECT new dn.quest.statistics.dto.UserPeriodStatsDTO(" +
-           "u.userId, " +
-           "SUM(u.gameSessions), " +
-           "SUM(u.completedQuests), " +
-           "SUM(u.totalGameTimeMinutes), " +
-           "SUM(u.successfulCodeSubmissions), " +
-           "AVG(u.currentRating)" +
-           ") FROM UserStatistics u " +
-           "WHERE u.date BETWEEN :startDate AND :endDate " +
-           "GROUP BY u.userId")
-    List<Object[]> getUserPeriodStats(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
-    /**
      * Получить пользователей с последней активностью после указанного времени
      */
     List<UserStatistics> findByLastActiveAtAfter(LocalDateTime time);
@@ -101,72 +87,61 @@ public interface UserStatisticsRepository extends JpaRepository<UserStatistics, 
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.currentRating = :rating, u.ratingChange = :change WHERE u.userId = :userId AND u.date = :date")
-    int updateUserRating(@Param("userId") Long userId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("change") Double change);
+    int updateUserRating(@Param("userId") UUID userId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("change") Double change);
 
     /**
      * Увеличить количество игровых сессий пользователя
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.gameSessions = u.gameSessions + 1, u.lastActiveAt = :lastActiveAt, u.lastIp = :ip, u.lastUserAgent = :userAgent WHERE u.userId = :userId AND u.date = :date")
-    int incrementGameSessions(@Param("userId") Long userId, @Param("date") LocalDate date, @Param("lastActiveAt") LocalDateTime lastActiveAt, @Param("ip") String ip, @Param("userAgent") String userAgent);
+    int incrementGameSessions(@Param("userId") UUID userId, @Param("date") LocalDate date, @Param("lastActiveAt") LocalDateTime lastActiveAt, @Param("ip") String ip, @Param("userAgent") String userAgent);
 
     /**
      * Увеличить количество завершенных квестов пользователя
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.completedQuests = u.completedQuests + 1 WHERE u.userId = :userId AND u.date = :date")
-    int incrementCompletedQuests(@Param("userId") Long userId, @Param("date") LocalDate date);
+    int incrementCompletedQuests(@Param("userId") UUID userId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество успешных отправок кода
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.successfulCodeSubmissions = u.successfulCodeSubmissions + 1 WHERE u.userId = :userId AND u.date = :date")
-    int incrementSuccessfulCodeSubmissions(@Param("userId") Long userId, @Param("date") LocalDate date);
+    int incrementSuccessfulCodeSubmissions(@Param("userId") UUID userId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество неудачных отправок кода
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.failedCodeSubmissions = u.failedCodeSubmissions + 1 WHERE u.userId = :userId AND u.date = :date")
-    int incrementFailedCodeSubmissions(@Param("userId") Long userId, @Param("date") LocalDate date);
+    int incrementFailedCodeSubmissions(@Param("userId") UUID userId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество завершенных уровней
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.completedLevels = u.completedLevels + 1 WHERE u.userId = :userId AND u.date = :date")
-    int incrementCompletedLevels(@Param("userId") Long userId, @Param("date") LocalDate date);
+    int incrementCompletedLevels(@Param("userId") UUID userId, @Param("date") LocalDate date);
 
     /**
      * Добавить время игры
      */
     @Modifying
     @Query("UPDATE UserStatistics u SET u.totalGameTimeMinutes = u.totalGameTimeMinutes + :minutes WHERE u.userId = :userId AND u.date = :date")
-    int addGameTime(@Param("userId") Long userId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
+    int addGameTime(@Param("userId") UUID userId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
 
     /**
      * Получить среднее время завершения уровня по пользователю
      */
     @Query("SELECT AVG(u.avgLevelCompletionTimeSeconds) FROM UserStatistics u WHERE u.userId = :userId AND u.date BETWEEN :startDate AND :endDate AND u.avgLevelCompletionTimeSeconds IS NOT NULL")
-    Double getAvgLevelCompletionTimeByUser(@Param("userId") Long userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    Double getAvgLevelCompletionTimeByUser(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     /**
      * Получить количество пользователей с рейтингом
      */
     @Query("SELECT COUNT(DISTINCT u.userId) FROM UserStatistics u WHERE u.date = :date AND u.currentRating IS NOT NULL")
     Long countUsersWithRating(@Param("date") LocalDate date);
-
-    /**
-     * Получить статистику по типам активности пользователей
-     */
-    @Query("SELECT " +
-           "COUNT(DISTINCT CASE WHEN u.logins > 0 THEN u.userId END) as logins, " +
-           "COUNT(DISTINCT CASE WHEN u.gameSessions > 0 THEN u.userId END) as gameSessions, " +
-           "COUNT(DISTINCT CASE WHEN u.completedQuests > 0 THEN u.userId END) as completedQuests, " +
-           "COUNT(DISTINCT CASE WHEN u.createdQuests > 0 THEN u.userId END) as createdQuests " +
-           "FROM UserStatistics u WHERE u.date = :date")
-    Object[] getActivityStatsByDate(@Param("date") LocalDate date);
 
     /**
      * Удалить старую статистику (для очистки)

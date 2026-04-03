@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * События связанные с профилями пользователей
@@ -21,7 +22,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserProfileCreatedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String publicName;
@@ -39,7 +40,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserProfileUpdatedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String publicName;
@@ -61,7 +62,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserProfileDeletedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         
@@ -77,7 +78,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserBlockedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String reason;
@@ -98,7 +99,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserUnblockedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         
@@ -114,7 +115,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserRoleChangedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String oldRole;
@@ -132,7 +133,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserAvatarUpdatedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String oldAvatarUrl;
         private String newAvatarUrl;
@@ -149,7 +150,7 @@ public class UserProfileEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserActivityData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String activityType;
         private String description;

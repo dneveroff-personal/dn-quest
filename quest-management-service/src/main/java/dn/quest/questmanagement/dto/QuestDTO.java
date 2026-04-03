@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * DTO для представления квеста
@@ -24,9 +25,19 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class QuestDTO extends BaseDTO {
+public class QuestDTO {
+
+    /**
+     * Идентификатор сущности
+     */
+    private Long id;
+
+    /**
+     * Версия для оптимистичной блокировки
+     */
+    private Long version;
 
     /**
      * Уникальный номер квеста
@@ -61,7 +72,7 @@ public class QuestDTO extends BaseDTO {
     /**
      * ID авторов квеста (для микросервисной архитектуры)
      */
-    private Set<Long> authorIds;
+    private Set<UUID> authorIds;
 
     /**
      * Дата начала квеста

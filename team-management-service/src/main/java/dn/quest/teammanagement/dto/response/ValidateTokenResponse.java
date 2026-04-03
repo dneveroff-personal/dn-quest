@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для ответа валидации токена
@@ -25,7 +26,7 @@ public class ValidateTokenResponse {
     /**
      * ID пользователя
      */
-    private Long userId;
+    private UUID userId;
     
     /**
      * Имя пользователя

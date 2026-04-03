@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с квестами
@@ -96,10 +97,10 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
     
     // Запросы для поиска квестов автора
     @Query("SELECT q FROM Quest q JOIN q.authors a WHERE a.id = :authorId ORDER BY q.createdAt DESC")
-    List<Quest> findByAuthorId(@Param("authorId") Long authorId);
+    List<Quest> findByAuthorId(@Param("authorId") UUID authorId);
     
     @Query("SELECT q FROM Quest q JOIN q.authors a WHERE a.id = :authorId AND q.published = true ORDER BY q.startAt ASC")
-    List<Quest> findPublishedByAuthorId(@Param("authorId") Long authorId);
+    List<Quest> findPublishedByAuthorId(@Param("authorId") UUID authorId);
     
     // Запросы для поиска по номеру квеста
     Optional<Quest> findByNumber(Long number);

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для команды
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TeamDTO {
 
-    private Long id;
+    private UUID id;
     private String name;
     private String description;
     private String logoUrl;

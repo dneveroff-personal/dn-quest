@@ -12,6 +12,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Игровая сессия - основная сущность для управления игровым процессом
@@ -34,8 +35,8 @@ import java.util.Set;
 public class GameSession {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * Название сессии
@@ -98,7 +99,7 @@ public class GameSession {
     private Level currentLevel;
 
     @Column(name = "current_level_id", insertable = false, updatable = false)
-    private Long currentLevelId;
+    private UUID currentLevelId;
 
     /**
      * Максимальное количество участников

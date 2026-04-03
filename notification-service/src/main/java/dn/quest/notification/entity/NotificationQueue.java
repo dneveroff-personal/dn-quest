@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения уведомлений в очереди обработки
@@ -24,14 +25,14 @@ import java.time.LocalDateTime;
 public class NotificationQueue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "notification_id", nullable = false)
-    private Long notificationId;
+    private String notificationId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_id", nullable = false, columnDefinition = "BINARY(16)")
+    private UUID userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority", nullable = false)

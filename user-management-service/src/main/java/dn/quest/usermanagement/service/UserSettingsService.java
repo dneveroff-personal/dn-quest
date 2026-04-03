@@ -5,6 +5,7 @@ import dn.quest.usermanagement.dto.UserSettingsDTO;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления настройками пользователей
@@ -14,12 +15,12 @@ public interface UserSettingsService {
     /**
      * Создает настройки пользователя по умолчанию
      */
-    UserSettingsDTO createUserSettings(Long userId);
+    UserSettingsDTO createUserSettings(UUID userId);
 
     /**
      * Получает настройки пользователя по ID пользователя
      */
-    Optional<UserSettingsDTO> getUserSettingsByUserId(Long userId);
+    Optional<UserSettingsDTO> getUserSettingsByUserId(UUID userId);
 
     /**
      * Получает настройки пользователя по ID настроек
@@ -29,19 +30,19 @@ public interface UserSettingsService {
     /**
      * Обновляет настройки пользователя
      */
-    UserSettingsDTO updateUserSettings(Long userId, UpdateSettingsRequestDTO request);
+    UserSettingsDTO updateUserSettings(UUID userId, UpdateSettingsRequestDTO request);
 
     /**
      * Обновляет настройки приватности
      */
-    UserSettingsDTO updatePrivacySettings(Long userId, Boolean profilePublic, Boolean showEmail, 
+    UserSettingsDTO updatePrivacySettings(UUID userId, Boolean profilePublic, Boolean showEmail, 
                                          Boolean showRealName, Boolean showLocation, 
                                          Boolean showWebsite, Boolean showStatistics);
 
     /**
      * Обновляет настройки уведомлений
      */
-    UserSettingsDTO updateNotificationSettings(Long userId, Boolean emailNotifications, 
+    UserSettingsDTO updateNotificationSettings(UUID userId, Boolean emailNotifications, 
                                               Boolean teamInvitations, Boolean questReminders, 
                                               Boolean achievementNotifications, 
                                               Boolean friendRequests, Boolean systemNotifications);
@@ -49,24 +50,24 @@ public interface UserSettingsService {
     /**
      * Обновляет настройки интерфейса
      */
-    UserSettingsDTO updateInterfaceSettings(Long userId, String theme, String language, 
+    UserSettingsDTO updateInterfaceSettings(UUID userId, String theme, String language, 
                                            String timezone, String dateFormat, String timeFormat);
 
     /**
      * Обновляет игровые настройки
      */
-    UserSettingsDTO updateGameSettings(Long userId, Boolean autoJoinTeams, Boolean showHints, 
+    UserSettingsDTO updateGameSettings(UUID userId, Boolean autoJoinTeams, Boolean showHints, 
                                       Boolean soundEffects, Boolean music, Boolean animations);
 
     /**
      * Применяет настройки по умолчанию
      */
-    UserSettingsDTO resetToDefaults(Long userId);
+    UserSettingsDTO resetToDefaults(UUID userId);
 
     /**
      * Удаляет настройки пользователя
      */
-    void deleteUserSettings(Long userId);
+    void deleteUserSettings(UUID userId);
 
     /**
      * Получает пользователей с публичными профилями
@@ -101,7 +102,7 @@ public interface UserSettingsService {
     /**
      * Проверяет существование настроек пользователя
      */
-    boolean existsByUserId(Long userId);
+    boolean existsByUserId(UUID userId);
 
     /**
      * Получает статистику по настройкам

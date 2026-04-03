@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления пользователями
@@ -24,12 +25,12 @@ public interface UserService {
     void deleteUser(Long id);
     
     // Управление профилем
-    User updateProfile(Long userId, String firstName, String lastName, String bio);
-    User updateAvatar(Long userId, String avatarUrl);
-    User updateSettings(Long userId, Map<String, Object> settings);
-    User changePassword(Long userId, String oldPassword, String newPassword);
-    User deactivateUser(Long userId);
-    User activateUser(Long userId);
+    User updateProfile(UUID userId, String firstName, String lastName, String bio);
+    User updateAvatar(UUID userId, String avatarUrl);
+    User updateSettings(UUID userId, Map<String, Object> settings);
+    User changePassword(UUID userId, String oldPassword, String newPassword);
+    User deactivateUser(UUID userId);
+    User activateUser(UUID userId);
     
     // Поиск и фильтрация пользователей
     Page<User> getAllUsers(Pageable pageable);
@@ -52,68 +53,68 @@ public interface UserService {
     List<User> getHighestRatedUsers(int limit);
     
     // Игровая статистика
-    User updateGameStats(Long userId, int gamesPlayed, int gamesWon, long playtimeSeconds);
-    Double getUserWinRate(Long userId);
-    Long getUserTotalPlaytime(Long userId);
-    int getUserGamesPlayed(Long userId);
-    int getUserGamesWon(Long userId);
+    User updateGameStats(UUID userId, int gamesPlayed, int gamesWon, long playtimeSeconds);
+    Double getUserWinRate(UUID userId);
+    Long getUserTotalPlaytime(UUID userId);
+    int getUserGamesPlayed(UUID userId);
+    int getUserGamesWon(UUID userId);
     List<User> getTopPlayersByScore(int limit);
     List<User> getTopPlayersByTime(int limit);
     List<User> getTopPlayersByWinRate(int limit);
     
     // Рейтинги и достижения
-    User updateUserRating(Long userId, Double newRating);
-    Double calculateUserRating(Long userId);
-    Integer getUserRanking(Long userId);
-    List<String> getUserAchievements(Long userId);
-    void addAchievement(Long userId, String achievementCode);
-    void removeAchievement(Long userId, String achievementCode);
-    boolean hasAchievement(Long userId, String achievementCode);
+    User updateUserRating(UUID userId, Double newRating);
+    Double calculateUserRating(UUID userId);
+    Integer getUserRanking(UUID userId);
+    List<String> getUserAchievements(UUID userId);
+    void addAchievement(UUID userId, String achievementCode);
+    void removeAchievement(UUID userId, String achievementCode);
+    boolean hasAchievement(UUID userId, String achievementCode);
     
     // Валидация и бизнес-логика
     boolean canCreateUser(String username, String email);
-    boolean canUpdateUser(Long userId, Long editorId);
-    boolean canDeleteUser(Long userId, Long deleterId);
+    boolean canUpdateUser(UUID userId, Long editorId);
+    boolean canDeleteUser(UUID userId, Long deleterId);
     boolean isValidUsername(String username);
     boolean isValidEmail(String email);
     boolean isUsernameAvailable(String username);
     boolean isEmailAvailable(String email);
     
     // Управление ролями
-    User assignRole(Long userId, UserRole role);
-    User removeRole(Long userId, UserRole role);
-    List<UserRole> getUserRoles(Long userId);
-    boolean hasRole(Long userId, UserRole role);
-    boolean hasAnyRole(Long userId, List<UserRole> roles);
+    User assignRole(UUID userId, UserRole role);
+    User removeRole(UUID userId, UserRole role);
+    List<UserRole> getUserRoles(UUID userId);
+    boolean hasRole(UUID userId, UserRole role);
+    boolean hasAnyRole(UUID userId, List<UserRole> roles);
     
     // Управление сессиями
-    List<Long> getUserActiveSessions(Long userId);
-    List<Long> getUserCompletedSessions(Long userId);
-    void addUserToSession(Long userId, Long sessionId);
-    void removeUserFromSession(Long userId, Long sessionId);
-    boolean isUserInSession(Long userId, Long sessionId);
+    List<Long> getUserActiveSessions(UUID userId);
+    List<Long> getUserCompletedSessions(UUID userId);
+    void addUserToSession(UUID userId, Long sessionId);
+    void removeUserFromSession(UUID userId, Long sessionId);
+    boolean isUserInSession(UUID userId, Long sessionId);
     
     // Управление командами
-    List<Long> getUserTeams(Long userId);
-    List<Long> getUserOwnedTeams(Long userId);
-    void addUserToTeam(Long userId, Long teamId);
-    void removeUserFromTeam(Long userId, Long teamId);
-    boolean isUserInTeam(Long userId, Long teamId);
-    boolean isUserTeamCaptain(Long userId, Long teamId);
+    List<Long> getUserTeams(UUID userId);
+    List<Long> getUserOwnedTeams(UUID userId);
+    void addUserToTeam(UUID userId, UUID teamId);
+    void removeUserFromTeam(UUID userId, UUID teamId);
+    boolean isUserInTeam(UUID userId, UUID teamId);
+    boolean isUserTeamCaptain(UUID userId, UUID teamId);
     
     // Операции для администрирования
     List<User> getAllUsersForAdmin();
-    void suspendUser(Long userId, String reason);
-    void unsuspendUser(Long userId);
-    void banUser(Long userId, String reason);
-    void unbanUser(Long userId);
+    void suspendUser(UUID userId, String reason);
+    void unsuspendUser(UUID userId);
+    void banUser(UUID userId, String reason);
+    void unbanUser(UUID userId);
     List<User> getSuspendedUsers();
     List<User> getBannedUsers();
 
     // Операции с кэшированием
     void cacheUser(User user);
-    void evictUserFromCache(Long userId);
-    Optional<User> getCachedUser(Long userId);
+    void evictUserFromCache(UUID userId);
+    Optional<User> getCachedUser(UUID userId);
     void cacheUserByUsername(String username, User user);
     void evictUserByUsernameFromCache(String username);
     Optional<User> getCachedUserByUsername(String username);
@@ -134,8 +135,8 @@ public interface UserService {
     
     // Аналитика и отчеты
     List<Object[]> getUserStatisticsByDay(Instant start, Instant end);
-    List<Object[]> getUserActivityAnalysis(Long userId);
-    List<Object[]> getUserPerformanceAnalysis(Long userId);
+    List<Object[]> getUserActivityAnalysis(UUID userId);
+    List<Object[]> getUserPerformanceAnalysis(UUID userId);
     List<Object[]> getUserGrowthMetrics();
     List<Object[]> getUserRetentionAnalysis();
     
@@ -146,7 +147,7 @@ public interface UserService {
     
     // Вспомогательные методы
     String generateUserId();
-    void logUserOperation(String operation, Long userId, Long operatorId);
+    void logUserOperation(String operation, UUID userId, Long operatorId);
     String generateUsername(String firstName, String lastName);
     boolean isValidPassword(String password);
     String hashPassword(String password);
@@ -154,111 +155,111 @@ public interface UserService {
     
     // Операции с поиском
     Page<User> searchUsers(String keyword, Pageable pageable);
-    List<User> getRecommendedUsers(Long userId, int limit);
-    List<User> getSimilarUsers(Long userId, int limit);
+    List<User> getRecommendedUsers(UUID userId, int limit);
+    List<User> getSimilarUsers(UUID userId, int limit);
     List<User> getUsersBySkillLevel(String skillLevel);
     List<User> getUsersByLocation(String location);
     
     // Операции с предпочтениями
-    User updatePreferences(Long userId, Map<String, Object> preferences);
-    Map<String, Object> getUserPreferences(Long userId);
-    User setNotificationSettings(Long userId, Map<String, Boolean> settings);
-    Map<String, Boolean> getNotificationSettings(Long userId);
-    User setPrivacySettings(Long userId, Map<String, String> settings);
-    Map<String, String> getPrivacySettings(Long userId);
+    User updatePreferences(UUID userId, Map<String, Object> preferences);
+    Map<String, Object> getUserPreferences(UUID userId);
+    User setNotificationSettings(UUID userId, Map<String, Boolean> settings);
+    Map<String, Boolean> getNotificationSettings(UUID userId);
+    User setPrivacySettings(UUID userId, Map<String, String> settings);
+    Map<String, String> getPrivacySettings(UUID userId);
     
     // Операции с друзьями
     void sendFriendRequest(Long fromUserId, Long toUserId);
     void acceptFriendRequest(Long fromUserId, Long toUserId);
     void rejectFriendRequest(Long fromUserId, Long toUserId);
-    void removeFriend(Long userId, Long friendId);
-    List<User> getUserFriends(Long userId);
-    List<User> getPendingFriendRequests(Long userId);
-    List<User> getSentFriendRequests(Long userId);
-    boolean areFriends(Long userId1, Long userId2);
+    void removeFriend(UUID userId, Long friendId);
+    List<User> getUserFriends(UUID userId);
+    List<User> getPendingFriendRequests(UUID userId);
+    List<User> getSentFriendRequests(UUID userId);
+    boolean areFriends(UUID userId1, UUID userId2);
     
     // Операции с блокировкой
-    void blockUser(Long userId, Long blockedUserId);
-    void unblockUser(Long userId, Long blockedUserId);
-    List<User> getBlockedUsers(Long userId);
-    boolean isUserBlocked(Long userId, Long blockedUserId);
+    void blockUser(UUID userId, Long blockedUserId);
+    void unblockUser(UUID userId, Long blockedUserId);
+    List<User> getBlockedUsers(UUID userId);
+    boolean isUserBlocked(UUID userId, Long blockedUserId);
     
     // Операции с историей
-    List<String> getUserHistory(Long userId);
-    void addUserHistoryEntry(Long userId, String entry);
-    List<String> getUserLoginHistory(Long userId);
-    void recordUserLogin(Long userId, String ipAddress);
-    List<String> getUserActionHistory(Long userId, Instant start, Instant end);
+    List<String> getUserHistory(UUID userId);
+    void addUserHistoryEntry(UUID userId, String entry);
+    List<String> getUserLoginHistory(UUID userId);
+    void recordUserLogin(UUID userId, String ipAddress);
+    List<String> getUserActionHistory(UUID userId, Instant start, Instant end);
     
     // Операции с безопасностью
-    User enableTwoFactorAuth(Long userId);
-    User disableTwoFactorAuth(Long userId);
-    String generateTwoFactorSecret(Long userId);
-    boolean verifyTwoFactorCode(Long userId, String code);
-    List<String> getSecurityQuestions(Long userId);
-    User setSecurityQuestions(Long userId, Map<String, String> questions);
-    boolean verifySecurityAnswer(Long userId, String question, String answer);
+    User enableTwoFactorAuth(UUID userId);
+    User disableTwoFactorAuth(UUID userId);
+    String generateTwoFactorSecret(UUID userId);
+    boolean verifyTwoFactorCode(UUID userId, String code);
+    List<String> getSecurityQuestions(UUID userId);
+    User setSecurityQuestions(UUID userId, Map<String, String> questions);
+    boolean verifySecurityAnswer(UUID userId, String question, String answer);
     
     // Операции с устройствами
-    void registerDevice(Long userId, String deviceId, String deviceName);
-    void unregisterDevice(Long userId, String deviceId);
-    List<Map<String, Object>> getUserDevices(Long userId);
-    void revokeAllDevices(Long userId);
-    boolean isDeviceRegistered(Long userId, String deviceId);
+    void registerDevice(UUID userId, String deviceId, String deviceName);
+    void unregisterDevice(UUID userId, String deviceId);
+    List<Map<String, Object>> getUserDevices(UUID userId);
+    void revokeAllDevices(UUID userId);
+    boolean isDeviceRegistered(UUID userId, String deviceId);
     
     // Операции с сессиями авторизации
-    List<String> getActiveTokens(Long userId);
-    void revokeToken(Long userId, String tokenId);
-    void revokeAllTokens(Long userId);
+    List<String> getActiveTokens(UUID userId);
+    void revokeToken(UUID userId, String tokenId);
+    void revokeAllTokens(UUID userId);
     void revokeExpiredTokens();
-    boolean isTokenValid(Long userId, String tokenId);
+    boolean isTokenValid(UUID userId, String tokenId);
     
     // Операции с экспортом
-    Map<String, Object> exportUserData(Long userId);
+    Map<String, Object> exportUserData(UUID userId);
     List<User> exportUsers();
-    String generateUserReport(Long userId);
+    String generateUserReport(UUID userId);
     String generateUsersReport();
     void importUserData(Map<String, Object> userData);
     
     // Операции с валидацией
     Map<String, List<String>> validateUserComplete(User user);
-    List<String> getUserValidationErrors(Long userId);
-    boolean isUserProfileComplete(Long userId);
-    double getProfileCompleteness(Long userId);
+    List<String> getUserValidationErrors(UUID userId);
+    boolean isUserProfileComplete(UUID userId);
+    double getProfileCompleteness(UUID userId);
     
     // Операции с метаданными
-    User updateUserMetadata(Long userId, Map<String, Object> metadata);
-    Map<String, Object> getUserMetadata(Long userId);
-    void addUserMetadata(Long userId, String key, Object value);
-    void removeUserMetadata(Long userId, String key);
-    Object getUserMetadataValue(Long userId, String key);
+    User updateUserMetadata(UUID userId, Map<String, Object> metadata);
+    Map<String, Object> getUserMetadata(UUID userId);
+    void addUserMetadata(UUID userId, String key, Object value);
+    void removeUserMetadata(UUID userId, String key);
+    Object getUserMetadataValue(UUID userId, String key);
     
     // Операции с мониторингом
-    Map<String, Object> getUserHealthMetrics(Long userId);
-    List<String> getUserErrors(Long userId);
-    Map<String, Object> getUserPerformanceStats(Long userId);
-    void monitorUserActivity(Long userId);
-    List<Map<String, Object>> getUserActivityLog(Long userId, Instant start, Instant end);
+    Map<String, Object> getUserHealthMetrics(UUID userId);
+    List<String> getUserErrors(UUID userId);
+    Map<String, Object> getUserPerformanceStats(UUID userId);
+    void monitorUserActivity(UUID userId);
+    List<Map<String, Object>> getUserActivityLog(UUID userId, Instant start, Instant end);
     
     // Операции с аналитикой
-    Map<String, Object> getUserAnalytics(Long userId);
-    List<Object[]> getUserGameStats(Long userId);
-    List<Object[]> getUserProgressStats(Long userId);
-    List<Object[]> getUserSocialStats(Long userId);
-    Map<String, Object> getUserEngagementMetrics(Long userId);
+    Map<String, Object> getUserAnalytics(UUID userId);
+    List<Object[]> getUserGameStats(UUID userId);
+    List<Object[]> getUserProgressStats(UUID userId);
+    List<Object[]> getUserSocialStats(UUID userId);
+    Map<String, Object> getUserEngagementMetrics(UUID userId);
     
     // Операции с рекомендациями
-    List<User> getRecommendedFriends(Long userId, int limit);
-    List<Long> getRecommendedQuests(Long userId, int limit);
-    List<Long> getRecommendedTeams(Long userId, int limit);
-    Map<String, Object> getPersonalizedRecommendations(Long userId);
+    List<User> getRecommendedFriends(UUID userId, int limit);
+    List<Long> getRecommendedQuests(UUID userId, int limit);
+    List<Long> getRecommendedTeams(UUID userId, int limit);
+    Map<String, Object> getPersonalizedRecommendations(UUID userId);
     
     // Операции с геймификацией
-    User addExperiencePoints(Long userId, int points);
-    User addLevel(Long userId);
-    int getUserLevel(Long userId);
-    long getUserExperiencePoints(Long userId);
-    long getExperienceToNextLevel(Long userId);
-    List<String> getUserUnlockedFeatures(Long userId);
-    void unlockFeature(Long userId, String feature);
+    User addExperiencePoints(UUID userId, int points);
+    User addLevel(UUID userId);
+    int getUserLevel(UUID userId);
+    long getUserExperiencePoints(UUID userId);
+    long getExperienceToNextLevel(UUID userId);
+    List<String> getUserUnlockedFeatures(UUID userId);
+    void unlockFeature(UUID userId, String feature);
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * DTO для запросов статистики
@@ -33,7 +34,7 @@ public class StatisticsRequestDTO {
     /**
      * ID пользователя (для фильтрации по пользователю)
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * ID квеста (для фильтрации по квесту)
@@ -43,7 +44,7 @@ public class StatisticsRequestDTO {
     /**
      * ID команды (для фильтрации по команде)
      */
-    private Long teamId;
+    private UUID teamId;
 
     /**
      * Категория (для фильтрации по категории)

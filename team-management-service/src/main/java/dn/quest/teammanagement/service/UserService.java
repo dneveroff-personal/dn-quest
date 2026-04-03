@@ -6,6 +6,8 @@ import dn.quest.teammanagement.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -16,7 +18,7 @@ public interface UserService {
     /**
      * Получить пользователя по ID
      */
-    UserDTO getUserById(Long userId);
+    UserDTO getUserById(UUID userId);
 
     /**
      * Получить пользователя по имени пользователя
@@ -31,7 +33,7 @@ public interface UserService {
     /**
      * Получить Entity пользователя по ID
      */
-    Optional<User> getUserEntityById(Long userId);
+    Optional<User> getUserEntityById(UUID userId);
 
     /**
      * Получить Entity пользователя по имени пользователя
@@ -41,7 +43,7 @@ public interface UserService {
     /**
      * Проверить, существует ли пользователь
      */
-    boolean userExists(Long userId);
+    boolean userExists(UUID userId);
 
     /**
      * Проверить, существует ли пользователь с таким именем
@@ -56,7 +58,7 @@ public interface UserService {
     /**
      * Проверить, активен ли пользователь
      */
-    boolean isUserActive(Long userId);
+    boolean isUserActive(UUID userId);
 
     /**
      * Поиск пользователей по имени
@@ -71,17 +73,17 @@ public interface UserService {
     /**
      * Получить пользователей для приглашения в команду
      */
-    List<UserDTO> getUsersForTeamInvitation(Long teamId, String search, int limit);
+    List<UserDTO> getUsersForTeamInvitation(UUID teamId, String search, int limit);
 
     /**
      * Получить пользователей по списку ID
      */
-    List<UserDTO> getUsersByIds(List<Long> userIds);
+    List<UserDTO> getUsersByIds(List<UUID> userIds);
 
     /**
      * Получить Entity пользователей по списку ID
      */
-    List<User> getUserEntitiesByIds(List<Long> userIds);
+    List<User> getUserEntitiesByIds(List<UUID> userIds);
 
     /**
      * Создать или обновить пользователя (синхронизация)
@@ -127,32 +129,32 @@ public interface UserService {
     /**
      * Валидировать пользователя
      */
-    boolean validateUser(Long userId);
+    boolean validateUser(UUID userId);
 
     /**
      * Получить публичную информацию о пользователе
      */
-    UserDTO getPublicUserInfo(Long userId);
+    UserDTO getPublicUserInfo(UUID userId);
 
     /**
      * Обновить информацию о пользователе
      */
-    UserDTO updateUser(Long userId, UserDTO userDTO);
+    UserDTO updateUser(UUID userId, UserDTO userDTO);
 
     /**
      * Деактивировать пользователя
      */
-    void deactivateUser(Long userId);
+    void deactivateUser(UUID userId);
 
     /**
      * Активировать пользователя
      */
-    void activateUser(Long userId);
+    void activateUser(UUID userId);
 
     /**
      * Проверить, может ли пользователь быть приглашен в команду
      */
-    boolean canUserBeInvited(Long userId, Long teamId);
+    boolean canUserBeInvited(UUID userId, UUID teamId);
 
     /**
      * Получить пользователей по первым буквам имени
@@ -182,7 +184,7 @@ public interface UserService {
     /**
      * Получить ID юзера по имени
      */
-    Long getUserIdByUsername(String username);
+    UUID getUserIdByUsername(String username);
 
     List<UserDTO> getUsersByRole(String role, Pageable pageable);
 
@@ -196,17 +198,17 @@ public interface UserService {
     /**
      * Обновить статистику отправки кода пользователя
      */
-    void updateCodeSubmissionStatistics(Long userId, String sessionId);
+    void updateCodeSubmissionStatistics(UUID userId, String sessionId);
 
     /**
      * Обновить статистику завершения уровней
      */
-    void updateLevelCompletionStatistics(Long userId, String sessionId, int levelNumber);
+    void updateLevelCompletionStatistics(UUID userId, String sessionId, int levelNumber);
 
     /**
      * Обновить статистику файлов пользователя
      */
-    void updateFileStatistics(Long userId, Long fileId, String action);
+    void updateFileStatistics(UUID userId, Long fileId, String action);
 
     /**
      * Обновить кэш файлов

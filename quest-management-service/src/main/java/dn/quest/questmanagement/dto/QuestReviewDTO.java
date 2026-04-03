@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для отзыва на квест
@@ -17,17 +18,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class QuestReviewDTO {
 
-    private Long id;
+    private UUID id;
 
     /**
      * ID квеста
      */
-    private Long questId;
+    private UUID questId;
 
     /**
      * ID пользователя
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Заголовок отзыва

@@ -250,7 +250,7 @@ public class NotificationAnalyticsServiceImpl implements NotificationAnalyticsSe
             
             for (int i = 0; i < Math.min(results.size(), limit); i++) {
                 Object[] row = results.get(i);
-                Long userId = (Long) row[0];
+                UUID userId = (UUID) row[0];
                 Long count = (Long) row[1];
                 
                 UserNotificationStatistics userStat = new UserNotificationStatistics();

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с лидербордами
@@ -23,7 +24,7 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> 
      * Найти запись в лидерборде по типу, периоду, дате и ID сущности
      */
     Optional<Leaderboard> findByLeaderboardTypeAndPeriodAndDateAndEntityId(
-            String leaderboardType, String period, LocalDate date, Long entityId);
+            String leaderboardType, String period, LocalDate date, String entityId);
 
     /**
      * Найти все записи в лидерборде по типу, периоду и дате
@@ -46,13 +47,13 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> 
     /**
      * Найти записи пользователя в разных лидербордах
      */
-    List<Leaderboard> findByEntityIdAndPeriodAndDateOrderByRank(Long entityId, String period, LocalDate date);
+    List<Leaderboard> findByEntityIdAndPeriodAndDateOrderByRank(String entityId, String period, LocalDate date);
 
     /**
      * Найти все записи пользователя за период
      */
     List<Leaderboard> findByEntityIdAndPeriodAndDateBetweenOrderByDateDescRank(
-            Long entityId, String period, LocalDate startDate, LocalDate endDate);
+            String entityId, String period, LocalDate startDate, LocalDate endDate);
 
     /**
      * Получить записи лидерборда за диапазон дат
@@ -197,7 +198,7 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> 
      * Найти записи в лидерборде по типу, периоду, ID сущности и диапазону дат
      */
     List<Leaderboard> findByLeaderboardTypeAndPeriodAndEntityIdAndDateBetween(
-            String leaderboardType, String period, Long entityId, LocalDate startDate, LocalDate endDate);
+            String leaderboardType, String period, String entityId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти топ N записей в лидерборде

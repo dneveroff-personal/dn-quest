@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения игровой статистики
@@ -31,8 +32,8 @@ import java.time.LocalDateTime;
 public class GameStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID игровой сессии
@@ -44,13 +45,13 @@ public class GameStatistics {
      * ID пользователя
      */
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     /**
      * ID команды (если командная игра)
      */
     @Column(name = "team_id")
-    private Long teamId;
+    private UUID teamId;
 
     /**
      * ID квеста

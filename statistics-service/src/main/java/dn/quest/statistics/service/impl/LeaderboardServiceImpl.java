@@ -192,7 +192,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public Map<String, Object> getUserLeaderboardPosition(Long userId, String period, LocalDate date) {
+    public Map<String, Object> getUserLeaderboardPosition(UUID userId, String period, LocalDate date) {
         log.debug("Getting leaderboard position for user: {} period: {} date: {}", userId, period, date);
         
         try {
@@ -200,7 +200,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Ищем позицию пользователя в лидерборде
             Optional<Leaderboard> leaderboardEntry = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("users", period, targetDate, userId);
+                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("users", period, targetDate, userId.toString());
             
             Map<String, Object> result = new HashMap<>();
             
@@ -247,7 +247,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Ищем позицию квеста в лидерборде
             Optional<Leaderboard> leaderboardEntry = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("quests", period, targetDate, questId);
+                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("quests", period, targetDate, questId.toString());
             
             Map<String, Object> result = new HashMap<>();
             
@@ -286,7 +286,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public Map<String, Object> getTeamLeaderboardPosition(Long teamId, String period, String metric, LocalDate date) {
+    public Map<String, Object> getTeamLeaderboardPosition(UUID teamId, String period, String metric, LocalDate date) {
         log.debug("Getting leaderboard position for team: {} period: {} metric: {} date: {}", teamId, period, metric, date);
         
         try {
@@ -294,7 +294,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             // Ищем позицию команды в лидерборде
             Optional<Leaderboard> leaderboardEntry = leaderboardRepository
-                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("teams", period, targetDate, teamId);
+                    .findByLeaderboardTypeAndPeriodAndDateAndEntityId("teams", period, targetDate, teamId.toString());
             
             Map<String, Object> result = new HashMap<>();
             
@@ -333,7 +333,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public List<LeaderboardDTO> getUserSurroundingInLeaderboard(Long userId, String period, int count, LocalDate date) {
+    public List<LeaderboardDTO> getUserSurroundingInLeaderboard(UUID userId, String period, int count, LocalDate date) {
         log.debug("Getting surrounding users for user: {} period: {} count: {} date: {}", userId, period, count, date);
         
         try {
@@ -366,13 +366,13 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public Map<String, Object> getUserLeaderboardHistory(Long userId, String period, LocalDate startDate, LocalDate endDate) {
+    public Map<String, Object> getUserLeaderboardHistory(UUID userId, String period, LocalDate startDate, LocalDate endDate) {
         log.debug("Getting leaderboard history for user: {} period: {} from {} to {}", userId, period, startDate, endDate);
         
         try {
             List<Leaderboard> historyEntries = leaderboardRepository
                     .findByLeaderboardTypeAndPeriodAndEntityIdAndDateBetween(
-                            "users", period, userId, startDate, endDate);
+                            "users", period, userId.toString(), startDate, endDate);
             
             List<Map<String, Object>> historyData = historyEntries.stream()
                     .map(entry -> {
@@ -785,11 +785,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
 
     private LeaderboardDTO convertMapToLeaderboardDTO(Map<String, Object> map) {
         return LeaderboardDTO.builder()
-                .id(((Number) map.get("id")).longValue())
+                .id(UUID.fromString((map.get("id")).toString()))
                 .leaderboardType((String) map.get("leaderboardType"))
                 .period((String) map.get("period"))
                 .date((LocalDate) map.get("date"))
-                .entityId(((Number) map.get("entityId")).longValue())
+                .entityId((map.get("entityId")).toString())
                 .entityName((String) map.get("entityName"))
                 .rank((Integer) map.get("rank"))
                 .previousRank((Integer) map.get("previousRank"))
@@ -830,7 +830,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                 .collect(Collectors.toList());
     }
 
-    private Map<String, Object> calculateUserPositionDynamically(Long userId, String period, LocalDate date) {
+    private Map<String, Object> calculateUserPositionDynamically(UUID userId, String period, LocalDate date) {
         // Динамический расчет позиции пользователя
         // В реальной реализации здесь был бы запрос к статистике и расчет позиции
         
@@ -856,7 +856,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return result;
     }
 
-    private Map<String, Object> calculateTeamPositionDynamically(Long teamId, String period, String metric, LocalDate date) {
+    private Map<String, Object> calculateTeamPositionDynamically(UUID teamId, String period, String metric, LocalDate date) {
         // Динамический расчет позиции команды
         // В реальной реализации здесь был бы запрос к статистике и расчет позиции
         
@@ -904,13 +904,13 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         }
         
         // Группируем статистику по пользователям
-        Map<Long, List<UserStatistics>> groupedByUser = userStats.stream()
+        Map<UUID, List<UserStatistics>> groupedByUser = userStats.stream()
                 .collect(Collectors.groupingBy(UserStatistics::getUserId));
         
         // Рассчитываем очки для каждого пользователя
         List<Leaderboard> leaderboards = groupedByUser.entrySet().stream()
                 .map(entry -> {
-                    Long userId = entry.getKey();
+                    UUID userId = entry.getKey();
                     List<UserStatistics> stats = entry.getValue();
                     
                     // Агрегируем статистику пользователя за период
@@ -923,7 +923,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             .leaderboardType("users")
                             .period(period)
                             .date(date)
-                            .entityId(userId)
+                            .entityId(userId.toString())
                             .entityName("User_" + userId) // В реальности здесь было бы получение имени пользователя
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -991,7 +991,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             .leaderboardType("quests")
                             .period(period)
                             .date(date)
-                            .entityId(questId)
+                            .entityId(questId.toString())
                             .entityName(aggregated.getQuestTitle())
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -1038,13 +1038,13 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         }
         
         // Группируем статистику по командам
-        Map<Long, List<TeamStatistics>> groupedByTeam = teamStats.stream()
+        Map<UUID, List<TeamStatistics>> groupedByTeam = teamStats.stream()
                 .collect(Collectors.groupingBy(TeamStatistics::getTeamId));
         
         // Рассчитываем очки для каждой команды
         List<Leaderboard> leaderboards = groupedByTeam.entrySet().stream()
                 .map(entry -> {
-                    Long teamId = entry.getKey();
+                    UUID teamId = entry.getKey();
                     List<TeamStatistics> stats = entry.getValue();
                     
                     // Агрегируем статистику команды за период
@@ -1057,7 +1057,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             .leaderboardType("teams")
                             .period(period)
                             .date(date)
-                            .entityId(teamId)
+                            .entityId(teamId.toString())
                             .entityName(aggregated.getTeamName())
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -1339,7 +1339,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return (wins / (double) stats.getGameSessions()) * 100.0;
     }
 
-    private double calculateUserAvgRating(Long userId) {
+    private double calculateUserAvgRating(UUID userId) {
         if (userId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о рейтингах
@@ -1347,12 +1347,12 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return 4.2;
     }
 
-    private int calculateUserAchievements(Long userId) {
+    private int calculateUserAchievements(UUID userId) {
         if (userId == null) return 0;
         
         // В реальной реализации здесь был бы запрос к данным о достижениях
         // Пока возвращаем количество на основе ID пользователя
-        return (int) (userId % 20) + 5;
+        return 0;
     }
 
     private int calculateTeamLevel(TeamStatistics stats) {
@@ -1393,7 +1393,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return (stats.getQuestWins() / (double) stats.getPlayedQuests()) * 100.0;
     }
 
-    private double calculateTeamAvgRating(Long teamId) {
+    private double calculateTeamAvgRating(UUID teamId) {
         if (teamId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о рейтингах команд

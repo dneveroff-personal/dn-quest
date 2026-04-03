@@ -7,6 +7,7 @@ import lombok.Builder;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для игровой сессии
@@ -16,7 +17,7 @@ import java.util.List;
 public record GameSessionDTO(
     
     @Schema(description = "ID сессии", example = "1")
-    Long id,
+    UUID id,
     
     @Schema(description = "Название сессии", example = "Вечерний квест")
     String name,
@@ -28,16 +29,16 @@ public record GameSessionDTO(
     SessionStatus status,
     
     @Schema(description = "ID владельца сессии", example = "123")
-    Long ownerId,
+    UUID ownerId,
     
     @Schema(description = "ID квеста", example = "456")
-    Long questId,
+    UUID questId,
     
     @Schema(description = "ID команды", example = "789")
-    Long teamId,
+    UUID teamId,
     
     @Schema(description = "ID текущего уровня", example = "101")
-    Long currentLevelId,
+    UUID currentLevelId,
     
     @Schema(description = "Максимальное количество участников", example = "10")
     Integer maxParticipants,
@@ -46,7 +47,7 @@ public record GameSessionDTO(
     Integer participantCount,
     
     @Schema(description = "ID участников")
-    List<Long> participantIds,
+    List<UUID> participantIds,
     
     @Schema(description = "Продолжительность в секундах", example = "3600")
     Long durationSeconds,

@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Контроллер для управления профилями пользователей
@@ -38,7 +39,7 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "Получить профиль пользователя по ID", description = "Возвращает профиль пользователя по указанному ID")
     public ResponseEntity<UserProfileDTO> getUserById(
-            @Parameter(description = "ID пользователя") @PathVariable Long id) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID id) {
         
         return userProfileService.getUserProfileByUserId(id)
                 .map(ResponseEntity::ok)
@@ -48,7 +49,7 @@ public class UserController {
     @GetMapping("/profile/{userId}")
     @Operation(summary = "Получить профиль пользователя по userId", description = "Возвращает профиль пользователя по userId из Authentication Service")
     public ResponseEntity<UserProfileDTO> getUserProfileByUserId(
-            @Parameter(description = "ID пользователя из Authentication Service") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя из Authentication Service") @PathVariable UUID userId) {
         
         return userProfileService.getUserProfileByUserId(userId)
                 .map(ResponseEntity::ok)
@@ -105,7 +106,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить профиль пользователя", description = "Обновляет профиль пользователя")
     public ResponseEntity<UserProfileDTO> updateUserProfile(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Valid @RequestBody UpdateProfileRequestDTO request) {
         
         UserProfileDTO updatedProfile = userProfileService.updateUserProfile(userId, request);
@@ -116,7 +117,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить аватар пользователя", description = "Обновляет аватар пользователя")
     public ResponseEntity<UserProfileDTO> updateUserAvatar(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "URL аватара") @RequestParam String avatarUrl) {
         
         UserProfileDTO updatedProfile = userProfileService.updateUserAvatar(userId, avatarUrl);
@@ -127,7 +128,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Удалить аватар пользователя", description = "Удаляет аватар пользователя")
     public ResponseEntity<UserProfileDTO> removeUserAvatar(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserProfileDTO updatedProfile = userProfileService.removeUserAvatar(userId);
         return ResponseEntity.ok(updatedProfile);
@@ -137,7 +138,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Заблокировать пользователя", description = "Блокирует пользователя")
     public ResponseEntity<UserProfileDTO> blockUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Valid @RequestBody BlockUserRequestDTO request) {
         
         UserProfileDTO blockedProfile = userProfileService.blockUser(userId, request);
@@ -148,7 +149,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Разблокировать пользователя", description = "Разблокирует пользователя")
     public ResponseEntity<UserProfileDTO> unblockUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserProfileDTO unblockedProfile = userProfileService.unblockUser(userId);
         return ResponseEntity.ok(unblockedProfile);
@@ -158,7 +159,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Активировать пользователя", description = "Активирует пользователя")
     public ResponseEntity<UserProfileDTO> activateUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserProfileDTO activatedProfile = userProfileService.activateUser(userId);
         return ResponseEntity.ok(activatedProfile);
@@ -168,7 +169,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Деактивировать пользователя", description = "Деактивирует пользователя")
     public ResponseEntity<UserProfileDTO> deactivateUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserProfileDTO deactivatedProfile = userProfileService.deactivateUser(userId);
         return ResponseEntity.ok(deactivatedProfile);
@@ -178,7 +179,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Удалить профиль пользователя", description = "Удаляет профиль пользователя")
     public ResponseEntity<Void> deleteUser(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         userProfileService.deleteUserProfile(userId);
         return ResponseEntity.noContent().build();
@@ -214,7 +215,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить активность пользователя", description = "Обновляет время последней активности пользователя")
     public ResponseEntity<Void> updateLastActivity(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         userProfileService.updateLastActivity(userId);
         return ResponseEntity.ok().build();

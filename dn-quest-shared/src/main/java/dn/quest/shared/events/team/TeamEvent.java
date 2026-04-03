@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * События связанные с командами
  */
@@ -21,12 +23,12 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamCreatedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String teamDescription;
         private String teamTag;
         private String teamCategory;
-        private Long captainId;
+        private UUID captainId;
         private String captainUsername;
         private Boolean isPrivate;
         private Integer maxMembers;
@@ -41,7 +43,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamUpdatedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String teamDescription;
         private String teamTag;
@@ -61,10 +63,10 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamDeletedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private String teamTag;
-        private Long captainId;
+        private UUID captainId;
         private String captainUsername;
         private Integer memberCount;
         private String deletionReason;
@@ -79,7 +81,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamMemberAddedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long memberId;
         private String memberUsername;
@@ -98,7 +100,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamMemberRemovedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long memberId;
         private String memberUsername;
@@ -116,7 +118,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamMemberRoleChangedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long memberId;
         private String memberUsername;
@@ -135,7 +137,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamCaptainChangedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long oldCaptainId;
         private String oldCaptainUsername;
@@ -154,7 +156,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamSettingsUpdatedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Boolean isPrivate;
         private Integer maxMembers;
@@ -174,7 +176,7 @@ public class TeamEvent {
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationSentEvent extends BaseEvent {
         private Long invitationId;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long invitedUserId;
         private String invitedUserUsername;
@@ -194,9 +196,9 @@ public class TeamEvent {
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationAcceptedEvent extends BaseEvent {
         private Long invitationId;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
-        private Long userId;
+        private UUID userId;
         private String username;
         private String memberRole;
     }
@@ -211,9 +213,9 @@ public class TeamEvent {
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationDeclinedEvent extends BaseEvent {
         private Long invitationId;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
-        private Long userId;
+        private UUID userId;
         private String username;
         private String declineReason;
     }
@@ -228,7 +230,7 @@ public class TeamEvent {
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationRevokedEvent extends BaseEvent {
         private Long invitationId;
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Long revokedUserId;
         private String revokedUserUsername;
@@ -246,7 +248,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamStatisticsUpdatedEvent extends BaseEvent {
-        private Long teamId;
+        private UUID teamId;
         private String teamName;
         private Integer totalGames;
         private Integer wins;

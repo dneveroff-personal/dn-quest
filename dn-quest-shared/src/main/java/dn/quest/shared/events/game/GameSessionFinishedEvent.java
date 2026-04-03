@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /**
  * Событие окончания игровой сессии
  */
@@ -17,8 +19,8 @@ public class GameSessionFinishedEvent extends BaseEvent {
 
     private Long questId;
     private Long sessionId;
-    private Long userId;
-    private Long teamId;
+    private UUID userId;
+    private UUID teamId;
     private Integer totalScore;
     private Integer levelsCompleted;
     private Boolean isCompleted;

@@ -5,9 +5,12 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Базовый класс для всех событий Game Engine Service
@@ -31,105 +34,50 @@ import java.util.Map;
 public abstract class GameEngineEvent {
 
     @Schema(description = "ID события", example = "evt_123456789")
+    @Getter
+    @Setter
     private String eventId;
 
     @Schema(description = "ID сессии", example = "789")
+    @Getter
+    @Setter
     private Long sessionId;
 
-    @Schema(description = "ID пользователя", example = "123")
-    private Long userId;
+    @Schema(description = "ID пользователя", example = "550e8400-e29b-41d4-a716-446655440000")
+    @Getter
+    @Setter
+    private UUID userId;
 
     @Schema(description = "ID команды", example = "456")
-    private Long teamId;
+    @Getter
+    @Setter
+    private UUID teamId;
 
     @Schema(description = "ID квеста", example = "101")
+    @Getter
+    @Setter
     private Long questId;
 
     @Schema(description = "Время создания события")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @Getter
+    @Setter
     private Instant timestamp;
 
     @Schema(description = "Версия события", example = "1.0")
+    @Getter
+    @Setter
     private String version;
 
     @Schema(description = "Источник события", example = "game-engine-service")
+    @Getter
+    @Setter
     private String source;
 
     @Schema(description = "Дополнительные метаданные")
+    @Getter
+    @Setter
     private Map<String, Object> metadata;
-
-    // Getters and setters
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public Long getQuestId() {
-        return questId;
-    }
-
-    public void setQuestId(Long questId) {
-        this.questId = questId;
-    }
-
-    public Instant getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
 
     protected abstract String getEventTypeForSubclass();
 

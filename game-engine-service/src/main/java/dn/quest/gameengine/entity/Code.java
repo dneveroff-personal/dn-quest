@@ -8,6 +8,8 @@ import lombok.ToString;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import java.util.UUID;
+
 /**
  * Код уровня
  */
@@ -25,8 +27,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 public class Code {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "level_id", nullable = false)

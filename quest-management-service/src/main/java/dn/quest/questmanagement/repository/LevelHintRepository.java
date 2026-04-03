@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с подсказками уровней
@@ -23,19 +24,19 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      * Найти подсказки по ID уровня с сортировкой по порядковому номеру
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId ORDER BY h.orderIndex ASC")
-    List<LevelHint> findByLevelIdOrderByOrderIndex(@Param("levelId") Long levelId);
+    List<LevelHint> findByLevelIdOrderByOrderIndex(@Param("levelId") UUID levelId);
 
     /**
      * Найти подсказки по ID уровня с пагинацией
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId ORDER BY h.orderIndex ASC")
-    Page<LevelHint> findByLevelIdOrderByOrderIndex(@Param("levelId") Long levelId, Pageable pageable);
+    Page<LevelHint> findByLevelIdOrderByOrderIndex(@Param("levelId") UUID levelId, Pageable pageable);
 
     /**
      * Найти подсказку по ID уровня и порядковому номеру
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.orderIndex = :orderIndex")
-    Optional<LevelHint> findByLevelIdAndOrderIndex(@Param("levelId") Long levelId, 
+    Optional<LevelHint> findByLevelIdAndOrderIndex(@Param("levelId") UUID levelId, 
                                                    @Param("orderIndex") Integer orderIndex);
 
     /**
@@ -53,7 +54,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.hintType = :hintType " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findByLevelIdAndHintType(@Param("levelId") Long levelId, 
+    List<LevelHint> findByLevelIdAndHintType(@Param("levelId") UUID levelId, 
                                              @Param("hintType") LevelHint.HintType hintType);
 
     /**
@@ -61,14 +62,14 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.hintType = 'TEXT' " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findTextHintsByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findTextHintsByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти файловые подсказки по ID уровня
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.hintType = 'FILE' " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findFileHintsByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findFileHintsByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти подсказки по типу файла
@@ -80,7 +81,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.fileType = :fileType " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findByLevelIdAndFileType(@Param("levelId") Long levelId, 
+    List<LevelHint> findByLevelIdAndFileType(@Param("levelId") UUID levelId, 
                                              @Param("fileType") LevelHint.FileType fileType);
 
     /**
@@ -102,7 +103,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.offsetSec <= :offsetSec " +
            "ORDER BY h.offsetSec ASC, h.orderIndex ASC")
-    List<LevelHint> findByLevelIdAndOffsetSecLessThanEqual(@Param("levelId") Long levelId, 
+    List<LevelHint> findByLevelIdAndOffsetSecLessThanEqual(@Param("levelId") UUID levelId, 
                                                            @Param("offsetSec") Integer offsetSec);
 
     /**
@@ -115,7 +116,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.active = true " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findActiveByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findActiveByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти обязательные подсказки
@@ -127,7 +128,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.mandatory = true " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findMandatoryByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findMandatoryByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти бесплатные подсказки
@@ -141,7 +142,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND (h.cost IS NULL OR h.cost = 0) " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findFreeByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findFreeByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти платные подсказки
@@ -155,7 +156,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.cost IS NOT NULL AND h.cost > 0 " +
            "ORDER BY h.cost ASC, h.orderIndex ASC")
-    List<LevelHint> findPaidByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findPaidByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти подсказки по стоимости
@@ -208,13 +209,13 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h FROM LevelHint h WHERE h.levelId = :levelId AND h.fileUrl IS NOT NULL AND h.fileUrl != '' " +
            "ORDER BY h.orderIndex ASC")
-    List<LevelHint> findHintsWithFilesByLevelId(@Param("levelId") Long levelId);
+    List<LevelHint> findHintsWithFilesByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Подсчет подсказок по ID уровня
      */
     @Query("SELECT COUNT(h) FROM LevelHint h WHERE h.levelId = :levelId")
-    long countByLevelId(@Param("levelId") Long levelId);
+    long countByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Подсчет подсказок по типу
@@ -225,31 +226,31 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      * Подсчет подсказок по ID уровня и типу
      */
     @Query("SELECT COUNT(h) FROM LevelHint h WHERE h.levelId = :levelId AND h.hintType = :hintType")
-    long countByLevelIdAndHintType(@Param("levelId") Long levelId, 
+    long countByLevelIdAndHintType(@Param("levelId") UUID levelId, 
                                    @Param("hintType") LevelHint.HintType hintType);
 
     /**
      * Подсчет активных подсказок по ID уровня
      */
     @Query("SELECT COUNT(h) FROM LevelHint h WHERE h.levelId = :levelId AND h.active = true")
-    long countActiveByLevelId(@Param("levelId") Long levelId);
+    long countActiveByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Подсчет обязательных подсказок по ID уровня
      */
     @Query("SELECT COUNT(h) FROM LevelHint h WHERE h.levelId = :levelId AND h.mandatory = true")
-    long countMandatoryByLevelId(@Param("levelId") Long levelId);
+    long countMandatoryByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Проверить существование подсказки по ID уровня и порядковому номеру
      */
-    boolean existsByLevelIdAndOrderIndex(Long levelId, Integer orderIndex);
+    boolean existsByLevelIdAndOrderIndex(UUID levelId, Integer orderIndex);
 
     /**
      * Найти максимальный порядковый номер подсказки для уровня
      */
     @Query("SELECT COALESCE(MAX(h.orderIndex), 0) FROM LevelHint h WHERE h.levelId = :levelId")
-    Integer findMaxOrderIndexByLevelId(@Param("levelId") Long levelId);
+    Integer findMaxOrderIndexByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Обновить порядковый номер подсказки
@@ -280,7 +281,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Modifying
     @Query("DELETE FROM LevelHint h WHERE h.levelId = :levelId")
-    int deleteByLevelId(@Param("levelId") Long levelId);
+    int deleteByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Увеличить счетчик использований подсказки
@@ -295,7 +296,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
      */
     @Query("SELECT h.orderIndex, COUNT(h) FROM LevelHint h WHERE h.levelId = :levelId " +
            "GROUP BY h.orderIndex HAVING COUNT(h) > 1")
-    List<Object[]> findDuplicateOrderIndexes(@Param("levelId") Long levelId);
+    List<Object[]> findDuplicateOrderIndexes(@Param("levelId") UUID levelId);
 
     /**
      * Получить статистику по подсказкам уровня
@@ -310,7 +311,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
            "SUM(h.usageCount) as totalUsages, " +
            "COALESCE(AVG(h.cost), 0) as avgCost " +
            "FROM LevelHint h WHERE h.levelId = :levelId")
-    Object[] getLevelHintStatistics(@Param("levelId") Long levelId);
+    Object[] getLevelHintStatistics(@Param("levelId") UUID levelId);
 
     /**
      * Найти наиболее используемые подсказки
@@ -333,7 +334,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
     @Modifying
     @Query("UPDATE LevelHint h SET h.usageCount = 0, h.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE h.levelId = :levelId")
-    int resetUsageCountByLevelId(@Param("levelId") Long levelId);
+    int resetUsageCountByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти подсказки с истекающим сроком доступности

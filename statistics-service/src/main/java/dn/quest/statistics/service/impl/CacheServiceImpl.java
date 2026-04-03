@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -131,13 +132,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public Map<String, Object> getUserStatistics(Long userId, LocalDate date) {
+    public Map<String, Object> getUserStatistics(UUID userId, LocalDate date) {
         String key = buildUserStatsKey(userId, date);
         return userStatisticsCache.getIfPresent(key);
     }
 
     @Override
-    public void cacheUserStatistics(Long userId, LocalDate date, Map<String, Object> statistics) {
+    public void cacheUserStatistics(UUID userId, LocalDate date, Map<String, Object> statistics) {
         String key = buildUserStatsKey(userId, date);
         userStatisticsCache.put(key, statistics);
         log.debug("Cached user statistics for user: {} date: {}", userId, date);
@@ -157,13 +158,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public Map<String, Object> getTeamStatistics(Long teamId, LocalDate date) {
+    public Map<String, Object> getTeamStatistics(UUID teamId, LocalDate date) {
         String key = buildTeamStatsKey(teamId, date);
         return teamStatisticsCache.getIfPresent(key);
     }
 
     @Override
-    public void cacheTeamStatistics(Long teamId, LocalDate date, Map<String, Object> statistics) {
+    public void cacheTeamStatistics(UUID teamId, LocalDate date, Map<String, Object> statistics) {
         String key = buildTeamStatsKey(teamId, date);
         teamStatisticsCache.put(key, statistics);
         log.debug("Cached team statistics for team: {} date: {}", teamId, date);
@@ -270,7 +271,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void invalidateUserCache(Long userId) {
+    public void invalidateUserCache(UUID userId) {
         String pattern = "user_stats:" + userId + ":*";
         clearCacheByPattern(pattern);
         log.info("Invalidated cache for user: {}", userId);
@@ -284,7 +285,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void invalidateTeamCache(Long teamId) {
+    public void invalidateTeamCache(UUID teamId) {
         String pattern = "team_stats:" + teamId + ":*";
         clearCacheByPattern(pattern);
         log.info("Invalidated cache for team: {}", teamId);
@@ -441,7 +442,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     // Вспомогательные методы для построения ключей
-    private String buildUserStatsKey(Long userId, LocalDate date) {
+    private String buildUserStatsKey(UUID userId, LocalDate date) {
         return "user_stats:" + userId + ":" + date;
     }
 
@@ -449,7 +450,7 @@ public class CacheServiceImpl implements CacheService {
         return "quest_stats:" + questId + ":" + date;
     }
 
-    private String buildTeamStatsKey(Long teamId, LocalDate date) {
+    private String buildTeamStatsKey(UUID teamId, LocalDate date) {
         return "team_stats:" + teamId + ":" + date;
     }
 

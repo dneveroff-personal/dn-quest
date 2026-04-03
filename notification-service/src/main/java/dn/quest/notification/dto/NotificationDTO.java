@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для уведомления
@@ -23,7 +24,7 @@ public class NotificationDTO {
     /**
      * ID записи в базе данных
      */
-    private Long id;
+    private UUID id;
 
     /**
      * Уникальный идентификатор уведомления
@@ -33,7 +34,7 @@ public class NotificationDTO {
     /**
      * ID получателя уведомления
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Тип уведомления

@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления квестами
@@ -51,7 +52,7 @@ public interface QuestService {
     List<Quest> getActiveQuests();
     List<Quest> getQuestsByType(QuestType type);
     List<Quest> getQuestsByDifficulty(Difficulty difficulty);
-    List<Quest> getQuestsByAuthor(Long authorId);
+    List<Quest> getQuestsByAuthor(UUID authorId);
     List<Quest> getQuestsByNameContaining(String name);
     List<Quest> getQuestsByRating(Double minRating, Double maxRating);
     
@@ -78,10 +79,10 @@ public interface QuestService {
     List<Level> getHighestRatedLevels(int limit);
     
     // Валидация и бизнес-логика
-    boolean canCreateQuest(Long userId);
-    boolean canUpdateQuest(Long questId, Long userId);
-    boolean canDeleteQuest(Long questId, Long userId);
-    boolean canPublishQuest(Long questId, Long userId);
+    boolean canCreateQuest(UUID userId);
+    boolean canUpdateQuest(Long questId, UUID userId);
+    boolean canDeleteQuest(Long questId, UUID userId);
+    boolean canPublishQuest(Long questId, UUID userId);
     boolean isValidQuestStructure(Quest quest);
     boolean isValidLevelSequence(List<Level> levels);
     
@@ -161,13 +162,13 @@ public interface QuestService {
     // Вспомогательные методы
     String generateQuestId();
     String generateLevelId();
-    void logQuestOperation(String operation, Long questId, Long userId);
+    void logQuestOperation(String operation, Long questId, UUID userId);
     boolean isValidQuestName(String name);
     String sanitizeQuestDescription(String description);
     
     // Операции с поиском
     Page<Quest> searchQuests(String keyword, Pageable pageable);
-    List<Quest> getRecommendedQuests(Long userId, int limit);
+    List<Quest> getRecommendedQuests(UUID userId, int limit);
     List<Quest> getSimilarQuests(Long questId, int limit);
     List<Quest> getQuestsByTags(List<String> tags);
     
@@ -230,13 +231,13 @@ public interface QuestService {
     
     // Операции с доступом
     Quest setQuestAccessLevel(Long questId, String accessLevel);
-    boolean isQuestAccessible(Long questId, Long userId);
-    List<Quest> getAccessibleQuests(Long userId);
-    Quest grantQuestAccess(Long questId, Long userId);
-    void revokeQuestAccess(Long questId, Long userId);
+    boolean isQuestAccessible(Long questId, UUID userId);
+    List<Quest> getAccessibleQuests(UUID userId);
+    Quest grantQuestAccess(Long questId, UUID userId);
+    void revokeQuestAccess(Long questId, UUID userId);
     
     // Операции с безопасностью
-    boolean isQuestModificationAllowed(Long userId, Long questId);
+    boolean isQuestModificationAllowed(UUID userId, Long questId);
     void validateQuestData(Quest quest);
     void sanitizeQuestData(Quest quest);
     List<String> detectSuspiciousContent(Quest quest);

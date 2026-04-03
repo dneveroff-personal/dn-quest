@@ -12,12 +12,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с уровнями квестов
  */
 @Repository
-public interface LevelRepository extends JpaRepository<Level, Long>, JpaSpecificationExecutor<Level> {
+public interface LevelRepository extends JpaRepository<Level, UUID>, JpaSpecificationExecutor<Level> {
 
     /**
      * Найти уровни по ID квеста с сортировкой по порядковому номеру

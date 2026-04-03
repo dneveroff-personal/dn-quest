@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие обновления пользователя
  */
@@ -16,7 +18,7 @@ public class UserUpdatedEvent extends BaseEvent {
     /**
      * ID обновлённого пользователя
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Имя пользователя

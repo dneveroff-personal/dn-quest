@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public TeamInvitationDTO inviteUser(Long teamId, InviteUserRequest request, Long inviterId) {
+    public TeamInvitationDTO inviteUser(UUID teamId, InviteUserRequest request, UUID inviterId) {
         log.debug("Inviting user {} to team: {} by inviter: {}", request.getUsername(), teamId, inviterId);
 
         Team team = teamRepository.findById(teamId)
@@ -102,7 +103,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public TeamInvitationDTO inviteUserById(Long teamId, Long userId, String message, Long inviterId) {
+    public TeamInvitationDTO inviteUserById(UUID teamId, UUID userId, String message, UUID inviterId) {
         log.debug("Inviting user {} to team: {} by inviter: {}", userId, teamId, inviterId);
 
         Team team = teamRepository.findById(teamId)
@@ -152,7 +153,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public TeamInvitationDTO respondToInvitation(Long invitationId, RespondToInvitationRequest request, Long userId) {
+    public TeamInvitationDTO respondToInvitation(Long invitationId, RespondToInvitationRequest request, UUID userId) {
         log.debug("Responding to invitation: {} by user: {} with accept: {}", invitationId, userId, request.getAccept());
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -180,7 +181,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public TeamInvitationDTO acceptInvitation(Long invitationId, Long userId, String message) {
+    public TeamInvitationDTO acceptInvitation(Long invitationId, UUID userId, String message) {
         log.debug("Accepting invitation: {} by user: {}", invitationId, userId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -221,7 +222,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public TeamInvitationDTO declineInvitation(Long invitationId, Long userId, String message) {
+    public TeamInvitationDTO declineInvitation(Long invitationId, UUID userId, String message) {
         log.debug("Declining invitation: {} by user: {}", invitationId, userId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -246,7 +247,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public void revokeInvitation(Long invitationId, Long revokerId) {
+    public void revokeInvitation(Long invitationId, UUID revokerId) {
         log.debug("Revoking invitation: {} by user: {}", invitationId, revokerId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -269,7 +270,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "invitations", key = "#invitationId")
-    public TeamInvitationDTO getInvitationById(Long invitationId, Long userId) {
+    public TeamInvitationDTO getInvitationById(Long invitationId, UUID userId) {
         log.debug("Getting invitation: {} by user: {}", invitationId, userId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -289,7 +290,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(value = "userInvitations", key = "#userId + '_' + #pageable.pageNumber + '_' + #pageable.pageSize")
-    public InvitationListResponse getUserInvitations(Long userId, Pageable pageable) {
+    public InvitationListResponse getUserInvitations(UUID userId, Pageable pageable) {
         log.debug("Getting invitations for user: {} with pagination: {}", userId, pageable);
 
         User user = userService.getUserEntityById(userId)
@@ -308,7 +309,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamInvitationDTO> getUserActiveInvitations(Long userId) {
+    public List<TeamInvitationDTO> getUserActiveInvitations(UUID userId) {
         log.debug("Getting active invitations for user: {}", userId);
 
         User user = userService.getUserEntityById(userId)
@@ -320,7 +321,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public InvitationListResponse getTeamInvitations(Long teamId, Long requesterId, Pageable pageable) {
+    public InvitationListResponse getTeamInvitations(UUID teamId, UUID requesterId, Pageable pageable) {
         log.debug("Getting invitations for team: {} by requester: {} with pagination: {}", teamId, requesterId, pageable);
 
         Team team = teamRepository.findById(teamId)
@@ -345,7 +346,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamInvitationDTO> getTeamActiveInvitations(Long teamId, Long requesterId) {
+    public List<TeamInvitationDTO> getTeamActiveInvitations(UUID teamId, UUID requesterId) {
         log.debug("Getting active invitations for team: {} by requester: {}", teamId, requesterId);
 
         Team team = teamRepository.findById(teamId)
@@ -363,7 +364,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamInvitationDTO> getInvitationsSentByUser(Long userId, Pageable pageable) {
+    public List<TeamInvitationDTO> getInvitationsSentByUser(UUID userId, Pageable pageable) {
         log.debug("Getting invitations sent by user: {} with pagination: {}", userId, pageable);
 
         User user = userService.getUserEntityById(userId)
@@ -375,7 +376,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public long getUserActiveInvitationsCount(Long userId) {
+    public long getUserActiveInvitationsCount(UUID userId) {
         log.debug("Getting active invitations count for user: {}", userId);
 
         User user = userService.getUserEntityById(userId)
@@ -386,7 +387,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public long getTeamActiveInvitationsCount(Long teamId, Long requesterId) {
+    public long getTeamActiveInvitationsCount(UUID teamId, UUID requesterId) {
         log.debug("Getting active invitations count for team: {} by requester: {}", teamId, requesterId);
 
         Team team = teamRepository.findById(teamId)
@@ -403,7 +404,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean hasActiveInvitation(Long teamId, Long userId) {
+    public boolean hasActiveInvitation(UUID teamId, UUID userId) {
         log.debug("Checking active invitation for team: {} and user: {}", teamId, userId);
 
         Team team = teamRepository.findById(teamId)
@@ -417,7 +418,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canRespondToInvitation(Long invitationId, Long userId) {
+    public boolean canRespondToInvitation(Long invitationId, UUID userId) {
         log.debug("Checking if user {} can respond to invitation: {}", userId, invitationId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -430,7 +431,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canRevokeInvitation(Long invitationId, Long userId) {
+    public boolean canRevokeInvitation(Long invitationId, UUID userId) {
         log.debug("Checking if user {} can revoke invitation: {}", userId, invitationId);
 
         TeamInvitation invitation = invitationRepository.findById(invitationId)
@@ -478,7 +479,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public InvitationStatisticsDTO getInvitationStatistics(Long teamId, Long requesterId) {
+    public InvitationStatisticsDTO getInvitationStatistics(UUID teamId, UUID requesterId) {
         log.debug("Getting invitation statistics for team: {} by requester: {}", teamId, requesterId);
 
         Team team = teamRepository.findById(teamId)
@@ -550,7 +551,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public List<TeamInvitationDTO> bulkInviteUsers(Long teamId, List<Long> userIds, String message, Long inviterId) {
+    public List<TeamInvitationDTO> bulkInviteUsers(UUID teamId, List<UUID> userIds, String message, UUID inviterId) {
         log.debug("Bulk inviting users to team: {} by inviter: {}", teamId, inviterId);
 
         return userIds.stream()
@@ -560,7 +561,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @CacheEvict(value = {"teamInvitations", "userInvitations"}, allEntries = true)
-    public void bulkRevokeInvitations(Long teamId, List<Long> invitationIds, Long revokerId) {
+    public void bulkRevokeInvitations(UUID teamId, List<Long> invitationIds, UUID revokerId) {
         log.debug("Bulk revoking invitations for team: {} by revoker: {}", teamId, revokerId);
 
         invitationIds.forEach(invitationId -> revokeInvitation(invitationId, revokerId));
@@ -586,7 +587,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TeamInvitationDTO> getRecentInvitations(Long userId, int limit) {
+    public List<TeamInvitationDTO> getRecentInvitations(UUID userId, int limit) {
         log.debug("Getting recent invitations for user: {} with limit: {}", userId, limit);
 
         User user = userService.getUserEntityById(userId)
@@ -599,7 +600,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean checkTeamInvitationLimit(Long teamId) {
+    public boolean checkTeamInvitationLimit(UUID teamId) {
         log.debug("Checking invitation limit for team: {}", teamId);
 
         Team team = teamRepository.findById(teamId)
@@ -618,7 +619,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean checkUserInvitationLimit(Long userId) {
+    public boolean checkUserInvitationLimit(UUID userId) {
         log.debug("Checking invitation limit for user: {}", userId);
 
         // Здесь можно добавить логику проверки лимита приглашений для пользователя
@@ -667,7 +668,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
                 .orElse(false);
     }
 
-    private boolean canRevokeInvitation(TeamInvitation invitation, Long userId) {
+    private boolean canRevokeInvitation(TeamInvitation invitation, UUID userId) {
         // Приглашение может отозвать:
         // 1. Тот, кто отправил приглашение
         // 2. Капитан команды
@@ -683,7 +684,7 @@ public class TeamInvitationServiceImpl implements TeamInvitationService {
                 .orElse(false);
     }
 
-    private void updateInvitationStatistics(Long teamId) {
+    private void updateInvitationStatistics(UUID teamId) {
         Team team = teamRepository.findById(teamId).orElse(null);
         if (team == null) return;
 

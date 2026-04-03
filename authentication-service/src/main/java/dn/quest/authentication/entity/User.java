@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сущность пользователя для микросервиса аутентификации
@@ -35,9 +36,9 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @EqualsAndHashCode.Include
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false, length = 64)
     private String username;

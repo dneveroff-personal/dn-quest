@@ -14,6 +14,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сущность уведомления
@@ -34,8 +35,8 @@ import java.util.Map;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * Уникальный идентификатор уведомления
@@ -44,10 +45,10 @@ public class Notification {
     private String notificationId;
 
     /**
-     * ID получателя уведомления
+     * ID получателя уведомления (UUID пользователя)
      */
-    @Column(nullable = false)
-    private Long userId;
+    @Column(nullable = false, columnDefinition = "BINARY(16)")
+    private UUID userId;
 
     /**
      * Email получателя

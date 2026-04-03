@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.exception;
 
+import java.util.UUID;
+
 /**
  * Исключение, выбрасываемое когда команда не найдена
  */
@@ -13,7 +15,7 @@ public class TeamNotFoundException extends RuntimeException {
         super(message, cause);
     }
     
-    public TeamNotFoundException(Long teamId) {
+    public TeamNotFoundException(UUID teamId) {
         super("Team not found with id: " + teamId);
     }
     

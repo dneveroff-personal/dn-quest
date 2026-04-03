@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения статистики квестов
@@ -29,8 +30,8 @@ import java.time.LocalDateTime;
 public class QuestStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID квеста
@@ -48,7 +49,7 @@ public class QuestStatistics {
      * ID автора квеста
      */
     @Column(name = "author_id")
-    private Long authorId;
+    private UUID authorId;
 
     /**
      * Дата статистики

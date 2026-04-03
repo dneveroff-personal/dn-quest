@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для работы с лидербордами
@@ -31,7 +32,7 @@ public interface LeaderboardService {
     /**
      * Получить позицию пользователя в лидерборде
      */
-    Map<String, Object> getUserLeaderboardPosition(Long userId, String period, LocalDate date);
+    Map<String, Object> getUserLeaderboardPosition(UUID userId, String period, LocalDate date);
 
     /**
      * Получить позицию квеста в лидерборде
@@ -41,17 +42,17 @@ public interface LeaderboardService {
     /**
      * Получить позицию команды в лидерборде
      */
-    Map<String, Object> getTeamLeaderboardPosition(Long teamId, String period, String metric, LocalDate date);
+    Map<String, Object> getTeamLeaderboardPosition(UUID teamId, String period, String metric, LocalDate date);
 
     /**
      * Получить окружение пользователя в лидерборде
      */
-    List<LeaderboardDTO> getUserSurroundingInLeaderboard(Long userId, String period, int count, LocalDate date);
+    List<LeaderboardDTO> getUserSurroundingInLeaderboard(UUID userId, String period, int count, LocalDate date);
 
     /**
      * Получить историю позиций в лидерборде
      */
-    Map<String, Object> getUserLeaderboardHistory(Long userId, String period, LocalDate startDate, LocalDate endDate);
+    Map<String, Object> getUserLeaderboardHistory(UUID userId, String period, LocalDate startDate, LocalDate endDate);
 
     /**
      * Получить доступные категории лидербордов

@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Реализация сервиса для управления игровыми сессиями
@@ -64,7 +65,7 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Override
     @Cacheable(value = "gameSessions", key = "#id")
     @Transactional(readOnly = true)
-    public Optional<GameSession> getSessionById(Long id) {
+    public Optional<GameSession> getSessionById(UUID id) {
         log.debug("Fetching game session by ID: {}", id);
         return gameSessionRepository.findById(id);
     }
@@ -88,7 +89,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CacheEvict(value = "gameSessions", key = "#id")
-    public void deleteSession(Long id) {
+    public void deleteSession(UUID id) {
         log.info("Deleting game session: {}", id);
         
         GameSession session = gameSessionRepository.findById(id)
@@ -103,7 +104,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession startSession(Long sessionId, User startedBy) {
+    public GameSession startSession(UUID sessionId, User startedBy) {
         log.info("Starting game session: {} by user: {}", sessionId, startedBy.getId());
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -132,7 +133,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession pauseSession(Long sessionId, User pausedBy) {
+    public GameSession pauseSession(UUID sessionId, User pausedBy) {
         log.info("Pausing game session: {} by user: {}", sessionId, pausedBy.getId());
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -156,7 +157,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession resumeSession(Long sessionId, User resumedBy) {
+    public GameSession resumeSession(UUID sessionId, User resumedBy) {
         log.info("Resuming game session: {} by user: {}", sessionId, resumedBy.getId());
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -180,7 +181,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession finishSession(Long sessionId, User finishedBy) {
+    public GameSession finishSession(UUID sessionId, User finishedBy) {
         log.info("Finishing game session: {} by user: {}", sessionId, finishedBy.getId());
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -241,7 +242,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GameSession> getSessionsByQuest(Long questId) {
+    public List<GameSession> getSessionsByQuest(UUID questId) {
         log.debug("Fetching game sessions for quest: {}", questId);
         return gameSessionRepository.findByQuestId(questId);
     }
@@ -255,7 +256,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession joinSession(Long sessionId, User user) {
+    public GameSession joinSession(UUID sessionId, User user) {
         log.info("User {} joining game session: {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -282,7 +283,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession leaveSession(Long sessionId, User user) {
+    public GameSession leaveSession(UUID sessionId, User user) {
         log.info("User {} leaving game session: {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -307,26 +308,26 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isUserInSession(Long sessionId, User user) {
+    public boolean isUserInSession(UUID sessionId, User user) {
         log.debug("Checking if user {} is in session {}", user.getId(), sessionId);
         return gameSessionRepository.existsByIdAndParticipantsContaining(sessionId, user);
     }
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession moveToNextLevel(Long sessionId) {
+    public GameSession moveToNextLevel(UUID sessionId) {
         log.info("Moving to next level in session: {}", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
             .orElseThrow(() -> new RuntimeException("Game session not found: " + sessionId));
         
         // Логика перехода на следующий уровень
-        Long currentLevelId = session.getCurrentLevelId();
+        UUID currentLevelId = session.getCurrentLevelId();
         if (currentLevelId != null) {
             // Получение следующего уровня из квеста
             Quest quest = session.getQuest();
             if (quest != null) {
-                List<Long> levelIds = quest.getLevelIds();
+                List<UUID> levelIds = quest.getLevelIds();
                 int currentIndex = levelIds.indexOf(currentLevelId);
                 if (currentIndex >= 0 && currentIndex < levelIds.size() - 1) {
                     session.setCurrentLevelId(levelIds.get(currentIndex + 1));
@@ -343,7 +344,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession setCurrentLevel(Long sessionId, Long levelId) {
+    public GameSession setCurrentLevel(UUID sessionId, UUID levelId) {
         log.info("Setting current level {} for session: {}", levelId, sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -360,7 +361,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Long> getCurrentLevelId(Long sessionId) {
+    public Optional<UUID> getCurrentLevelId(UUID sessionId) {
         log.debug("Getting current level ID for session: {}", sessionId);
         return gameSessionRepository.findById(sessionId)
             .map(GameSession::getCurrentLevelId);
@@ -403,7 +404,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canStartSession(Long sessionId, User user) {
+    public boolean canStartSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can start session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -424,7 +425,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canPauseSession(Long sessionId, User user) {
+    public boolean canPauseSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can pause session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -445,7 +446,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canResumeSession(Long sessionId, User user) {
+    public boolean canResumeSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can resume session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -466,7 +467,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canFinishSession(Long sessionId, User user) {
+    public boolean canFinishSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can finish session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -487,7 +488,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canJoinSession(Long sessionId, User user) {
+    public boolean canJoinSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can join session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -512,7 +513,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canLeaveSession(Long sessionId, User user) {
+    public boolean canLeaveSession(UUID sessionId, User user) {
         log.debug("Checking if user {} can leave session {}", user.getId(), sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -526,7 +527,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession updateLastActivity(Long sessionId) {
+    public GameSession updateLastActivity(UUID sessionId) {
         log.debug("Updating last activity for session: {}", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -538,7 +539,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Instant getSessionDuration(Long sessionId) {
+    public Instant getSessionDuration(UUID sessionId) {
         log.debug("Getting session duration for: {}", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -559,7 +560,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isSessionExpired(Long sessionId) {
+    public boolean isSessionExpired(UUID sessionId) {
         log.debug("Checking if session {} is expired", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId).orElse(null);
@@ -574,14 +575,14 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<GameSession> getSessionsByTeam(Long teamId) {
+    public List<GameSession> getSessionsByTeam(UUID teamId) {
         log.debug("Getting sessions for team: {}", teamId);
         return gameSessionRepository.findByTeamId(teamId);
     }
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession assignTeamToSession(Long sessionId, Long teamId) {
+    public GameSession assignTeamToSession(UUID sessionId, UUID teamId) {
         log.info("Assigning team {} to session: {}", teamId, sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -601,7 +602,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession removeTeamFromSession(Long sessionId) {
+    public GameSession removeTeamFromSession(UUID sessionId) {
         log.info("Removing team from session: {}", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -641,9 +642,9 @@ public class GameSessionServiceImpl implements GameSessionService {
     @Transactional(readOnly = true)
     public Page<GameSession> getSessionsWithFilters(
         SessionStatus status,
-        Long questId,
-        Long userId,
-        Long teamId,
+        UUID questId,
+        UUID userId,
+        UUID teamId,
         Instant startDate,
         Instant endDate,
         Pageable pageable
@@ -663,7 +664,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession forceFinishSession(Long sessionId, String reason) {
+    public GameSession forceFinishSession(UUID sessionId, String reason) {
         log.info("Force finishing session {} with reason: {}", sessionId, reason);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -688,7 +689,7 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CachePut(value = "gameSessions", key = "#sessionId")
-    public GameSession archiveSession(Long sessionId) {
+    public GameSession archiveSession(UUID sessionId) {
         log.info("Archiving session: {}", sessionId);
         
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -715,14 +716,14 @@ public class GameSessionServiceImpl implements GameSessionService {
 
     @Override
     @CacheEvict(value = "gameSessions", key = "#sessionId")
-    public void evictSessionFromCache(Long sessionId) {
+    public void evictSessionFromCache(UUID sessionId) {
         log.debug("Evicting session from cache: {}", sessionId);
         // Кэширование происходит автоматически через аннотации
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<GameSession> getCachedSession(Long sessionId) {
+    public Optional<GameSession> getCachedSession(UUID sessionId) {
         log.debug("Getting cached session: {}", sessionId);
         return getSessionById(sessionId);
     }

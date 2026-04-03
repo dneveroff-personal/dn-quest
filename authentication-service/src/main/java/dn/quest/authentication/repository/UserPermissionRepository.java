@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с разрешениями пользователей
@@ -19,12 +20,12 @@ import java.util.Optional;
 public interface UserPermissionRepository extends JpaRepository<UserPermission, Long>, JpaSpecificationExecutor<UserPermission> {
 
     // Поиск по пользователю
-    List<UserPermission> findByUserId(Long userId);
-    Optional<UserPermission> findByUserIdAndPermissionId(Long userId, Long permissionId);
+    List<UserPermission> findByUserId(UUID userId);
+    Optional<UserPermission> findByUserIdAndPermissionId(UUID userId, Long permissionId);
 
     // Поиск с JOIN FETCH для оптимизации
     @Query("SELECT up FROM UserPermission up LEFT JOIN FETCH up.user LEFT JOIN FETCH up.permission WHERE up.user.id = :userId")
-    List<UserPermission> findByUserIdWithPermissions(@Param("userId") Long userId);
+    List<UserPermission> findByUserIdWithPermissions(@Param("userId") UUID userId);
 
     // Поиск по разрешению
     List<UserPermission> findByPermissionId(Long permissionId);
@@ -39,7 +40,7 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
 
     // Проверка наличия разрешения у пользователя
     @Query("SELECT COUNT(up) > 0 FROM UserPermission up JOIN up.user u JOIN up.permission p WHERE u.id = :userId AND p.name = :permissionName")
-    boolean hasUserPermission(@Param("userId") Long userId, @Param("permissionName") String permissionName);
+    boolean hasUserPermission(@Param("userId") UUID userId, @Param("permissionName") String permissionName);
 
     // Проверка наличия разрешения у пользователя по username
     @Query("SELECT COUNT(up) > 0 FROM UserPermission up JOIN up.user u JOIN up.permission p WHERE u.username = :username AND p.name = :permissionName")
@@ -47,7 +48,7 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
 
     // Получение всех разрешений пользователя
     @Query("SELECT p.name FROM UserPermission up JOIN up.user u JOIN up.permission p WHERE u.id = :userId")
-    List<String> findPermissionNamesByUserId(@Param("userId") Long userId);
+    List<String> findPermissionNamesByUserId(@Param("userId") UUID userId);
 
     // Получение всех разрешений пользователя по username
     @Query("SELECT p.name FROM UserPermission up JOIN up.user u JOIN up.permission p WHERE u.username = :username")
@@ -56,16 +57,16 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
     // Удаление разрешений пользователя
     @Modifying
     @Query("DELETE FROM UserPermission up WHERE up.user.id = :userId")
-    int deleteByUserId(@Param("userId") Long userId);
+    int deleteByUserId(@Param("userId") UUID userId);
 
     @Modifying
     @Query("DELETE FROM UserPermission up WHERE up.user.id = :userId AND up.permission.id = :permissionId")
-    int deleteByUserIdAndPermissionId(@Param("userId") Long userId, @Param("permissionId") Long permissionId);
+    int deleteByUserIdAndPermissionId(@Param("userId") UUID userId, @Param("permissionId") Long permissionId);
 
     // Удаление разрешений по имени
     @Modifying
     @Query("DELETE FROM UserPermission up WHERE up.user.id = :userId AND up.permission.name = :permissionName")
-    int deleteByUserIdAndPermissionName(@Param("userId") Long userId, @Param("permissionName") String permissionName);
+    int deleteByUserIdAndPermissionName(@Param("userId") UUID userId, @Param("permissionName") String permissionName);
 
     // Поиск по дате выдачи
     @Query("SELECT up FROM UserPermission up WHERE up.grantedAt >= :startDate AND up.grantedAt <= :endDate")
@@ -76,7 +77,7 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
 
     // Статистика
     @Query("SELECT COUNT(up) FROM UserPermission up WHERE up.user.id = :userId")
-    long countByUserId(@Param("userId") Long userId);
+    long countByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT COUNT(up) FROM UserPermission up WHERE up.permission.id = :permissionId")
     long countByPermissionId(@Param("permissionId") Long permissionId);

@@ -110,7 +110,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     void testSubmitCode_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
         Long questId = 1L;
-        Long userId = 1L;
+        UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -142,7 +142,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     void testSubmitCode_WrongCode_ReturnsWrongCode() throws Exception {
         // Given - Сначала создаем игровую сессию
         Long questId = 1L;
-        Long userId = 1L;
+        UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -170,7 +170,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     void testSubmitCode_DuplicateCode_ReturnsAlreadyFound() throws Exception {
         // Given - Сначала создаем игровую сессию и отправляем правильный код
         Long questId = 1L;
-        Long userId = 1L;
+        UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -229,7 +229,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     void testFinishGameSession_Success() throws Exception {
         // Given - Сначала создаем игровую сессию и завершаем все уровни
         Long questId = 1L;
-        Long userId = 1L;
+        UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")

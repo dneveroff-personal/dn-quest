@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления завершенными уровнями
@@ -22,23 +23,23 @@ public interface LevelCompletionService {
     void deleteCompletion(Long id);
     
     // Управление завершением уровней
-    LevelCompletion completeLevel(Long sessionId, Long userId, Long levelId, String code, Double timeSpent, Double score);
-    LevelCompletion completeLevelWithBonus(Long sessionId, Long userId, Long levelId, String code, Double timeSpent, Double score, Double bonus);
-    LevelCompletion recordCompletion(Long sessionId, Long userId, Long levelId, LevelCompletion completion);
+    LevelCompletion completeLevel(Long sessionId, UUID userId, Long levelId, String code, Double timeSpent, Double score);
+    LevelCompletion completeLevelWithBonus(Long sessionId, UUID userId, Long levelId, String code, Double timeSpent, Double score, Double bonus);
+    LevelCompletion recordCompletion(Long sessionId, UUID userId, Long levelId, LevelCompletion completion);
     
     // Поиск и фильтрация завершений
     Page<LevelCompletion> getAllCompletions(Pageable pageable);
     List<LevelCompletion> getCompletionsBySession(Long sessionId);
-    List<LevelCompletion> getCompletionsByUser(Long userId);
+    List<LevelCompletion> getCompletionsByUser(UUID userId);
     List<LevelCompletion> getCompletionsByLevel(Long levelId);
-    List<LevelCompletion> getCompletionsBySessionAndUser(Long sessionId, Long userId);
-    List<LevelCompletion> getCompletionsByUserAndLevel(Long userId, Long levelId);
+    List<LevelCompletion> getCompletionsBySessionAndUser(Long sessionId, UUID userId);
+    List<LevelCompletion> getCompletionsByUserAndLevel(UUID userId, Long levelId);
     List<LevelCompletion> getCompletionsByQuest(Long questId);
     
     // Статистика завершений
     long getTotalCompletionsCount();
     long getCompletionsCountBySession(Long sessionId);
-    long getCompletionsCountByUser(Long userId);
+    long getCompletionsCountByUser(UUID userId);
     long getCompletionsCountByLevel(Long levelId);
     long getCompletionsCountByQuest(Long questId);
     long getUniqueUsersCompletedLevel(Long levelId);
@@ -51,7 +52,7 @@ public interface LevelCompletionService {
     List<LevelCompletion> getLowestScoringCompletions(Long levelId, int limit);
     Double getAverageCompletionTime(Long levelId);
     Double getAverageCompletionScore(Long levelId);
-    Double getAverageCompletionTimeByUser(Long userId, Long levelId);
+    Double getAverageCompletionTimeByUser(UUID userId, Long levelId);
     
     // Анализ по времени
     List<LevelCompletion> getCompletionsByDateRange(Instant start, Instant end);
@@ -71,32 +72,32 @@ public interface LevelCompletionService {
     // Рейтинги и лидерборды
     List<LevelCompletion> getTopCompletionsByScore(Long levelId, int limit);
     List<LevelCompletion> getTopCompletionsByTime(Long levelId, int limit);
-    List<LevelCompletion> getUserBestCompletions(Long userId, int limit);
+    List<LevelCompletion> getUserBestCompletions(UUID userId, int limit);
     List<LevelCompletion> getSessionBestCompletions(Long sessionId, int limit);
-    Integer getUserRanking(Long userId, Long levelId);
-    Integer getSessionRanking(Long sessionId, Long userId, Long levelId);
+    Integer getUserRanking(UUID userId, Long levelId);
+    Integer getSessionRanking(Long sessionId, UUID userId, Long levelId);
     
     // Валидация и бизнес-логика
-    boolean canCompleteLevel(Long sessionId, Long userId, Long levelId);
-    boolean isLevelAlreadyCompleted(Long sessionId, Long userId, Long levelId);
+    boolean canCompleteLevel(Long sessionId, UUID userId, Long levelId);
+    boolean isLevelAlreadyCompleted(Long sessionId, UUID userId, Long levelId);
     boolean isValidCompletionTime(Double timeSpent, Long levelId);
     boolean isValidCompletionScore(Double score, Long levelId);
-    boolean isFirstCompletion(Long sessionId, Long userId, Long levelId);
+    boolean isFirstCompletion(Long sessionId, UUID userId, Long levelId);
     boolean isRecordCompletion(Long completionId);
     
     // Управление последовательностью
-    List<LevelCompletion> getCompletionSequence(Long sessionId, Long userId);
-    LevelCompletion getFirstCompletion(Long sessionId, Long userId);
-    LevelCompletion getLastCompletion(Long sessionId, Long userId);
-    LevelCompletion getNextLevelCompletion(Long sessionId, Long userId, Long currentLevelId);
-    boolean isQuestCompleted(Long sessionId, Long userId, Long questId);
+    List<LevelCompletion> getCompletionSequence(Long sessionId, UUID userId);
+    LevelCompletion getFirstCompletion(Long sessionId, UUID userId);
+    LevelCompletion getLastCompletion(Long sessionId, UUID userId);
+    LevelCompletion getNextLevelCompletion(Long sessionId, UUID userId, Long currentLevelId);
+    boolean isQuestCompleted(Long sessionId, UUID userId, Long questId);
     
     // Командные операции
-    List<LevelCompletion> getTeamCompletions(Long sessionId, Long teamId);
-    List<LevelCompletion> getTeamCompletionsForLevel(Long sessionId, Long teamId, Long levelId);
-    Double getTeamAverageCompletionTime(Long sessionId, Long teamId, Long levelId);
-    Double getTeamAverageScore(Long sessionId, Long teamId, Long levelId);
-    boolean isTeamLevelCompleted(Long sessionId, Long teamId, Long levelId);
+    List<LevelCompletion> getTeamCompletions(Long sessionId, UUID teamId);
+    List<LevelCompletion> getTeamCompletionsForLevel(Long sessionId, UUID teamId, Long levelId);
+    Double getTeamAverageCompletionTime(Long sessionId, UUID teamId, Long levelId);
+    Double getTeamAverageScore(Long sessionId, UUID teamId, Long levelId);
+    boolean isTeamLevelCompleted(Long sessionId, UUID teamId, Long levelId);
     
     // Операции для администрирования
     List<LevelCompletion> getAllCompletionsForAdmin();
@@ -131,7 +132,7 @@ public interface LevelCompletionService {
     List<Object[]> getCompletionStatisticsByHour(Long levelId, Instant start, Instant end);
     List<Object[]> getCompletionStatisticsByDay(Long levelId, Instant start, Instant end);
     List<Object[]> getCompletionRateAnalysis(Long levelId);
-    List<Object[]> getUserCompletionSummary(Long userId);
+    List<Object[]> getUserCompletionSummary(UUID userId);
     List<Object[]> getLevelDifficultyAnalysis(Long levelId);
     List<Object[]> getTimeDistributionAnalysis(Long levelId);
     List<Object[]> getScoreDistributionAnalysis(Long levelId);
@@ -150,7 +151,7 @@ public interface LevelCompletionService {
     // Операции с достижениями
     void checkCompletionAchievements(LevelCompletion completion);
     List<String> getCompletionAchievements(Long completionId);
-    boolean hasCompletionAchievement(Long userId, String achievementCode);
+    boolean hasCompletionAchievement(UUID userId, String achievementCode);
     
     // Операции с попытками
     int getCompletionAttempts(Long completionId);
@@ -175,9 +176,9 @@ public interface LevelCompletionService {
     Double getSessionTotalScore(Long sessionId);
     
     // Операции с квестами
-    List<LevelCompletion> getQuestCompletionSummary(Long questId, Long userId);
-    Double getQuestCompletionPercentage(Long questId, Long userId);
-    Long getQuestTotalCompletionTime(Long questId, Long userId);
-    Double getQuestTotalScore(Long questId, Long userId);
-    boolean isQuestFullyCompleted(Long questId, Long userId);
+    List<LevelCompletion> getQuestCompletionSummary(Long questId, UUID userId);
+    Double getQuestCompletionPercentage(Long questId, UUID userId);
+    Long getQuestTotalCompletionTime(Long questId, UUID userId);
+    Double getQuestTotalScore(Long questId, UUID userId);
+    boolean isQuestFullyCompleted(Long questId, UUID userId);
 }

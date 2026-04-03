@@ -4,6 +4,8 @@ import dn.quest.shared.events.BaseEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие публикации квеста
  */
@@ -39,5 +41,5 @@ public class QuestPublishedEvent extends BaseEvent {
     /**
      * ID автора квеста
      */
-    private Long authorId;
+    private UUID authorId;
 }

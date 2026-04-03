@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Контроллер для управления настройками пользователей
@@ -31,7 +32,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Получить настройки пользователя", description = "Возвращает настройки пользователя по ID")
     public ResponseEntity<UserSettingsDTO> getUserSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         return userSettingsService.getUserSettingsByUserId(userId)
                 .map(ResponseEntity::ok)
@@ -42,7 +43,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить настройки пользователя", description = "Обновляет все настройки пользователя")
     public ResponseEntity<UserSettingsDTO> updateUserSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Valid @RequestBody UpdateSettingsRequestDTO request) {
         
         UserSettingsDTO updatedSettings = userSettingsService.updateUserSettings(userId, request);
@@ -53,7 +54,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить настройки приватности", description = "Обновляет настройки приватности пользователя")
     public ResponseEntity<UserSettingsDTO> updatePrivacySettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Публичный профиль") @RequestParam(required = false) Boolean profilePublic,
             @Parameter(description = "Показывать email") @RequestParam(required = false) Boolean showEmail,
             @Parameter(description = "Показывать настоящее имя") @RequestParam(required = false) Boolean showRealName,
@@ -70,7 +71,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить настройки уведомлений", description = "Обновляет настройки уведомлений пользователя")
     public ResponseEntity<UserSettingsDTO> updateNotificationSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Email уведомления") @RequestParam(required = false) Boolean emailNotifications,
             @Parameter(description = "Приглашения в команды") @RequestParam(required = false) Boolean teamInvitations,
             @Parameter(description = "Напоминания о квестах") @RequestParam(required = false) Boolean questReminders,
@@ -88,7 +89,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить настройки интерфейса", description = "Обновляет настройки интерфейса пользователя")
     public ResponseEntity<UserSettingsDTO> updateInterfaceSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Тема оформления") @RequestParam(required = false) String theme,
             @Parameter(description = "Язык интерфейса") @RequestParam(required = false) String language,
             @Parameter(description = "Часовой пояс") @RequestParam(required = false) String timezone,
@@ -104,7 +105,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Обновить игровые настройки", description = "Обновляет игровые настройки пользователя")
     public ResponseEntity<UserSettingsDTO> updateGameSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Автоматически вступать в команды") @RequestParam(required = false) Boolean autoJoinTeams,
             @Parameter(description = "Показывать подсказки") @RequestParam(required = false) Boolean showHints,
             @Parameter(description = "Звуковые эффекты") @RequestParam(required = false) Boolean soundEffects,
@@ -120,7 +121,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userId")
     @Operation(summary = "Сбросить настройки по умолчанию", description = "Сбрасывает настройки пользователя к значениям по умолчанию")
     public ResponseEntity<UserSettingsDTO> resetToDefaults(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         UserSettingsDTO resetSettings = userSettingsService.resetToDefaults(userId);
         return ResponseEntity.ok(resetSettings);
@@ -130,7 +131,7 @@ public class UserSettingsController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Удалить настройки пользователя", description = "Удаляет настройки пользователя")
     public ResponseEntity<Void> deleteUserSettings(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         userSettingsService.deleteUserSettings(userId);
         return ResponseEntity.noContent().build();

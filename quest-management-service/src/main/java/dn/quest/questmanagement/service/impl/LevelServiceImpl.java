@@ -69,7 +69,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public LevelDTO updateLevel(Long id, LevelDTO dto) {
+    public LevelDTO updateLevel(UUID id, LevelDTO dto) {
         log.info("Updating level with ID: {}", id);
 
         Level level = getLevelEntityById(id);
@@ -95,7 +95,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public void deleteLevel(Long id) {
+    public void deleteLevel(UUID id) {
         log.info("Deleting level with ID: {}", id);
 
         Level level = getLevelEntityById(id);
@@ -118,7 +118,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public LevelDTO getLevelById(Long id) {
+    public LevelDTO getLevelById(UUID id) {
         Level level = getLevelEntityById(id);
         return convertToDTO(level);
     }
@@ -157,7 +157,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public LevelDTO changeLevelOrder(Long levelId, Integer newOrder) {
+    public LevelDTO changeLevelOrder(UUID levelId, Integer newOrder) {
         log.info("Changing order of level with ID: {} to {}", levelId, newOrder);
 
         Level level = getLevelEntityById(levelId);
@@ -197,7 +197,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public LevelDTO moveLevelUp(Long levelId) {
+    public LevelDTO moveLevelUp(UUID levelId) {
         Level level = getLevelEntityById(levelId);
 
         if (level.getOrderIndex() <= 1) {
@@ -209,7 +209,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public LevelDTO moveLevelDown(Long levelId) {
+    public LevelDTO moveLevelDown(UUID levelId) {
         Level level = getLevelEntityById(levelId);
 
         Integer maxOrder = levelRepository.findMaxOrderIndexByQuestId(level.getQuestId());
@@ -326,7 +326,7 @@ public class LevelServiceImpl implements LevelService {
 
     // Вспомогательные методы
 
-    private Level getLevelEntityById(Long id) {
+    private Level getLevelEntityById(UUID id) {
         return levelRepository.findById(id)
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with ID: " + id));
     }

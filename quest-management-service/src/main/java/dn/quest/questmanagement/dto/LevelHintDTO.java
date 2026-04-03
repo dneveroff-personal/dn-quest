@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для представления подсказки уровня
@@ -31,7 +32,7 @@ public class LevelHintDTO extends BaseDTO {
      * ID уровня, к которому относится подсказка
      */
     @NotNull(message = "ID уровня обязателен")
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Порядковый номер подсказки в уровне
@@ -283,7 +284,7 @@ public class LevelHintDTO extends BaseDTO {
      */
     public boolean isValid() {
         // Проверка обязательных полей
-        if (levelId == null || levelId <= 0) {
+        if (levelId == null) {
             return false;
         }
         

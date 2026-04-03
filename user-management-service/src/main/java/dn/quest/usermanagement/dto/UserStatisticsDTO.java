@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * DTO для статистики пользователя
@@ -19,10 +20,10 @@ import java.time.Instant;
 public class UserStatisticsDTO {
     
     @Schema(description = "ID статистики", example = "1")
-    private Long id;
+    private UUID id;
     
     @Schema(description = "ID пользователя", example = "1")
-    private Long userId;
+    private UUID userId;
     
     // Общая статистика
     @Schema(description = "Общий счет", example = "15000")

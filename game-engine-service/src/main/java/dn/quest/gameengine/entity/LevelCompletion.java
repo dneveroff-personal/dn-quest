@@ -9,6 +9,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Завершение уровня в игровой сессии
@@ -29,8 +30,8 @@ import java.time.Instant;
 public class LevelCompletion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)

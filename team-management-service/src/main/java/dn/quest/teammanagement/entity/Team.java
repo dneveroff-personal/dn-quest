@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сущность команды
@@ -28,8 +29,8 @@ import java.util.Set;
 public class Team {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 120)
     private String name;
@@ -85,14 +86,14 @@ public class Team {
     /**
      * Проверяет, является ли пользователь капитаном команды
      */
-    public boolean isCaptain(Long userId) {
+    public boolean isCaptain(UUID userId) {
         return captain != null && captain.getId().equals(userId);
     }
 
     /**
      * Проверяет, является ли пользователь участником команды
      */
-    public boolean isMember(Long userId) {
+    public boolean isMember(UUID userId) {
         return members.stream()
                 .anyMatch(member -> member.getUser().getId().equals(userId));
     }
@@ -100,7 +101,7 @@ public class Team {
     /**
      * Получает роль пользователя в команде
      */
-    public TeamRole getUserRole(Long userId) {
+    public TeamRole getUserRole(UUID userId) {
         return members.stream()
                 .filter(member -> member.getUser().getId().equals(userId))
                 .map(TeamMember::getRole)

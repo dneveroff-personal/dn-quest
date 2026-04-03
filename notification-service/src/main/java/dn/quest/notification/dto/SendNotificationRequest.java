@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * DTO для запроса отправки уведомления
@@ -23,10 +24,10 @@ import java.util.Map;
 public class SendNotificationRequest {
 
     /**
-     * ID получателя уведомления
+     * ID получателя уведомления (UUID пользователя)
      */
     @NotNull(message = "User ID is required")
-    private Long userId;
+    private UUID userId;
 
     /**
      * Тип уведомления

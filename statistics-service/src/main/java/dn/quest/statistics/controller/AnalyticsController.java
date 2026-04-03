@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Контроллер для работы с аналитикой
@@ -88,7 +89,7 @@ public class AnalyticsController {
             @RequestParam(required = false) String category,
             
             @Parameter(description = "ID автора для фильтрации") 
-            @RequestParam(required = false) Long authorId) {
+            @RequestParam(required = false) UUID authorId) {
         
         log.info("Getting quest performance report from {} to {} category: {} author: {}", 
                 startDate, endDate, category, authorId);
@@ -115,7 +116,7 @@ public class AnalyticsController {
             @RequestParam(required = false) Long questId,
             
             @Parameter(description = "ID пользователя для фильтрации") 
-            @RequestParam(required = false) Long userId) {
+            @RequestParam(required = false) UUID userId) {
         
         log.info("Getting game session report from {} to {} quest: {} user: {}", 
                 startDate, endDate, questId, userId);

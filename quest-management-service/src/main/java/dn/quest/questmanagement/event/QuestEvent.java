@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Базовый класс для событий квестов
@@ -30,10 +31,10 @@ public class QuestEvent extends BaseDTO {
     private Set<Long> authorIds;
     private String status;
     private LocalDateTime timestamp;
-    private Long userId;
+    private UUID userId;
     private String reason;
 
-    public QuestEvent(String eventType, Long questId, Long userId) {
+    public QuestEvent(String eventType, Long questId, UUID userId) {
         this.eventType = eventType;
         this.questId = questId;
         this.userId = userId;

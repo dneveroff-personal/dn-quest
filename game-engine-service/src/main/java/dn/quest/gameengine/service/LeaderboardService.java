@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления лидербордами и рейтингами
@@ -17,43 +18,43 @@ import java.util.Optional;
 public interface LeaderboardService {
 
     // Базовые операции с лидербордами
-    Map<String, Object> getSessionLeaderboard(Long sessionId, Pageable pageable);
-    Map<String, Object> getQuestLeaderboard(Long questId, Pageable pageable);
+    Map<String, Object> getSessionLeaderboard(UUID sessionId, Pageable pageable);
+    Map<String, Object> getQuestLeaderboard(UUID questId, Pageable pageable);
     Map<String, Object> getGlobalLeaderboard(Pageable pageable);
-    Map<String, Object> getTeamLeaderboard(Long teamId, Pageable pageable);
+    Map<String, Object> getTeamLeaderboard(UUID teamId, Pageable pageable);
     
     // Лидерборды по разным метрикам
-    Map<String, Object> getSessionLeaderboardByScore(Long sessionId, Pageable pageable);
-    Map<String, Object> getSessionLeaderboardByTime(Long sessionId, Pageable pageable);
-    Map<String, Object> getSessionLeaderboardByEfficiency(Long sessionId, Pageable pageable);
-    Map<String, Object> getSessionLeaderboardByCompletionRate(Long sessionId, Pageable pageable);
+    Map<String, Object> getSessionLeaderboardByScore(UUID sessionId, Pageable pageable);
+    Map<String, Object> getSessionLeaderboardByTime(UUID sessionId, Pageable pageable);
+    Map<String, Object> getSessionLeaderboardByEfficiency(UUID sessionId, Pageable pageable);
+    Map<String, Object> getSessionLeaderboardByCompletionRate(UUID sessionId, Pageable pageable);
     
     // Пользовательские рейтинги
-    Integer getUserRankingInSession(Long sessionId, Long userId);
-    Integer getUserRankingInQuest(Long questId, Long userId);
-    Integer getUserGlobalRanking(Long userId);
-    Integer getUserRankingByScore(Long sessionId, Long userId);
-    Integer getUserRankingByTime(Long sessionId, Long userId);
+    Integer getUserRankingInSession(UUID sessionId, UUID userId);
+    Integer getUserRankingInQuest(UUID questId, UUID userId);
+    Integer getUserGlobalRanking(UUID userId);
+    Integer getUserRankingByScore(UUID sessionId, UUID userId);
+    Integer getUserRankingByTime(UUID sessionId, UUID userId);
     
     // Командные рейтинги
-    Integer getTeamRankingInSession(Long sessionId, Long teamId);
-    Integer getTeamRankingInQuest(Long questId, Long teamId);
-    Integer getTeamGlobalRanking(Long teamId);
-    Map<String, Object> getTeamLeaderboardByScore(Long sessionId, Pageable pageable);
-    Map<String, Object> getTeamLeaderboardByTime(Long sessionId, Pageable pageable);
+    Integer getTeamRankingInSession(UUID sessionId, UUID teamId);
+    Integer getTeamRankingInQuest(UUID questId, UUID teamId);
+    Integer getTeamGlobalRanking(UUID teamId);
+    Map<String, Object> getTeamLeaderboardByScore(UUID sessionId, Pageable pageable);
+    Map<String, Object> getTeamLeaderboardByTime(UUID sessionId, Pageable pageable);
     
     // Статистика лидербордов
-    long getTotalParticipantsInSession(Long sessionId);
-    long getTotalParticipantsInQuest(Long questId);
-    double getAverageScoreInSession(Long sessionId);
-    double getAverageTimeInSession(Long sessionId);
-    double getAverageCompletionRateInSession(Long sessionId);
+    long getTotalParticipantsInSession(UUID sessionId);
+    long getTotalParticipantsInQuest(UUID questId);
+    double getAverageScoreInSession(UUID sessionId);
+    double getAverageTimeInSession(UUID sessionId);
+    double getAverageCompletionRateInSession(UUID sessionId);
     
     // Исторические лидерборды
-    Map<String, Object> getSessionLeaderboardAtTime(Long sessionId, Instant timestamp, Pageable pageable);
-    Map<String, Object> getQuestLeaderboardAtTime(Long questId, Instant timestamp, Pageable pageable);
-    List<Map<String, Object>> getSessionLeaderboardHistory(Long sessionId, Instant start, Instant end);
-    List<Map<String, Object>> getQuestLeaderboardHistory(Long questId, Instant start, Instant end);
+    Map<String, Object> getSessionLeaderboardAtTime(UUID sessionId, Instant timestamp, Pageable pageable);
+    Map<String, Object> getQuestLeaderboardAtTime(UUID questId, Instant timestamp, Pageable pageable);
+    List<Map<String, Object>> getSessionLeaderboardHistory(UUID sessionId, Instant start, Instant end);
+    List<Map<String, Object>> getQuestLeaderboardHistory(UUID questId, Instant start, Instant end);
     
     // Лидерборды по периодам
     Map<String, Object> getDailyLeaderboard(Instant date, Pageable pageable);
@@ -68,58 +69,58 @@ public interface LeaderboardService {
     Map<String, Object> getLeaderboardByUserLevel(String userLevel, Pageable pageable);
     
     // Персонализированные лидерборды
-    Map<String, Object> getUserRelativeLeaderboard(Long userId, Long sessionId, int radius);
-    Map<String, Object> getUserFriendsLeaderboard(Long userId, Long sessionId, Pageable pageable);
-    Map<String, Object> getUserSimilarLevelLeaderboard(Long userId, Long sessionId, Pageable pageable);
+    Map<String, Object> getUserRelativeLeaderboard(UUID userId, UUID sessionId, int radius);
+    Map<String, Object> getUserFriendsLeaderboard(UUID userId, UUID sessionId, Pageable pageable);
+    Map<String, Object> getUserSimilarLevelLeaderboard(UUID userId, UUID sessionId, Pageable pageable);
     
     // Операции с кэшированием лидербордов
-    void cacheSessionLeaderboard(Long sessionId, Map<String, Object> leaderboard);
-    void cacheQuestLeaderboard(Long questId, Map<String, Object> leaderboard);
+    void cacheSessionLeaderboard(UUID sessionId, Map<String, Object> leaderboard);
+    void cacheQuestLeaderboard(UUID questId, Map<String, Object> leaderboard);
     void cacheGlobalLeaderboard(Map<String, Object> leaderboard);
-    Optional<Map<String, Object>> getCachedSessionLeaderboard(Long sessionId);
-    Optional<Map<String, Object>> getCachedQuestLeaderboard(Long questId);
+    Optional<Map<String, Object>> getCachedSessionLeaderboard(UUID sessionId);
+    Optional<Map<String, Object>> getCachedQuestLeaderboard(UUID questId);
     Optional<Map<String, Object>> getCachedGlobalLeaderboard();
-    void evictLeaderboardCache(Long sessionId);
+    void evictLeaderboardCache(UUID sessionId);
     void evictAllLeaderboardCache();
     
     // Обновление лидербордов
-    void updateSessionLeaderboard(Long sessionId);
-    void updateQuestLeaderboard(Long questId);
+    void updateSessionLeaderboard(UUID sessionId);
+    void updateQuestLeaderboard(UUID questId);
     void updateGlobalLeaderboard();
-    void updateTeamLeaderboard(Long teamId);
-    void updateUserRanking(Long userId, Long sessionId);
-    void updateTeamRanking(Long teamId, Long sessionId);
+    void updateTeamLeaderboard(UUID teamId);
+    void updateUserRanking(UUID userId, UUID sessionId);
+    void updateTeamRanking(UUID teamId, UUID sessionId);
     
     // Операции с событиями
     void publishLeaderboardUpdatedEvent(String leaderboardType, Long entityId);
-    void publishRankingChangedEvent(Long userId, Long sessionId, Integer oldRank, Integer newRank);
-    void publishTeamRankingChangedEvent(Long teamId, Long sessionId, Integer oldRank, Integer newRank);
+    void publishRankingChangedEvent(UUID userId, UUID sessionId, Integer oldRank, Integer newRank);
+    void publishTeamRankingChangedEvent(UUID teamId, UUID sessionId, Integer oldRank, Integer newRank);
     
     // Аналитика лидербордов
-    List<Object[]> getLeaderboardStatistics(Long sessionId);
-    List<Object[]> getRankingDistribution(Long sessionId);
-    List<Object[]> getScoreDistribution(Long sessionId);
-    List<Object[]> getTimeDistribution(Long sessionId);
-    List<Object[]> getUserRankingHistory(Long userId, Long sessionId, Instant start, Instant end);
+    List<Object[]> getLeaderboardStatistics(UUID sessionId);
+    List<Object[]> getRankingDistribution(UUID sessionId);
+    List<Object[]> getScoreDistribution(UUID sessionId);
+    List<Object[]> getTimeDistribution(UUID sessionId);
+    List<Object[]> getUserRankingHistory(UUID userId, UUID sessionId, Instant start, Instant end);
     
     // Операции для администрирования
     List<Map<String, Object>> getAllLeaderboards();
-    void resetLeaderboard(Long sessionId);
+    void resetLeaderboard(UUID sessionId);
     void resetAllLeaderboards();
-    void recalculateLeaderboard(Long sessionId);
+    void recalculateLeaderboard(UUID sessionId);
     void recalculateAllLeaderboards();
     List<Map<String, Object>> getLeaderboardPerformanceMetrics();
     
     // Валидация и бизнес-логика
-    boolean isUserEligibleForLeaderboard(Long userId, Long sessionId);
-    boolean isTeamEligibleForLeaderboard(Long teamId, Long sessionId);
+    boolean isUserEligibleForLeaderboard(UUID userId, UUID sessionId);
+    boolean isTeamEligibleForLeaderboard(UUID teamId, UUID sessionId);
     boolean isValidLeaderboardEntry(Map<String, Object> entry);
-    boolean isLeaderboardStale(Long sessionId, Instant lastUpdate);
+    boolean isLeaderboardStale(UUID sessionId, Instant lastUpdate);
     
     // Операции с фильтрацией
-    Map<String, Object> getFilteredLeaderboard(Long sessionId, List<String> filters, Pageable pageable);
+    Map<String, Object> getFilteredLeaderboard(UUID sessionId, List<String> filters, Pageable pageable);
     Map<String, Object> getLeaderboardWithFilters(
-        Long sessionId,
+        UUID sessionId,
         List<Long> userIds,
         List<Long> teamIds,
         String difficulty,
@@ -130,27 +131,27 @@ public interface LeaderboardService {
     );
     
     // Операции с экспортом
-    List<Map<String, Object>> exportLeaderboard(Long sessionId);
-    List<Map<String, Object>> exportQuestLeaderboard(Long questId);
+    List<Map<String, Object>> exportLeaderboard(UUID sessionId);
+    List<Map<String, Object>> exportQuestLeaderboard(UUID questId);
     List<Map<String, Object>> exportGlobalLeaderboard();
-    String generateLeaderboardReport(Long sessionId);
-    String generateQuestLeaderboardReport(Long questId);
+    String generateLeaderboardReport(UUID sessionId);
+    String generateQuestLeaderboardReport(UUID questId);
     
     // Операции с достижениями
-    List<Map<String, Object>> getTopAchievers(Long sessionId, int limit);
-    List<Map<String, Object>> getMostImprovedUsers(Long sessionId, Instant start, Instant end, int limit);
-    List<Map<String, Object>> getConsistentPerformers(Long sessionId, int limit);
+    List<Map<String, Object>> getTopAchievers(UUID sessionId, int limit);
+    List<Map<String, Object>> getMostImprovedUsers(UUID sessionId, Instant start, Instant end, int limit);
+    List<Map<String, Object>> getConsistentPerformers(UUID sessionId, int limit);
     
     // Операции с предсказаниями
-    Map<String, Object> predictUserRanking(Long userId, Long sessionId);
-    Map<String, Object> predictTeamRanking(Long teamId, Long sessionId);
-    List<Map<String, Object>> getTrendingUsers(Long sessionId, int limit);
-    List<Map<String, Object>> getTrendingTeams(Long sessionId, int limit);
+    Map<String, Object> predictUserRanking(UUID userId, UUID sessionId);
+    Map<String, Object> predictTeamRanking(UUID teamId, UUID sessionId);
+    List<Map<String, Object>> getTrendingUsers(UUID sessionId, int limit);
+    List<Map<String, Object>> getTrendingTeams(UUID sessionId, int limit);
     
     // Операции с сравнением
-    Map<String, Object> compareUsers(Long userId1, Long userId2, Long sessionId);
-    Map<String, Object> compareTeams(Long teamId1, Long teamId2, Long sessionId);
-    Map<String, Object> compareSessions(Long sessionId1, Long sessionId2);
+    Map<String, Object> compareUsers(UUID userId1, UUID userId2, UUID sessionId);
+    Map<String, Object> compareTeams(UUID teamId1, UUID teamId2, UUID sessionId);
+    Map<String, Object> compareSessions(UUID sessionId1, UUID sessionId2);
     
     // Операции с агрегацией
     Map<String, Object> getAggregatedLeaderboard(List<Long> sessionIds, Pageable pageable);
@@ -158,35 +159,35 @@ public interface LeaderboardService {
     Map<String, Object> getCrossPlatformLeaderboard(Pageable pageable);
     
     // Операции с реальным временем
-    void enableRealTimeUpdates(Long sessionId);
-    void disableRealTimeUpdates(Long sessionId);
-    boolean isRealTimeUpdatesEnabled(Long sessionId);
-    void subscribeToLeaderboardUpdates(Long sessionId, String subscriptionId);
+    void enableRealTimeUpdates(UUID sessionId);
+    void disableRealTimeUpdates(UUID sessionId);
+    boolean isRealTimeUpdatesEnabled(UUID sessionId);
+    void subscribeToLeaderboardUpdates(UUID sessionId, String subscriptionId);
     void unsubscribeFromLeaderboardUpdates(String subscriptionId);
     
     // Вспомогательные методы
-    double calculateUserScore(Long userId, Long sessionId);
-    double calculateTeamScore(Long teamId, Long sessionId);
-    double calculateEfficiencyScore(Long userId, Long sessionId);
-    double calculateCompletionRate(Long userId, Long sessionId);
+    double calculateUserScore(UUID userId, UUID sessionId);
+    double calculateTeamScore(UUID teamId, UUID sessionId);
+    double calculateEfficiencyScore(UUID userId, UUID sessionId);
+    double calculateCompletionRate(UUID userId, UUID sessionId);
     String generateLeaderboardKey(String type, Long entityId);
     void logLeaderboardUpdate(String operation, Long entityId);
     
     // Операции с оптимизацией
-    void optimizeLeaderboardCalculation(Long sessionId);
+    void optimizeLeaderboardCalculation(UUID sessionId);
     void precomputeLeaderboards(List<Long> sessionIds);
     List<Long> getPopularLeaderboards(int limit);
-    void scheduleLeaderboardUpdate(Long sessionId, Instant nextUpdate);
+    void scheduleLeaderboardUpdate(UUID sessionId, Instant nextUpdate);
     
     // Операции с безопасностью
-    boolean isLeaderboardAccessAllowed(Long userId, Long sessionId);
-    boolean isLeaderboardModificationAllowed(Long userId, Long sessionId);
+    boolean isLeaderboardAccessAllowed(UUID userId, UUID sessionId);
+    boolean isLeaderboardModificationAllowed(UUID userId, UUID sessionId);
     void validateLeaderboardData(Map<String, Object> data);
     void sanitizeLeaderboardData(Map<String, Object> data);
     
     // Операции с мониторингом
     Map<String, Object> getLeaderboardHealthMetrics();
-    List<String> getLeaderboardErrors(Long sessionId);
+    List<String> getLeaderboardErrors(UUID sessionId);
     Map<String, Object> getLeaderboardPerformanceStats();
     void monitorLeaderboardUpdates();
 }

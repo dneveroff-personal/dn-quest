@@ -530,7 +530,7 @@ public interface AuthServiceClient {
 #### 5.4.2 События для Kafka
 ```java
 // События
-public record QuestCreatedEvent(Long questId, String title, Long authorId) {}
+public record QuestCreatedEvent(Long questId, String title, UUID authorId) {}
 public record QuestPublishedEvent(Long questId, String title) {}
 public record QuestUpdatedEvent(Long questId, String title) {}
 public record QuestDeletedEvent(Long questId) {}
@@ -656,7 +656,7 @@ public class FileStorageController {
     }
     
     @PostMapping("/avatar/{userId}")
-    public ResponseEntity<UserDTO> uploadAvatar(@PathVariable Long userId, 
+    public ResponseEntity<UserDTO> uploadAvatar(@PathVariable UUID userId, 
                                               @RequestParam("file") MultipartFile file) {
         // Загрузка аватара пользователя
     }
@@ -772,15 +772,15 @@ public interface TeamInfoClient {
 #### 6.2.1 События пользователей
 ```java
 // Топик: user-events
-public record UserRegisteredEvent(Long userId, String username, String email) {}
-public record UserUpdatedEvent(Long userId, String username, String email) {}
-public record UserDeletedEvent(Long userId) {}
+public record UserRegisteredEvent(UUID userId, String username, String email) {}
+public record UserUpdatedEvent(UUID userId, String username, String email) {}
+public record UserDeletedEvent(UUID userId) {}
 ```
 
 #### 6.2.2 События квестов
 ```java
 // Топик: quest-events
-public record QuestCreatedEvent(Long questId, String title, Long authorId) {}
+public record QuestCreatedEvent(Long questId, String title, UUID authorId) {}
 public record QuestPublishedEvent(Long questId, String title) {}
 public record QuestUpdatedEvent(Long questId, String title) {}
 public record QuestDeletedEvent(Long questId) {}
@@ -789,19 +789,19 @@ public record QuestDeletedEvent(Long questId) {}
 #### 6.2.3 Игровые события
 ```java
 // Топик: game-events
-public record GameSessionStartedEvent(Long sessionId, Long questId, Long userId, Long teamId) {}
-public record GameSessionFinishedEvent(Long sessionId, Long questId, Long userId, Long teamId) {}
-public record CodeSubmittedEvent(Long sessionId, Long levelId, Long userId, String code, boolean correct) {}
-public record LevelCompletedEvent(Long sessionId, Long levelId, Long userId, int durationSec) {}
+public record GameSessionStartedEvent(Long sessionId, Long questId, UUID userId, UUID teamId) {}
+public record GameSessionFinishedEvent(Long sessionId, Long questId, UUID userId, UUID teamId) {}
+public record CodeSubmittedEvent(Long sessionId, Long levelId, UUID userId, String code, boolean correct) {}
+public record LevelCompletedEvent(Long sessionId, Long levelId, UUID userId, int durationSec) {}
 ```
 
 #### 6.2.4 События команд
 ```java
 // Топик: team-events
-public record TeamCreatedEvent(Long teamId, String name, Long captainId) {}
-public record TeamMemberAddedEvent(Long teamId, Long userId, TeamRole role) {}
-public record TeamMemberRemovedEvent(Long teamId, Long userId) {}
-public record TeamCaptainTransferredEvent(Long teamId, Long oldCaptainId, Long newCaptainId) {}
+public record TeamCreatedEvent(UUID teamId, String name, UUID captainId) {}
+public record TeamMemberAddedEvent(UUID teamId, UUID userId, TeamRole role) {}
+public record TeamMemberRemovedEvent(UUID teamId, UUID userId) {}
+public record TeamCaptainTransferredEvent(UUID teamId, Long oldCaptainId, Long newCaptainId) {}
 ```
 
 ### 6.3 Обработка событий
@@ -1163,12 +1163,12 @@ public class DataSyncHandler {
 public class CachedUserService {
     
     @Cacheable(value = "users", key = "#userId")
-    public UserDTO getUser(Long userId) {
+    public UserDTO getUser(UUID userId) {
         return userServiceClient.getUserById(userId);
     }
     
     @CacheEvict(value = "users", key = "#userId")
-    public void evictUserCache(Long userId) {
+    public void evictUserCache(UUID userId) {
         // Инвалидация кэша при обновлении
     }
 }

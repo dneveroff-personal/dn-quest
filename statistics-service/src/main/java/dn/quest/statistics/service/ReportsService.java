@@ -5,6 +5,7 @@ import dn.quest.statistics.dto.StatisticsRequestDTO;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для генерации отчетов и экспорта данных
@@ -19,17 +20,17 @@ public interface ReportsService {
     /**
      * Экспортировать статистику пользователей
      */
-    byte[] exportUserStatistics(LocalDate startDate, LocalDate endDate, String format, Long userId);
+    byte[] exportUserStatistics(LocalDate startDate, LocalDate endDate, String format, UUID userId);
 
     /**
      * Экспортировать статистику квестов
      */
-    byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, Long authorId);
+    byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID authorId);
 
     /**
      * Экспортировать игровую статистику
      */
-    byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, Long userId);
+    byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID userId);
 
     /**
      * Экспортировать лидерборды
@@ -79,7 +80,7 @@ public interface ReportsService {
     /**
      * Экспортировать командную статистику
      */
-    byte[] exportTeamStatistics(LocalDate startDate, LocalDate endDate, String format, Long teamId);
+    byte[] exportTeamStatistics(LocalDate startDate, LocalDate endDate, String format, UUID teamId);
 
     /**
      * Сгенерировать CSV отчет

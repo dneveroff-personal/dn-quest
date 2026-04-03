@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие удаления пользователя
  */
@@ -16,5 +18,5 @@ public class UserDeletedEvent extends BaseEvent {
     /**
      * ID удалённого пользователя
      */
-    private Long userId;
+    private UUID userId;
 }

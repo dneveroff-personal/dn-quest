@@ -1,5 +1,7 @@
 package dn.quest.teammanagement.exception;
 
+import java.util.UUID;
+
 /**
  * Исключение, выбрасываемое когда пользователь не найден
  */
@@ -13,7 +15,7 @@ public class UserNotFoundException extends RuntimeException {
         super(message, cause);
     }
     
-    public UserNotFoundException(Long userId) {
+    public UserNotFoundException(UUID userId) {
         super("User not found with id: " + userId);
     }
     

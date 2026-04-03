@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с профилями пользователей
@@ -20,7 +21,7 @@ import java.util.Optional;
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
     // Базовые запросы поиска
-    Optional<UserProfile> findByUserId(Long userId);
+    Optional<UserProfile> findByUserId(UUID userId);
     Optional<UserProfile> findByUsername(String username);
     Optional<UserProfile> findByEmail(String email);
     List<UserProfile> findByRole(UserRole role);
@@ -85,7 +86,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     List<UserProfile> findRegisteredBetween(@Param("from") Instant from, @Param("to") Instant to);
 
     // Проверка существования
-    boolean existsByUserId(Long userId);
+    boolean existsByUserId(UUID userId);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 

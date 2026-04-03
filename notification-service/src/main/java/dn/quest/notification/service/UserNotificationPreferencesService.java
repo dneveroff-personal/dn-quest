@@ -6,6 +6,7 @@ import dn.quest.notification.enums.NotificationType;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления пользовательскими предпочтениями уведомлений
@@ -15,92 +16,92 @@ public interface UserNotificationPreferencesService {
     /**
      * Создать предпочтения для пользователя
      */
-    UserNotificationPreferences createPreferences(Long userId);
+    UserNotificationPreferences createPreferences(UUID userId);
 
     /**
      * Получить предпочтения пользователя
      */
-    Optional<UserNotificationPreferences> getPreferences(Long userId);
+    Optional<UserNotificationPreferences> getPreferences(UUID userId);
 
     /**
      * Обновить предпочтения пользователя
      */
-    UserNotificationPreferences updatePreferences(Long userId, UserNotificationPreferences preferences);
+    UserNotificationPreferences updatePreferences(UUID userId, UserNotificationPreferences preferences);
 
     /**
      * Обновить конкретные настройки
      */
-    UserNotificationPreferences updatePreferences(Long userId, Map<String, Object> updates);
+    UserNotificationPreferences updatePreferences(UUID userId, Map<String, Object> updates);
 
     /**
      * Удалить предпочтения пользователя
      */
-    void deletePreferences(Long userId);
+    void deletePreferences(UUID userId);
 
     /**
      * Проверить, включен ли тип уведомлений для пользователя
      */
-    boolean isNotificationTypeEnabled(Long userId, NotificationType type);
+    boolean isNotificationTypeEnabled(UUID userId, NotificationType type);
 
     /**
      * Проверить, включена ли категория уведомлений для пользователя
      */
-    boolean isNotificationCategoryEnabled(Long userId, String category);
+    boolean isNotificationCategoryEnabled(UUID userId, String category);
 
     /**
      * Проверить, находится ли пользователь в режиме Do Not Disturb
      */
-    boolean isDoNotDisturbActive(Long userId);
+    boolean isDoNotDisturbActive(UUID userId);
 
     /**
      * Обновить FCM token пользователя
      */
-    void updateFcmToken(Long userId, String fcmToken);
+    void updateFcmToken(UUID userId, String fcmToken);
 
     /**
      * Обновить Telegram chat ID пользователя
      */
-    void updateTelegramChatId(Long userId, String telegramChatId);
+    void updateTelegramChatId(UUID userId, String telegramChatId);
 
     /**
      * Обновить email пользователя
      */
-    void updateEmail(Long userId, String email);
+    void updateEmail(UUID userId, String email);
 
     /**
      * Обновить телефон пользователя
      */
-    void updatePhone(Long userId, String phone);
+    void updatePhone(UUID userId, String phone);
 
     /**
      * Включить/выключить тип уведомлений
      */
-    UserNotificationPreferences toggleNotificationType(Long userId, NotificationType type, boolean enabled);
+    UserNotificationPreferences toggleNotificationType(UUID userId, NotificationType type, boolean enabled);
 
     /**
      * Включить/выключить категорию уведомлений
      */
-    UserNotificationPreferences toggleNotificationCategory(Long userId, String category, boolean enabled);
+    UserNotificationPreferences toggleNotificationCategory(UUID userId, String category, boolean enabled);
 
     /**
      * Установить Do Not Disturb режим
      */
-    UserNotificationPreferences setDoNotDisturb(Long userId, boolean enabled, Integer startHour, Integer endHour);
+    UserNotificationPreferences setDoNotDisturb(UUID userId, boolean enabled, Integer startHour, Integer endHour);
 
     /**
      * Установить лимиты уведомлений
      */
-    UserNotificationPreferences setNotificationLimits(Long userId, Integer perHour, Integer perDay);
+    UserNotificationPreferences setNotificationLimits(UUID userId, Integer perHour, Integer perDay);
 
     /**
      * Установить предпочитаемый язык
      */
-    UserNotificationPreferences setPreferredLanguage(Long userId, String language);
+    UserNotificationPreferences setPreferredLanguage(UUID userId, String language);
 
     /**
      * Установить часовой пояс
      */
-    UserNotificationPreferences setTimeZone(Long userId, String timeZone);
+    UserNotificationPreferences setTimeZone(UUID userId, String timeZone);
 
     /**
      * Получить пользователей для массовой рассылки
@@ -118,25 +119,25 @@ public interface UserNotificationPreferencesService {
     /**
      * Сбросить настройки пользователя к значениям по умолчанию
      */
-    UserNotificationPreferences resetToDefaults(Long userId);
+    UserNotificationPreferences resetToDefaults(UUID userId);
 
     /**
      * Экспортировать предпочтения пользователя
      */
-    Map<String, Object> exportPreferences(Long userId);
+    Map<String, Object> exportPreferences(UUID userId);
 
     /**
      * Импортировать предпочтения пользователя
      */
-    UserNotificationPreferences importPreferences(Long userId, Map<String, Object> data);
+    UserNotificationPreferences importPreferences(UUID userId, Map<String, Object> data);
 
     /**
      * Проверить лимиты уведомлений для пользователя
      */
-    boolean checkNotificationLimits(Long userId);
+    boolean checkNotificationLimits(UUID userId);
 
     /**
      * Получить доступные каналы для пользователя
      */
-    List<NotificationType> getAvailableChannels(Long userId);
+    List<NotificationType> getAvailableChannels(UUID userId);
 }

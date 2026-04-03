@@ -2,6 +2,7 @@ package dn.quest.notification.service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Сервис для ограничения частоты отправки уведомлений (Rate Limiting)
@@ -11,7 +12,7 @@ public interface RateLimitingService {
     /**
      * Проверить, может ли пользователь отправить уведомление
      */
-    boolean canSendNotification(Long userId, String notificationType);
+    boolean canSendNotification(UUID userId, String notificationType);
 
     /**
      * Проверить, может ли IP адрес отправить запрос
@@ -26,7 +27,7 @@ public interface RateLimitingService {
     /**
      * Зарегистрировать попытку отправки уведомления
      */
-    void recordNotificationAttempt(Long userId, String notificationType);
+    void recordNotificationAttempt(UUID userId, String notificationType);
 
     /**
      * Зарегистрировать запрос от IP
@@ -41,7 +42,7 @@ public interface RateLimitingService {
     /**
      * Получить статистику по лимитам для пользователя
      */
-    UserRateLimitStatus getUserRateLimitStatus(Long userId);
+    UserRateLimitStatus getUserRateLimitStatus(UUID userId);
 
     /**
      * Получить статистику по лимитам для IP
@@ -56,7 +57,7 @@ public interface RateLimitingService {
     /**
      * Сбросить счетчики для пользователя
      */
-    void resetUserCounters(Long userId);
+    void resetUserCounters(UUID userId);
 
     /**
      * Сбросить счетчики для IP
@@ -66,22 +67,22 @@ public interface RateLimitingService {
     /**
      * Проверить, находится ли пользователь в черном списке
      */
-    boolean isUserBlacklisted(Long userId);
+    boolean isUserBlacklisted(UUID userId);
 
     /**
      * Добавить пользователя в черный список
      */
-    void blacklistUser(Long userId, String reason, long durationMinutes);
+    void blacklistUser(UUID userId, String reason, long durationMinutes);
 
     /**
      * Удалить пользователя из черного списка
      */
-    void removeFromBlacklist(Long userId);
+    void removeFromBlacklist(UUID userId);
 
     // DTO классы
 
     class UserRateLimitStatus {
-        private Long userId;
+        private UUID userId;
         private Map<String, Integer> currentCounts;
         private Map<String, Integer> limits;
         private Map<String, LocalDateTime> resetTimes;
@@ -90,8 +91,8 @@ public interface RateLimitingService {
         private LocalDateTime blacklistExpiry;
 
         // Getters and setters
-        public Long getUserId() { return userId; }
-        public void setUserId(Long userId) { this.userId = userId; }
+        public UUID getUserId() { return userId; }
+        public void setUserId(UUID userId) { this.userId = userId; }
 
         public Map<String, Integer> getCurrentCounts() { return currentCounts; }
         public void setCurrentCounts(Map<String, Integer> currentCounts) { this.currentCounts = currentCounts; }

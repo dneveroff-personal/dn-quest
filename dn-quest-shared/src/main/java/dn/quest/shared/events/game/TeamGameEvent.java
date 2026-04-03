@@ -1,9 +1,12 @@
 package dn.quest.shared.events.game;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Событие команды в игровом движке
@@ -18,128 +21,57 @@ public class TeamGameEvent extends GameEngineEvent {
     }
 
     @Schema(description = "ID команды", example = "456", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
-    private Long teamId;
+    @Getter
+    @Setter
+    private UUID teamId;
 
     @Schema(description = "Название команды", example = "Мстители")
+    @Getter
+    @Setter
     private String teamName;
 
     @Schema(description = "Тип события", example = "TEAM_JOINED")
+    @Getter
+    @Setter
     private String teamEventType;
 
     @Schema(description = "ID игрока", example = "123")
+    @Getter
+    @Setter
     private Long playerId;
 
     @Schema(description = "Имя игрока", example = "Player1")
+    @Getter
+    @Setter
     private String playerName;
 
     @Schema(description = "Роль игрока", example = "LEADER")
+    @Getter
+    @Setter
     private String playerRole;
 
     @Schema(description = "Счет команды", example = "1500.0")
+    @Getter
+    @Setter
     private Double teamScore;
 
     @Schema(description = "Позиция в лидерборде", example = "5")
+    @Getter
+    @Setter
     private Integer leaderboardPosition;
 
     @Schema(description = "Количество активных участников", example = "4")
+    @Getter
+    @Setter
     private Integer activeMembers;
 
     @Schema(description = "Время события")
+    @Getter
+    @Setter
     private Instant eventTime;
 
     @Schema(description = "Дополнительные метаданные")
+    @Getter
+    @Setter
     private Map<String, Object> metadata;
-
-    // Getters and setters
-    @Override
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    @Override
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
-
-    public String getTeamEventType() {
-        return teamEventType;
-    }
-
-    public void setTeamEventType(String teamEventType) {
-        this.teamEventType = teamEventType;
-    }
-
-    public Long getPlayerId() {
-        return playerId;
-    }
-
-    public void setPlayerId(Long playerId) {
-        this.playerId = playerId;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
-
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
-    }
-
-    public String getPlayerRole() {
-        return playerRole;
-    }
-
-    public void setPlayerRole(String playerRole) {
-        this.playerRole = playerRole;
-    }
-
-    public Double getTeamScore() {
-        return teamScore;
-    }
-
-    public void setTeamScore(Double teamScore) {
-        this.teamScore = teamScore;
-    }
-
-    public Integer getLeaderboardPosition() {
-        return leaderboardPosition;
-    }
-
-    public void setLeaderboardPosition(Integer leaderboardPosition) {
-        this.leaderboardPosition = leaderboardPosition;
-    }
-
-    public Integer getActiveMembers() {
-        return activeMembers;
-    }
-
-    public void setActiveMembers(Integer activeMembers) {
-        this.activeMembers = activeMembers;
-    }
-
-    public Instant getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(Instant eventTime) {
-        this.eventTime = eventTime;
-    }
-
-    @Override
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
 }

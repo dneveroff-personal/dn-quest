@@ -1,9 +1,12 @@
 package dn.quest.shared.events.game;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Событие запроса на участие
@@ -18,154 +21,67 @@ public class ParticipationRequestEvent extends GameEngineEvent {
     }
 
     @Schema(description = "ID запроса", example = "12345", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private Long requestId;
 
     @Schema(description = "ID сессии", example = "789", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private Long sessionId;
 
     @Schema(description = "ID команды", example = "456", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
-    private Long teamId;
+    @Getter
+    @Setter
+    private UUID teamId;
 
     @Schema(description = "Название команды", example = "Мстители")
+    @Getter
+    @Setter
     private String teamName;
 
     @Schema(description = "ID квеста", example = "101")
+    @Getter
+    @Setter
     private Long questId;
 
     @Schema(description = "Название квеста", example = "Тайна старого замка")
+    @Getter
+    @Setter
     private String questName;
 
     @Schema(description = "Тип запроса", example = "JOIN_REQUEST")
+    @Getter
+    @Setter
     private String requestType;
 
     @Schema(description = "Статус запроса", example = "PENDING")
+    @Getter
+    @Setter
     private String status;
 
     @Schema(description = "Сообщение от команды", example = "Хотим присоединиться!")
+    @Getter
+    @Setter
     private String teamMessage;
 
     @Schema(description = "Ответ организатора", example = "Принято")
+    @Getter
+    @Setter
     private String organizerResponse;
 
     @Schema(description = "Время создания запроса")
+    @Getter
+    @Setter
     private Instant requestedAt;
 
     @Schema(description = "Время обработки запроса")
+    @Getter
+    @Setter
     private Instant processedAt;
 
     @Schema(description = "Дополнительные метаданные")
+    @Getter
+    @Setter
     private Map<String, Object> metadata;
-
-    // Getters and setters
-    public Long getRequestId() {
-        return requestId;
-    }
-
-    public void setRequestId(Long requestId) {
-        this.requestId = requestId;
-    }
-
-    @Override
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    @Override
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    @Override
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    @Override
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public String getTeamName() {
-        return teamName;
-    }
-
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
-
-    @Override
-    public Long getQuestId() {
-        return questId;
-    }
-
-    @Override
-    public void setQuestId(Long questId) {
-        this.questId = questId;
-    }
-
-    public String getQuestName() {
-        return questName;
-    }
-
-    public void setQuestName(String questName) {
-        this.questName = questName;
-    }
-
-    public String getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getTeamMessage() {
-        return teamMessage;
-    }
-
-    public void setTeamMessage(String teamMessage) {
-        this.teamMessage = teamMessage;
-    }
-
-    public String getOrganizerResponse() {
-        return organizerResponse;
-    }
-
-    public void setOrganizerResponse(String organizerResponse) {
-        this.organizerResponse = organizerResponse;
-    }
-
-    public Instant getRequestedAt() {
-        return requestedAt;
-    }
-
-    public void setRequestedAt(Instant requestedAt) {
-        this.requestedAt = requestedAt;
-    }
-
-    public Instant getProcessedAt() {
-        return processedAt;
-    }
-
-    public void setProcessedAt(Instant processedAt) {
-        this.processedAt = processedAt;
-    }
-
-    @Override
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
 }

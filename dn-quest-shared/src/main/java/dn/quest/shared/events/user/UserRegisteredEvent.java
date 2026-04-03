@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие регистрации пользователя
  */
@@ -16,7 +18,7 @@ public class UserRegisteredEvent extends BaseEvent {
     /**
      * ID зарегистрированного пользователя
      */
-    private Long userId;
+    private UUID userId;
 
     /**
      * Имя пользователя

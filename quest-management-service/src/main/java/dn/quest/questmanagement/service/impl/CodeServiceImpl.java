@@ -32,7 +32,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public CodeDTO createCode(CodeDTO dto, Long levelId) {
+    public CodeDTO createCode(CodeDTO dto, UUID levelId) {
         log.info("Creating new code for level with ID: {}", levelId);
 
         // Проверка существования уровня
@@ -61,7 +61,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public CodeDTO updateCode(Long id, CodeDTO dto) {
+    public CodeDTO updateCode(UUID id, CodeDTO dto) {
         log.info("Updating code with ID: {}", id);
 
         Code code = getCodeEntityById(id);
@@ -86,7 +86,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public void deleteCode(Long id) {
+    public void deleteCode(UUID id) {
         log.info("Deleting code with ID: {}", id);
 
         Code code = getCodeEntityById(id);
@@ -96,14 +96,14 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional(readOnly = true)
-    public CodeDTO getCodeById(Long id) {
+    public CodeDTO getCodeById(UUID id) {
         Code code = getCodeEntityById(id);
         return convertToDTO(code);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CodeDTO> getCodesByLevelId(Long levelId) {
+    public List<CodeDTO> getCodesByLevelId(UUID levelId) {
         List<Code> codes = codeRepository.findByLevelId(levelId);
         return codes.stream()
                 .map(this::convertToDTO)
@@ -112,7 +112,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CodeDTO> getCodesByType(Long levelId, CodeType type) {
+    public List<CodeDTO> getCodesByType(UUID levelId, CodeType type) {
         List<Code> codes = codeRepository.findByLevelIdAndCodeType(levelId, type);
         return codes.stream()
                 .map(this::convertToDTO)
@@ -121,7 +121,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public CodeValidationResult validateCode(Long levelId, String codeValue) {
+    public CodeValidationResult validateCode(UUID levelId, String codeValue) {
         log.info("Validating code '{}' for level with ID: {}", codeValue, levelId);
 
         // Поиск активного кода с указанным значением
@@ -143,7 +143,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public void copyCodesForLevel(Long sourceLevelId, Long targetLevelId) {
+    public void copyCodesForLevel(UUID sourceLevelId, UUID targetLevelId) {
         log.info("Copying codes from level {} to level {}", sourceLevelId, targetLevelId);
 
         List<Code> sourceCodes = codeRepository.findByLevelId(sourceLevelId);
@@ -166,7 +166,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional(readOnly = true)
-    public CodeUsageStatistics getCodeUsageStatistics(Long levelId) {
+    public CodeUsageStatistics getCodeUsageStatistics(UUID levelId) {
         List<Code> codes = codeRepository.findByLevelId(levelId);
 
         long totalCodes = codes.size();
@@ -181,7 +181,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public void resetCodeUsage(Long levelId) {
+    public void resetCodeUsage(UUID levelId) {
         log.info("Resetting code usage for level with ID: {}", levelId);
 
         List<Code> codes = codeRepository.findByLevelId(levelId);
@@ -198,7 +198,7 @@ public class CodeServiceImpl implements CodeService {
 
     @Override
     @Transactional
-    public CodeDTO toggleCodeActive(Long codeId, boolean active) {
+    public CodeDTO toggleCodeActive(UUID codeId, boolean active) {
         log.info("Toggling code with ID: {} to active: {}", codeId, active);
 
         Code code = getCodeEntityById(codeId);
@@ -213,12 +213,12 @@ public class CodeServiceImpl implements CodeService {
 
     // Вспомогательные методы
 
-    private Code getCodeEntityById(Long id) {
+    private Code getCodeEntityById(UUID id) {
         return codeRepository.findById(id)
                 .orElseThrow(() -> new CodeNotFoundException("Code not found with ID: " + id));
     }
 
-    private Long getQuestIdByLevelId(Long levelId) {
+    private Long getQuestIdByLevelId(UUID levelId) {
         return levelRepository.findById(levelId)
                 .map(level -> level.getQuestId())
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with ID: " + levelId));

@@ -151,7 +151,7 @@ public class NotificationAsyncHelper {
                 String payload = objectMapper.writeValueAsString(notification);
 
                 queueService.addToQueue(
-                    notification.getId(),
+                    notification.getNotificationId(),
                     notification.getUserId(),
                     channel,
                     notification.getPriority(),

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис для управления попытками ввода кодов
@@ -23,16 +24,16 @@ public interface CodeAttemptService {
     void deleteAttempt(Long id);
     
     // Основная игровая логика
-    CodeAttempt submitCode(Long sessionId, Long userId, String code, String sector);
-    CodeAttempt submitCodeWithBonus(Long sessionId, Long userId, String code, String sector, Double bonusMultiplier);
+    CodeAttempt submitCode(Long sessionId, UUID userId, String code, String sector);
+    CodeAttempt submitCodeWithBonus(Long sessionId, UUID userId, String code, String sector, Double bonusMultiplier);
     AttemptResult validateCode(String submittedCode, String correctCode, String sector);
     boolean isCodeCorrect(String submittedCode, String correctCode);
     
     // Поиск и фильтрация попыток
     Page<CodeAttempt> getAllAttempts(Pageable pageable);
     List<CodeAttempt> getAttemptsBySession(Long sessionId);
-    List<CodeAttempt> getAttemptsByUser(Long userId);
-    List<CodeAttempt> getAttemptsBySessionAndUser(Long sessionId, Long userId);
+    List<CodeAttempt> getAttemptsByUser(UUID userId);
+    List<CodeAttempt> getAttemptsBySessionAndUser(Long sessionId, UUID userId);
     List<CodeAttempt> getAttemptsByResult(AttemptResult result);
     List<CodeAttempt> getAttemptsByCode(String code);
     List<CodeAttempt> getAttemptsBySector(String sector);
@@ -40,12 +41,12 @@ public interface CodeAttemptService {
     // Статистика попыток
     long getTotalAttemptsCount();
     long getAttemptsCountBySession(Long sessionId);
-    long getAttemptsCountByUser(Long userId);
+    long getAttemptsCountByUser(UUID userId);
     long getAttemptsCountByResult(AttemptResult result);
     long getCorrectAttemptsCount(Long sessionId);
     long getIncorrectAttemptsCount(Long sessionId);
     double getSuccessRate(Long sessionId);
-    double getSuccessRateByUser(Long userId);
+    double getSuccessRateByUser(UUID userId);
     
     // Анализ попыток
     List<CodeAttempt> getRecentAttempts(int limit);
@@ -61,27 +62,27 @@ public interface CodeAttemptService {
     Double calculatePenaltyMultiplier(int consecutiveFailures);
     
     // Валидация и бизнес-логика
-    boolean canSubmitAttempt(Long sessionId, Long userId);
-    boolean isAttemptLimitReached(Long sessionId, Long userId);
-    int getRemainingAttempts(Long sessionId, Long userId);
-    boolean isCooldownActive(Long sessionId, Long userId);
-    long getCooldownRemainingSeconds(Long sessionId, Long userId);
+    boolean canSubmitAttempt(Long sessionId, UUID userId);
+    boolean isAttemptLimitReached(Long sessionId, UUID userId);
+    int getRemainingAttempts(Long sessionId, UUID userId);
+    boolean isCooldownActive(Long sessionId, UUID userId);
+    long getCooldownRemainingSeconds(Long sessionId, UUID userId);
     
     // Анализ паттернов
     List<String> getMostCommonIncorrectCodes(Long sessionId);
     List<String> getMostCommonSectors(Long sessionId);
     double getAverageAttemptsPerCode(Long sessionId);
-    List<CodeAttempt> getConsecutiveFailures(Long sessionId, Long userId);
+    List<CodeAttempt> getConsecutiveFailures(Long sessionId, UUID userId);
     
     // Операции с сессиями
     List<CodeAttempt> getSessionAttemptsSummary(Long sessionId);
     CodeAttempt getFirstCorrectAttempt(Long sessionId, Long levelId);
-    CodeAttempt getLastAttempt(Long sessionId, Long userId);
-    List<CodeAttempt> getAttemptsSinceLastCorrect(Long sessionId, Long userId);
+    CodeAttempt getLastAttempt(Long sessionId, UUID userId);
+    List<CodeAttempt> getAttemptsSinceLastCorrect(Long sessionId, UUID userId);
     
     // Управление временем
     CodeAttempt updateAttemptTimestamp(Long attemptId);
-    Instant getAverageTimeBetweenAttempts(Long sessionId, Long userId);
+    Instant getAverageTimeBetweenAttempts(Long sessionId, UUID userId);
     List<CodeAttempt> getAttemptsInTimeWindow(Long sessionId, Instant start, Instant end);
     
     // Операции для администрирования

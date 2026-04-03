@@ -311,7 +311,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
 
     @Override
     @Async
-    public void aggregateUserStatistics(Long userId, LocalDate date) {
+    public void aggregateUserStatistics(UUID userId, LocalDate date) {
         log.debug("Aggregating user statistics for user: {} date: {}", userId, date);
         
         try {
@@ -367,7 +367,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
 
     @Override
     @Async
-    public void aggregateTeamStatistics(Long teamId, LocalDate date) {
+    public void aggregateTeamStatistics(UUID teamId, LocalDate date) {
         log.debug("Aggregating team statistics for team: {} date: {}", teamId, date);
         
         try {
@@ -432,10 +432,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
     private void aggregateUserStatisticsForDate(LocalDate date) {
         List<UserStatistics> stats = userStatisticsRepository.findByDate(date);
         
-        Map<Long, List<UserStatistics>> groupedByUser = stats.stream()
+        Map<UUID, List<UserStatistics>> groupedByUser = stats.stream()
                 .collect(Collectors.groupingBy(UserStatistics::getUserId));
         
-        for (Map.Entry<Long, List<UserStatistics>> entry : groupedByUser.entrySet()) {
+        for (Map.Entry<UUID, List<UserStatistics>> entry : groupedByUser.entrySet()) {
             UserStatistics aggregated = aggregateDailyUserStats(entry.getValue());
             userStatisticsRepository.save(aggregated);
         }
@@ -456,10 +456,10 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
     private void aggregateTeamStatisticsForDate(LocalDate date) {
         List<TeamStatistics> stats = teamStatisticsRepository.findByDate(date);
         
-        Map<Long, List<TeamStatistics>> groupedByTeam = stats.stream()
+        Map<UUID, List<TeamStatistics>> groupedByTeam = stats.stream()
                 .collect(Collectors.groupingBy(TeamStatistics::getTeamId));
         
-        for (Map.Entry<Long, List<TeamStatistics>> entry : groupedByTeam.entrySet()) {
+        for (Map.Entry<UUID, List<TeamStatistics>> entry : groupedByTeam.entrySet()) {
             TeamStatistics aggregated = aggregateDailyTeamStats(entry.getValue());
             teamStatisticsRepository.save(aggregated);
         }
@@ -630,7 +630,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .collect(Collectors.groupingBy(UserStatistics::getUserId))
                 .entrySet().stream()
                 .map(entry -> {
-                    Long userId = entry.getKey();
+                    UUID userId = entry.getKey();
                     List<UserStatistics> stats = entry.getValue();
                     
                     // Агрегируем статистику пользователя за день
@@ -643,7 +643,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                             .leaderboardType("users")
                             .period("daily")
                             .date(date)
-                            .entityId(userId)
+                            .entityId(String.valueOf(userId))
                             .entityName("User_" + userId) // В реальности здесь было бы получение имени пользователя
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -707,7 +707,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                             .leaderboardType("quests")
                             .period("daily")
                             .date(date)
-                            .entityId(questId)
+                            .entityId(String.valueOf(questId))
                             .entityName(aggregated.getQuestTitle())
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -756,7 +756,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                 .collect(Collectors.groupingBy(TeamStatistics::getTeamId))
                 .entrySet().stream()
                 .map(entry -> {
-                    Long teamId = entry.getKey();
+                    UUID teamId = entry.getKey();
                     List<TeamStatistics> stats = entry.getValue();
                     
                     // Агрегируем статистику команды за день
@@ -769,7 +769,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
                             .leaderboardType("teams")
                             .period("daily")
                             .date(date)
-                            .entityId(teamId)
+                            .entityId(String.valueOf(teamId))
                             .entityName(aggregated.getTeamName())
                             .score(score)
                             .rank(0) // Будет рассчитан после сортировки
@@ -1547,7 +1547,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         return (wins / (double) stats.getGameSessions()) * 100.0;
     }
 
-    private double calculateUserAvgRating(Long userId) {
+    private double calculateUserAvgRating(UUID userId) {
         if (userId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о рейтингах
@@ -1555,12 +1555,12 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         return 4.2;
     }
 
-    private int calculateUserAchievements(Long userId) {
+    private int calculateUserAchievements(UUID userId) {
         if (userId == null) return 0;
         
         // В реальной реализации здесь был бы запрос к данным о достижениях
         // Пока возвращаем количество на основе ID пользователя
-        return (int) (userId % 20) + 5;
+        return 0;
     }
 
     private int calculateTeamLevel(TeamStatistics stats) {
@@ -1601,7 +1601,7 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
         return (stats.getQuestWins() / (double) stats.getPlayedQuests()) * 100.0;
     }
 
-    private double calculateTeamAvgRating(Long teamId) {
+    private double calculateTeamAvgRating(UUID teamId) {
         if (teamId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о рейтингах команд

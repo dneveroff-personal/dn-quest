@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Feign клиент для интеграции с User Management Service
@@ -42,13 +43,13 @@ public interface UserManagementServiceClient {
      * Проверить, является ли пользователь автором квестов
      */
     @GetMapping("/api/users/{id}/is-author")
-    Boolean isQuestAuthor(@PathVariable("id") Long userId);
+    Boolean isQuestAuthor(@PathVariable("id") UUID userId);
 
     /**
      * Получить статистику пользователя
      */
     @GetMapping("/api/users/{id}/statistics")
-    UserStatisticsDTO getUserStatistics(@PathVariable("id") Long userId);
+    UserStatisticsDTO getUserStatistics(@PathVariable("id") UUID userId);
 
     /**
      * DTO для статистики пользователя

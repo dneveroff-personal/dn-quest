@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с пользователями
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
      * Найти пользователя по имени пользователя
@@ -78,7 +79,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Найти пользователей по списку ID
      */
     @Query("SELECT u FROM User u WHERE u.id IN :userIds AND u.isActive = true")
-    List<User> findByIdInAndIsActiveTrue(@Param("userIds") List<Long> userIds);
+    List<User> findByIdInAndIsActiveTrue(@Param("userIds") List<UUID> userIds);
 
     /**
      * Получить количество активных пользователей
@@ -139,7 +140,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "AND (LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
-    List<User> findUsersForTeamInvitation(@Param("teamId") Long teamId, @Param("search") String search, Pageable pageable);
+    List<User> findUsersForTeamInvitation(@Param("teamId") UUID teamId, @Param("search") String search, Pageable pageable);
 
     /**
      * Найти пользователей по роли

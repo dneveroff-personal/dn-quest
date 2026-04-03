@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с игровой статистикой
@@ -29,12 +30,12 @@ public interface GameStatisticsRepository extends JpaRepository<GameStatistics, 
     /**
      * Найти статистику по пользователю
      */
-    List<GameStatistics> findByUserIdOrderByDateDesc(Long userId);
+    List<GameStatistics> findByUserIdOrderByDateDesc(UUID userId);
 
     /**
      * Найти статистику по пользователю за период
      */
-    List<GameStatistics> findByUserIdAndDateBetweenOrderByDateDesc(Long userId, LocalDate startDate, LocalDate endDate);
+    List<GameStatistics> findByUserIdAndDateBetweenOrderByDateDesc(UUID userId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику по квесту
@@ -49,12 +50,12 @@ public interface GameStatisticsRepository extends JpaRepository<GameStatistics, 
     /**
      * Найти статистику по команде
      */
-    List<GameStatistics> findByTeamIdOrderByDateDesc(Long teamId);
+    List<GameStatistics> findByTeamIdOrderByDateDesc(UUID teamId);
 
     /**
      * Найти статистику по команде за период
      */
-    List<GameStatistics> findByTeamIdAndDateBetweenOrderByDateDesc(Long teamId, LocalDate startDate, LocalDate endDate);
+    List<GameStatistics> findByTeamIdAndDateBetweenOrderByDateDesc(UUID teamId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Получить количество игровых сессий за дату

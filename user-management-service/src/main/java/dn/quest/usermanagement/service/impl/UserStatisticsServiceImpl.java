@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +28,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO createUserStatistics(Long userId) {
+    public UserStatisticsDTO createUserStatistics(UUID userId) {
         log.info("Creating user statistics for user ID: {}", userId);
 
         if (userStatisticsRepository.existsByUserId(userId)) {
@@ -51,7 +48,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserStatisticsDTO> getUserStatisticsByUserId(Long userId) {
+    public Optional<UserStatisticsDTO> getUserStatisticsByUserId(UUID userId) {
         return userStatisticsRepository.findByUserId(userId)
                 .map(this::convertToDTO);
     }
@@ -65,7 +62,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO addExperience(Long userId, Long experience) {
+    public UserStatisticsDTO addExperience(UUID userId, Long experience) {
         log.info("Adding {} experience to user ID: {}", experience, userId);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -80,7 +77,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO addScore(Long userId, Long score) {
+    public UserStatisticsDTO addScore(UUID userId, Long score) {
         log.info("Adding {} score to user ID: {}", score, userId);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -94,7 +91,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateQuestStatistics(Long userId, Boolean completed, Long playtimeMinutes) {
+    public UserStatisticsDTO updateQuestStatistics(UUID userId, Boolean completed, Long playtimeMinutes) {
         log.info("Updating quest statistics for user ID: {}. Completed: {}, playtime: {} minutes",
                 userId, completed, playtimeMinutes);
 
@@ -117,7 +114,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateLevelStatistics(Long userId, Boolean levelCompleted,
+    public UserStatisticsDTO updateLevelStatistics(UUID userId, Boolean levelCompleted,
                                                     Boolean codeSolved, Boolean hintUsed, Boolean attemptMade) {
         log.info("Updating level statistics for user ID: {}. Level completed: {}, code solved: {}, hint used: {}, attempt made: {}",
                 userId, levelCompleted, codeSolved, hintUsed, attemptMade);
@@ -149,7 +146,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateTeamStatistics(Long userId, String actionType) {
+    public UserStatisticsDTO updateTeamStatistics(UUID userId, String actionType) {
         log.info("Updating team statistics for user ID: {}. Action type: {}", userId, actionType);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -182,7 +179,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateAchievementStatistics(Long userId, String achievementType) {
+    public UserStatisticsDTO updateAchievementStatistics(UUID userId, String achievementType) {
         log.info("Updating achievement statistics for user ID: {}. Achievement type: {}", userId, achievementType);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -210,7 +207,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateLoginStatistics(Long userId) {
+    public UserStatisticsDTO updateLoginStatistics(UUID userId) {
         log.info("Updating login statistics for user ID: {}", userId);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -224,7 +221,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateStreakStatistics(Long userId) {
+    public UserStatisticsDTO updateStreakStatistics(UUID userId) {
         log.info("Updating streak statistics for user ID: {}", userId);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -261,7 +258,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public UserStatisticsDTO updateLastActivity(Long userId) {
+    public UserStatisticsDTO updateLastActivity(UUID userId) {
         log.info("Updating last activity for user ID: {}", userId);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -275,7 +272,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public void deleteUserStatistics(Long userId) {
+    public void deleteUserStatistics(UUID userId) {
         log.info("Deleting user statistics for user ID: {}", userId);
 
         userStatisticsRepository.findByUserId(userId)
@@ -384,7 +381,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Long getUserRankByScore(Long userId) {
+    public Long getUserRankByScore(UUID userId) {
         UserStatistics statistics = userStatisticsRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("User statistics not found for user ID: " + userId));
 
@@ -393,7 +390,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Long getUserRankByLevel(Long userId) {
+    public Long getUserRankByLevel(UUID userId) {
         UserStatistics statistics = userStatisticsRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("User statistics not found for user ID: " + userId));
 
@@ -402,7 +399,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean existsByUserId(Long userId) {
+    public boolean existsByUserId(UUID userId) {
         return userStatisticsRepository.existsByUserId(userId);
     }
 
@@ -412,7 +409,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
         log.info("Getting global statistics");
 
         long totalUsers = userStatisticsRepository.count();
-        long activeUsers = userStatisticsRepository.findByLastActivityAfter(
+        long activeUsers = userStatisticsRepository.findByLastActivityAtAfter(
                 Instant.now().minus(30, ChronoUnit.DAYS)).size();
 
         Double averageScore = userStatisticsRepository.getAverageScore();
@@ -454,7 +451,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public void updateGameSessionStatistics(Long userId, Long sessionId, String status) {
+    public void updateGameSessionStatistics(UUID userId, Long sessionId, String status) {
         log.info("Updating game session statistics for user ID: {}. Session ID: {}, status: {}", userId, sessionId, status);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -468,7 +465,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public void updateLevelCompletionStatistics(Long userId, Integer levelNumber) {
+    public void updateLevelCompletionStatistics(UUID userId, Integer levelNumber) {
         log.info("Updating level completion statistics for user ID: {}. Level number: {}", userId, levelNumber);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -480,7 +477,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public void updateFileStatistics(Long userId, Long fileId, String action) {
+    public void updateFileStatistics(UUID userId, Long fileId, String action) {
         log.info("Updating file statistics for user ID: {}. File ID: {}, action: {}", userId, fileId, action);
 
         UserStatistics statistics = getOrCreateStatistics(userId);
@@ -494,7 +491,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     // Helper methods
 
-    private UserStatistics getOrCreateStatistics(Long userId) {
+    private UserStatistics getOrCreateStatistics(UUID userId) {
         return userStatisticsRepository.findByUserId(userId)
                 .orElseGet(() -> {
                     log.info("Creating new statistics for user ID: {}", userId);

@@ -4,6 +4,7 @@ import dn.quest.questmanagement.dto.LevelHintDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис для управления подсказками уровней
@@ -17,7 +18,7 @@ public interface LevelHintService {
      * @param levelId ID уровня
      * @return созданная подсказка
      */
-    LevelHintDTO createHint(LevelHintDTO dto, Long levelId);
+    LevelHintDTO createHint(LevelHintDTO dto, UUID levelId);
 
     /**
      * Обновить существующую подсказку
@@ -49,7 +50,7 @@ public interface LevelHintService {
      * @param levelId ID уровня
      * @return список подсказок
      */
-    List<LevelHintDTO> getHintsByLevelId(Long levelId);
+    List<LevelHintDTO> getHintsByLevelId(UUID levelId);
 
     /**
      * Получить доступные подсказки уровня для пользователя
@@ -58,7 +59,7 @@ public interface LevelHintService {
      * @param userId ID пользователя
      * @return список доступных подсказок
      */
-    List<LevelHintDTO> getAvailableHintsByLevelId(Long levelId, Long userId);
+    List<LevelHintDTO> getAvailableHintsByLevelId(UUID levelId, UUID userId);
 
     /**
      * Проверить доступность подсказки
@@ -67,7 +68,7 @@ public interface LevelHintService {
      * @param userId ID пользователя
      * @return результат проверки
      */
-    HintAvailabilityResult checkHintAvailability(Long hintId, Long userId);
+    HintAvailabilityResult checkHintAvailability(Long hintId, UUID userId);
 
     /**
      * Копировать подсказки из одного уровня в другой
@@ -75,7 +76,7 @@ public interface LevelHintService {
      * @param sourceLevelId ID исходного уровня
      * @param targetLevelId ID целевого уровня
      */
-    void copyHintsForLevel(Long sourceLevelId, Long targetLevelId);
+    void copyHintsForLevel(UUID sourceLevelId, UUID targetLevelId);
 
     /**
      * Активировать/деактивировать подсказку

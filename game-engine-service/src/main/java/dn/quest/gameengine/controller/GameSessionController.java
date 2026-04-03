@@ -35,6 +35,7 @@ import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Контроллер для управления игровыми сессиями
@@ -62,9 +63,9 @@ public class GameSessionController {
             @Parameter(description = "Поле для сортировки") @RequestParam(defaultValue = "createdAt") String sortBy,
             @Parameter(description = "Направление сортировки") @RequestParam(defaultValue = "desc") String sortDir,
             @Parameter(description = "Фильтр по статусу") @RequestParam(required = false) SessionStatus status,
-            @Parameter(description = "Фильтр по ID квеста") @RequestParam(required = false) Long questId,
-            @Parameter(description = "Фильтр по ID пользователя") @RequestParam(required = false) Long userId,
-            @Parameter(description = "Фильтр по ID команды") @RequestParam(required = false) Long teamId,
+            @Parameter(description = "Фильтр по ID квеста") @RequestParam(required = false) UUID questId,
+            @Parameter(description = "Фильтр по ID пользователя") @RequestParam(required = false) UUID userId,
+            @Parameter(description = "Фильтр по ID команды") @RequestParam(required = false) UUID teamId,
             @Parameter(description = "Начальная дата") @RequestParam(required = false) Instant startDate,
             @Parameter(description = "Конечная дата") @RequestParam(required = false) Instant endDate
     ) {
@@ -120,7 +121,7 @@ public class GameSessionController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<GameSessionDTO> getSessionById(
-            @Parameter(description = "ID сессии") @PathVariable Long id) {
+            @Parameter(description = "ID сессии") @PathVariable UUID id) {
         log.info("Getting game session by ID: {}", id);
 
         Optional<GameSession> session = gameSessionService.getSessionById(id);
@@ -146,7 +147,7 @@ public class GameSessionController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> updateSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @Valid @RequestBody UpdateGameSessionRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("Updating game session {} by user: {}", id, currentUser.getId());
@@ -176,7 +177,7 @@ public class GameSessionController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Deleting game session {} by user: {}", id, currentUser.getId());
 
@@ -209,7 +210,7 @@ public class GameSessionController {
     @PostMapping("/{id}/start")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> startSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Starting game session {} by user: {}", id, currentUser.getId());
 
@@ -237,7 +238,7 @@ public class GameSessionController {
     @PostMapping("/{id}/pause")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> pauseSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Pausing game session {} by user: {}", id, currentUser.getId());
 
@@ -265,7 +266,7 @@ public class GameSessionController {
     @PostMapping("/{id}/resume")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> resumeSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Resuming game session {} by user: {}", id, currentUser.getId());
 
@@ -293,7 +294,7 @@ public class GameSessionController {
     @PostMapping("/{id}/finish")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> finishSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("Finishing game session {} by user: {}", id, currentUser.getId());
 
@@ -316,10 +317,10 @@ public class GameSessionController {
     })
     @GetMapping("/{id}/current-level")
     public ResponseEntity<BaseDTO> getCurrentLevel(
-            @Parameter(description = "ID сессии") @PathVariable Long id) {
+            @Parameter(description = "ID сессии") @PathVariable UUID id) {
         log.info("Getting current level for session: {}", id);
 
-        Optional<Long> currentLevelId = gameSessionService.getCurrentLevelId(id);
+        Optional<UUID> currentLevelId = gameSessionService.getCurrentLevelId(id);
         if (currentLevelId.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -343,7 +344,7 @@ public class GameSessionController {
     @PostMapping("/{id}/submit-code")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<SubmitCodeResponse> submitCode(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @Valid @RequestBody SubmitCodeRequest request,
             @AuthenticationPrincipal User currentUser) {
         log.info("Submitting code for session {} by user: {}", id, currentUser.getId());
@@ -382,7 +383,7 @@ public class GameSessionController {
     })
     @GetMapping("/{id}/progress")
     public ResponseEntity<BaseDTO> getSessionProgress(
-            @Parameter(description = "ID сессии") @PathVariable Long id) {
+            @Parameter(description = "ID сессии") @PathVariable UUID id) {
         log.info("Getting progress for session: {}", id);
 
         // TODO: Реализация получения прогресса через LevelProgressService
@@ -400,7 +401,7 @@ public class GameSessionController {
     })
     @GetMapping("/{id}/attempts")
     public ResponseEntity<PaginationDTO<BaseDTO>> getSessionAttempts(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "20") int size) {
         log.info("Getting attempts for session: {}", id);
@@ -421,7 +422,7 @@ public class GameSessionController {
     })
     @GetMapping("/{id}/leaderboard")
     public ResponseEntity<BaseDTO> getSessionLeaderboard(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @Parameter(description = "Номер страницы") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Размер страницы") @RequestParam(defaultValue = "20") int size) {
         log.info("Getting leaderboard for session: {}", id);
@@ -446,7 +447,7 @@ public class GameSessionController {
     @PostMapping("/{id}/join")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GameSessionDTO> joinSession(
-            @Parameter(description = "ID сессии") @PathVariable Long id,
+            @Parameter(description = "ID сессии") @PathVariable UUID id,
             @AuthenticationPrincipal User currentUser) {
         log.info("User {} joining session: {}", currentUser.getId(), id);
 
@@ -462,7 +463,7 @@ public class GameSessionController {
 
     // Приватные вспомогательные методы
 
-    private boolean hasFilters(SessionStatus status, Long questId, Long userId, Long teamId, Instant startDate, Instant endDate) {
+    private boolean hasFilters(SessionStatus status, UUID questId, UUID userId, UUID teamId, Instant startDate, Instant endDate) {
         return status != null || questId != null || userId != null || teamId != null || startDate != null || endDate != null;
     }
 

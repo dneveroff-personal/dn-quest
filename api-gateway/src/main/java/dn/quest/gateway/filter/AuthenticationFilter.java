@@ -17,6 +17,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Фильтр аутентификации для проверки JWT токенов
@@ -73,7 +74,7 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
 
         // Извлекаем информацию из токена
         String username = JwtUtil.extractUsername(token, jwtSecret);
-        Long userId = JwtUtil.extractUserId(token, jwtSecret);
+        UUID userId = JwtUtil.extractUserId(token, jwtSecret);
         String role = JwtUtil.extractRole(token, jwtSecret);
 
         if (username == null) {

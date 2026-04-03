@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * DTO для прогресса по уровню
@@ -19,7 +20,7 @@ public record LevelProgressDTO(
     Long sessionId,
     
     @Schema(description = "ID пользователя", example = "123")
-    Long userId,
+    UUID userId,
     
     @Schema(description = "ID уровня", example = "101")
     Long levelId,

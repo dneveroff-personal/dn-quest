@@ -866,7 +866,7 @@ void testTeamGameplay() {
     ResponseEntity<TeamResponse> teamResponse = restTemplate.postForEntity(
         "/api/teams", teamRequest, TeamResponse.class);
     
-    Long teamId = teamResponse.getBody().getId();
+    UUID teamId = teamResponse.getBody().getId();
     
     // Генерация приглашения
     ResponseEntity<InvitationResponse> invitationResponse = restTemplate.postForEntity(

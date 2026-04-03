@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,7 +27,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     private final ConcurrentHashMap<String, IpCounter> ipCounters = new ConcurrentHashMap<>();
     
     // Черный список пользователей
-    private final ConcurrentHashMap<Long, BlacklistEntry> userBlacklist = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, BlacklistEntry> userBlacklist = new ConcurrentHashMap<>();
     
     // Блокированные IP адреса
     private final ConcurrentHashMap<String, BlacklistEntry> ipBlocks = new ConcurrentHashMap<>();
@@ -60,7 +61,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     private int blacklistDurationMinutes;
 
     @Override
-    public boolean canSendNotification(Long userId, String notificationType) {
+    public boolean canSendNotification(UUID userId, String notificationType) {
         // Проверяем черный список
         if (isUserBlacklisted(userId)) {
             logger.debug("User {} is blacklisted", userId);
@@ -144,7 +145,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     }
 
     @Override
-    public void recordNotificationAttempt(Long userId, String notificationType) {
+    public void recordNotificationAttempt(UUID userId, String notificationType) {
         String key = userId.toString();
         UserCounter counter = userCounters.get(key);
         if (counter != null) {
@@ -169,7 +170,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     }
 
     @Override
-    public UserRateLimitStatus getUserRateLimitStatus(Long userId) {
+    public UserRateLimitStatus getUserRateLimitStatus(UUID userId) {
         String key = userId.toString();
         UserCounter counter = userCounters.get(key);
         if (counter == null) {
@@ -270,7 +271,7 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     }
 
     @Override
-    public void resetUserCounters(Long userId) {
+    public void resetUserCounters(UUID userId) {
         userCounters.remove(userId.toString());
         logger.info("Reset counters for user: {}", userId);
     }
@@ -282,20 +283,20 @@ public class RateLimitingServiceImpl implements RateLimitingService {
     }
 
     @Override
-    public boolean isUserBlacklisted(Long userId) {
+    public boolean isUserBlacklisted(UUID userId) {
         BlacklistEntry entry = userBlacklist.get(userId);
         return entry != null && entry.getExpiryTime().isAfter(LocalDateTime.now());
     }
 
     @Override
-    public void blacklistUser(Long userId, String reason, long durationMinutes) {
+    public void blacklistUser(UUID userId, String reason, long durationMinutes) {
         BlacklistEntry entry = new BlacklistEntry(reason, LocalDateTime.now().plusMinutes(durationMinutes));
         userBlacklist.put(userId, entry);
         logger.warn("User {} blacklisted for {} minutes. Reason: {}", userId, durationMinutes, reason);
     }
 
     @Override
-    public void removeFromBlacklist(Long userId) {
+    public void removeFromBlacklist(UUID userId) {
         userBlacklist.remove(userId);
         logger.info("User {} removed from blacklist", userId);
     }

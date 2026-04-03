@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления командами
@@ -72,14 +73,14 @@ public class TeamController {
         
         log.debug("Creating team with name: {} by user: {}", request.getName(), userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamDTO team = teamService.createTeam(request, userId);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(team);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TeamDTO> getTeamById(@PathVariable Long id) {
+    public ResponseEntity<TeamDTO> getTeamById(@PathVariable UUID id) {
         log.debug("Getting team by id: {}", id);
         
         return ResponseEntity.ok(teamService.getTeamById(id));
@@ -88,13 +89,13 @@ public class TeamController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamDTO> updateTeam(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdateTeamRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Updating team: {} by user: {}", id, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamDTO updatedTeam = teamService.updateTeam(id, request, userId);
         
         return ResponseEntity.ok(updatedTeam);
@@ -103,19 +104,19 @@ public class TeamController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteTeam(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Deleting team: {} by user: {}", id, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         teamService.deleteTeam(id, userId);
         
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/members")
-    public ResponseEntity<List<TeamMemberDTO>> getTeamMembers(@PathVariable Long id) {
+    public ResponseEntity<List<TeamMemberDTO>> getTeamMembers(@PathVariable UUID id) {
         log.debug("Getting members for team: {}", id);
         
         List<TeamMemberDTO> members = teamService.getTeamMembers(id);
@@ -125,13 +126,13 @@ public class TeamController {
     @PostMapping("/{id}/members")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamMemberDTO> addMember(
-            @PathVariable Long id,
-            @RequestParam Long userId,
+            @PathVariable UUID id,
+            @RequestParam UUID userId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Adding member {} to team: {} by user: {}", userId, id, userDetails.getUsername());
         
-        Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID requesterId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamMember member = teamService.addMember(id, userId, requesterId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(teamMapper.toTeamMemberDTO(member));
@@ -140,13 +141,13 @@ public class TeamController {
     @DeleteMapping("/{id}/members/{userId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> removeMember(
-            @PathVariable Long id,
-            @PathVariable Long userId,
+            @PathVariable UUID id,
+            @PathVariable UUID userId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Removing member {} from team: {} by user: {}", userId, id, userDetails.getUsername());
         
-        Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID requesterId = userService.getUserIdByUsername(userDetails.getUsername());
         teamService.removeMember(id, userId, requesterId);
         
         return ResponseEntity.noContent().build();
@@ -155,15 +156,15 @@ public class TeamController {
     @PutMapping("/{id}/members/{userId}/role")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamMemberDTO> changeMemberRole(
-            @PathVariable Long id,
-            @PathVariable Long userId,
+            @PathVariable UUID id,
+            @PathVariable UUID userId,
             @Valid @RequestBody ChangeMemberRoleRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Changing role for member {} in team: {} to {} by user: {}", 
                 userId, id, request.getRole(), userDetails.getUsername());
         
-        Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID requesterId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamMember member = teamService.changeMemberRole(id, userId, String.valueOf(request.getRole()), requesterId);
         
         return ResponseEntity.ok(teamMapper.toTeamMemberDTO(member));
@@ -172,21 +173,21 @@ public class TeamController {
     @PutMapping("/{id}/captain/{userId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamMemberDTO> transferCaptaincy(
-            @PathVariable Long id,
-            @PathVariable Long userId,
+            @PathVariable UUID id,
+            @PathVariable UUID userId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Transferring captaincy to member {} in team: {} by user: {}", 
                 userId, id, userDetails.getUsername());
         
-        Long requesterId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID requesterId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamMember member = teamService.transferCaptain(id, userId, requesterId);
 
         return ResponseEntity.ok(teamMapper.toTeamMemberDTO(member));
     }
 
     @GetMapping("/{id}/settings")
-    public ResponseEntity<TeamSettingsDTO> getTeamSettings(@PathVariable Long id) {
+    public ResponseEntity<TeamSettingsDTO> getTeamSettings(@PathVariable UUID id) {
         log.debug("Getting settings for team: {}", id);
         
         return ResponseEntity.ok(teamService.getTeamSettings(id));
@@ -195,20 +196,20 @@ public class TeamController {
     @PutMapping("/{id}/settings")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamSettingsDTO> updateTeamSettings(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdateTeamSettingsRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Updating settings for team: {} by user: {}", id, userDetails.getUsername());
         
-        Long userId = userService.getUserIdByUsername(userDetails.getUsername());
+        UUID userId = userService.getUserIdByUsername(userDetails.getUsername());
         TeamSettingsDTO settings = teamService.updateTeamSettings(id, request, userId);
         
         return ResponseEntity.ok(settings);
     }
 
     @GetMapping("/{id}/statistics")
-    public ResponseEntity<TeamStatisticsDTO> getTeamStatistics(@PathVariable Long id) {
+    public ResponseEntity<TeamStatisticsDTO> getTeamStatistics(@PathVariable UUID id) {
         log.debug("Getting statistics for team: {}", id);
         
         return ResponseEntity.ok(teamService.getTeamStatistics(id));

@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с командами
  */
 @Repository
-public interface TeamRepository extends JpaRepository<Team, Long> {
+public interface TeamRepository extends JpaRepository<Team, UUID> {
 
     /**
      * Найти команду по названию
@@ -25,7 +26,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     /**
      * Найти команды по капитану
      */
-    List<Team> findByCaptainId(Long captainId);
+    List<Team> findByCaptainId(UUID captainId);
 
     /**
      * Найти активные команды
@@ -67,7 +68,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      * Найти команды, в которых состоит пользователь
      */
     @Query("SELECT DISTINCT tm.team FROM TeamMember tm WHERE tm.user.id = :userId AND tm.isActive = true")
-    List<Team> findTeamsByUserId(@Param("userId") Long userId);
+    List<Team> findTeamsByUserId(@Param("userId") UUID userId);
 
     /**
      * Найти активные команды, в которых состоит пользователь
@@ -77,7 +78,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
            "WHERE tm.user.id = :userId " +
            "AND tm.isActive = true " +
            "AND t.isActive = true")
-    List<Team> findActiveTeamsByUserId(@Param("userId") Long userId);
+    List<Team> findActiveTeamsByUserId(@Param("userId") UUID userId);
 
     /**
      * Проверить, существует ли команда с таким названием
@@ -87,7 +88,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     /**
      * Проверить, является ли пользователь капитаном команды
      */
-    boolean existsByIdAndCaptainId(Long teamId, Long captainId);
+    boolean existsByIdAndCaptainId(UUID teamId, UUID captainId);
 
     /**
      * Найти команды с количеством участников меньше максимального

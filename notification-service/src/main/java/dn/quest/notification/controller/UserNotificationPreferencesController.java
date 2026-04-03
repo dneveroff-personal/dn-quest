@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * REST контроллер для управления пользовательскими предпочтениями уведомлений
@@ -35,7 +36,7 @@ public class UserNotificationPreferencesController {
     @PostMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> createPreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Creating notification preferences for user: {}", userId);
         
@@ -56,7 +57,7 @@ public class UserNotificationPreferencesController {
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> getPreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Getting notification preferences for user: {}", userId);
         
@@ -77,7 +78,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> updatePreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Valid @RequestBody UserNotificationPreferences preferences) {
         
         log.info("Updating notification preferences for user: {}", userId);
@@ -98,7 +99,7 @@ public class UserNotificationPreferencesController {
     @PatchMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> updatePartialPreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody Map<String, Object> updates) {
         
         log.info("Updating partial preferences for user: {}", userId);
@@ -119,7 +120,7 @@ public class UserNotificationPreferencesController {
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<Void>> deletePreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Deleting notification preferences for user: {}", userId);
         
@@ -139,7 +140,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/types/{type}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> toggleNotificationType(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Тип уведомлений") @PathVariable NotificationType type,
             @Parameter(description = "Включить") @RequestParam boolean enabled) {
         
@@ -161,7 +162,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/categories/{category}")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> toggleNotificationCategory(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @Parameter(description = "Категория уведомлений") @PathVariable String category,
             @Parameter(description = "Включить") @RequestParam boolean enabled) {
         
@@ -183,7 +184,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/do-not-disturb")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> setDoNotDisturb(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody DoNotDisturbRequest request) {
         
         log.info("Setting Do Not Disturb for user {}: enabled={}, start={}, end={}", 
@@ -206,7 +207,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/limits")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> setNotificationLimits(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody NotificationLimitsRequest request) {
         
         log.info("Setting notification limits for user {}: perHour={}, perDay={}", 
@@ -229,7 +230,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/fcm-token")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<Void>> updateFcmToken(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody FcmTokenRequest request) {
         
         log.info("Updating FCM token for user: {}", userId);
@@ -250,7 +251,7 @@ public class UserNotificationPreferencesController {
     @PutMapping("/{userId}/telegram")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<Void>> updateTelegramChatId(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody TelegramChatIdRequest request) {
         
         log.info("Updating Telegram chat ID for user: {}", userId);
@@ -271,7 +272,7 @@ public class UserNotificationPreferencesController {
     @PostMapping("/{userId}/reset")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> resetToDefaults(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Resetting notification preferences to defaults for user: {}", userId);
         
@@ -291,7 +292,7 @@ public class UserNotificationPreferencesController {
     @GetMapping("/{userId}/export")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<Map<String, Object>>> exportPreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Exporting notification preferences for user: {}", userId);
         
@@ -311,7 +312,7 @@ public class UserNotificationPreferencesController {
     @PostMapping("/{userId}/import")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<UserNotificationPreferences>> importPreferences(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId,
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId,
             @RequestBody Map<String, Object> data) {
         
         log.info("Importing notification preferences for user: {}", userId);
@@ -332,7 +333,7 @@ public class UserNotificationPreferencesController {
     @GetMapping("/{userId}/channels")
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     public ResponseEntity<ApiResponse<List<NotificationType>>> getAvailableChannels(
-            @Parameter(description = "ID пользователя") @PathVariable Long userId) {
+            @Parameter(description = "ID пользователя") @PathVariable UUID userId) {
         
         log.info("Getting available channels for user: {}", userId);
         

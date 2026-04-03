@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность кода уровня
@@ -36,15 +37,15 @@ import java.time.LocalDateTime;
 public class Code {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID уровня, к которому относится код
      */
     @NotNull(message = "ID уровня обязателен")
     @Column(name = "level_id", nullable = false)
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Тип кода

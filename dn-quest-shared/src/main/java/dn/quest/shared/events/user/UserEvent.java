@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * События связанные с пользователями
@@ -22,7 +23,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserRegisteredData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String publicName;
@@ -40,7 +41,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserUpdatedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String publicName;
@@ -60,7 +61,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserDeletedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         
@@ -76,7 +77,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserPasswordChangedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         
@@ -92,7 +93,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserRoleChangedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String oldRole;
@@ -110,7 +111,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserLoggedInData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String clientIp;
@@ -128,7 +129,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserLoggedOutData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String clientIp;
@@ -146,7 +147,7 @@ public class UserEvent {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserPermissionsUpdatedData {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private List<String> addedPermissions;

@@ -1,42 +1,67 @@
--- Development PostgreSQL initialization script
--- This script runs automatically on first container start for dev environment
+-- DN Quest - Database Initialization Script
+-- Creates separate databases for each microservice
 
--- Enable UUID extension if needed
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Enable citext extension for case-insensitive text
-CREATE EXTENSION IF NOT EXISTS "citext";
-
--- Enable pgcrypto for password hashing
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
--- Log statements for debugging
-SET log_statement = 'all';
-SET log_min_duration_statement = 0;
-
--- Create all required databases for microservices
+-- Authentication Service Database
 CREATE DATABASE dnquest_auth;
-CREATE DATABASE dnquest_users;
-CREATE DATABASE dnquest_quests;
-CREATE DATABASE dnquest_game;
-CREATE DATABASE dnquest_teams;
-CREATE DATABASE dnquest_notifications;
-CREATE DATABASE dnquest_statistics;
-CREATE DATABASE dnquest_files;
-
--- Grant privileges to the default user
 GRANT ALL PRIVILEGES ON DATABASE dnquest_auth TO dn;
+
+-- User Management Service Database
+CREATE DATABASE dnquest_users;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_users TO dn;
+
+-- Quest Management Service Database
+CREATE DATABASE dnquest_quests;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_quests TO dn;
+
+-- Game Engine Service Database
+CREATE DATABASE dnquest_game;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_game TO dn;
+
+-- Team Management Service Database
+CREATE DATABASE dnquest_teams;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_teams TO dn;
+
+-- Notification Service Database
+CREATE DATABASE dnquest_notifications;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_notifications TO dn;
+
+-- Statistics Service Database
+CREATE DATABASE dnquest_statistics;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_statistics TO dn;
+
+-- File Storage Service Database
+CREATE DATABASE dnquest_files;
 GRANT ALL PRIVILEGES ON DATABASE dnquest_files TO dn;
 
--- Development-specific settings
-DO $$ 
-BEGIN
-    -- Custom type initialization can be added here
-    NULL;
-END $$;
+-- Connect to each database and create schemas
+\c dnquest_auth;
+CREATE SCHEMA IF NOT EXISTS auth;
+GRANT ALL PRIVILEGES ON SCHEMA auth TO dn;
+
+\c dnquest_users;
+CREATE SCHEMA IF NOT EXISTS users;
+GRANT ALL PRIVILEGES ON SCHEMA users TO dn;
+
+\c dnquest_quests;
+CREATE SCHEMA IF NOT EXISTS quests;
+GRANT ALL PRIVILEGES ON SCHEMA quests TO dn;
+
+\c dnquest_game;
+CREATE SCHEMA IF NOT EXISTS game;
+GRANT ALL PRIVILEGES ON SCHEMA game TO dn;
+
+\c dnquest_teams;
+CREATE SCHEMA IF NOT EXISTS teams;
+GRANT ALL PRIVILEGES ON SCHEMA teams TO dn;
+
+\c dnquest_notifications;
+CREATE SCHEMA IF NOT EXISTS notifications;
+GRANT ALL PRIVILEGES ON SCHEMA notifications TO dn;
+
+\c dnquest_statistics;
+CREATE SCHEMA IF NOT EXISTS statistics;
+GRANT ALL PRIVILEGES ON SCHEMA statistics TO dn;
+
+\c dnquest_files;
+CREATE SCHEMA IF NOT EXISTS files;
+GRANT ALL PRIVILEGES ON SCHEMA files TO dn;

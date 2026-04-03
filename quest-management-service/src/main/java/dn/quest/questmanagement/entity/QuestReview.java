@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения отзывов на квесты
@@ -26,20 +27,20 @@ import java.time.LocalDateTime;
 public class QuestReview {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID квеста
      */
     @Column(name = "quest_id", nullable = false)
-    private Long questId;
+    private UUID questId;
 
     /**
      * ID пользователя, оставившего отзыв
      */
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private UUID userId;
 
     /**
      * Заголовок отзыва

@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 /**
  * События связанные с пользователями
  */
@@ -21,7 +23,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserCreatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String firstName;
@@ -40,7 +42,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserUpdatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String firstName;
@@ -63,7 +65,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserDeletedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String firstName;
@@ -84,7 +86,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserActivatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String activatedBy;
@@ -102,7 +104,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserDeactivatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String deactivatedBy;
@@ -120,7 +122,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserRoleChangedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String previousRole;
@@ -140,7 +142,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserLoggedInEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String ipAddress;
@@ -159,7 +161,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserLoggedOutEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String logoutTime;
@@ -175,7 +177,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserPasswordChangedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String changedBy;
@@ -194,7 +196,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserPasswordResetRequestedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String resetToken;
@@ -213,7 +215,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserProfileUpdatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private String email;
         private String firstName;
@@ -236,7 +238,7 @@ public class UserEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class UserStatisticsUpdatedEvent extends BaseEvent {
-        private Long userId;
+        private UUID userId;
         private String username;
         private Integer teamCount;
         private Integer activeTeamCount;

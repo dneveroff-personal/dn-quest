@@ -1,8 +1,11 @@
 package dn.quest.shared.events.game;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Событие связанное с попыткой ввода кода
@@ -17,176 +20,79 @@ public class CodeAttemptEvent extends GameEngineEvent {
     }
 
     @Schema(description = "Подтип события", example = "CODE_SUBMITTED", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private CodeAttemptEventType subType;
 
     @Schema(description = "ID попытки", example = "12345", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private Long attemptId;
 
     @Schema(description = "ID сессии", example = "789", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private Long sessionId;
 
-    @Schema(description = "ID пользователя", example = "123", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
-    private Long userId;
+    @Schema(description = "ID пользователя", example = "550e8400-e29b-41d4-a716-446655440000", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
+    private UUID userId;
 
     @Schema(description = "ID уровня", example = "101")
+    @Getter
+    @Setter
     private Long levelId;
 
     @Schema(description = "Название уровня", example = "Первый этаж")
+    @Getter
+    @Setter
     private String levelName;
 
     @Schema(description = "Отправленный код", example = "ABC123", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private String submittedCode;
 
     @Schema(description = "Правильный код", example = "ABC123")
+    @Getter
+    @Setter
     private String correctCode;
 
     @Schema(description = "Сектор кода", example = "A", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private String sector;
 
     @Schema(description = "Результат попытки", example = "CORRECT", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
+    @Getter
+    @Setter
     private String result;
 
     @Schema(description = "Полученные очки", example = "100.0")
+    @Getter
+    @Setter
     private Double points;
 
     @Schema(description = "Бонусные очки", example = "20.0")
+    @Getter
+    @Setter
     private Double bonusPoints;
 
     @Schema(description = "Штрафные очки", example = "-10.0")
+    @Getter
+    @Setter
     private Double penaltyPoints;
 
     @Schema(description = "Общий счет за попытку", example = "110.0")
+    @Getter
+    @Setter
     private Double totalScore;
 
     @Schema(description = "Дополнительные метаданные")
+    @Getter
+    @Setter
     private Map<String, Object> metadata;
-
-    // Getters and setters
-    public CodeAttemptEventType getSubType() {
-        return subType;
-    }
-
-    public void setSubType(CodeAttemptEventType subType) {
-        this.subType = subType;
-    }
-
-    public Long getAttemptId() {
-        return attemptId;
-    }
-
-    public void setAttemptId(Long attemptId) {
-        this.attemptId = attemptId;
-    }
-
-    @Override
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    @Override
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    @Override
-    public Long getUserId() {
-        return userId;
-    }
-
-    @Override
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getLevelId() {
-        return levelId;
-    }
-
-    public void setLevelId(Long levelId) {
-        this.levelId = levelId;
-    }
-
-    public String getLevelName() {
-        return levelName;
-    }
-
-    public void setLevelName(String levelName) {
-        this.levelName = levelName;
-    }
-
-    public String getSubmittedCode() {
-        return submittedCode;
-    }
-
-    public void setSubmittedCode(String submittedCode) {
-        this.submittedCode = submittedCode;
-    }
-
-    public String getCorrectCode() {
-        return correctCode;
-    }
-
-    public void setCorrectCode(String correctCode) {
-        this.correctCode = correctCode;
-    }
-
-    public String getSector() {
-        return sector;
-    }
-
-    public void setSector(String sector) {
-        this.sector = sector;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public Double getPoints() {
-        return points;
-    }
-
-    public void setPoints(Double points) {
-        this.points = points;
-    }
-
-    public Double getBonusPoints() {
-        return bonusPoints;
-    }
-
-    public void setBonusPoints(Double bonusPoints) {
-        this.bonusPoints = bonusPoints;
-    }
-
-    public Double getPenaltyPoints() {
-        return penaltyPoints;
-    }
-
-    public void setPenaltyPoints(Double penaltyPoints) {
-        this.penaltyPoints = penaltyPoints;
-    }
-
-    public Double getTotalScore() {
-        return totalScore;
-    }
-
-    public void setTotalScore(Double totalScore) {
-        this.totalScore = totalScore;
-    }
-
-    @Override
-    public Map<String, Object> getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
 
     /**
      * Типы событий попытки ввода кода

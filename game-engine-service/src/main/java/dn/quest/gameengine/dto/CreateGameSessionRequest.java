@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 
+import java.util.UUID;
+
 /**
  * DTO для запроса на создание игровой сессии
  */
@@ -25,7 +27,7 @@ public record CreateGameSessionRequest(
     Long questId,
     
     @Schema(description = "ID команды (необязательно)", example = "789")
-    Long teamId,
+    UUID teamId,
     
     @Schema(description = "Максимальное количество участников", example = "10", minimum = "1", maximum = "100")
     @Min(value = 1, message = "Минимальное количество участников - 1")

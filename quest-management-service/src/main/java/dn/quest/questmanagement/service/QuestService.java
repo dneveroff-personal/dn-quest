@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Сервис для управления квестами
@@ -25,7 +26,7 @@ public interface QuestService {
      * @param authorId ID автора квеста
      * @return созданный квест
      */
-    QuestDTO createQuest(QuestCreateUpdateDTO dto, Long authorId);
+    QuestDTO createQuest(QuestCreateUpdateDTO dto, UUID authorId);
 
     /**
      * Обновить существующий квест
@@ -35,7 +36,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего обновление
      * @return обновленный квест
      */
-    QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, Long userId);
+    QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, UUID userId);
 
     /**
      * Удалить квест
@@ -43,7 +44,7 @@ public interface QuestService {
      * @param id ID квеста
      * @param userId ID пользователя, выполняющего удаление
      */
-    void deleteQuest(Long id, Long userId);
+    void deleteQuest(Long id, UUID userId);
 
     /**
      * Получить квест по ID
@@ -99,7 +100,7 @@ public interface QuestService {
      * @param pageable параметры пагинации
      * @return страница квестов автора
      */
-    Page<QuestDTO> getQuestsByAuthor(Long authorId, Pageable pageable);
+    Page<QuestDTO> getQuestsByAuthor(UUID authorId, Pageable pageable);
 
     /**
      * Получить квесты по сложности
@@ -147,7 +148,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return опубликованный квест
      */
-    QuestDTO publishQuest(Long id, Long userId);
+    QuestDTO publishQuest(Long id, UUID userId);
 
     /**
      * Снять квест с публикации
@@ -156,7 +157,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return квест снятый с публикации
      */
-    QuestDTO unpublishQuest(Long id, Long userId);
+    QuestDTO unpublishQuest(Long id, UUID userId);
 
     /**
      * Архивировать квест
@@ -166,7 +167,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return архивированный квест
      */
-    QuestDTO archiveQuest(Long id, String reason, Long userId);
+    QuestDTO archiveQuest(Long id, String reason, UUID userId);
 
     /**
      * Разархивировать квест
@@ -175,7 +176,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return разархивированный квест
      */
-    QuestDTO unarchiveQuest(Long id, Long userId);
+    QuestDTO unarchiveQuest(Long id, UUID userId);
 
     /**
      * Копировать квест
@@ -185,7 +186,7 @@ public interface QuestService {
      * @param authorId ID автора копии
      * @return скопированный квест
      */
-    QuestDTO copyQuest(Long id, String newTitle, Long authorId);
+    QuestDTO copyQuest(Long id, String newTitle, UUID authorId);
 
     /**
      * Создать шаблон из квеста
@@ -195,7 +196,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return созданный шаблон
      */
-    QuestDTO createTemplateFromQuest(Long id, String templateName, Long userId);
+    QuestDTO createTemplateFromQuest(Long id, String templateName, UUID userId);
 
     /**
      * Создать квест из шаблона
@@ -205,7 +206,7 @@ public interface QuestService {
      * @param authorId ID автора
      * @return созданный квест
      */
-    QuestDTO createQuestFromTemplate(Long templateId, String title, Long authorId);
+    QuestDTO createQuestFromTemplate(Long templateId, String title, UUID authorId);
 
     /**
      * Изменить статус квеста
@@ -215,7 +216,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return квест с измененным статусом
      */
-    QuestDTO changeQuestStatus(Long id, QuestStatus status, Long userId);
+    QuestDTO changeQuestStatus(Long id, QuestStatus status, UUID userId);
 
     /**
      * Добавить автора квесту
@@ -225,7 +226,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего операцию
      * @return обновленный квест
      */
-    QuestDTO addQuestAuthor(Long questId, Long authorId, Long userId);
+    QuestDTO addQuestAuthor(Long questId, UUID authorId, UUID userId);
 
     /**
      * Удалить автора квеста
@@ -235,7 +236,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего операцию
      * @return обновленный квест
      */
-    QuestDTO removeQuestAuthor(Long questId, Long authorId, Long userId);
+    QuestDTO removeQuestAuthor(Long questId, UUID authorId, UUID userId);
 
     /**
      * Добавить теги квесту
@@ -245,7 +246,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return обновленный квест
      */
-    QuestDTO addQuestTags(Long questId, Set<String> tags, Long userId);
+    QuestDTO addQuestTags(Long questId, Set<String> tags, UUID userId);
 
     /**
      * Удалить теги квеста
@@ -255,7 +256,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return обновленный квест
      */
-    QuestDTO removeQuestTags(Long questId, Set<String> tags, Long userId);
+    QuestDTO removeQuestTags(Long questId, Set<String> tags, UUID userId);
 
     /**
      * Проверить права доступа к квесту
@@ -264,7 +265,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если есть доступ
      */
-    boolean hasQuestAccess(Long questId, Long userId);
+    boolean hasQuestAccess(Long questId, UUID userId);
 
     /**
      * Проверить права на редактирование квеста
@@ -273,7 +274,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если можно редактировать
      */
-    boolean canEditQuest(Long questId, Long userId);
+    boolean canEditQuest(Long questId, UUID userId);
 
     /**
      * Проверить права на публикацию квеста
@@ -282,7 +283,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если можно публиковать
      */
-    boolean canPublishQuest(Long questId, Long userId);
+    boolean canPublishQuest(Long questId, UUID userId);
 
     /**
      * Валидировать квест перед публикацией

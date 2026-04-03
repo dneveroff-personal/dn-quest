@@ -10,6 +10,8 @@ CREATE TABLE file_metadata (
     storage_path VARCHAR(500),
     description VARCHAR(1000),
     owner_id UUID,
+    quest_id UUID,
+    team_id UUID,
     is_public BOOLEAN DEFAULT FALSE,
     is_temporary BOOLEAN DEFAULT FALSE,
     expires_at TIMESTAMP,

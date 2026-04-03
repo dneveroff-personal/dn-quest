@@ -6,6 +6,8 @@ import dn.quest.teammanagement.dto.response.ValidateTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * Feign клиент для взаимодействия с Authentication Service
  */
@@ -28,7 +30,7 @@ public interface AuthenticationServiceClient {
      * Получение информации о пользователе по ID
      */
     @GetMapping("/api/users/{id}")
-    UserDTO getUserById(@PathVariable("id") Long userId);
+    UserDTO getUserById(@PathVariable("id") UUID userId);
 
     /**
      * Получение информации о пользователе по имени пользователя
@@ -46,7 +48,7 @@ public interface AuthenticationServiceClient {
      * Проверка существования пользователя по ID
      */
     @GetMapping("/api/users/{id}/exists")
-    boolean userExists(@PathVariable("id") Long userId);
+    boolean userExists(@PathVariable("id") UUID userId);
 
     /**
      * Проверка существования пользователя по имени пользователя
@@ -64,25 +66,25 @@ public interface AuthenticationServiceClient {
      * Получение роли пользователя
      */
     @GetMapping("/api/users/{id}/role")
-    String getUserRole(@PathVariable("id") Long userId);
+    String getUserRole(@PathVariable("id") UUID userId);
 
     /**
      * Проверка, является ли пользователь администратором
      */
     @GetMapping("/api/users/{id}/is-admin")
-    boolean isUserAdmin(@PathVariable("id") Long userId);
+    boolean isUserAdmin(@PathVariable("id") UUID userId);
 
     /**
      * Проверка, активен ли пользователь
      */
     @GetMapping("/api/users/{id}/is-active")
-    boolean isUserActive(@PathVariable("id") Long userId);
+    boolean isUserActive(@PathVariable("id") UUID userId);
 
     /**
      * Обновление последней активности пользователя
      */
     @PutMapping("/api/users/{id}/last-activity")
-    void updateLastActivity(@PathVariable("id") Long userId);
+    void updateLastActivity(@PathVariable("id") UUID userId);
 
     /**
      * Получение списка пользователей по IDs
@@ -132,17 +134,17 @@ public interface AuthenticationServiceClient {
      * Обновление информации о пользователе
      */
     @PutMapping("/api/users/{id}")
-    UserDTO updateUser(@PathVariable("id") Long userId, @RequestBody UserDTO userDTO);
+    UserDTO updateUser(@PathVariable("id") UUID userId, @RequestBody UserDTO userDTO);
 
     /**
      * Деактивация пользователя
      */
     @PutMapping("/api/users/{id}/deactivate")
-    void deactivateUser(@PathVariable("id") Long userId);
+    void deactivateUser(@PathVariable("id") UUID userId);
 
     /**
      * Активация пользователя
      */
     @PutMapping("/api/users/{id}/activate")
-    void activateUser(@PathVariable("id") Long userId);
+    void activateUser(@PathVariable("id") UUID userId);
 }

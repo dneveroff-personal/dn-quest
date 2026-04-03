@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Сущность для хранения статистики пользователей
@@ -28,14 +29,14 @@ import java.time.LocalDateTime;
 public class UserStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     /**
      * ID пользователя
      */
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private UUID userId;
 
     /**
      * Дата статистики

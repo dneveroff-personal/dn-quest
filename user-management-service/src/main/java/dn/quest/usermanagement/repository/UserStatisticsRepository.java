@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы со статистикой пользователей
@@ -19,8 +20,8 @@ import java.util.Optional;
 public interface UserStatisticsRepository extends JpaRepository<UserStatistics, Long> {
 
     // Базовые запросы
-    Optional<UserStatistics> findByUserId(Long userId);
-    boolean existsByUserId(Long userId);
+    Optional<UserStatistics> findByUserId(UUID userId);
+    boolean existsByUserId(UUID userId);
 
     // Запросы для лидербордов
     @Query("SELECT us FROM UserStatistics us ORDER BY us.totalScore DESC")
@@ -57,9 +58,9 @@ public interface UserStatisticsRepository extends JpaRepository<UserStatistics, 
     List<UserStatistics> findByLegendaryAchievementsGreaterThan(Integer minLegendaryAchievements);
 
     // Поиск по активности
-    List<UserStatistics> findByLastActivityAfter(Instant after);
-    List<UserStatistics> findByLastActivityBefore(Instant before);
-    List<UserStatistics> findByLastActivityBetween(Instant start, Instant end);
+    List<UserStatistics> findByLastActivityAtAfter(Instant after);
+    List<UserStatistics> findByLastActivityAtBefore(Instant before);
+    List<UserStatistics> findByLastActivityAtBetween(Instant start, Instant end);
 
     List<UserStatistics> findByLoginCountGreaterThan(Integer minLogins);
     List<UserStatistics> findByCurrentStreakDaysGreaterThan(Integer minStreakDays);
@@ -141,14 +142,14 @@ public interface UserStatisticsRepository extends JpaRepository<UserStatistics, 
 
     // Массовые операции
     @Query("UPDATE UserStatistics us SET us.totalScore = us.totalScore + :score WHERE us.userId = :userId")
-    void addScoreToUser(@Param("userId") Long userId, @Param("score") Long score);
+    void addScoreToUser(@Param("userId") UUID userId, @Param("score") Long score);
 
     @Query("UPDATE UserStatistics us SET us.experiencePoints = us.experiencePoints + :experience WHERE us.userId = :userId")
-    void addExperienceToUser(@Param("userId") Long userId, @Param("experience") Long experience);
+    void addExperienceToUser(@Param("userId") UUID userId, @Param("experience") Long experience);
 
     @Query("UPDATE UserStatistics us SET us.questsCompleted = us.questsCompleted + 1 WHERE us.userId = :userId")
-    void incrementQuestsCompleted(@Param("userId") Long userId);
+    void incrementQuestsCompleted(@Param("userId") UUID userId);
 
     @Query("UPDATE UserStatistics us SET us.lastActivityAt = :now WHERE us.userId = :userId")
-    void updateLastActivity(@Param("userId") Long userId, @Param("now") Instant now);
+    void updateLastActivity(@Param("userId") UUID userId, @Param("now") Instant now);
 }

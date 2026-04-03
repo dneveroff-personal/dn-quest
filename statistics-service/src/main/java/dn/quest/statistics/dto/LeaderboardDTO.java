@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для лидербордов
@@ -20,7 +21,7 @@ public class LeaderboardDTO {
     /**
      * ID записи
      */
-    private Long id;
+    private UUID id;
 
     /**
      * Тип лидерборда (users, quests, teams)
@@ -40,7 +41,7 @@ public class LeaderboardDTO {
     /**
      * ID сущности (пользователя, квеста, команды)
      */
-    private Long entityId;
+    private String entityId;
 
     /**
      * Название сущности

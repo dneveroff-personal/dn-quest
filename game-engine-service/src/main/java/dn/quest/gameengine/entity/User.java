@@ -11,6 +11,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Пользователь системы
@@ -34,7 +35,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     @Column(nullable = false, length = 64)
     private String username;

@@ -5,6 +5,7 @@ import dn.quest.notification.enums.NotificationPriority;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -15,13 +16,13 @@ public interface NotificationQueueService {
     /**
      * Добавляет уведомление в очередь
      */
-    NotificationQueue addToQueue(Long notificationId, Long userId, String channelType, 
+    NotificationQueue addToQueue(String notificationId, UUID userId, String channelType,
                                NotificationPriority priority, String payload);
 
     /**
      * Добавляет отложенное уведомление в очередь
      */
-    NotificationQueue addToQueue(Long notificationId, Long userId, String channelType, 
+    NotificationQueue addToQueue(String notificationId, UUID userId, String channelType,
                                NotificationPriority priority, String payload, 
                                LocalDateTime scheduledAt);
 
@@ -48,12 +49,12 @@ public interface NotificationQueueService {
     /**
      * Отмечает уведомление как успешно отправленное
      */
-    void markAsSent(Long queueItemId);
+    void markAsSent(UUID queueItemId);
 
     /**
      * Отмечает уведомление как неудачное
      */
-    void markAsFailed(Long queueItemId, String errorMessage);
+    void markAsFailed(UUID queueItemId, String errorMessage);
 
     /**
      * Перемещает уведомление в Dead Letter Queue
@@ -73,17 +74,17 @@ public interface NotificationQueueService {
     /**
      * Получает уведомления по ID пользователя
      */
-    List<NotificationQueue> getUserNotifications(Long userId);
+    List<NotificationQueue> getUserNotifications(UUID userId);
 
     /**
      * Отменяет запланированное уведомление
      */
-    boolean cancelScheduledNotification(Long queueItemId);
+    boolean cancelScheduledNotification(UUID queueItemId);
 
     /**
      * Изменяет приоритет уведомления в очереди
      */
-    boolean updatePriority(Long queueItemId, NotificationPriority newPriority);
+    boolean updatePriority(UUID queueItemId, NotificationPriority newPriority);
 
     /**
      * Получает просроченные уведомления

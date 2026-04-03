@@ -5,6 +5,7 @@ import dn.quest.questmanagement.entity.Level;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Сервис для управления уровнями квестов
@@ -27,14 +28,14 @@ public interface LevelService {
      * @param dto DTO для обновления уровня
      * @return обновленный уровень
      */
-    LevelDTO updateLevel(Long id, LevelDTO dto);
+    LevelDTO updateLevel(UUID id, LevelDTO dto);
 
     /**
      * Удалить уровень
      *
      * @param id ID уровня
      */
-    void deleteLevel(Long id);
+    void deleteLevel(UUID id);
 
     /**
      * Получить уровень по ID
@@ -42,7 +43,7 @@ public interface LevelService {
      * @param id ID уровня
      * @return уровень
      */
-    LevelDTO getLevelById(Long id);
+    LevelDTO getLevelById(UUID id);
 
     /**
      * Получить все уровни квеста
@@ -86,7 +87,7 @@ public interface LevelService {
      * @param newOrder новый порядковый номер
      * @return обновленный уровень
      */
-    LevelDTO changeLevelOrder(Long levelId, Integer newOrder);
+    LevelDTO changeLevelOrder(UUID levelId, Integer newOrder);
 
     /**
      * Переместить уровень вверх
@@ -94,7 +95,7 @@ public interface LevelService {
      * @param levelId ID уровня
      * @return обновленный уровень
      */
-    LevelDTO moveLevelUp(Long levelId);
+    LevelDTO moveLevelUp(UUID levelId);
 
     /**
      * Переместить уровень вниз
@@ -102,7 +103,7 @@ public interface LevelService {
      * @param levelId ID уровня
      * @return обновленный уровень
      */
-    LevelDTO moveLevelDown(Long levelId);
+    LevelDTO moveLevelDown(UUID levelId);
 
     /**
      * Копировать уровни из одного квеста в другой
