@@ -21,7 +21,7 @@ import java.util.UUID;
 public class UserProfileDTO {
     
     @Schema(description = "ID профиля", example = "1")
-    private UUID id;
+    private Long id;
     
     @Schema(description = "ID пользователя", example = "1")
     private UUID userId;

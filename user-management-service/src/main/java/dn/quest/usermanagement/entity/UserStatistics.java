@@ -32,9 +32,9 @@ import java.util.UUID;
 public class UserStatistics {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private UUID id;
+    private Long id;
 
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;

@@ -20,10 +20,10 @@ public class FileValidationService {
     @Value("${file.upload.max-size:50MB}")
     private String maxFileSize;
 
-    @Value("${file.upload.allowed-types}")
+    @Value("${file.upload.allowed-types:image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml,video/mp4,video/avi,video/mov,audio/mp3,audio/wav,application/pdf}")
     private List<String> allowedTypes;
 
-    @Value("${file.upload.allowed-extensions}")
+    @Value("${file.upload.allowed-extensions:jpg,jpeg,png,gif,webp,svg,mp4,avi,mov,mp3,wav,pdf}")
     private List<String> allowedExtensions;
 
     // Максимальные размеры для разных типов файлов

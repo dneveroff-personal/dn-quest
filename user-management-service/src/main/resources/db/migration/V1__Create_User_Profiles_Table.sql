@@ -1,7 +1,7 @@
 -- Создание таблицы профилей пользователей
 CREATE TABLE user_profiles (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE,
     username VARCHAR(64) NOT NULL,
     email VARCHAR(255),
     public_name VARCHAR(128),

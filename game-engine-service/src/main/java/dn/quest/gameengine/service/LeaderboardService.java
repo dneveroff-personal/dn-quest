@@ -1,9 +1,5 @@
 package dn.quest.gameengine.service;
 
-import dn.quest.gameengine.entity.GameSession;
-import dn.quest.gameengine.entity.User;
-import dn.quest.gameengine.entity.Team;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;

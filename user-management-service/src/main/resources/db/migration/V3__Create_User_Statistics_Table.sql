@@ -1,7 +1,7 @@
 -- Создание таблицы статистики пользователей
 CREATE TABLE user_statistics (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE,
     
     -- Общая статистика
     total_score BIGINT NOT NULL DEFAULT 0,

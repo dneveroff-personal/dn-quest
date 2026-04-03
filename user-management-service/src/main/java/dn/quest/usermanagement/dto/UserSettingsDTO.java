@@ -20,7 +20,7 @@ import java.util.UUID;
 public class UserSettingsDTO {
     
     @Schema(description = "ID настроек", example = "1")
-    private UUID id;
+    private Long id;
     
     @Schema(description = "ID пользователя", example = "1")
     private UUID userId;
