@@ -18,7 +18,7 @@ import java.util.UUID;
  * Repository для работы с профилями пользователей
  */
 @Repository
-public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
+public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
 
     // Базовые запросы поиска
     Optional<UserProfile> findByUserId(UUID userId);
@@ -92,11 +92,11 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 
     // Массовые операции
     @Query("UPDATE UserProfile up SET up.isBlocked = false, up.blockedUntil = null, up.blockReason = null WHERE up.id IN :ids")
-    void unblockUsers(@Param("ids") List<Long> ids);
+    void unblockUsers(@Param("ids") List<UUID> ids);
 
     @Query("UPDATE UserProfile up SET up.isActive = false WHERE up.id IN :ids")
-    void deactivateUsers(@Param("ids") List<Long> ids);
+    void deactivateUsers(@Param("ids") List<UUID> ids);
 
     @Query("UPDATE UserProfile up SET up.isActive = true WHERE up.id IN :ids")
-    void activateUsers(@Param("ids") List<Long> ids);
+    void activateUsers(@Param("ids") List<UUID> ids);
 }

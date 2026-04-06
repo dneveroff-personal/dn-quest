@@ -140,7 +140,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     // Запросы для поиска запросов от конкретных пользователей
     @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.user.id IN :userIds ORDER BY pr.createdAt DESC")
-    List<ParticipationRequest> findByUserIds(@Param("userIds") List<Long> userIds);
+    List<ParticipationRequest> findByUserIds(@Param("userIds") List<UUID> userIds);
 
     // Запросы для анализа эффективности обработки
     @Query("SELECT pr.processedByUser, COUNT(pr), AVG(pr.processedAt.getEpochSecond() - pr.createdAt.getEpochSecond()) FROM ParticipationRequest pr WHERE pr.processedByUser IS NOT NULL GROUP BY pr.processedByUser")

@@ -147,7 +147,7 @@ public class GameEvents {
         private String teamName;
         private UUID levelId;
         private String levelName;
-        private Long hintId;
+        private UUID hintId;
         private String hintText;
         private Long participantId;
         private String participantUsername;

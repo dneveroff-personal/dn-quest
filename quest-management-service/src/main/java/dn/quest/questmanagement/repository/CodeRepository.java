@@ -253,7 +253,7 @@ public interface CodeRepository extends JpaRepository<Code, UUID>, JpaSpecificat
     @Modifying
     @Query("UPDATE Code c SET c.active = true, c.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE c.id IN :codeIds")
-    int activateCodes(@Param("codeIds") List<Long> codeIds);
+    int activateCodes(@Param("codeIds") List<UUID> codeIds);
 
     /**
      * Деактивировать коды
@@ -261,7 +261,7 @@ public interface CodeRepository extends JpaRepository<Code, UUID>, JpaSpecificat
     @Modifying
     @Query("UPDATE Code c SET c.active = false, c.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE c.id IN :codeIds")
-    int deactivateCodes(@Param("codeIds") List<Long> codeIds);
+    int deactivateCodes(@Param("codeIds") List<UUID> codeIds);
 
     /**
      * Удалить коды по ID уровня

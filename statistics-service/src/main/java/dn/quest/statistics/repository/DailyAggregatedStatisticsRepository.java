@@ -12,12 +12,13 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с агрегированной ежедневной статистикой
  */
 @Repository
-public interface DailyAggregatedStatisticsRepository extends JpaRepository<DailyAggregatedStatistics, Long> {
+public interface DailyAggregatedStatisticsRepository extends JpaRepository<DailyAggregatedStatistics, UUID> {
 
     /**
      * Найти статистику по дате

@@ -645,8 +645,8 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     @Override
     public Map<String, Object> getLeaderboardWithFilters(
             UUID sessionId,
-            List<Long> userIds,
-            List<Long> teamIds,
+            List<UUID> userIds,
+            List<UUID> teamIds,
             String difficulty,
             String questType,
             Instant startDate,
@@ -758,13 +758,13 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     // Операции с агрегацией
 
     @Override
-    public Map<String, Object> getAggregatedLeaderboard(List<Long> sessionIds, Pageable pageable) {
+    public Map<String, Object> getAggregatedLeaderboard(List<UUID> sessionIds, Pageable pageable) {
         log.info("Fetching aggregated leaderboard. Sessions: {}", sessionIds);
         return createEmptyResult(pageable);
     }
 
     @Override
-    public Map<String, Object> getMultiQuestLeaderboard(List<Long> questIds, Pageable pageable) {
+    public Map<String, Object> getMultiQuestLeaderboard(List<UUID> questIds, Pageable pageable) {
         log.info("Fetching multi-quest leaderboard. Quests: {}", questIds);
         return createEmptyResult(pageable);
     }
@@ -847,12 +847,12 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public void precomputeLeaderboards(List<Long> sessionIds) {
+    public void precomputeLeaderboards(List<UUID> sessionIds) {
         log.info("Precomputing leaderboards for sessions: {}", sessionIds);
     }
 
     @Override
-    public List<Long> getPopularLeaderboards(int limit) {
+    public List<UUID> getPopularLeaderboards(int limit) {
         log.info("Fetching popular leaderboards. Limit: {}", limit);
         return List.of();
     }

@@ -15,7 +15,7 @@ public class InvitationNotFoundException extends RuntimeException {
         super(message, cause);
     }
     
-    public InvitationNotFoundException(Long invitationId) {
+    public InvitationNotFoundException(UUID invitationId) {
         super("Invitation not found with id: " + invitationId);
     }
     

@@ -16,7 +16,7 @@ import java.util.UUID;
  * Репозиторий для работы с кодами уровней
  */
 @Repository
-public interface CodeRepository extends JpaRepository<Code, Long> {
+public interface CodeRepository extends JpaRepository<Code, UUID> {
 
     // Базовые запросы
     @Query("select c from Code c where c.level = :level")

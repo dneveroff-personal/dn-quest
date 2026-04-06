@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Сервис управления пользователями
@@ -22,7 +23,7 @@ public interface UserService {
     /**
      * Получение пользователя по ID
      */
-    Optional<User> findById(Long id);
+    Optional<User> findById(UUID id);
 
     /**
      * Получение пользователя по имени
@@ -52,17 +53,17 @@ public interface UserService {
     /**
      * Удаление пользователя
      */
-    void deleteUser(Long id);
+    void deleteUser(UUID id);
 
     /**
      * Активация/деактивация пользователя
      */
-    User toggleUserStatus(Long id, boolean isActive);
+    User toggleUserStatus(UUID id, boolean isActive);
 
     /**
      * Изменение роли пользователя
      */
-    User changeUserRole(Long id, UserRole newRole);
+    User changeUserRole(UUID id, UserRole newRole);
 
     /**
      * Обновление последнего входа

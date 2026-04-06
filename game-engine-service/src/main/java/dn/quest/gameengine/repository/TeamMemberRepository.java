@@ -14,12 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с участниками команд
  */
 @Repository
-public interface TeamMemberRepository extends JpaRepository<TeamMember, Long> {
+public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
 
     // Базовые запросы
     Optional<TeamMember> findByTeamAndUser(Team team, User user);

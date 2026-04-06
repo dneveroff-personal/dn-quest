@@ -17,7 +17,7 @@ import java.util.UUID;
  * Репозиторий для работы с прогрессом прохождения уровней
  */
 @Repository
-public interface LevelProgressRepository extends JpaRepository<LevelProgress, Long> {
+public interface LevelProgressRepository extends JpaRepository<LevelProgress, UUID> {
 
     // Базовые запросы
     List<LevelProgress> findBySession(GameSession session);

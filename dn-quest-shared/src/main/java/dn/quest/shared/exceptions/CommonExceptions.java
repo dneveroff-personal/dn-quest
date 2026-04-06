@@ -2,6 +2,8 @@ package dn.quest.shared.exceptions;
 
 import dn.quest.shared.constants.ApplicationConstants;
 
+import java.util.UUID;
+
 /**
  * Общие исключения для микросервисов DN Quest
  */
@@ -54,7 +56,7 @@ public final class CommonExceptions {
      * Исключение "ресурс не найден"
      */
     public static class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String resource, Long id) {
+        public ResourceNotFoundException(String resource, UUID id) {
             super(String.format("%s with id %d not found", resource, id));
         }
         
@@ -190,7 +192,7 @@ public final class CommonExceptions {
             return new AuthorizationException(message);
         }
         
-        public static ResourceNotFoundException notFound(String resource, Long id) {
+        public static ResourceNotFoundException notFound(String resource, UUID id) {
             return new ResourceNotFoundException(resource, id);
         }
         

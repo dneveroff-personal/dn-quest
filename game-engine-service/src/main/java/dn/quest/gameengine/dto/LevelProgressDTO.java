@@ -14,7 +14,7 @@ import java.util.UUID;
 public record LevelProgressDTO(
     
     @Schema(description = "ID прогресса", example = "12345")
-    Long id,
+    UUID id,
     
     @Schema(description = "ID сессии", example = "789")
     UUID sessionId,
@@ -131,7 +131,7 @@ public record LevelProgressDTO(
     public record UsedHintDTO(
         
         @Schema(description = "ID подсказки", example = "2001")
-        Long hintId,
+        UUID hintId,
         
         @Schema(description = "Текст подсказки", example = "Ищите рядом с большим деревом")
         String hintText,

@@ -9,12 +9,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с настройками команд
  */
 @Repository
-public interface TeamSettingsRepository extends JpaRepository<TeamSettings, Long> {
+public interface TeamSettingsRepository extends JpaRepository<TeamSettings, UUID> {
 
     /**
      * Найти настройки по команде

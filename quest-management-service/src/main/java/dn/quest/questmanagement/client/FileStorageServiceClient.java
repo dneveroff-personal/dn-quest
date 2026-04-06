@@ -85,7 +85,7 @@ public interface FileStorageServiceClient {
      * DTO для ответа загрузки файла
      */
     class FileUploadResponseDTO {
-        private Long id;
+        private UUID id;
         private String fileName;
         private String originalFileName;
         private String filePath;
@@ -96,8 +96,8 @@ public interface FileStorageServiceClient {
         private String downloadUrl;
 
         // Getters and setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
+        public UUID getId() { return id; }
+        public void setId(UUID id) { this.id = id; }
 
         public String getFileName() { return fileName; }
         public void setFileName(String fileName) { this.fileName = fileName; }
@@ -128,7 +128,7 @@ public interface FileStorageServiceClient {
      * DTO для информации о файле
      */
     class FileInfoDTO {
-        private Long id;
+        private UUID id;
         private String fileName;
         private String originalFileName;
         private String filePath;
@@ -145,8 +145,8 @@ public interface FileStorageServiceClient {
         private String downloadUrl;
 
         // Getters and setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
+        public UUID getId() { return id; }
+        public void setId(UUID id) { this.id = id; }
 
         public String getFileName() { return fileName; }
         public void setFileName(String fileName) { this.fileName = fileName; }

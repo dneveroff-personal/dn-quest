@@ -14,12 +14,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с пользователями
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
 
     // Базовые запросы поиска
     Optional<User> findByUsername(String username);
@@ -30,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     // Запросы с JOIN FETCH для оптимизации
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.userPermissions WHERE u.id = :id")
-    Optional<User> findByIdWithPermissions(@Param("id") Long id);
+    Optional<User> findByIdWithPermissions(@Param("id") UUID id);
     
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.userPermissions WHERE u.username = :username")
     Optional<User> findByUsernameWithPermissions(@Param("username") String username);

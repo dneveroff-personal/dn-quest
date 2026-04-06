@@ -90,7 +90,7 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
     @Modifying
     @Query("UPDATE NotificationQueue nq SET nq.status = :status, nq.processedAt = :processedAt " +
            "WHERE nq.id = :id")
-    int updateNotificationStatus(@Param("id") Long id, 
+    int updateNotificationStatus(@Param("id") UUID id,
                                 @Param("status") NotificationStatus status, 
                                 @Param("processedAt") LocalDateTime processedAt);
 

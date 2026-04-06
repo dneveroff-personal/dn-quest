@@ -427,6 +427,8 @@ services:
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
       USER_SERVICE_URL: http://user-management-service-dev:8082
+      REDIS_HOST: redis-dev
+      REDIS_PORT: 6379
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_TEAMMANAGEMENT: DEBUG
     volumes:
@@ -435,6 +437,8 @@ services:
       postgres-dev:
         condition: service_healthy
       kafka-dev:
+        condition: service_healthy
+      redis-dev:
         condition: service_healthy
       authentication-service-dev:
         condition: service_started

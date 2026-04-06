@@ -133,7 +133,7 @@ public interface TeamService {
     /**
      * Отозвать приглашение
      */
-    void revokeInvitation(UUID teamId, Long invitationId, UUID userId);
+    void revokeInvitation(UUID teamId, UUID invitationId, UUID userId);
 
     /**
      * Получить настройки команды

@@ -117,13 +117,13 @@ public interface StatisticsServiceClient {
      * Получение сравнительной статистики команд
      */
     @PostMapping("/api/statistics/teams/compare")
-    TeamComparisonDTO compareTeams(@RequestBody List<Long> teamIds);
+    TeamComparisonDTO compareTeams(@RequestBody List<UUID> teamIds);
 
     /**
      * Получение сравнительной статистики пользователей
      */
     @PostMapping("/api/statistics/users/compare")
-    UserComparisonDTO compareUsers(@RequestBody List<Long> userIds);
+    UserComparisonDTO compareUsers(@RequestBody List<UUID> userIds);
 
     /**
      * Получение прогнозов статистики
@@ -199,7 +199,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class InvitationStatisticsDataDTO {
-        private Long invitationId;
+        private UUID invitationId;
         private UUID teamId;
         private String teamName;
         private UUID userId;
@@ -230,7 +230,7 @@ public interface StatisticsServiceClient {
         private Integer levelsCompleted;
         private Integer totalLevels;
         private Integer participantCount;
-        private List<Long> participantIds;
+        private List<UUID> participantIds;
     }
 
     @Setter

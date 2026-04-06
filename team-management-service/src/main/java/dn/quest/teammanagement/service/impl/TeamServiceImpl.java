@@ -543,7 +543,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void revokeInvitation(UUID teamId, Long invitationId, UUID userId) {
+    public void revokeInvitation(UUID teamId, UUID invitationId, UUID userId) {
 
     }
 

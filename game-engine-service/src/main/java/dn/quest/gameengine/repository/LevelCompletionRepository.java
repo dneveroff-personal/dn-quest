@@ -17,7 +17,7 @@ import java.util.UUID;
  * Репозиторий для работы с завершениями уровней
  */
 @Repository
-public interface LevelCompletionRepository extends JpaRepository<LevelCompletion, Long> {
+public interface LevelCompletionRepository extends JpaRepository<LevelCompletion, UUID> {
 
     // Базовые запросы
     @Query("select lc from LevelCompletion lc where lc.level.quest = :quest order by lc.passTime asc")

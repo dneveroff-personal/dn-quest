@@ -34,7 +34,7 @@ public class UserStatistics {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private Long id;
+    private UUID id;
 
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;

@@ -210,7 +210,7 @@ public interface GameEngineServiceClient {
     @Setter
     @Getter
     class GameSessionDTO {
-        private Long id;
+        private UUID id;
         private UUID questId;
         private String questName;
         private UUID teamId;
@@ -242,7 +242,7 @@ public interface GameEngineServiceClient {
     @Setter
     @Getter
     class QuestDTO {
-        private Long id;
+        private UUID id;
         private String name;
         private String description;
         private String category;

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.util.UUID;
+
 /**
  * Feign клиент для интеграции с Authentication Service
  */
@@ -16,7 +18,7 @@ public interface AuthenticationServiceClient {
      * Получить информацию о пользователе по ID
      */
     @GetMapping("/api/users/{id}")
-    UserDTO getUserById(@PathVariable("id") Long id);
+    UserDTO getUserById(@PathVariable("id") UUID id);
 
     /**
      * Получить информацию о пользователе по токену
@@ -34,11 +36,11 @@ public interface AuthenticationServiceClient {
      * Проверить, существует ли пользователь
      */
     @GetMapping("/api/users/{id}/exists")
-    Boolean userExists(@PathVariable("id") Long id);
+    Boolean userExists(@PathVariable("id") UUID id);
 
     /**
      * Получить пользователей по списку ID
      */
     @GetMapping("/api/users/batch")
-    java.util.List<UserDTO> getUsersByIds(@RequestHeader("X-User-Ids") java.util.List<Long> userIds);
+    java.util.List<UserDTO> getUsersByIds(@RequestHeader("X-User-Ids") java.util.List<UUID> userIds);
 }

@@ -117,8 +117,8 @@ public interface LeaderboardService {
     Map<String, Object> getFilteredLeaderboard(UUID sessionId, List<String> filters, Pageable pageable);
     Map<String, Object> getLeaderboardWithFilters(
         UUID sessionId,
-        List<Long> userIds,
-        List<Long> teamIds,
+        List<UUID> userIds,
+        List<UUID> teamIds,
         String difficulty,
         String questType,
         Instant startDate,
@@ -150,8 +150,8 @@ public interface LeaderboardService {
     Map<String, Object> compareSessions(UUID sessionId1, UUID sessionId2);
     
     // Операции с агрегацией
-    Map<String, Object> getAggregatedLeaderboard(List<Long> sessionIds, Pageable pageable);
-    Map<String, Object> getMultiQuestLeaderboard(List<Long> questIds, Pageable pageable);
+    Map<String, Object> getAggregatedLeaderboard(List<UUID> sessionIds, Pageable pageable);
+    Map<String, Object> getMultiQuestLeaderboard(List<UUID> questIds, Pageable pageable);
     Map<String, Object> getCrossPlatformLeaderboard(Pageable pageable);
     
     // Операции с реальным временем
@@ -171,8 +171,8 @@ public interface LeaderboardService {
     
     // Операции с оптимизацией
     void optimizeLeaderboardCalculation(UUID sessionId);
-    void precomputeLeaderboards(List<Long> sessionIds);
-    List<Long> getPopularLeaderboards(int limit);
+    void precomputeLeaderboards(List<UUID> sessionIds);
+    List<UUID> getPopularLeaderboards(int limit);
     void scheduleLeaderboardUpdate(UUID sessionId, Instant nextUpdate);
     
     // Операции с безопасностью

@@ -18,7 +18,7 @@ import java.util.UUID;
  * Репозиторий для работы со статистикой команд
  */
 @Repository
-public interface TeamStatisticsRepository extends JpaRepository<TeamStatistics, Long> {
+public interface TeamStatisticsRepository extends JpaRepository<TeamStatistics, UUID> {
 
     /**
      * Найти статистику по команде

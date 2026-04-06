@@ -22,29 +22,29 @@ public interface QuestService {
 
     // Базовые операции CRUD
     Quest createQuest(Quest quest);
-    Optional<Quest> getQuestById(Long id);
+    Optional<Quest> getQuestById(UUID id);
     Quest updateQuest(Quest quest);
-    void deleteQuest(Long id);
+    void deleteQuest(UUID id);
     
     // Управление уровнями
     Level createLevel(Level level);
-    Optional<Level> getLevelById(Long id);
+    Optional<Level> getLevelById(UUID id);
     Level updateLevel(Level level);
-    void deleteLevel(Long id);
+    void deleteLevel(UUID id);
     List<Level> getQuestLevels(UUID questId);
     
     // Управление кодами
     Code createCode(Code code);
-    Optional<Code> getCodeById(Long id);
+    Optional<Code> getCodeById(UUID id);
     Code updateCode(Code code);
-    void deleteCode(Long id);
+    void deleteCode(UUID id);
     List<Code> getLevelCodes(UUID levelId);
     
     // Управление подсказками
     LevelHint createHint(LevelHint hint);
-    Optional<LevelHint> getHintById(Long id);
+    Optional<LevelHint> getHintById(UUID id);
     LevelHint updateHint(LevelHint hint);
-    void deleteHint(Long id);
+    void deleteHint(UUID id);
     List<LevelHint> getLevelHints(UUID levelId);
     
     // Поиск и фильтрация квестов
@@ -113,7 +113,7 @@ public interface QuestService {
     
     // Операции с подсказками
     LevelHint addHintToLevel(UUID levelId, String hintText, Integer penaltyPoints);
-    void removeHintFromLevel(UUID levelId, Long hintId);
+    void removeHintFromLevel(UUID levelId, UUID hintId);
     List<LevelHint> getOrderedHints(UUID levelId);
     Integer calculateTotalHintPenalty(UUID levelId);
     
@@ -221,7 +221,7 @@ public interface QuestService {
     Quest setQuestCategory(UUID questId, String category);
     List<Quest> getQuestsByCategory(String category);
     List<String> getAllCategories();
-    Map<String, Long> getCategoryStatistics();
+    Map<String, UUID> getCategoryStatistics();
     
     // Операции с языками
     Quest setQuestLanguage(UUID questId, String language);

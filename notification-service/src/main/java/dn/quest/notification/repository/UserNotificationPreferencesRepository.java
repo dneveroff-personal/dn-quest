@@ -15,7 +15,7 @@ import java.util.UUID;
  * Репозиторий для работы с пользовательскими предпочтениями уведомлений
  */
 @Repository
-public interface UserNotificationPreferencesRepository extends JpaRepository<UserNotificationPreferences, Long> {
+public interface UserNotificationPreferencesRepository extends JpaRepository<UserNotificationPreferences, UUID> {
 
     /**
      * Найти предпочтения пользователя по ID

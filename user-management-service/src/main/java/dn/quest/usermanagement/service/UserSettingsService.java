@@ -25,7 +25,7 @@ public interface UserSettingsService {
     /**
      * Получает настройки пользователя по ID настроек
      */
-    Optional<UserSettingsDTO> getUserSettingsById(Long id);
+    Optional<UserSettingsDTO> getUserSettingsById(UUID id);
 
     /**
      * Обновляет настройки пользователя

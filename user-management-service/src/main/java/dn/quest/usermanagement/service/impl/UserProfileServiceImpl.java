@@ -65,7 +65,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserProfileDTO> getUserProfileById(Long id) {
+    public Optional<UserProfileDTO> getUserProfileById(UUID id) {
         log.debug("Получение профиля пользователя по id: {}", id);
         return userProfileRepository.findById(id).map(this::mapToDto);
     }

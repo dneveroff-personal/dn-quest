@@ -20,7 +20,7 @@ import java.util.UUID;
  * Репозиторий для работы с попытками ввода кодов
  */
 @Repository
-public interface CodeAttemptRepository extends JpaRepository<CodeAttempt, Long> {
+public interface CodeAttemptRepository extends JpaRepository<CodeAttempt, UUID> {
 
     // Базовые запросы
     List<CodeAttempt> findBySession(GameSession session);

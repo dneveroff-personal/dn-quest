@@ -55,7 +55,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserStatisticsDTO> getUserStatisticsById(Long id) {
+    public Optional<UserStatisticsDTO> getUserStatisticsById(UUID id) {
         return userStatisticsRepository.findById(id)
                 .map(this::convertToDTO);
     }

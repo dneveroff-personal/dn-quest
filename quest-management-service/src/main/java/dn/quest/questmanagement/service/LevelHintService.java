@@ -27,14 +27,14 @@ public interface LevelHintService {
      * @param dto DTO для обновления подсказки
      * @return обновленная подсказка
      */
-    LevelHintDTO updateHint(Long id, LevelHintDTO dto);
+    LevelHintDTO updateHint(UUID id, LevelHintDTO dto);
 
     /**
      * Удалить подсказку
      *
      * @param id ID подсказки
      */
-    void deleteHint(Long id);
+    void deleteHint(UUID id);
 
     /**
      * Получить подсказку по ID
@@ -42,7 +42,7 @@ public interface LevelHintService {
      * @param id ID подсказки
      * @return подсказка
      */
-    LevelHintDTO getHintById(Long id);
+    LevelHintDTO getHintById(UUID id);
 
     /**
      * Получить все подсказки уровня
@@ -68,7 +68,7 @@ public interface LevelHintService {
      * @param userId ID пользователя
      * @return результат проверки
      */
-    HintAvailabilityResult checkHintAvailability(Long hintId, UUID userId);
+    HintAvailabilityResult checkHintAvailability(UUID hintId, UUID userId);
 
     /**
      * Копировать подсказки из одного уровня в другой
@@ -85,7 +85,7 @@ public interface LevelHintService {
      * @param active флаг активности
      * @return обновленная подсказка
      */
-    LevelHintDTO toggleHintActive(Long hintId, boolean active);
+    LevelHintDTO toggleHintActive(UUID hintId, boolean active);
 
     /**
      * Результат проверки доступности подсказки

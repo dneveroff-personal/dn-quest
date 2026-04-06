@@ -14,7 +14,7 @@ import java.util.UUID;
  * Репозиторий для работы с подсказками уровней
  */
 @Repository
-public interface LevelHintRepository extends JpaRepository<LevelHint, Long> {
+public interface LevelHintRepository extends JpaRepository<LevelHint, UUID> {
 
     // Базовые запросы
     List<LevelHint> findByLevel(Level level);

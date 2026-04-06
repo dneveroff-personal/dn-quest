@@ -154,21 +154,21 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> 
      */
     @Modifying
     @Query("UPDATE Leaderboard l SET l.rank = :rank WHERE l.id = :id")
-    int updateRank(@Param("id") Long id, @Param("rank") Integer rank);
+    int updateRank(@Param("id") UUID id, @Param("rank") Integer rank);
 
     /**
      * Обновить изменение ранга
      */
     @Modifying
     @Query("UPDATE Leaderboard l SET l.previousRank = :previousRank, l.rankChange = :rankChange WHERE l.id = :id")
-    int updateRankChange(@Param("id") Long id, @Param("previousRank") Integer previousRank, @Param("rankChange") Integer rankChange);
+    int updateRankChange(@Param("id") UUID id, @Param("previousRank") Integer previousRank, @Param("rankChange") Integer rankChange);
 
     /**
      * Обновить счет и изменение счета
      */
     @Modifying
     @Query("UPDATE Leaderboard l SET l.score = :score, l.previousScore = :previousScore, l.scoreChange = :scoreChange WHERE l.id = :id")
-    int updateScore(@Param("id") Long id, @Param("score") Double score, @Param("previousScore") Double previousScore, @Param("scoreChange") Double scoreChange);
+    int updateScore(@Param("id") UUID id, @Param("score") Double score, @Param("previousScore") Double previousScore, @Param("scoreChange") Double scoreChange);
 
     /**
      * Удалить записи лидерборда за дату

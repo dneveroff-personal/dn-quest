@@ -30,7 +30,7 @@ public interface UserProfileService {
     /**
      * Получает профиль пользователя по ID профиля
      */
-    Optional<UserProfileDTO> getUserProfileById(Long id);
+    Optional<UserProfileDTO> getUserProfileById(UUID id);
 
     /**
      * Получает профиль пользователя по имени пользователя

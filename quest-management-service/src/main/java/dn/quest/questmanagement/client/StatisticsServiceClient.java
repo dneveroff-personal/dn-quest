@@ -168,7 +168,7 @@ public interface StatisticsServiceClient {
     @Getter
     class HintUsedEventDTO extends GameEventDTO {
         private UUID levelId;
-        private Long hintId;
+        private UUID hintId;
         private Integer hintCost;
         private Long usageTime;
     }

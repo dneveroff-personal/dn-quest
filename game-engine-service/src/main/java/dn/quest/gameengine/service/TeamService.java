@@ -20,9 +20,9 @@ public interface TeamService {
 
     // Базовые операции CRUD
     Team createTeam(Team team);
-    Optional<Team> getTeamById(Long id);
+    Optional<Team> getTeamById(UUID id);
     Team updateTeam(Team team);
-    void deleteTeam(Long id);
+    void deleteTeam(UUID id);
     
     // Управление командами
     Team createTeam(String name, String description, UUID captainId);

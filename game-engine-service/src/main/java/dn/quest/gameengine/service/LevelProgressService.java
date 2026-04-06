@@ -18,9 +18,9 @@ public interface LevelProgressService {
 
     // Базовые операции CRUD
     LevelProgress createProgress(LevelProgress progress);
-    Optional<LevelProgress> getProgressById(Long id);
+    Optional<LevelProgress> getProgressById(UUID id);
     LevelProgress updateProgress(LevelProgress progress);
-    void deleteProgress(Long id);
+    void deleteProgress(UUID id);
     
     // Управление прогрессом
     LevelProgress startLevel(UUID sessionId, UUID userId, UUID levelId);
@@ -88,8 +88,8 @@ public interface LevelProgressService {
     LevelProgress moveToNextLevel(UUID sessionId, UUID userId);
     LevelProgress skipLevel(UUID sessionId, UUID userId, UUID levelId, String reason);
     LevelProgress restartLevel(UUID sessionId, UUID userId, UUID levelId);
-    List<Long> getAvailableLevels(UUID sessionId, UUID userId);
-    List<Long> getCompletedLevelSequence(UUID sessionId, UUID userId);
+    List<UUID> getAvailableLevels(UUID sessionId, UUID userId);
+    List<UUID> getCompletedLevelSequence(UUID sessionId, UUID userId);
     Long getNextLevelId(UUID sessionId, UUID userId);
     
     // Операции с сессиями
@@ -150,7 +150,7 @@ public interface LevelProgressService {
     void logProgress(LevelProgress progress);
     
     // Операции с подсказками
-    LevelProgress useHint(Long progressId, Long hintId);
+    LevelProgress useHint(Long progressId, UUID hintId);
     int getHintsUsed(UUID sessionId, UUID userId, UUID levelId);
     Double calculateHintPenalty(UUID sessionId, UUID userId, UUID levelId);
     

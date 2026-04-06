@@ -19,7 +19,7 @@ import java.util.UUID;
  * Репозиторий для работы с квестами
  */
 @Repository
-public interface QuestRepository extends JpaRepository<Quest, Long> {
+public interface QuestRepository extends JpaRepository<Quest, UUID> {
 
     // Оптимизированные запросы с индексами
     List<Quest> findByEndAtIsNullOrderByStartAtAsc();
@@ -48,10 +48,10 @@ public interface QuestRepository extends JpaRepository<Quest, Long> {
     
     // Запросы с JOIN FETCH для избежания N+1 проблемы
     @Query("SELECT q FROM Quest q LEFT JOIN FETCH q.authors WHERE q.id = :id")
-    Optional<Quest> findByIdWithAuthors(@Param("id") Long id);
+    Optional<Quest> findByIdWithAuthors(@Param("id") UUID id);
     
     @Query("SELECT q FROM Quest q LEFT JOIN FETCH q.authors LEFT JOIN FETCH q.levels WHERE q.id = :id")
-    Optional<Quest> findByIdWithAuthorsAndLevels(@Param("id") Long id);
+    Optional<Quest> findByIdWithAuthorsAndLevels(@Param("id") UUID id);
     
     // Поиск по типу и сложности
     List<Quest> findByType(QuestType type);

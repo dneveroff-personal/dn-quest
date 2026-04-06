@@ -73,7 +73,7 @@ public class UserSettingsServiceImpl implements UserSettingsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UserSettingsDTO> getUserSettingsById(Long id) {
+    public Optional<UserSettingsDTO> getUserSettingsById(UUID id) {
         log.debug("Получение настроек пользователя по id: {}", id);
         return userSettingsRepository.findById(id).map(this::mapToDto);
     }

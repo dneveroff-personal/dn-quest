@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * DTO для создания и обновления квеста
@@ -55,7 +56,7 @@ public class QuestCreateUpdateDTO {
     /**
      * ID авторов квеста
      */
-    private Set<Long> authorIds;
+    private Set<UUID> authorIds;
 
     /**
      * Дата начала квеста
@@ -317,7 +318,7 @@ public class QuestCreateUpdateDTO {
         // Очистка ID авторов
         if (authorIds != null) {
             authorIds = authorIds.stream()
-                    .filter(authorId -> authorId != null && authorId > 0)
+                    .filter(authorId -> authorId != null)
                     .collect(java.util.stream.Collectors.toSet());
         }
     }

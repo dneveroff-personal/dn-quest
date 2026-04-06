@@ -19,9 +19,9 @@ public interface ParticipationRequestService {
 
     // Базовые операции CRUD
     ParticipationRequest createRequest(ParticipationRequest request);
-    Optional<ParticipationRequest> getRequestById(Long id);
+    Optional<ParticipationRequest> getRequestById(UUID id);
     ParticipationRequest updateRequest(ParticipationRequest request);
-    void deleteRequest(Long id);
+    void deleteRequest(UUID id);
     
     // Управление запросами
     ParticipationRequest submitRequest(UUID sessionId, UUID userId, String message);
@@ -181,9 +181,9 @@ public interface ParticipationRequestService {
     List<String> getRequestNotes(Long requestId);
     
     // Операции с пакетной обработкой
-    void batchApproveRequests(List<Long> requestIds, Long approvedBy);
-    void batchRejectRequests(List<Long> requestIds, Long rejectedBy, String reason);
-    void batchCancelRequests(List<Long> requestIds, Long cancelledBy);
+    void batchApproveRequests(List<UUID> requestIds, Long approvedBy);
+    void batchRejectRequests(List<UUID> requestIds, Long rejectedBy, String reason);
+    void batchCancelRequests(List<UUID> requestIds, Long cancelledBy);
     
     // Операции с фильтрацией
     Page<ParticipationRequest> getRequestsWithFilters(

@@ -30,7 +30,7 @@ public interface GameSessionRepository extends JpaRepository<GameSession, UUID> 
 
     // Оптимизированные запросы с JOIN FETCH
     @Query("SELECT gs FROM GameSession gs LEFT JOIN FETCH gs.quest LEFT JOIN FETCH gs.user LEFT JOIN FETCH gs.team WHERE gs.id = :id")
-    Optional<GameSession> findByIdWithDetails(@Param("id") Long id);
+    Optional<GameSession> findByIdWithDetails(@Param("id") UUID id);
     
     @Query("SELECT gs FROM GameSession gs LEFT JOIN FETCH gs.quest LEFT JOIN FETCH gs.user LEFT JOIN FETCH gs.team WHERE gs.quest = :quest")
     List<GameSession> findByQuestWithDetails(@Param("quest") Quest quest);

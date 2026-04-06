@@ -187,7 +187,7 @@ public interface QuestRepository extends JpaRepository<Quest, UUID>, JpaSpecific
     @Modifying
     @Query("UPDATE Quest q SET q.status = :status, q.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE q.id IN :questIds")
-    int updateStatus(@Param("questIds") List<Long> questIds, @Param("status") QuestStatus status);
+    int updateStatus(@Param("questIds") List<UUID> questIds, @Param("status") QuestStatus status);
 
     /**
      * Архивировать квесты
@@ -196,7 +196,7 @@ public interface QuestRepository extends JpaRepository<Quest, UUID>, JpaSpecific
     @Query("UPDATE Quest q SET q.archived = true, q.archivedAt = CURRENT_TIMESTAMP, " +
            "q.archiveReason = :reason, q.published = false, q.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE q.id IN :questIds")
-    int archiveQuests(@Param("questIds") List<Long> questIds, @Param("reason") String reason);
+    int archiveQuests(@Param("questIds") List<UUID> questIds, @Param("reason") String reason);
 
     /**
      * Найти квесты для публикации (черновики, готовые к публикации)

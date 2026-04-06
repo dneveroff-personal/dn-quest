@@ -18,7 +18,7 @@ import java.util.UUID;
  * Repository для работы с подсказками уровней
  */
 @Repository
-public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, JpaSpecificationExecutor<LevelHint> {
+public interface LevelHintRepository extends JpaRepository<LevelHint, UUID>, JpaSpecificationExecutor<LevelHint> {
 
     /**
      * Найти подсказки по ID уровня с сортировкой по порядковому номеру
@@ -258,7 +258,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
     @Modifying
     @Query("UPDATE LevelHint h SET h.orderIndex = :newOrderIndex, h.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE h.id = :hintId")
-    int updateOrderIndex(@Param("hintId") Long hintId, @Param("newOrderIndex") Integer newOrderIndex);
+    int updateOrderIndex(@Param("hintId") UUID hintId, @Param("newOrderIndex") Integer newOrderIndex);
 
     /**
      * Активировать подсказки
@@ -266,7 +266,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
     @Modifying
     @Query("UPDATE LevelHint h SET h.active = true, h.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE h.id IN :hintIds")
-    int activateHints(@Param("hintIds") List<Long> hintIds);
+    int activateHints(@Param("hintIds") List<UUID> hintIds);
 
     /**
      * Деактивировать подсказки
@@ -274,7 +274,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
     @Modifying
     @Query("UPDATE LevelHint h SET h.active = false, h.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE h.id IN :hintIds")
-    int deactivateHints(@Param("hintIds") List<Long> hintIds);
+    int deactivateHints(@Param("hintIds") List<UUID> hintIds);
 
     /**
      * Удалить подсказки по ID уровня
@@ -289,7 +289,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long>, Jpa
     @Modifying
     @Query("UPDATE LevelHint h SET h.usageCount = h.usageCount + 1, h.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE h.id = :hintId")
-    int incrementUsageCount(@Param("hintId") Long hintId);
+    int incrementUsageCount(@Param("hintId") UUID hintId);
 
     /**
      * Найти дубликаты порядковых номеров для уровня

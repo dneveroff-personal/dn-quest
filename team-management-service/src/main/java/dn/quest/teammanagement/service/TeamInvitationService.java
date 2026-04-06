@@ -29,27 +29,27 @@ public interface TeamInvitationService {
     /**
      * Ответить на приглашение
      */
-    TeamInvitationDTO respondToInvitation(Long invitationId, RespondToInvitationRequest request, UUID userId);
+    TeamInvitationDTO respondToInvitation(UUID invitationId, RespondToInvitationRequest request, UUID userId);
 
     /**
      * Принять приглашение
      */
-    TeamInvitationDTO acceptInvitation(Long invitationId, UUID userId, String message);
+    TeamInvitationDTO acceptInvitation(UUID invitationId, UUID userId, String message);
 
     /**
      * Отклонить приглашение
      */
-    TeamInvitationDTO declineInvitation(Long invitationId, UUID userId, String message);
+    TeamInvitationDTO declineInvitation(UUID invitationId, UUID userId, String message);
 
     /**
      * Отозвать приглашение
      */
-    void revokeInvitation(Long invitationId, UUID revokerId);
+    void revokeInvitation(UUID invitationId, UUID revokerId);
 
     /**
      * Получить приглашение по ID
      */
-    TeamInvitationDTO getInvitationById(Long invitationId, UUID userId);
+    TeamInvitationDTO getInvitationById(UUID invitationId, UUID userId);
 
     /**
      * Получить приглашения пользователя
@@ -94,12 +94,12 @@ public interface TeamInvitationService {
     /**
      * Проверить, может ли пользователь ответить на приглашение
      */
-    boolean canRespondToInvitation(Long invitationId, UUID userId);
+    boolean canRespondToInvitation(UUID invitationId, UUID userId);
 
     /**
      * Проверить, может ли пользователь отозвать приглашение
      */
-    boolean canRevokeInvitation(Long invitationId, UUID userId);
+    boolean canRevokeInvitation(UUID invitationId, UUID userId);
 
     /**
      * Обновить статус истекших приглашений
@@ -134,7 +134,7 @@ public interface TeamInvitationService {
     /**
      * Массовый отзыв приглашений
      */
-    void bulkRevokeInvitations(UUID teamId, List<Long> invitationIds, UUID revokerId);
+    void bulkRevokeInvitations(UUID teamId, List<UUID> invitationIds, UUID revokerId);
 
     /**
      * Получить приглашения, созданные за период
@@ -171,7 +171,7 @@ public interface TeamInvitationService {
     /**
      * Отправить напоминание о приглашении
      */
-    void sendInvitationReminder(Long invitationId);
+    void sendInvitationReminder(UUID invitationId);
 
     /**
      * Получить DTO для Entity

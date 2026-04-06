@@ -5,28 +5,28 @@
 .PHONY: help build build-service dev-up dev-down dev-restart logs status clean minio-console swagger
 
 # Простые ANSI цвета (работают везде: Windows, Linux, macOS, WSL, Git Bash)
-GREEN  := \033[0;32m
-YELLOW := \033[0;33m
-RESET  := \033[0m
+GREEN  := \033[32m
+YELLOW := \033[33m
+RESET  := \033[39m
 
 help: ## Показать все команды
 	@echo "=== DN Quest — команды разработки ==="
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$    ' \( (MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf " \)(GREEN)%-25s$(RESET) %s\n",     $$1, $$    2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$    ' \( (MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf " $(GREEN)%-25s$(RESET) %s\n",     $$1, $$    2}'
 
 build: ## Полная пересборка всех сервисов
-	@echo "\( (GREEN)Пересборка всего проекта... \)(RESET)"
+	@echo "$(GREEN)Пересборка всего проекта... $(RESET)"
 	./gradlew clean build -x test --parallel
 
 build-service: ## Пересобрать один сервис: make build-service SERVICE=file-storage-service
-	@echo "$(GREEN)Пересборка \( (SERVICE)... \)(RESET)"
+	@echo "$(GREEN)Пересборка \( (SERVICE)... \)$(RESET)"
 	./gradlew :\( (SERVICE):clean : \)(SERVICE):bootJar -x test
 
 dev-up: ## Запустить dev-окружение (make dev-up SERVICE=xxx — только один)
-	@echo "\( (GREEN)Запуск dev-окружения... \)(RESET)"
+	@echo "$(GREEN)Запуск dev-окружения... $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d --build $(SERVICE)
 
 dev-down: ## Остановить и удалить всё
-	@echo "\( (YELLOW)Остановка всех сервисов... \)(RESET)"
+	@echo "$(YELLOW)Остановка всех сервисов... $(RESET)"
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans
 
 dev-restart: ## Полный перезапуск
@@ -34,31 +34,42 @@ dev-restart: ## Полный перезапуск
 	@$(MAKE) dev-up
 
 dev-common:
-	@echo "\( (GREEN) Запускаем базовые: Postgres, Redis, Zookeeper, Kafka, Minio \)(RESET)"
+	@echo "$(GREEN) Запускаем базовые: Postgres, Redis, Zookeeper, Kafka, Minio $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
 
 dev-auth:
-	@echo "\( (GREEN) Запускаем authentication сервис \)(RESET)"
+	@echo "$(GREEN) Запускаем authentication сервис $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d authentication-service-dev
 
 dev-user-file:
-	@echo "\( (GREEN) Запускаем user-management и file-storage сервисы \)(RESET)"
+	@echo "$(GREEN) Запускаем user-management и file-storage сервисы $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d user-management-service-dev file-storage-service-dev
 
-dev-quest-team:
-	@echo "\( (GREEN) Запускаем quest-management и team-management сервисы \)(RESET)"
-	docker compose -f docker-compose.dev.yml up -d quest-management-service-dev team-management-service-dev
+dev-quest:
+	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d quest-management-service-dev
+
+dev-team:
+	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d team-management-service-dev
+
+dev-team:
+	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d team-management-service-dev
+
+dev-game:
+	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d game-engine-service-dev
 
 dev-ready:
-	@echo "\( (GREEN) Запускаем 1 этап \)(RESET)"
+	@echo "$(GREEN) Запускаем 1 этап $(RESET)"
 	$(MAKE) dev-common
-	$(MAKE) dev-auth
-	$(MAKE) dev-user-file
+	docker compose -f docker-compose.dev.yml up -d authentication-service-dev user-management-service-dev file-storage-service-dev quest-management-service-dev team-management-service-dev
 
 dev-test:
-	@echo "\( (GREEN) Запускаем 1 этап \)(RESET)"
+	@echo "$(GREEN) Запускаем 1 этап $(RESET)"
 	$(MAKE) dev-ready
-	$(MAKE) dev-quest-team
+	$(MAKE) dev-game
 
 logs: ## Показать логи сервиса: make logs SERVICE=file-storage-service
 	docker compose -f docker-compose.dev.yml logs -f $(SERVICE)
@@ -67,7 +78,7 @@ status: ## Статус всех контейнеров
 	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 clean: ## Полная очистка проекта
-	@echo "\( (YELLOW)Полная очистка... \)(RESET)"
+	@echo "$(YELLOW)Полная очистка... $(RESET)"
 	./gradlew clean
 	rm -rf */build/ .gradle/ build/
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans

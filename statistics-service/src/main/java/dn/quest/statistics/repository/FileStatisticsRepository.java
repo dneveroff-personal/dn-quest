@@ -19,7 +19,7 @@ import java.util.UUID;
  * Репозиторий для работы с файловой статистикой
  */
 @Repository
-public interface FileStatisticsRepository extends JpaRepository<FileStatistics, Long> {
+public interface FileStatisticsRepository extends JpaRepository<FileStatistics, UUID> {
 
     /**
      * Найти статистику файла по ID и дате

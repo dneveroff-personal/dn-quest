@@ -19,7 +19,7 @@ USER dnquest
 EXPOSE ${PORT}
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/actuator/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/api/actuator/health || exit 1
 
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

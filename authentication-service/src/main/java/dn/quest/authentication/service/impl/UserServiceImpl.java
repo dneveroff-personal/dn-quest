@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Реализация сервиса управления пользователями
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -101,7 +102,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         log.debug("Удаление пользователя с ID: {}", id);
         User user = findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
@@ -111,7 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User toggleUserStatus(Long id, boolean isActive) {
+    public User toggleUserStatus(UUID id, boolean isActive) {
         log.debug("Изменение статуса пользователя с ID: {} на {}", id, isActive);
         User user = findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
@@ -126,7 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changeUserRole(Long id, UserRole newRole) {
+    public User changeUserRole(UUID id, UserRole newRole) {
         log.debug("Изменение роли пользователя с ID: {} на {}", id, newRole);
         User user = findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));

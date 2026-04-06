@@ -38,7 +38,7 @@ public interface UserManagementServiceClient {
      * Получение списка пользователей по IDs
      */
     @PostMapping("/api/users/batch")
-    List<UserDTO> getUsersByIds(@RequestBody List<Long> userIds);
+    List<UserDTO> getUsersByIds(@RequestBody List<UUID> userIds);
 
     /**
      * Поиск пользователей

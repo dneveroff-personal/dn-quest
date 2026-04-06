@@ -19,9 +19,9 @@ public interface CodeAttemptService {
 
     // Базовые операции CRUD
     CodeAttempt createAttempt(CodeAttempt attempt);
-    Optional<CodeAttempt> getAttemptById(Long id);
+    Optional<CodeAttempt> getAttemptById(UUID id);
     CodeAttempt updateAttempt(CodeAttempt attempt);
-    void deleteAttempt(Long id);
+    void deleteAttempt(UUID id);
     
     // Основная игровая логика
     CodeAttempt submitCode(UUID sessionId, UUID userId, String code, String sector);

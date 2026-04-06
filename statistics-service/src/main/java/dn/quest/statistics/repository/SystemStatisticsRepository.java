@@ -13,12 +13,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с системной статистикой
  */
 @Repository
-public interface SystemStatisticsRepository extends JpaRepository<SystemStatistics, Long> {
+public interface SystemStatisticsRepository extends JpaRepository<SystemStatistics, UUID> {
 
     /**
      * Найти статистику по дате и метрике
@@ -108,7 +109,7 @@ public interface SystemStatisticsRepository extends JpaRepository<SystemStatisti
      */
     @Modifying
     @Query("UPDATE SystemStatistics s SET s.value = :value, s.lastUpdatedAt = :updatedAt WHERE s.id = :id")
-    int updateMetricValue(@Param("id") Long id, @Param("value") Double value, @Param("updatedAt") LocalDateTime updatedAt);
+    int updateMetricValue(@Param("id") UUID id, @Param("value") Double value, @Param("updatedAt") LocalDateTime updatedAt);
 
     /**
      * Обновить статистику метрики
@@ -123,7 +124,7 @@ public interface SystemStatisticsRepository extends JpaRepository<SystemStatisti
            "s.totalValue = :totalValue, " +
            "s.lastUpdatedAt = :updatedAt " +
            "WHERE s.id = :id")
-    int updateMetricStats(@Param("id") Long id, 
+    int updateMetricStats(@Param("id") UUID id,
                          @Param("value") Double value, 
                          @Param("count") Long count,
                          @Param("minValue") Double minValue, 
@@ -137,14 +138,14 @@ public interface SystemStatisticsRepository extends JpaRepository<SystemStatisti
      */
     @Modifying
     @Query("UPDATE SystemStatistics s SET s.count = s.count + 1, s.lastUpdatedAt = :updatedAt WHERE s.id = :id")
-    int incrementMetricCount(@Param("id") Long id, @Param("updatedAt") LocalDateTime updatedAt);
+    int incrementMetricCount(@Param("id") UUID id, @Param("updatedAt") LocalDateTime updatedAt);
 
     /**
      * Добавить к общему значению
      */
     @Modifying
     @Query("UPDATE SystemStatistics s SET s.totalValue = s.totalValue + :value, s.lastUpdatedAt = :updatedAt WHERE s.id = :id")
-    int addToTotalValue(@Param("id") Long id, @Param("value") Double value, @Param("updatedAt") LocalDateTime updatedAt);
+    int addToTotalValue(@Param("id") UUID id, @Param("value") Double value, @Param("updatedAt") LocalDateTime updatedAt);
 
     /**
      * Получить уникальные категории

@@ -19,7 +19,7 @@ public interface UserManagementServiceClient {
      * Получить информацию о пользователе по ID
      */
     @GetMapping("/api/users/{id}")
-    UserDTO getUserById(@PathVariable("id") Long id);
+    UserDTO getUserById(@PathVariable("id") UUID id);
 
     /**
      * Получить информацию о пользователе по username
@@ -31,7 +31,7 @@ public interface UserManagementServiceClient {
      * Получить пользователей по списку ID
      */
     @GetMapping("/api/users/batch")
-    List<UserDTO> getUsersByIds(@RequestHeader("X-User-Ids") List<Long> userIds);
+    List<UserDTO> getUsersByIds(@RequestHeader("X-User-Ids") List<UUID> userIds);
 
     /**
      * Получить авторов квестов

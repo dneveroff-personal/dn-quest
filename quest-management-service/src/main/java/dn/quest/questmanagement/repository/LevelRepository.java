@@ -195,7 +195,7 @@ public interface LevelRepository extends JpaRepository<Level, UUID>, JpaSpecific
     @Modifying
     @Query("UPDATE Level l SET l.active = true, l.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE l.id IN :levelIds")
-    int activateLevels(@Param("levelIds") List<Long> levelIds);
+    int activateLevels(@Param("levelIds") List<UUID> levelIds);
 
     /**
      * Деактивировать уровни
@@ -203,7 +203,7 @@ public interface LevelRepository extends JpaRepository<Level, UUID>, JpaSpecific
     @Modifying
     @Query("UPDATE Level l SET l.active = false, l.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE l.id IN :levelIds")
-    int deactivateLevels(@Param("levelIds") List<Long> levelIds);
+    int deactivateLevels(@Param("levelIds") List<UUID> levelIds);
 
     /**
      * Удалить уровни по ID квеста

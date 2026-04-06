@@ -17,7 +17,7 @@ import java.util.UUID;
  * Repository для работы с отзывами на квесты
  */
 @Repository
-public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> {
+public interface QuestReviewRepository extends JpaRepository<QuestReview, UUID> {
 
     /**
      * Найти отзыв квеста от пользователя

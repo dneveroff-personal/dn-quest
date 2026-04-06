@@ -93,7 +93,7 @@ public record GameSessionDTO(
     @Schema(description = "Краткая информация о квесте")
     public record QuestSummaryDTO(
         @Schema(description = "ID квеста", example = "456")
-        Long id,
+        UUID id,
         
         @Schema(description = "Название квеста", example = "Тайна старого замка")
         String name,
@@ -117,7 +117,7 @@ public record GameSessionDTO(
     @Schema(description = "Краткая информация о пользователе")
     public record UserSummaryDTO(
         @Schema(description = "ID пользователя", example = "123")
-        Long id,
+        UUID id,
         
         @Schema(description = "Имя пользователя", example = "john_doe")
         String username,
@@ -138,7 +138,7 @@ public record GameSessionDTO(
     @Schema(description = "Краткая информации о команде")
     public record TeamSummaryDTO(
         @Schema(description = "ID команды", example = "789")
-        Long id,
+        UUID id,
         
         @Schema(description = "Название команды", example = "Мстители")
         String name,

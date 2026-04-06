@@ -15,12 +15,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с приглашениями в команды
  */
 @Repository
-public interface TeamInvitationRepository extends JpaRepository<TeamInvitation, Long> {
+public interface TeamInvitationRepository extends JpaRepository<TeamInvitation, UUID> {
 
     /**
      * Найти приглашения пользователя

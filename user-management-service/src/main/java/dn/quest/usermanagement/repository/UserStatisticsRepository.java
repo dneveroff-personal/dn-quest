@@ -17,7 +17,7 @@ import java.util.UUID;
  * Repository для работы со статистикой пользователей
  */
 @Repository
-public interface UserStatisticsRepository extends JpaRepository<UserStatistics, Long> {
+public interface UserStatisticsRepository extends JpaRepository<UserStatistics, UUID> {
 
     // Базовые запросы
     Optional<UserStatistics> findByUserId(UUID userId);

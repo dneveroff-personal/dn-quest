@@ -20,7 +20,7 @@ import java.util.UUID;
  * Репозиторий для работы с игровой статистикой
  */
 @Repository
-public interface GameStatisticsRepository extends JpaRepository<GameStatistics, Long> {
+public interface GameStatisticsRepository extends JpaRepository<GameStatistics, UUID> {
 
     /**
      * Найти статистику игровой сессии по ID

@@ -257,7 +257,7 @@ class InvitationController {
 
     @GetMapping("/{invitationId}")
     public ResponseEntity<TeamInvitationDTO> getInvitationById(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Getting invitation: {} by user: {}", invitationId, userDetails.getUsername());
@@ -271,7 +271,7 @@ class InvitationController {
     @PutMapping("/{invitationId}/respond")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamInvitationDTO> respondToInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @Valid @RequestBody RespondToInvitationRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -287,7 +287,7 @@ class InvitationController {
     @PutMapping("/{invitationId}/accept")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamInvitationDTO> acceptInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @RequestParam(required = false) String message,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -302,7 +302,7 @@ class InvitationController {
     @PutMapping("/{invitationId}/decline")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<TeamInvitationDTO> declineInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @RequestParam(required = false) String message,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -317,7 +317,7 @@ class InvitationController {
     @DeleteMapping("/{invitationId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> revokeInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Revoking invitation: {} by user: {}", invitationId, userDetails.getUsername());
@@ -331,7 +331,7 @@ class InvitationController {
     @PostMapping("/{invitationId}/reminder")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> sendInvitationReminder(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Sending reminder for invitation: {} by user: {}", invitationId, userDetails.getUsername());
@@ -343,7 +343,7 @@ class InvitationController {
 
     @GetMapping("/{invitationId}/can-respond")
     public ResponseEntity<Boolean> canRespondToInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Checking if user {} can respond to invitation: {}", userDetails.getUsername(), invitationId);
@@ -356,7 +356,7 @@ class InvitationController {
 
     @GetMapping("/{invitationId}/can-revoke")
     public ResponseEntity<Boolean> canRevokeInvitation(
-            @PathVariable Long invitationId,
+            @PathVariable UUID invitationId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         log.debug("Checking if user {} can revoke invitation: {}", userDetails.getUsername(), invitationId);

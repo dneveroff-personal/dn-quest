@@ -19,7 +19,7 @@ import java.util.UUID;
  * Repository для работы с медиа файлами квестов
  */
 @Repository
-public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, JpaSpecificationExecutor<QuestMedia> {
+public interface QuestMediaRepository extends JpaRepository<QuestMedia, UUID>, JpaSpecificationExecutor<QuestMedia> {
 
     /**
      * Найти медиа по ID квеста
@@ -302,7 +302,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     @Modifying
     @Query("UPDATE QuestMedia m SET m.active = true, m.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE m.id IN :mediaIds")
-    int activateMedia(@Param("mediaIds") List<Long> mediaIds);
+    int activateMedia(@Param("mediaIds") List<UUID> mediaIds);
 
     /**
      * Деактивировать медиа
@@ -310,7 +310,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     @Modifying
     @Query("UPDATE QuestMedia m SET m.active = false, m.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE m.id IN :mediaIds")
-    int deactivateMedia(@Param("mediaIds") List<Long> mediaIds);
+    int deactivateMedia(@Param("mediaIds") List<UUID> mediaIds);
 
     /**
      * Установить обложку квеста

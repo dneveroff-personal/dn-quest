@@ -175,7 +175,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationSentEvent extends BaseEvent {
-        private Long invitationId;
+        private UUID invitationId;
         private UUID teamId;
         private String teamName;
         private Long invitedUserId;
@@ -195,7 +195,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationAcceptedEvent extends BaseEvent {
-        private Long invitationId;
+        private UUID invitationId;
         private UUID teamId;
         private String teamName;
         private UUID userId;
@@ -212,7 +212,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationDeclinedEvent extends BaseEvent {
-        private Long invitationId;
+        private UUID invitationId;
         private UUID teamId;
         private String teamName;
         private UUID userId;
@@ -229,7 +229,7 @@ public class TeamEvent {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class TeamInvitationRevokedEvent extends BaseEvent {
-        private Long invitationId;
+        private UUID invitationId;
         private UUID teamId;
         private String teamName;
         private Long revokedUserId;

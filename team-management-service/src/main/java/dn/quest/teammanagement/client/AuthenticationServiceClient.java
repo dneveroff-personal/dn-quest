@@ -90,7 +90,7 @@ public interface AuthenticationServiceClient {
      * Получение списка пользователей по IDs
      */
     @PostMapping("/api/users/batch")
-    java.util.List<UserDTO> getUsersByIds(@RequestBody java.util.List<Long> userIds);
+    java.util.List<UserDTO> getUsersByIds(@RequestBody java.util.List<UUID> userIds);
 
     /**
      * Поиск пользователей

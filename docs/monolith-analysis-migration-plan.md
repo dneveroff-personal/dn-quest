@@ -551,7 +551,7 @@ public record QuestDeletedEvent(UUID questId) {}
 @FeignClient(name = "user-management-service")
 public interface UserServiceClient {
     @GetMapping("/api/users/{id}")
-    UserDTO getUserById(@PathVariable("id") Long id);
+    UserDTO getUserById(@PathVariable("id") UUID id);
     
     @GetMapping("/api/users/search")
     List<UserDTO> searchUsers(@RequestParam("query") String query);
@@ -578,16 +578,16 @@ public interface UserServiceClient {
 @FeignClient(name = "quest-management-service")
 public interface QuestServiceClient {
     @GetMapping("/api/quests/{id}")
-    QuestDTO getQuestById(@PathVariable("id") Long id);
+    QuestDTO getQuestById(@PathVariable("id") UUID id);
     
     @GetMapping("/api/levels/{id}")
-    LevelDTO getLevelById(@PathVariable("id") Long id);
+    LevelDTO getLevelById(@PathVariable("id") UUID id);
 }
 
 @FeignClient(name = "team-management-service")
 public interface TeamServiceClient {
     @GetMapping("/api/teams/{id}")
-    TeamDTO getTeamById(@PathVariable("id") Long id);
+    TeamDTO getTeamById(@PathVariable("id") UUID id);
 }
 ```
 
@@ -651,7 +651,7 @@ public class FileStorageController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> getFile(@PathVariable Long id) {
+    public ResponseEntity<Resource> getFile(@PathVariable UUID id) {
         // Получение файла
     }
     
@@ -744,13 +744,13 @@ public interface UserValidationClient {
 @FeignClient(name = "quest-management-service")
 public interface QuestInfoClient {
     @GetMapping("/api/quests/{id}")
-    QuestDTO getQuestById(@PathVariable Long id);
+    QuestDTO getQuestById(@PathVariable UUID id);
     
     @GetMapping("/api/levels/{id}")
-    LevelDTO getLevelById(@PathVariable Long id);
+    LevelDTO getLevelById(@PathVariable UUID id);
     
     @GetMapping("/api/levels/{id}/codes")
-    List<CodeDTO> getLevelCodes(@PathVariable Long id);
+    List<CodeDTO> getLevelCodes(@PathVariable UUID id);
 }
 ```
 
@@ -760,10 +760,10 @@ public interface QuestInfoClient {
 @FeignClient(name = "team-management-service")
 public interface TeamInfoClient {
     @GetMapping("/api/teams/{id}")
-    TeamDTO getTeamById(@PathVariable Long id);
+    TeamDTO getTeamById(@PathVariable UUID id);
     
     @GetMapping("/api/teams/{id}/members")
-    List<UserDTO> getTeamMembers(@PathVariable Long id);
+    List<UserDTO> getTeamMembers(@PathVariable UUID id);
 }
 ```
 

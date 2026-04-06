@@ -28,7 +28,7 @@ public class QuestEvent extends BaseDTO {
     private String questType;
     private String category;
     private Set<String> tags;
-    private Set<Long> authorIds;
+    private Set<UUID> authorIds;
     private String status;
     private LocalDateTime timestamp;
     private UUID userId;

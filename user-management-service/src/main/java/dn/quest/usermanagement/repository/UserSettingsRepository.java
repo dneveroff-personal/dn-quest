@@ -14,7 +14,7 @@ import java.util.UUID;
  * Repository для работы с настройками пользователей
  */
 @Repository
-public interface UserSettingsRepository extends JpaRepository<UserSettings, Long> {
+public interface UserSettingsRepository extends JpaRepository<UserSettings, UUID> {
 
     // Базовые запросы
     Optional<UserSettings> findByUserId(UUID userId);
@@ -103,11 +103,11 @@ public interface UserSettingsRepository extends JpaRepository<UserSettings, Long
 
     // Массовые операции для обновления настроек
     @Query("UPDATE UserSettings us SET us.emailNotifications = :enabled WHERE us.userId IN :userIds")
-    void updateEmailNotificationsForUsers(@Param("userIds") List<Long> userIds, @Param("enabled") Boolean enabled);
+    void updateEmailNotificationsForUsers(@Param("userIds") List<UUID> userIds, @Param("enabled") Boolean enabled);
 
     @Query("UPDATE UserSettings us SET us.theme = :theme WHERE us.userId IN :userIds")
-    void updateThemeForUsers(@Param("userIds") List<Long> userIds, @Param("theme") String theme);
+    void updateThemeForUsers(@Param("userIds") List<UUID> userIds, @Param("theme") String theme);
 
     @Query("UPDATE UserSettings us SET us.language = :language WHERE us.userId IN :userIds")
-    void updateLanguageForUsers(@Param("userIds") List<Long> userIds, @Param("language") String language);
+    void updateLanguageForUsers(@Param("userIds") List<UUID> userIds, @Param("language") String language);
 }

@@ -18,11 +18,11 @@ public interface UserService {
 
     // Базовые операции CRUD
     User createUser(User user);
-    Optional<User> getUserById(Long id);
+    Optional<User> getUserById(UUID id);
     Optional<User> getUserByUsername(String username);
     Optional<User> getUserByEmail(String email);
     User updateUser(User user);
-    void deleteUser(Long id);
+    void deleteUser(UUID id);
     
     // Управление профилем
     User updateProfile(UUID userId, String firstName, String lastName, String bio);
@@ -88,15 +88,15 @@ public interface UserService {
     boolean hasAnyRole(UUID userId, List<UserRole> roles);
     
     // Управление сессиями
-    List<Long> getUserActiveSessions(UUID userId);
-    List<Long> getUserCompletedSessions(UUID userId);
+    List<UUID> getUserActiveSessions(UUID userId);
+    List<UUID> getUserCompletedSessions(UUID userId);
     void addUserToSession(UUID userId, UUID sessionId);
     void removeUserFromSession(UUID userId, UUID sessionId);
     boolean isUserInSession(UUID userId, UUID sessionId);
     
     // Управление командами
-    List<Long> getUserTeams(UUID userId);
-    List<Long> getUserOwnedTeams(UUID userId);
+    List<UUID> getUserTeams(UUID userId);
+    List<UUID> getUserOwnedTeams(UUID userId);
     void addUserToTeam(UUID userId, UUID teamId);
     void removeUserFromTeam(UUID userId, UUID teamId);
     boolean isUserInTeam(UUID userId, UUID teamId);
@@ -250,8 +250,8 @@ public interface UserService {
     
     // Операции с рекомендациями
     List<User> getRecommendedFriends(UUID userId, int limit);
-    List<Long> getRecommendedQuests(UUID userId, int limit);
-    List<Long> getRecommendedTeams(UUID userId, int limit);
+    List<UUID> getRecommendedQuests(UUID userId, int limit);
+    List<UUID> getRecommendedTeams(UUID userId, int limit);
     Map<String, Object> getPersonalizedRecommendations(UUID userId);
     
     // Операции с геймификацией

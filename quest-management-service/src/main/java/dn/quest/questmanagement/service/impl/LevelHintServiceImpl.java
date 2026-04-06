@@ -62,7 +62,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional
-    public LevelHintDTO updateHint(Long id, LevelHintDTO dto) {
+    public LevelHintDTO updateHint(UUID id, LevelHintDTO dto) {
         log.info("Updating hint with ID: {}", id);
 
         LevelHint hint = getHintEntityById(id);
@@ -91,7 +91,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional
-    public void deleteHint(Long id) {
+    public void deleteHint(UUID id) {
         log.info("Deleting hint with ID: {}", id);
 
         LevelHint hint = getHintEntityById(id);
@@ -101,7 +101,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional(readOnly = true)
-    public LevelHintDTO getHintById(Long id) {
+    public LevelHintDTO getHintById(UUID id) {
         LevelHint hint = getHintEntityById(id);
         return convertToDTO(hint);
     }
@@ -129,7 +129,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional(readOnly = true)
-    public HintAvailabilityResult checkHintAvailability(Long hintId, UUID userId) {
+    public HintAvailabilityResult checkHintAvailability(UUID hintId, UUID userId) {
         LevelHint hint = getHintEntityById(hintId);
         LocalDateTime now = LocalDateTime.now();
 
@@ -169,7 +169,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     @Override
     @Transactional
-    public LevelHintDTO toggleHintActive(Long hintId, boolean active) {
+    public LevelHintDTO toggleHintActive(UUID hintId, boolean active) {
         log.info("Toggling hint with ID: {} to active: {}", hintId, active);
 
         LevelHint hint = getHintEntityById(hintId);
@@ -184,7 +184,7 @@ public class LevelHintServiceImpl implements LevelHintService {
 
     // Вспомогательные методы
 
-    private LevelHint getHintEntityById(Long id) {
+    private LevelHint getHintEntityById(UUID id) {
         return levelHintRepository.findById(id)
                 .orElseThrow(() -> new LevelHintNotFoundException("Hint not found with ID: " + id));
     }

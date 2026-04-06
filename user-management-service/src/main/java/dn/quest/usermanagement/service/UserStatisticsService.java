@@ -26,7 +26,7 @@ public interface UserStatisticsService {
     /**
      * Получает статистику пользователя по ID статистики
      */
-    Optional<UserStatisticsDTO> getUserStatisticsById(Long id);
+    Optional<UserStatisticsDTO> getUserStatisticsById(UUID id);
 
     /**
      * Добавляет опыт пользователю

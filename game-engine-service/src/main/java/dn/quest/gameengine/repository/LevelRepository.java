@@ -11,12 +11,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с уровнями
  */
 @Repository
-public interface LevelRepository extends JpaRepository<Level, Long> {
+public interface LevelRepository extends JpaRepository<Level, UUID> {
 
     // Базовые запросы
     List<Level> findByQuest(Quest quest);

@@ -18,9 +18,9 @@ public interface LevelCompletionService {
 
     // Базовые операции CRUD
     LevelCompletion createCompletion(LevelCompletion completion);
-    Optional<LevelCompletion> getCompletionById(Long id);
+    Optional<LevelCompletion> getCompletionById(UUID id);
     LevelCompletion updateCompletion(LevelCompletion completion);
-    void deleteCompletion(Long id);
+    void deleteCompletion(UUID id);
     
     // Управление завершением уровней
     LevelCompletion completeLevel(UUID sessionId, UUID userId, UUID levelId, String code, Double timeSpent, Double score);
@@ -161,7 +161,7 @@ public interface LevelCompletionService {
     // Операции с подсказками
     int getHintsUsedCount(Long completionId);
     Double calculateHintPenalty(int hintsUsed);
-    List<Long> getHintsUsedInCompletion(Long completionId);
+    List<UUID> getHintsUsedInCompletion(Long completionId);
     
     // Сравнительный анализ
     List<LevelCompletion> getSimilarCompletions(LevelCompletion completion, int limit);
