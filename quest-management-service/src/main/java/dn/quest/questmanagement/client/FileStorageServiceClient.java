@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Feign клиент для интеграции с File Storage Service
@@ -22,8 +23,8 @@ public interface FileStorageServiceClient {
     @PostMapping(value = "/api/files/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<FileUploadResponseDTO> uploadFile(
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "questId", required = false) Long questId,
-            @RequestParam(value = "levelId", required = false) Long levelId,
+            @RequestParam(value = "questId", required = false) UUID questId,
+            @RequestParam(value = "levelId", required = false) UUID levelId,
             @RequestParam(value = "mediaType", required = false) String mediaType,
             @RequestParam(value = "isPublic", required = false, defaultValue = "true") Boolean isPublic
     );
@@ -50,13 +51,13 @@ public interface FileStorageServiceClient {
      * Получить файлы квеста
      */
     @GetMapping("/api/files/quest/{questId}")
-    ResponseEntity<List<FileInfoDTO>> getQuestFiles(@PathVariable("questId") Long questId);
+    ResponseEntity<List<FileInfoDTO>> getQuestFiles(@PathVariable("questId") UUID questId);
 
     /**
      * Получить файлы уровня
      */
     @GetMapping("/api/files/level/{levelId}")
-    ResponseEntity<List<FileInfoDTO>> getLevelFiles(@PathVariable("levelId") Long levelId);
+    ResponseEntity<List<FileInfoDTO>> getLevelFiles(@PathVariable("levelId") UUID levelId);
 
     /**
      * Получить публичные файлы
@@ -70,8 +71,8 @@ public interface FileStorageServiceClient {
     @PostMapping("/api/files/{sourceFileId}/copy")
     ResponseEntity<FileInfoDTO> copyFile(
             @PathVariable("sourceFileId") Long sourceFileId,
-            @RequestParam(value = "questId", required = false) Long questId,
-            @RequestParam(value = "levelId", required = false) Long levelId
+            @RequestParam(value = "questId", required = false) UUID questId,
+            @RequestParam(value = "levelId", required = false) UUID levelId
     );
 
     /**
@@ -137,8 +138,8 @@ public interface FileStorageServiceClient {
         private String description;
         private Integer displayOrder;
         private Boolean isPublic;
-        private Long questId;
-        private Long levelId;
+        private UUID questId;
+        private UUID levelId;
         private String createdAt;
         private String updatedAt;
         private String downloadUrl;
@@ -174,11 +175,11 @@ public interface FileStorageServiceClient {
         public Boolean getIsPublic() { return isPublic; }
         public void setIsPublic(Boolean isPublic) { this.isPublic = isPublic; }
 
-        public Long getQuestId() { return questId; }
-        public void setQuestId(Long questId) { this.questId = questId; }
+        public UUID getQuestId() { return questId; }
+        public void setQuestId(UUID questId) { this.questId = questId; }
 
-        public Long getLevelId() { return levelId; }
-        public void setLevelId(Long levelId) { this.levelId = levelId; }
+        public UUID getLevelId() { return levelId; }
+        public void setLevelId(UUID levelId) { this.levelId = levelId; }
 
         public String getCreatedAt() { return createdAt; }
         public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }

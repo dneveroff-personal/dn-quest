@@ -1,8 +1,8 @@
 -- Создание таблицы quest_media
 CREATE TABLE quest_media (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
-    level_id BIGINT, -- может быть null, если медиа относится ко всему квесту
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
+    level_id UUID, -- может быть null, если медиа относится ко всему квесту
     file_name VARCHAR(255) NOT NULL,
     original_file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,

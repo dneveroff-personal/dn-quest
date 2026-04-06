@@ -65,7 +65,7 @@ public interface StatisticsAggregationService {
     /**
      * Агрегация статистики квеста
      */
-    void aggregateQuestStatistics(Long questId, java.time.LocalDate date);
+    void aggregateQuestStatistics(UUID questId, java.time.LocalDate date);
 
     /**
      * Агрегация статистики команды

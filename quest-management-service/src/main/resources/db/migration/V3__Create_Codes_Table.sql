@@ -1,7 +1,7 @@
 -- Создание таблицы codes
 CREATE TABLE codes (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     value VARCHAR(255) NOT NULL,
     type VARCHAR(50) NOT NULL,
     hint TEXT,
@@ -9,7 +9,7 @@ CREATE TABLE codes (
     active BOOLEAN DEFAULT true,
     usage_limit INTEGER, -- лимит использований (null - без лимита)
     usage_count INTEGER DEFAULT 0,
-    used_by BIGINT[], -- массив ID пользователей, использовавших код
+    used_by UUID[], -- массив ID пользователей, использовавших код
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     

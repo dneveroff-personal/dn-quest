@@ -113,7 +113,7 @@ public class AnalyticsController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             
             @Parameter(description = "ID квеста для фильтрации") 
-            @RequestParam(required = false) Long questId,
+            @RequestParam(required = false) UUID questId,
             
             @Parameter(description = "ID пользователя для фильтрации") 
             @RequestParam(required = false) UUID userId) {

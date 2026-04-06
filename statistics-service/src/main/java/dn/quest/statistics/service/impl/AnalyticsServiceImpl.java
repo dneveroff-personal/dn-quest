@@ -203,7 +203,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, UUID userId) {
+    public Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, UUID questId, UUID userId) {
         log.info("Getting game session report from {} to {} quest: {} user: {}", startDate, endDate, questId, userId);
         
         try {

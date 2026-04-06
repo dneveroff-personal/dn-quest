@@ -215,8 +215,8 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class GameSessionStatisticsDataDTO {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;

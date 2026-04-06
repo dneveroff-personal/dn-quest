@@ -22,17 +22,17 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
     /**
      * Найти отзыв квеста от пользователя
      */
-    Optional<QuestReview> findByQuestIdAndUserId(Long questId, UUID userId);
+    Optional<QuestReview> findByQuestIdAndUserId(UUID questId, UUID userId);
 
     /**
      * Найти все видимые отзывы квеста с пагинацией
      */
-    Page<QuestReview> findByQuestIdAndIsVisibleTrue(Long questId, Pageable pageable);
+    Page<QuestReview> findByQuestIdAndIsVisibleTrue(UUID questId, Pageable pageable);
 
     /**
      * Найти все отзывы квеста (включая скрытые)
      */
-    Page<QuestReview> findByQuestId(Long questId, Pageable pageable);
+    Page<QuestReview> findByQuestId(UUID questId, Pageable pageable);
 
     /**
      * Найти все отзывы пользователя
@@ -49,14 +49,14 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
      */
     @Modifying
     @Query("DELETE FROM QuestReview r WHERE r.questId = :questId AND r.userId = :userId")
-    void deleteByQuestIdAndUserId(@Param("questId") Long questId, @Param("userId") UUID userId);
+    void deleteByQuestIdAndUserId(@Param("questId") UUID questId, @Param("userId") UUID userId);
 
     /**
      * Удалить все отзывы квеста
      */
     @Modifying
     @Query("DELETE FROM QuestReview r WHERE r.questId = :questId")
-    void deleteByQuestId(@Param("questId") Long questId);
+    void deleteByQuestId(@Param("questId") UUID questId);
 
     /**
      * Удалить все отзывы пользователя
@@ -69,13 +69,13 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
      * Подсчитать количество отзывов квеста
      */
     @Query("SELECT COUNT(r) FROM QuestReview r WHERE r.questId = :questId")
-    long countByQuestId(@Param("questId") Long questId);
+    long countByQuestId(@Param("questId") UUID questId);
 
     /**
      * Подсчитать количество видимых отзывов квеста
      */
     @Query("SELECT COUNT(r) FROM QuestReview r WHERE r.questId = :questId AND r.isVisible = true")
-    long countVisibleByQuestId(@Param("questId") Long questId);
+    long countVisibleByQuestId(@Param("questId") UUID questId);
 
     /**
      * Подсчитать количество отзывов пользователя
@@ -86,17 +86,17 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
     /**
      * Найти отзывы с определенным рейтингом для квеста
      */
-    Page<QuestReview> findByQuestIdAndRatingAndIsVisibleTrue(Long questId, Integer rating, Pageable pageable);
+    Page<QuestReview> findByQuestIdAndRatingAndIsVisibleTrue(UUID questId, Integer rating, Pageable pageable);
 
     /**
      * Найти отзывы с определенным рейтингом
      */
-    List<QuestReview> findByQuestIdAndRating(Long questId, Integer rating);
+    List<QuestReview> findByQuestIdAndRating(UUID questId, Integer rating);
 
     /**
      * Проверить существование отзыва
      */
-    boolean existsByQuestIdAndUserId(Long questId, UUID userId);
+    boolean existsByQuestIdAndUserId(UUID questId, UUID userId);
 
     /**
      * Найти отзывы, созданные в определенном периоде
@@ -109,7 +109,7 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
      * Найти последние отзывы квеста
      */
     @Query("SELECT r FROM QuestReview r WHERE r.questId = :questId AND r.isVisible = true ORDER BY r.createdAt DESC")
-    List<QuestReview> findLatestByQuestId(@Param("questId") Long questId, Pageable pageable);
+    List<QuestReview> findLatestByQuestId(@Param("questId") UUID questId, Pageable pageable);
 
     /**
      * Найти последние отзывы пользователя
@@ -131,7 +131,7 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
     @Query("SELECT r FROM QuestReview r WHERE r.questId = :questId AND r.isVisible = true AND " +
            "(LOWER(r.title) LIKE LOWER(CONCAT('%', :searchText, '%')) OR " +
            "LOWER(r.content) LIKE LOWER(CONCAT('%', :searchText, '%')))")
-    Page<QuestReview> findByQuestIdAndTextSearch(@Param("questId") Long questId, 
+    Page<QuestReview> findByQuestIdAndTextSearch(@Param("questId") UUID questId, 
                                                @Param("searchText") String searchText, 
                                                Pageable pageable);
 
@@ -139,13 +139,13 @@ public interface QuestReviewRepository extends JpaRepository<QuestReview, Long> 
      * Получить средний рейтинг по отзывам квеста
      */
     @Query("SELECT COALESCE(AVG(r.rating), 0.0) FROM QuestReview r WHERE r.questId = :questId AND r.rating IS NOT NULL AND r.isVisible = true")
-    Double getAverageRatingByQuestId(@Param("questId") Long questId);
+    Double getAverageRatingByQuestId(@Param("questId") UUID questId);
 
     /**
      * Получить статистику рейтингов по отзывам для квеста
      */
     @Query("SELECT r.rating, COUNT(r) FROM QuestReview r WHERE r.questId = :questId AND r.rating IS NOT NULL AND r.isVisible = true GROUP BY r.rating ORDER BY r.rating")
-    List<Object[]> getRatingStatsByQuestId(@Param("questId") Long questId);
+    List<Object[]> getRatingStatsByQuestId(@Param("questId") UUID questId);
 
     /**
      * Найти отзывы для модерации

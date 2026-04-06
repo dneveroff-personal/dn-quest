@@ -191,12 +191,6 @@ public class Leaderboard {
     private Double avgCompletionTime;
 
     /**
-     * Количество оценок
-     */
-    @Column(name = "ratings_count")
-    private Integer ratingsCount;
-
-    /**
      * Средняя оценка
      */
     @Column(name = "avg_rating")

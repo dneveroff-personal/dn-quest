@@ -31,21 +31,21 @@ public interface QuestService {
     Optional<Level> getLevelById(Long id);
     Level updateLevel(Level level);
     void deleteLevel(Long id);
-    List<Level> getQuestLevels(Long questId);
+    List<Level> getQuestLevels(UUID questId);
     
     // Управление кодами
     Code createCode(Code code);
     Optional<Code> getCodeById(Long id);
     Code updateCode(Code code);
     void deleteCode(Long id);
-    List<Code> getLevelCodes(Long levelId);
+    List<Code> getLevelCodes(UUID levelId);
     
     // Управление подсказками
     LevelHint createHint(LevelHint hint);
     Optional<LevelHint> getHintById(Long id);
     LevelHint updateHint(LevelHint hint);
     void deleteHint(Long id);
-    List<LevelHint> getLevelHints(Long levelId);
+    List<LevelHint> getLevelHints(UUID levelId);
     
     // Поиск и фильтрация квестов
     Page<Quest> getAllQuests(Pageable pageable);
@@ -58,7 +58,7 @@ public interface QuestService {
     
     // Поиск уровней
     List<Level> getLevelsByDifficulty(Difficulty difficulty);
-    List<Level> getLevelsByQuest(Long questId);
+    List<Level> getLevelsByQuest(UUID questId);
     List<Level> getLevelsByNameContaining(String name);
     List<Level> getLevelsByEstimatedTime(Long minTime, Long maxTime);
     
@@ -80,56 +80,56 @@ public interface QuestService {
     
     // Валидация и бизнес-логика
     boolean canCreateQuest(UUID userId);
-    boolean canUpdateQuest(Long questId, UUID userId);
-    boolean canDeleteQuest(Long questId, UUID userId);
-    boolean canPublishQuest(Long questId, UUID userId);
+    boolean canUpdateQuest(UUID questId, UUID userId);
+    boolean canDeleteQuest(UUID questId, UUID userId);
+    boolean canPublishQuest(UUID questId, UUID userId);
     boolean isValidQuestStructure(Quest quest);
     boolean isValidLevelSequence(List<Level> levels);
     
     // Управление публикацией
-    Quest publishQuest(Long questId);
-    Quest unpublishQuest(Long questId);
-    Quest archiveQuest(Long questId);
+    Quest publishQuest(UUID questId);
+    Quest unpublishQuest(UUID questId);
+    Quest archiveQuest(UUID questId);
     List<Quest> getPublishedQuests();
     List<Quest> getArchivedQuests();
     
     // Управление рейтингами
-    Quest updateQuestRating(Long questId, Double newRating);
-    Level updateLevelRating(Long levelId, Double newRating);
-    Double calculateQuestRating(Long questId);
-    Double calculateLevelRating(Long levelId);
+    Quest updateQuestRating(UUID questId, Double newRating);
+    Level updateLevelRating(UUID levelId, Double newRating);
+    Double calculateQuestRating(UUID questId);
+    Double calculateLevelRating(UUID levelId);
     
     // Управление сложностью
-    Difficulty calculateQuestDifficulty(Long questId);
-    Difficulty calculateLevelDifficulty(Long levelId);
+    Difficulty calculateQuestDifficulty(UUID questId);
+    Difficulty calculateLevelDifficulty(UUID levelId);
     List<Quest> getQuestsByCalculatedDifficulty(Difficulty difficulty);
     
     // Операции с кодами
-    boolean validateCode(String code, Long levelId);
-    List<Code> getActiveCodes(Long levelId);
+    boolean validateCode(String code, UUID levelId);
+    List<Code> getActiveCodes(UUID levelId);
     List<Code> getCodesByType(String codeType);
-    Code addCodeToLevel(Long levelId, String codeValue, String codeType, Integer points);
-    void removeCodeFromLevel(Long levelId, Long codeId);
+    Code addCodeToLevel(UUID levelId, String codeValue, String codeType, Integer points);
+    void removeCodeFromLevel(UUID levelId, Long codeId);
     
     // Операции с подсказками
-    LevelHint addHintToLevel(Long levelId, String hintText, Integer penaltyPoints);
-    void removeHintFromLevel(Long levelId, Long hintId);
-    List<LevelHint> getOrderedHints(Long levelId);
-    Integer calculateTotalHintPenalty(Long levelId);
+    LevelHint addHintToLevel(UUID levelId, String hintText, Integer penaltyPoints);
+    void removeHintFromLevel(UUID levelId, Long hintId);
+    List<LevelHint> getOrderedHints(UUID levelId);
+    Integer calculateTotalHintPenalty(UUID levelId);
     
     // Операции для администрирования
     List<Quest> getAllQuestsForAdmin();
-    void forceDeleteQuest(Long questId, String reason);
-    void suspendQuest(Long questId, String reason);
-    void unsuspendQuest(Long questId);
+    void forceDeleteQuest(UUID questId, String reason);
+    void suspendQuest(UUID questId, String reason);
+    void unsuspendQuest(UUID questId);
     List<Quest> getSuspiciousQuests(int limit);
     
     // Операции с кэшированием
     void cacheQuest(Quest quest);
-    void evictQuestFromCache(Long questId);
-    Optional<Quest> getCachedQuest(Long questId);
-    void cacheQuestLevels(Long questId, List<Level> levels);
-    void evictQuestLevelsFromCache(Long questId);
+    void evictQuestFromCache(UUID questId);
+    Optional<Quest> getCachedQuest(UUID questId);
+    void cacheQuestLevels(UUID questId, List<Level> levels);
+    void evictQuestLevelsFromCache(UUID questId);
     
     // Операции с событиями
     void publishQuestCreatedEvent(Quest quest);
@@ -149,10 +149,10 @@ public interface QuestService {
     // Аналитика и отчеты
     List<Object[]> getQuestStatisticsByDay(Instant start, Instant end);
     List<Object[]> getLevelStatisticsByDay(Instant start, Instant end);
-    List<Object[]> getQuestCompletionAnalysis(Long questId);
-    List<Object[]> getLevelCompletionAnalysis(Long levelId);
+    List<Object[]> getQuestCompletionAnalysis(UUID questId);
+    List<Object[]> getLevelCompletionAnalysis(UUID levelId);
     List<Object[]> getQuestDifficultyAnalysis();
-    List<Object[]> getCodeUsageStatistics(Long levelId);
+    List<Object[]> getCodeUsageStatistics(UUID levelId);
     
     // Операции для оптимизации
     void batchCreateQuests(List<Quest> quests);
@@ -162,30 +162,30 @@ public interface QuestService {
     // Вспомогательные методы
     String generateQuestId();
     String generateLevelId();
-    void logQuestOperation(String operation, Long questId, UUID userId);
+    void logQuestOperation(String operation, UUID questId, UUID userId);
     boolean isValidQuestName(String name);
     String sanitizeQuestDescription(String description);
     
     // Операции с поиском
     Page<Quest> searchQuests(String keyword, Pageable pageable);
     List<Quest> getRecommendedQuests(UUID userId, int limit);
-    List<Quest> getSimilarQuests(Long questId, int limit);
+    List<Quest> getSimilarQuests(UUID questId, int limit);
     List<Quest> getQuestsByTags(List<String> tags);
     
     // Операции с версиями
-    Quest createQuestVersion(Long questId, String versionDescription);
-    List<Quest> getQuestVersions(Long questId);
-    Quest getQuestVersion(Long questId, String version);
-    Quest rollbackToVersion(Long questId, String version);
+    Quest createQuestVersion(UUID questId, String versionDescription);
+    List<Quest> getQuestVersions(UUID questId);
+    Quest getQuestVersion(UUID questId, String version);
+    Quest rollbackToVersion(UUID questId, String version);
     
     // Операции с шаблонами
     Quest createQuestTemplate(Quest quest);
     List<Quest> getQuestTemplates();
     Quest createQuestFromTemplate(Long templateId, Map<String, Object> parameters);
-    Quest saveAsTemplate(Long questId, String templateName);
+    Quest saveAsTemplate(UUID questId, String templateName);
     
     // Операции с экспортом/импортом
-    String exportQuest(Long questId);
+    String exportQuest(UUID questId);
     Quest importQuest(String questData);
     List<Quest> bulkImport(List<String> questDataList);
     String exportQuestTemplate(Long templateId);
@@ -193,65 +193,65 @@ public interface QuestService {
     // Операции с валидацией
     Map<String, List<String>> validateQuestComplete(Quest quest);
     Map<String, List<String>> validateLevelComplete(Level level);
-    List<String> getQuestValidationErrors(Long questId);
-    List<String> getLevelValidationErrors(Long levelId);
+    List<String> getQuestValidationErrors(UUID questId);
+    List<String> getLevelValidationErrors(UUID levelId);
     
     // Операции с метаданными
-    Quest updateQuestMetadata(Long questId, Map<String, Object> metadata);
-    Map<String, Object> getQuestMetadata(Long questId);
-    Level updateLevelMetadata(Long levelId, Map<String, Object> metadata);
-    Map<String, Object> getLevelMetadata(Long levelId);
+    Quest updateQuestMetadata(UUID questId, Map<String, Object> metadata);
+    Map<String, Object> getQuestMetadata(UUID questId);
+    Level updateLevelMetadata(UUID levelId, Map<String, Object> metadata);
+    Map<String, Object> getLevelMetadata(UUID levelId);
     
     // Операции с медиа
-    Quest addQuestMedia(Long questId, String mediaUrl, String mediaType);
-    void removeQuestMedia(Long questId, String mediaUrl);
-    List<String> getQuestMedia(Long questId);
-    Level addLevelMedia(Long levelId, String mediaUrl, String mediaType);
-    void removeLevelMedia(Long levelId, String mediaUrl);
-    List<String> getLevelMedia(Long levelId);
+    Quest addQuestMedia(UUID questId, String mediaUrl, String mediaType);
+    void removeQuestMedia(UUID questId, String mediaUrl);
+    List<String> getQuestMedia(UUID questId);
+    Level addLevelMedia(UUID levelId, String mediaUrl, String mediaType);
+    void removeLevelMedia(UUID levelId, String mediaUrl);
+    List<String> getLevelMedia(UUID levelId);
     
     // Операции с тегами
-    Quest addQuestTag(Long questId, String tag);
-    void removeQuestTag(Long questId, String tag);
-    List<String> getQuestTags(Long questId);
+    Quest addQuestTag(UUID questId, String tag);
+    void removeQuestTag(UUID questId, String tag);
+    List<String> getQuestTags(UUID questId);
     List<Quest> getQuestsByTag(String tag);
     List<String> getPopularTags(int limit);
     
     // Операции с категориями
-    Quest setQuestCategory(Long questId, String category);
+    Quest setQuestCategory(UUID questId, String category);
     List<Quest> getQuestsByCategory(String category);
     List<String> getAllCategories();
     Map<String, Long> getCategoryStatistics();
     
     // Операции с языками
-    Quest setQuestLanguage(Long questId, String language);
+    Quest setQuestLanguage(UUID questId, String language);
     List<Quest> getQuestsByLanguage(String language);
     List<String> getSupportedLanguages();
-    Quest translateQuest(Long questId, String targetLanguage);
+    Quest translateQuest(UUID questId, String targetLanguage);
     
     // Операции с доступом
-    Quest setQuestAccessLevel(Long questId, String accessLevel);
-    boolean isQuestAccessible(Long questId, UUID userId);
+    Quest setQuestAccessLevel(UUID questId, String accessLevel);
+    boolean isQuestAccessible(UUID questId, UUID userId);
     List<Quest> getAccessibleQuests(UUID userId);
-    Quest grantQuestAccess(Long questId, UUID userId);
-    void revokeQuestAccess(Long questId, UUID userId);
+    Quest grantQuestAccess(UUID questId, UUID userId);
+    void revokeQuestAccess(UUID questId, UUID userId);
     
     // Операции с безопасностью
-    boolean isQuestModificationAllowed(UUID userId, Long questId);
+    boolean isQuestModificationAllowed(UUID userId, UUID questId);
     void validateQuestData(Quest quest);
     void sanitizeQuestData(Quest quest);
     List<String> detectSuspiciousContent(Quest quest);
     
     // Операции с мониторингом
-    Map<String, Object> getQuestHealthMetrics(Long questId);
-    List<String> getQuestErrors(Long questId);
-    Map<String, Object> getQuestPerformanceStats(Long questId);
-    void monitorQuestActivity(Long questId);
+    Map<String, Object> getQuestHealthMetrics(UUID questId);
+    List<String> getQuestErrors(UUID questId);
+    Map<String, Object> getQuestPerformanceStats(UUID questId);
+    void monitorQuestActivity(UUID questId);
     
     // Операции с отчетами
-    String generateQuestReport(Long questId);
-    String generateLevelReport(Long levelId);
+    String generateQuestReport(UUID questId);
+    String generateLevelReport(UUID levelId);
     String generateQuestsReport();
-    Map<String, Object> getQuestAnalytics(Long questId);
-    Map<String, Object> getLevelAnalytics(Long levelId);
+    Map<String, Object> getQuestAnalytics(UUID questId);
+    Map<String, Object> getLevelAnalytics(UUID levelId);
 }

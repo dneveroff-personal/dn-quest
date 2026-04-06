@@ -19,7 +19,7 @@ public interface GameEngineServiceClient {
      * Получение информации о игровой сессии по ID
      */
     @GetMapping("/api/game-sessions/{id}")
-    GameSessionDTO getGameSessionById(@PathVariable("id") Long sessionId);
+    GameSessionDTO getGameSessionById(@PathVariable("id") UUID sessionId);
 
     /**
      * Получение списка игровых сессий для команды
@@ -115,7 +115,7 @@ public interface GameEngineServiceClient {
      * Получение информации о квесте по ID
      */
     @GetMapping("/api/quests/{id}")
-    QuestDTO getQuestById(@PathVariable("id") Long questId);
+    QuestDTO getQuestById(@PathVariable("id") UUID questId);
 
     /**
      * Получение списка доступных квестов для команды
@@ -177,7 +177,7 @@ public interface GameEngineServiceClient {
      */
     @PutMapping("/api/game-sessions/{id}/finish")
     GameSessionDTO finishGameSession(
-            @PathVariable("id") Long sessionId,
+            @PathVariable("id") UUID sessionId,
             @RequestBody FinishGameSessionRequest request
     );
 
@@ -186,7 +186,7 @@ public interface GameEngineServiceClient {
      */
     @PostMapping("/api/game-sessions/{id}/participants")
     GameSessionDTO addParticipantToGameSession(
-            @PathVariable("id") Long sessionId,
+            @PathVariable("id") UUID sessionId,
             @RequestBody AddParticipantRequest request
     );
 
@@ -195,7 +195,7 @@ public interface GameEngineServiceClient {
      */
     @DeleteMapping("/api/game-sessions/{id}/participants/{userId}")
     GameSessionDTO removeParticipantFromGameSession(
-            @PathVariable("id") Long sessionId,
+            @PathVariable("id") UUID sessionId,
             @PathVariable("userId") UUID userId
     );
 
@@ -211,7 +211,7 @@ public interface GameEngineServiceClient {
     @Getter
     class GameSessionDTO {
         private Long id;
-        private Long questId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -341,7 +341,7 @@ public interface GameEngineServiceClient {
     @Setter
     @Getter
     class CreateGameSessionRequest {
-        private Long questId;
+        private UUID questId;
         private UUID teamId;
         private Long startedBy;
     }

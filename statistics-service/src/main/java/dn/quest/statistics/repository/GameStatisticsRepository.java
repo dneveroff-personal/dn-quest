@@ -40,12 +40,12 @@ public interface GameStatisticsRepository extends JpaRepository<GameStatistics, 
     /**
      * Найти статистику по квесту
      */
-    List<GameStatistics> findByQuestIdOrderByDateDesc(Long questId);
+    List<GameStatistics> findByQuestIdOrderByDateDesc(UUID questId);
 
     /**
      * Найти статистику по квесту за период
      */
-    List<GameStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(Long questId, LocalDate startDate, LocalDate endDate);
+    List<GameStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(UUID questId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику по команде

@@ -20,7 +20,7 @@ import java.util.UUID;
 public class QuestEvent extends BaseDTO {
 
     private String eventType;
-    private Long questId;
+    private UUID questId;
     private Long questNumber;
     private String title;
     private String description;
@@ -34,7 +34,7 @@ public class QuestEvent extends BaseDTO {
     private UUID userId;
     private String reason;
 
-    public QuestEvent(String eventType, Long questId, UUID userId) {
+    public QuestEvent(String eventType, UUID questId, UUID userId) {
         this.eventType = eventType;
         this.questId = questId;
         this.userId = userId;

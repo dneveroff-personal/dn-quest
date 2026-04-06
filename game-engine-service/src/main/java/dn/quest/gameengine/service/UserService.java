@@ -90,9 +90,9 @@ public interface UserService {
     // Управление сессиями
     List<Long> getUserActiveSessions(UUID userId);
     List<Long> getUserCompletedSessions(UUID userId);
-    void addUserToSession(UUID userId, Long sessionId);
-    void removeUserFromSession(UUID userId, Long sessionId);
-    boolean isUserInSession(UUID userId, Long sessionId);
+    void addUserToSession(UUID userId, UUID sessionId);
+    void removeUserFromSession(UUID userId, UUID sessionId);
+    boolean isUserInSession(UUID userId, UUID sessionId);
     
     // Управление командами
     List<Long> getUserTeams(UUID userId);

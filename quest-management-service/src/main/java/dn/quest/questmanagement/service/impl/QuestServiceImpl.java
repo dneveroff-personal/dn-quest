@@ -81,7 +81,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, UUID userId) {
+    public QuestDTO updateQuest(UUID id, QuestCreateUpdateDTO dto, UUID userId) {
         log.info("Updating quest with ID: {} by user: {}", id, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -122,7 +122,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public void deleteQuest(Long id, UUID userId) {
+    public void deleteQuest(UUID id, UUID userId) {
         log.info("Deleting quest with ID: {} by user: {}", id, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -143,7 +143,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public QuestDTO getQuestById(Long id) {
+    public QuestDTO getQuestById(UUID id) {
         Quest quest = getQuestEntityById(id);
         return convertToDTO(quest);
     }
@@ -248,7 +248,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO publishQuest(Long id, UUID userId) {
+    public QuestDTO publishQuest(UUID id, UUID userId) {
         log.info("Publishing quest with ID: {} by user: {}", id, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -277,7 +277,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO unpublishQuest(Long id, UUID userId) {
+    public QuestDTO unpublishQuest(UUID id, UUID userId) {
         log.info("Unpublishing quest with ID: {} by user: {}", id, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -304,7 +304,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO archiveQuest(Long id, String reason, UUID userId) {
+    public QuestDTO archiveQuest(UUID id, String reason, UUID userId) {
         log.info("Archiving quest with ID: {} by user: {} with reason: {}", id, userId, reason);
 
         Quest quest = getQuestEntityById(id);
@@ -332,7 +332,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO unarchiveQuest(Long id, UUID userId) {
+    public QuestDTO unarchiveQuest(UUID id, UUID userId) {
         log.info("Unarchiving quest with ID: {} by user: {}", id, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -355,7 +355,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO copyQuest(Long id, String newTitle, UUID authorId) {
+    public QuestDTO copyQuest(UUID id, String newTitle, UUID authorId) {
         log.info("Copying quest with ID: {} with new title: {} for author: {}", id, newTitle, authorId);
 
         Quest originalQuest = getQuestEntityById(id);
@@ -394,7 +394,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO createTemplateFromQuest(Long id, String templateName, UUID userId) {
+    public QuestDTO createTemplateFromQuest(UUID id, String templateName, UUID userId) {
         log.info("Creating template from quest with ID: {} with name: {} by user: {}", id, templateName, userId);
 
         Quest originalQuest = getQuestEntityById(id);
@@ -438,7 +438,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO createQuestFromTemplate(Long templateId, String title, UUID authorId) {
+    public QuestDTO createQuestFromTemplate(UUID templateId, String title, UUID authorId) {
         log.info("Creating quest from template with ID: {} with title: {} for author: {}", templateId, title, authorId);
 
         Quest template = getQuestEntityById(templateId);
@@ -482,7 +482,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO changeQuestStatus(Long id, QuestStatus status, UUID userId) {
+    public QuestDTO changeQuestStatus(UUID id, QuestStatus status, UUID userId) {
         log.info("Changing status of quest with ID: {} to {} by user: {}", id, status, userId);
 
         Quest quest = getQuestEntityById(id);
@@ -512,7 +512,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO addQuestAuthor(Long questId, UUID authorId, UUID userId) {
+    public QuestDTO addQuestAuthor(UUID questId, UUID authorId, UUID userId) {
         log.info("Adding author {} to quest {} by user: {}", authorId, questId, userId);
 
         Quest quest = getQuestEntityById(questId);
@@ -533,7 +533,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO removeQuestAuthor(Long questId, UUID authorId, UUID userId) {
+    public QuestDTO removeQuestAuthor(UUID questId, UUID authorId, UUID userId) {
         log.info("Removing author {} from quest {} by user: {}", authorId, questId, userId);
 
         Quest quest = getQuestEntityById(questId);
@@ -559,7 +559,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO addQuestTags(Long questId, Set<String> tags, UUID userId) {
+    public QuestDTO addQuestTags(UUID questId, Set<String> tags, UUID userId) {
         log.info("Adding tags {} to quest {} by user: {}", tags, questId, userId);
 
         Quest quest = getQuestEntityById(questId);
@@ -583,7 +583,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional
-    public QuestDTO removeQuestTags(Long questId, Set<String> tags, UUID userId) {
+    public QuestDTO removeQuestTags(UUID questId, Set<String> tags, UUID userId) {
         log.info("Removing tags {} from quest {} by user: {}", tags, questId, userId);
 
         Quest quest = getQuestEntityById(questId);
@@ -606,7 +606,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean hasQuestAccess(Long questId, UUID userId) {
+    public boolean hasQuestAccess(UUID questId, UUID userId) {
         Quest quest = getQuestEntityById(questId);
         
         // Публичные квесты доступны всем
@@ -620,7 +620,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canEditQuest(Long questId, UUID userId) {
+    public boolean canEditQuest(UUID questId, UUID userId) {
         Quest quest = getQuestEntityById(questId);
         
         // Только авторы могут редактировать
@@ -629,7 +629,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean canPublishQuest(Long questId, UUID userId) {
+    public boolean canPublishQuest(UUID questId, UUID userId) {
         Quest quest = getQuestEntityById(questId);
         
         // Только авторы могут публиковать
@@ -644,7 +644,7 @@ public class QuestServiceImpl implements QuestService {
 
     @Override
     @Transactional(readOnly = true)
-    public QuestValidationResult validateQuestForPublishing(Long questId) {
+    public QuestValidationResult validateQuestForPublishing(UUID questId) {
         Quest quest = getQuestEntityById(questId);
         
         List<String> errors = new ArrayList<>();
@@ -770,7 +770,7 @@ public class QuestServiceImpl implements QuestService {
 
     // Вспомогательные методы
 
-    private Quest getQuestEntityById(Long id) {
+    private Quest getQuestEntityById(UUID id) {
         return questRepository.findById(id)
                 .orElseThrow(() -> new QuestNotFoundException("Quest not found with ID: " + id));
     }

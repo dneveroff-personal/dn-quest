@@ -1,6 +1,6 @@
 -- Создание таблицы пользователей
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     first_name VARCHAR(50),
@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Создание таблицы команд
 CREATE TABLE IF NOT EXISTS teams (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(120) NOT NULL UNIQUE,
     description VARCHAR(500),
     logo_url VARCHAR(500),
-    captain_id BIGINT NOT NULL,
+    captain_id UUID NOT NULL,
     max_members INTEGER DEFAULT 10,
     is_private BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS teams (
 
 -- Создание таблицы участников команд
 CREATE TABLE IF NOT EXISTS team_members (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     role VARCHAR(16) NOT NULL DEFAULT 'MEMBER',
     joined_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     left_at TIMESTAMP WITH TIME ZONE,
@@ -42,10 +42,10 @@ CREATE TABLE IF NOT EXISTS team_members (
 
 -- Создание таблицы приглашений в команды
 CREATE TABLE IF NOT EXISTS team_invitations (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    invited_by_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    invited_by_id UUID NOT NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
     invitation_message VARCHAR(500),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS team_invitations (
 
 -- Создание таблицы настроек команд
 CREATE TABLE IF NOT EXISTS team_settings (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL UNIQUE,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL UNIQUE,
     allow_member_invites BOOLEAN DEFAULT FALSE,
     require_captain_approval BOOLEAN DEFAULT TRUE,
     auto_accept_invites BOOLEAN DEFAULT FALSE,
@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS team_settings (
 
 -- Создание таблицы статистики команд
 CREATE TABLE IF NOT EXISTS team_statistics (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL UNIQUE,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL UNIQUE,
     total_members INTEGER DEFAULT 0,
     active_members INTEGER DEFAULT 0,
     total_invitations_sent BIGINT DEFAULT 0,

@@ -2,10 +2,7 @@ package dn.quest.gameengine.entity;
 
 import dn.quest.shared.enums.SessionStatus;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -32,6 +29,8 @@ import java.util.UUID;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EqualsAndHashCode(exclude = {"quest", "user", "team", "currentLevel", "levelProgresses", "codeAttempts", "levelCompletions"})
 @ToString(exclude = {"quest", "user", "team", "levelProgresses", "codeAttempts", "levelCompletions"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class GameSession {
 
     @Id

@@ -21,9 +21,9 @@ public class CodeSubmittedEvent extends BaseEvent {
 
     private String eventId;
     private Long attemptId;
-    private Long sessionId;
+    private UUID sessionId;
     private UUID userId;
-    private Long levelId;
+    private UUID levelId;
     private String submittedCode;
     private String codeSector;
     private Boolean isCorrect;

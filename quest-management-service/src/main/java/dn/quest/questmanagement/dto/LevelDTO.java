@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class LevelDTO extends BaseDTO {
      * ID квеста, к которому относится уровень
      */
     @NotNull(message = "ID квеста обязателен")
-    private Long questId;
+    private UUID questId;
 
     /**
      * Порядковый номер уровня в квесте
@@ -223,7 +224,7 @@ public class LevelDTO extends BaseDTO {
      */
     public boolean isValid() {
         // Проверка обязательных полей
-        if (questId == null || questId <= 0) {
+        if (questId == null) {
             return false;
         }
         

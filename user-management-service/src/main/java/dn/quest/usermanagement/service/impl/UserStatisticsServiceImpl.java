@@ -451,7 +451,7 @@ public class UserStatisticsServiceImpl implements UserStatisticsService {
 
     @Override
     @Transactional
-    public void updateGameSessionStatistics(UUID userId, Long sessionId, String status) {
+    public void updateGameSessionStatistics(UUID userId, UUID sessionId, String status) {
         log.info("Updating game session statistics for user ID: {}. Session ID: {}, status: {}", userId, sessionId, status);
 
         UserStatistics statistics = getOrCreateStatistics(userId);

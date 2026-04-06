@@ -131,7 +131,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestCreatedNotification(UUID questId, String title, UUID authorId) {
         log.info("Sending quest created notification to author: {}", authorId);
 
         try {
@@ -155,7 +155,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestUpdatedNotification(UUID questId, String title, UUID authorId) {
         log.info("Sending quest updated notification for quest: {}", questId);
         // Broadcast notification - notify all subscribers
         return CompletableFuture.completedFuture(null);
@@ -163,7 +163,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestPublishedNotification(UUID questId, String title, UUID authorId) {
         log.info("Sending quest published notification to author: {}", authorId);
 
         try {
@@ -187,7 +187,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, Long sessionId, Long questId) {
+    public CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, UUID sessionId, UUID questId) {
         log.info("Sending game session started notification to user: {}", userId);
 
         try {
@@ -211,7 +211,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, Long sessionId, boolean completed) {
+    public CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, UUID sessionId, boolean completed) {
         log.info("Sending game session finished notification to user: {}", userId);
 
         try {
@@ -235,7 +235,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, Long sessionId, Integer levelNumber) {
+    public CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, UUID sessionId, Integer levelNumber) {
         log.info("Sending level completed notification to user: {}", userId);
 
         try {
@@ -733,7 +733,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestCreatedNotifications(Long questId, String title, UUID authorId, 
+    private List<Notification> createQuestCreatedNotifications(UUID questId, String title, UUID authorId, 
                                                               UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_created_" + questId + "_" + System.currentTimeMillis();
@@ -766,7 +766,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestUpdatedNotifications(Long questId, String title, UUID authorId, 
+    private List<Notification> createQuestUpdatedNotifications(UUID questId, String title, UUID authorId, 
                                                               UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_updated_" + questId + "_" + System.currentTimeMillis();
@@ -799,7 +799,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestPublishedNotifications(Long questId, String title, UUID authorId, 
+    private List<Notification> createQuestPublishedNotifications(UUID questId, String title, UUID authorId, 
                                                                 UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_published_" + questId + "_" + System.currentTimeMillis();
@@ -832,7 +832,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createGameSessionStartedNotifications(UUID userId, Long sessionId, Long questId, 
+    private List<Notification> createGameSessionStartedNotifications(UUID userId, UUID sessionId, UUID questId, 
                                                                     UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "game_started_" + sessionId + "_" + System.currentTimeMillis();
@@ -865,7 +865,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createGameSessionFinishedNotifications(UUID userId, Long sessionId, boolean completed, 
+    private List<Notification> createGameSessionFinishedNotifications(UUID userId, UUID sessionId, boolean completed, 
                                                                      UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "game_finished_" + sessionId + "_" + System.currentTimeMillis();
@@ -901,7 +901,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createLevelCompletedNotifications(UUID userId, Long sessionId, Integer levelNumber, 
+    private List<Notification> createLevelCompletedNotifications(UUID userId, UUID sessionId, Integer levelNumber, 
                                                                UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "level_completed_" + sessionId + "_" + levelNumber + "_" + System.currentTimeMillis();

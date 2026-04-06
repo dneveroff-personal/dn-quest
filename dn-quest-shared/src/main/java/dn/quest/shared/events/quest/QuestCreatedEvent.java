@@ -16,7 +16,7 @@ public class QuestCreatedEvent extends BaseEvent {
     /**
      * ID созданного квеста
      */
-    private Long questId;
+    private UUID questId;
 
     /**
      * Название квеста

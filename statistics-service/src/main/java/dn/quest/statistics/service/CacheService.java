@@ -23,12 +23,12 @@ public interface CacheService {
     /**
      * Получить кэшированную статистику квеста
      */
-    Map<String, Object> getQuestStatistics(Long questId, LocalDate date);
+    Map<String, Object> getQuestStatistics(UUID questId, LocalDate date);
 
     /**
      * Сохранить статистику квеста в кэш
      */
-    void cacheQuestStatistics(Long questId, LocalDate date, Map<String, Object> statistics);
+    void cacheQuestStatistics(UUID questId, LocalDate date, Map<String, Object> statistics);
 
     /**
      * Получить кэшированную статистику команды
@@ -128,7 +128,7 @@ public interface CacheService {
     /**
      * Инвалидировать кэш квеста
      */
-    void invalidateQuestCache(Long questId);
+    void invalidateQuestCache(UUID questId);
 
     /**
      * Инвалидировать кэш команды

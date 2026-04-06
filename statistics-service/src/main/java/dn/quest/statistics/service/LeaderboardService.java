@@ -37,7 +37,7 @@ public interface LeaderboardService {
     /**
      * Получить позицию квеста в лидерборде
      */
-    Map<String, Object> getQuestLeaderboardPosition(Long questId, String period, String metric, LocalDate date);
+    Map<String, Object> getQuestLeaderboardPosition(UUID questId, String period, String metric, LocalDate date);
 
     /**
      * Получить позицию команды в лидерборде

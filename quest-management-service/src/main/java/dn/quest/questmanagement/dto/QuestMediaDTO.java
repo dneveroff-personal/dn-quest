@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO для представления медиа файла квеста
@@ -29,12 +30,12 @@ public class QuestMediaDTO extends BaseDTO {
     /**
      * ID квеста (null если медиа относится к уровню)
      */
-    private Long questId;
+    private UUID questId;
 
     /**
      * ID уровня (null если медиа относится к квесту)
      */
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Тип медиа

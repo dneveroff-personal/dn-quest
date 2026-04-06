@@ -16,7 +16,7 @@ public class QuestArchivedEvent extends QuestEvent {
         super();
     }
 
-    public QuestArchivedEvent(Long questId, Long questNumber, String title, String description,
+    public QuestArchivedEvent(UUID questId, Long questNumber, String title, String description,
                              String difficulty, String questType, String category,
                              java.util.Set<String> tags, java.util.Set<Long> authorIds,
                              String status, Long version, String reason, UUID userId) {

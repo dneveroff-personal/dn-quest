@@ -19,19 +19,19 @@ public interface StatisticsServiceClient {
      * Обновить статистику квеста
      */
     @PostMapping("/api/quests/{questId}/statistics")
-    ResponseEntity<Void> updateQuestStatistics(@PathVariable("questId") Long questId);
+    ResponseEntity<Void> updateQuestStatistics(@PathVariable("questId") UUID questId);
 
     /**
      * Получить статистику квеста
      */
     @GetMapping("/api/quests/{questId}/statistics")
-    ResponseEntity<QuestStatisticsDTO> getQuestStatistics(@PathVariable("questId") Long questId);
+    ResponseEntity<QuestStatisticsDTO> getQuestStatistics(@PathVariable("questId") UUID questId);
 
     /**
      * Получить статистику уровня
      */
     @GetMapping("/api/levels/{levelId}/statistics")
-    ResponseEntity<LevelStatisticsDTO> getLevelStatistics(@PathVariable("levelId") Long levelId);
+    ResponseEntity<LevelStatisticsDTO> getLevelStatistics(@PathVariable("levelId") UUID levelId);
 
     /**
      * Получить статистику кода
@@ -75,14 +75,14 @@ public interface StatisticsServiceClient {
      * Получить рейтинг квестов
      */
     @GetMapping("/api/quests/{questId}/rating")
-    ResponseEntity<QuestRatingDTO> getQuestRating(@PathVariable("questId") Long questId);
+    ResponseEntity<QuestRatingDTO> getQuestRating(@PathVariable("questId") UUID questId);
 
     /**
      * Добавить рейтинг квесту
      */
     @PostMapping("/api/quests/{questId}/rating")
     ResponseEntity<Void> addQuestRating(
-            @PathVariable("questId") Long questId,
+            @PathVariable("questId") UUID questId,
             @RequestBody QuestRatingDTO rating
     );
 
@@ -92,7 +92,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class QuestStatisticsDTO {
-        private Long questId;
+        private UUID questId;
         private Long totalSessions;
         private Long completedSessions;
         private Long activeSessions;
@@ -112,7 +112,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class LevelStatisticsDTO {
-        private Long levelId;
+        private UUID levelId;
         private Long totalCompletions;
         private Long uniqueCompletions;
         private Double averageCompletionTime;
@@ -142,8 +142,8 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class GameEventDTO {
-        private Long questId;
-        private Long sessionId;
+        private UUID questId;
+        private UUID sessionId;
         private UUID userId;
         private String eventType;
         private Long timestamp;
@@ -155,7 +155,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class CodeUsedEventDTO extends GameEventDTO {
-        private Long levelId;
+        private UUID levelId;
         private Long codeId;
         private String codeValue;
         private Long usageTime;
@@ -167,7 +167,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class HintUsedEventDTO extends GameEventDTO {
-        private Long levelId;
+        private UUID levelId;
         private Long hintId;
         private Integer hintCost;
         private Long usageTime;
@@ -179,7 +179,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class PopularQuestDTO {
-        private Long questId;
+        private UUID questId;
         private String title;
         private String difficulty;
         private String category;
@@ -193,7 +193,7 @@ public interface StatisticsServiceClient {
     @Setter
     @Getter
     class QuestRatingDTO {
-        private Long questId;
+        private UUID questId;
         private UUID userId;
         private Integer rating;
         private String review;

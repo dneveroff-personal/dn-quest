@@ -818,7 +818,7 @@ void testQuestCreationAndCompletion() {
         "/api/quests", questRequest, QuestResponse.class);
     
     assertThat(questResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    Long questId = questResponse.getBody().getId();
+    UUID questId = questResponse.getBody().getId();
     
     // Публикация квеста
     restTemplate.put("/api/quests/" + questId + "/publish", null);
@@ -831,7 +831,7 @@ void testQuestCreationAndCompletion() {
         "/api/game-sessions", sessionRequest, GameSessionResponse.class);
     
     assertThat(sessionResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    Long sessionId = sessionResponse.getBody().getId();
+    UUID sessionId = sessionResponse.getBody().getId();
     
     // Выполнение задания
     CodeSubmissionRequest submission = new CodeSubmissionRequest();

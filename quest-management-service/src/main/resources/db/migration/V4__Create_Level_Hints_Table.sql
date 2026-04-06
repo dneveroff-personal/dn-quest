@@ -1,12 +1,12 @@
 -- Создание таблицы level_hints
 CREATE TABLE level_hints (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     text TEXT NOT NULL,
     cost INTEGER DEFAULT 0, -- стоимость в очках
     available_after TIMESTAMP, -- время, после которого подсказка доступна
     active BOOLEAN DEFAULT true,
-    used_by BIGINT[], -- массив ID пользователей и времени использования (JSON)
+    used_by UUID[], -- массив ID пользователей и времени использования (JSON)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     

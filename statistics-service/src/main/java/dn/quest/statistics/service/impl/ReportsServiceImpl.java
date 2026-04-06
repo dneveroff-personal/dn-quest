@@ -102,7 +102,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID authorId) {
+    public byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, UUID questId, UUID authorId) {
         log.info("Exporting quest statistics from {} to {} format: {} quest: {} author: {}", startDate, endDate, format, questId, authorId);
         
         try {
@@ -146,7 +146,7 @@ public class ReportsServiceImpl implements ReportsService {
     }
 
     @Override
-    public byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID userId) {
+    public byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, UUID questId, UUID userId) {
         log.info("Exporting game statistics from {} to {} format: {} quest: {} user: {}", startDate, endDate, format, questId, userId);
         
         try {
@@ -952,7 +952,7 @@ public class ReportsServiceImpl implements ReportsService {
                 request.setEndDate((LocalDate) parameters.get("endDate"));
                 request.setStatisticsType("quest");
                 if (parameters.containsKey("questId")) {
-                    request.setQuestId((Long) parameters.get("questId"));
+                    request.setQuestId((UUID) parameters.get("questId"));
                 }
             }
             // Другие шаблоны обрабатываются аналогично
@@ -970,7 +970,7 @@ public class ReportsServiceImpl implements ReportsService {
         request.setStatisticsType((String) parameters.get("entityType"));
         
         if (parameters.containsKey("entityId")) {
-            request.setQuestId((Long) parameters.get("entityId"));
+            request.setQuestId((UUID) parameters.get("entityId"));
         }
         
         return request;

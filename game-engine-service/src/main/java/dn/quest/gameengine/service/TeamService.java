@@ -101,10 +101,10 @@ public interface TeamService {
     List<TeamMember> getUserPendingInvitations(UUID userId);
     
     // Командные операции
-    List<Team> getTeamsByGameSession(Long sessionId);
-    Team assignToGameSession(UUID teamId, Long sessionId);
-    Team removeFromGameSession(UUID teamId, Long sessionId);
-    List<Team> getAvailableTeamsForSession(Long sessionId);
+    List<Team> getTeamsByGameSession(UUID sessionId);
+    Team assignToGameSession(UUID teamId, UUID sessionId);
+    Team removeFromGameSession(UUID teamId, UUID sessionId);
+    List<Team> getAvailableTeamsForSession(UUID sessionId);
     
     // Операции для администрирования
     List<Team> getAllTeamsForAdmin();

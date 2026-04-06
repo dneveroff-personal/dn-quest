@@ -28,7 +28,7 @@ public class ParticipationRequestEvent extends GameEngineEvent {
     @Schema(description = "ID сессии", example = "789", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Getter
     @Setter
-    private Long sessionId;
+    private UUID sessionId;
 
     @Schema(description = "ID команды", example = "456", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Getter
@@ -43,7 +43,7 @@ public class ParticipationRequestEvent extends GameEngineEvent {
     @Schema(description = "ID квеста", example = "101")
     @Getter
     @Setter
-    private Long questId;
+    private UUID questId;
 
     @Schema(description = "Название квеста", example = "Тайна старого замка")
     @Getter

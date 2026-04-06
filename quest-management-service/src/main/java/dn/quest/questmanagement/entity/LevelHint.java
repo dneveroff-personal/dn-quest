@@ -67,7 +67,6 @@ public class LevelHint {
      */
     @NotBlank(message = "Текст подсказки не может быть пустым")
     @Size(max = 2000, message = "Текст подсказки не должен превышать 2000 символов")
-    @Lob
     @Column(name = "hint_text", nullable = false, columnDefinition = "TEXT")
     private String hintText;
 

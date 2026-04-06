@@ -11,8 +11,7 @@ CREATE INDEX IF NOT EXISTS idx_invitations_team_status_created ON team_invitatio
 CREATE INDEX IF NOT EXISTS idx_invitations_user_status_created ON team_invitations(user_id, status, created_at);
 
 -- Индексы для статистики
-CREATE INDEX IF NOT EXISTS idx_statistics_rating_active ON team_statistics(rating DESC) 
-    WHERE team_id IN (SELECT id FROM teams WHERE is_active = true);
+CREATE INDEX IF NOT EXISTS idx_statistics_rating_active ON team_statistics(rating DESC);
 CREATE INDEX IF NOT EXISTS idx_statistics_games_played ON team_statistics(total_games_played DESC);
 CREATE INDEX IF NOT EXISTS idx_statistics_win_rate ON team_statistics(win_rate DESC) 
     WHERE total_games_played > 0;
@@ -30,8 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_invitations_pending_active ON team_invitations(te
     WHERE status = 'PENDING' AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP);
 
 -- Индексы для настроек с фильтрацией
-CREATE INDEX IF NOT EXISTS idx_team_settings_searchable ON team_settings(allow_search, public_profile) 
-    WHERE team_id IN (SELECT id FROM teams WHERE is_active = true AND is_private = false);
+CREATE INDEX IF NOT EXISTS idx_team_settings_searchable ON team_settings(allow_search, public_profile);
 
 -- Добавление ограничений CHECK для данных
 ALTER TABLE teams ADD CONSTRAINT chk_teams_max_members 

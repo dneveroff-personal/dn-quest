@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Repository для работы с медиа файлами квестов
@@ -23,34 +24,34 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     /**
      * Найти медиа по ID квеста
      */
-    List<QuestMedia> findByQuestId(Long questId);
+    List<QuestMedia> findByQuestId(UUID questId);
 
     /**
      * Найти медиа по ID квеста с пагинацией
      */
-    Page<QuestMedia> findByQuestId(Long questId, Pageable pageable);
+    Page<QuestMedia> findByQuestId(UUID questId, Pageable pageable);
 
     /**
      * Найти медиа по ID квеста с сортировкой по порядковому номеру
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByQuestIdOrderByOrderIndex(@Param("questId") Long questId);
+    List<QuestMedia> findByQuestIdOrderByOrderIndex(@Param("questId") UUID questId);
 
     /**
      * Найти медиа по ID уровня
      */
-    List<QuestMedia> findByLevelId(Long levelId);
+    List<QuestMedia> findByLevelId(UUID levelId);
 
     /**
      * Найти медиа по ID уровня с пагинацией
      */
-    Page<QuestMedia> findByLevelId(Long levelId, Pageable pageable);
+    Page<QuestMedia> findByLevelId(UUID levelId, Pageable pageable);
 
     /**
      * Найти медиа по ID уровня с сортировкой по порядковому номеру
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.levelId = :levelId ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByLevelIdOrderByOrderIndex(@Param("levelId") Long levelId);
+    List<QuestMedia> findByLevelIdOrderByOrderIndex(@Param("levelId") UUID levelId);
 
     /**
      * Найти медиа по типу
@@ -67,7 +68,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId AND m.mediaType = :mediaType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByQuestIdAndMediaType(@Param("questId") Long questId, 
+    List<QuestMedia> findByQuestIdAndMediaType(@Param("questId") UUID questId, 
                                                @Param("mediaType") QuestMedia.MediaType mediaType);
 
     /**
@@ -75,7 +76,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.levelId = :levelId AND m.mediaType = :mediaType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByLevelIdAndMediaType(@Param("levelId") Long levelId, 
+    List<QuestMedia> findByLevelIdAndMediaType(@Param("levelId") UUID levelId, 
                                                @Param("mediaType") QuestMedia.MediaType mediaType);
 
     /**
@@ -88,7 +89,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId AND m.fileType = :fileType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByQuestIdAndFileType(@Param("questId") Long questId, 
+    List<QuestMedia> findByQuestIdAndFileType(@Param("questId") UUID questId, 
                                               @Param("fileType") FileType fileType);
 
     /**
@@ -96,7 +97,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.levelId = :levelId AND m.fileType = :fileType " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findByLevelIdAndFileType(@Param("levelId") Long levelId, 
+    List<QuestMedia> findByLevelIdAndFileType(@Param("levelId") UUID levelId, 
                                               @Param("fileType") FileType fileType);
 
     /**
@@ -111,7 +112,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId AND m.isCover = true " +
            "ORDER BY m.orderIndex ASC")
-    List<QuestMedia> findQuestCover(@Param("questId") Long questId);
+    List<QuestMedia> findQuestCover(@Param("questId") UUID questId);
 
     /**
      * Найти активные медиа
@@ -123,14 +124,14 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.questId = :questId AND m.active = true " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findActiveByQuestId(@Param("questId") Long questId);
+    List<QuestMedia> findActiveByQuestId(@Param("questId") UUID questId);
 
     /**
      * Найти активные медиа по ID уровня
      */
     @Query("SELECT m FROM QuestMedia m WHERE m.levelId = :levelId AND m.active = true " +
            "ORDER BY m.orderIndex ASC, m.createdAt ASC")
-    List<QuestMedia> findActiveByLevelId(@Param("levelId") Long levelId);
+    List<QuestMedia> findActiveByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Найти медиа по заголовку
@@ -235,13 +236,13 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      * Подсчет медиа по ID квеста
      */
     @Query("SELECT COUNT(m) FROM QuestMedia m WHERE m.questId = :questId")
-    long countByQuestId(@Param("questId") Long questId);
+    long countByQuestId(@Param("questId") UUID questId);
 
     /**
      * Подсчет медиа по ID уровня
      */
     @Query("SELECT COUNT(m) FROM QuestMedia m WHERE m.levelId = :levelId")
-    long countByLevelId(@Param("levelId") Long levelId);
+    long countByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Подсчет медиа по типу
@@ -257,13 +258,13 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      * Подсчет активных медиа по ID квеста
      */
     @Query("SELECT COUNT(m) FROM QuestMedia m WHERE m.questId = :questId AND m.active = true")
-    long countActiveByQuestId(@Param("questId") Long questId);
+    long countActiveByQuestId(@Param("questId") UUID questId);
 
     /**
      * Подсчет активных медиа по ID уровня
      */
     @Query("SELECT COUNT(m) FROM QuestMedia m WHERE m.levelId = :levelId AND m.active = true")
-    long countActiveByLevelId(@Param("levelId") Long levelId);
+    long countActiveByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Проверить существование медиа по пути к файлу
@@ -279,13 +280,13 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
      * Найти максимальный порядковый номер медиа для квеста
      */
     @Query("SELECT COALESCE(MAX(m.orderIndex), 0) FROM QuestMedia m WHERE m.questId = :questId")
-    Integer findMaxOrderIndexByQuestId(@Param("questId") Long questId);
+    Integer findMaxOrderIndexByQuestId(@Param("questId") UUID questId);
 
     /**
      * Найти максимальный порядковый номер медиа для уровня
      */
     @Query("SELECT COALESCE(MAX(m.orderIndex), 0) FROM QuestMedia m WHERE m.levelId = :levelId")
-    Integer findMaxOrderIndexByLevelId(@Param("levelId") Long levelId);
+    Integer findMaxOrderIndexByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Обновить порядковый номер медиа
@@ -325,21 +326,21 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
     @Modifying
     @Query("UPDATE QuestMedia m SET m.isCover = false, m.updatedAt = CURRENT_TIMESTAMP " +
            "WHERE m.questId = :questId")
-    int removeQuestCovers(@Param("questId") Long questId);
+    int removeQuestCovers(@Param("questId") UUID questId);
 
     /**
      * Удалить медиа по ID квеста
      */
     @Modifying
     @Query("DELETE FROM QuestMedia m WHERE m.questId = :questId")
-    int deleteByQuestId(@Param("questId") Long questId);
+    int deleteByQuestId(@Param("questId") UUID questId);
 
     /**
      * Удалить медиа по ID уровня
      */
     @Modifying
     @Query("DELETE FROM QuestMedia m WHERE m.levelId = :levelId")
-    int deleteByLevelId(@Param("levelId") Long levelId);
+    int deleteByLevelId(@Param("levelId") UUID levelId);
 
     /**
      * Получить статистику по медиа квеста
@@ -354,7 +355,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
            "COUNT(CASE WHEN m.isCover = true THEN 1 END) as covers, " +
            "COALESCE(SUM(m.fileSizeBytes), 0) as totalSize " +
            "FROM QuestMedia m WHERE m.questId = :questId")
-    Object[] getQuestMediaStatistics(@Param("questId") Long questId);
+    Object[] getQuestMediaStatistics(@Param("questId") UUID questId);
 
     /**
      * Получить статистику по медиа уровня
@@ -368,7 +369,7 @@ public interface QuestMediaRepository extends JpaRepository<QuestMedia, Long>, J
            "COUNT(CASE WHEN m.mediaType = 'DOCUMENT' THEN 1 END) as documents, " +
            "COALESCE(SUM(m.fileSizeBytes), 0) as totalSize " +
            "FROM QuestMedia m WHERE m.levelId = :levelId")
-    Object[] getLevelMediaStatistics(@Param("levelId") Long levelId);
+    Object[] getLevelMediaStatistics(@Param("levelId") UUID levelId);
 
     /**
      * Найти самые большие файлы

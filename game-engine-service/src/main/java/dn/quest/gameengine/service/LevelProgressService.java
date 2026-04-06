@@ -23,90 +23,90 @@ public interface LevelProgressService {
     void deleteProgress(Long id);
     
     // Управление прогрессом
-    LevelProgress startLevel(Long sessionId, UUID userId, Long levelId);
-    LevelProgress completeLevel(Long sessionId, UUID userId, Long levelId);
-    LevelProgress updateLevelProgress(Long sessionId, UUID userId, Long levelId, Double progressPercentage);
-    LevelProgress pauseLevel(Long sessionId, UUID userId, Long levelId);
-    LevelProgress resumeLevel(Long sessionId, UUID userId, Long levelId);
+    LevelProgress startLevel(UUID sessionId, UUID userId, UUID levelId);
+    LevelProgress completeLevel(UUID sessionId, UUID userId, UUID levelId);
+    LevelProgress updateLevelProgress(UUID sessionId, UUID userId, UUID levelId, Double progressPercentage);
+    LevelProgress pauseLevel(UUID sessionId, UUID userId, UUID levelId);
+    LevelProgress resumeLevel(UUID sessionId, UUID userId, UUID levelId);
     
     // Поиск и фильтрация прогресса
     Page<LevelProgress> getAllProgress(Pageable pageable);
-    List<LevelProgress> getProgressBySession(Long sessionId);
+    List<LevelProgress> getProgressBySession(UUID sessionId);
     List<LevelProgress> getProgressByUser(UUID userId);
-    List<LevelProgress> getProgressByLevel(Long levelId);
-    List<LevelProgress> getProgressBySessionAndUser(Long sessionId, UUID userId);
-    List<LevelProgress> getProgressBySessionAndLevel(Long sessionId, Long levelId);
-    List<LevelProgress> getProgressByUserAndLevel(UUID userId, Long levelId);
+    List<LevelProgress> getProgressByLevel(UUID levelId);
+    List<LevelProgress> getProgressBySessionAndUser(UUID sessionId, UUID userId);
+    List<LevelProgress> getProgressBySessionAndLevel(UUID sessionId, UUID levelId);
+    List<LevelProgress> getProgressByUserAndLevel(UUID userId, UUID levelId);
     
     // Статус прогресса
-    List<LevelProgress> getInProgressLevels(Long sessionId, UUID userId);
-    List<LevelProgress> getCompletedLevels(Long sessionId, UUID userId);
-    List<LevelProgress> getPausedLevels(Long sessionId, UUID userId);
-    List<LevelProgress> getNotStartedLevels(Long sessionId, UUID userId);
+    List<LevelProgress> getInProgressLevels(UUID sessionId, UUID userId);
+    List<LevelProgress> getCompletedLevels(UUID sessionId, UUID userId);
+    List<LevelProgress> getPausedLevels(UUID sessionId, UUID userId);
+    List<LevelProgress> getNotStartedLevels(UUID sessionId, UUID userId);
     
     // Статистика прогресса
     long getTotalProgressCount();
-    long getProgressCountBySession(Long sessionId);
+    long getProgressCountBySession(UUID sessionId);
     long getProgressCountByUser(UUID userId);
-    long getProgressCountByLevel(Long levelId);
-    long getCompletedLevelsCount(Long sessionId, UUID userId);
-    long getInProgressLevelsCount(Long sessionId, UUID userId);
-    double getOverallProgressPercentage(Long sessionId, UUID userId);
-    double getSessionProgressPercentage(Long sessionId);
+    long getProgressCountByLevel(UUID levelId);
+    long getCompletedLevelsCount(UUID sessionId, UUID userId);
+    long getInProgressLevelsCount(UUID sessionId, UUID userId);
+    double getOverallProgressPercentage(UUID sessionId, UUID userId);
+    double getSessionProgressPercentage(UUID sessionId);
     
     // Анализ прогресса
     List<LevelProgress> getRecentProgress(int limit);
     List<LevelProgress> getProgressByDateRange(Instant start, Instant end);
-    List<LevelProgress> getSlowestProgress(Long sessionId, int limit);
-    List<LevelProgress> getFastestProgress(Long sessionId, int limit);
-    LevelProgress getCurrentLevelProgress(Long sessionId, UUID userId);
+    List<LevelProgress> getSlowestProgress(UUID sessionId, int limit);
+    List<LevelProgress> getFastestProgress(UUID sessionId, int limit);
+    LevelProgress getCurrentLevelProgress(UUID sessionId, UUID userId);
     
     // Управление временем
-    Instant getLevelStartTime(Long sessionId, UUID userId, Long levelId);
-    Instant getLevelCompletionTime(Long sessionId, UUID userId, Long levelId);
-    Long getLevelDuration(Long sessionId, UUID userId, Long levelId);
-    Long getTotalTimeSpent(Long sessionId, UUID userId);
-    Double getAverageTimePerLevel(Long sessionId, UUID userId);
+    Instant getLevelStartTime(UUID sessionId, UUID userId, UUID levelId);
+    Instant getLevelCompletionTime(UUID sessionId, UUID userId, UUID levelId);
+    Long getLevelDuration(UUID sessionId, UUID userId, UUID levelId);
+    Long getTotalTimeSpent(UUID sessionId, UUID userId);
+    Double getAverageTimePerLevel(UUID sessionId, UUID userId);
     
     // Управление очками и бонусами
     LevelProgress addPoints(Long progressId, Double points, String reason);
     LevelProgress addBonus(Long progressId, Double bonus, String reason);
     LevelProgress applyPenalty(Long progressId, Double penalty, String reason);
-    Double calculateLevelScore(Long sessionId, UUID userId, Long levelId);
-    Double getTotalScore(Long sessionId, UUID userId);
-    Double getAverageScorePerLevel(Long sessionId, UUID userId);
+    Double calculateLevelScore(UUID sessionId, UUID userId, UUID levelId);
+    Double getTotalScore(UUID sessionId, UUID userId);
+    Double getAverageScorePerLevel(UUID sessionId, UUID userId);
     
     // Валидация и бизнес-логика
-    boolean canStartLevel(Long sessionId, UUID userId, Long levelId);
-    boolean canCompleteLevel(Long sessionId, UUID userId, Long levelId);
-    boolean canPauseLevel(Long sessionId, UUID userId, Long levelId);
-    boolean canResumeLevel(Long sessionId, UUID userId, Long levelId);
-    boolean isLevelAccessible(Long sessionId, UUID userId, Long levelId);
-    boolean arePrerequisitesMet(Long sessionId, UUID userId, Long levelId);
+    boolean canStartLevel(UUID sessionId, UUID userId, UUID levelId);
+    boolean canCompleteLevel(UUID sessionId, UUID userId, UUID levelId);
+    boolean canPauseLevel(UUID sessionId, UUID userId, UUID levelId);
+    boolean canResumeLevel(UUID sessionId, UUID userId, UUID levelId);
+    boolean isLevelAccessible(UUID sessionId, UUID userId, UUID levelId);
+    boolean arePrerequisitesMet(UUID sessionId, UUID userId, UUID levelId);
     
     // Управление последовательностью уровней
-    LevelProgress moveToNextLevel(Long sessionId, UUID userId);
-    LevelProgress skipLevel(Long sessionId, UUID userId, Long levelId, String reason);
-    LevelProgress restartLevel(Long sessionId, UUID userId, Long levelId);
-    List<Long> getAvailableLevels(Long sessionId, UUID userId);
-    List<Long> getCompletedLevelSequence(Long sessionId, UUID userId);
-    Long getNextLevelId(Long sessionId, UUID userId);
+    LevelProgress moveToNextLevel(UUID sessionId, UUID userId);
+    LevelProgress skipLevel(UUID sessionId, UUID userId, UUID levelId, String reason);
+    LevelProgress restartLevel(UUID sessionId, UUID userId, UUID levelId);
+    List<Long> getAvailableLevels(UUID sessionId, UUID userId);
+    List<Long> getCompletedLevelSequence(UUID sessionId, UUID userId);
+    Long getNextLevelId(UUID sessionId, UUID userId);
     
     // Операции с сессиями
-    List<LevelProgress> getSessionProgressSummary(Long sessionId);
-    List<LevelProgress> getAllUsersProgressForLevel(Long sessionId, Long levelId);
-    LevelProgress getBestProgressForLevel(Long sessionId, Long levelId);
-    List<LevelProgress> getTopProgressForSession(Long sessionId, int limit);
+    List<LevelProgress> getSessionProgressSummary(UUID sessionId);
+    List<LevelProgress> getAllUsersProgressForLevel(UUID sessionId, UUID levelId);
+    LevelProgress getBestProgressForLevel(UUID sessionId, UUID levelId);
+    List<LevelProgress> getTopProgressForSession(UUID sessionId, int limit);
     
     // Командные операции
-    List<LevelProgress> getTeamProgress(Long sessionId, UUID teamId);
-    Double getTeamProgressPercentage(Long sessionId, UUID teamId);
-    List<LevelProgress> getTeamMembersProgress(Long sessionId, UUID teamId, Long levelId);
+    List<LevelProgress> getTeamProgress(UUID sessionId, UUID teamId);
+    Double getTeamProgressPercentage(UUID sessionId, UUID teamId);
+    List<LevelProgress> getTeamMembersProgress(UUID sessionId, UUID teamId, UUID levelId);
     
     // Операции для администрирования
     List<LevelProgress> getAllProgressForAdmin();
-    void resetProgress(Long sessionId, UUID userId);
-    void resetSessionProgress(Long sessionId);
+    void resetProgress(UUID sessionId, UUID userId);
+    void resetSessionProgress(UUID sessionId);
     void deleteProgressOlderThan(Instant cutoffDate);
     List<LevelProgress> getStuckProgress(int hoursThreshold);
     
@@ -114,8 +114,8 @@ public interface LevelProgressService {
     void cacheProgress(LevelProgress progress);
     void evictProgressFromCache(Long progressId);
     Optional<LevelProgress> getCachedProgress(Long progressId);
-    void cacheSessionProgress(Long sessionId, List<LevelProgress> progressList);
-    void evictSessionProgressFromCache(Long sessionId);
+    void cacheSessionProgress(UUID sessionId, List<LevelProgress> progressList);
+    void evictSessionProgressFromCache(UUID sessionId);
     
     // Операции с событиями
     void publishLevelStartedEvent(LevelProgress progress);
@@ -131,11 +131,11 @@ public interface LevelProgressService {
     void notifyTeam(LevelProgress progress);
     
     // Аналитика и отчеты
-    List<Object[]> getProgressStatisticsByHour(Long sessionId, Instant start, Instant end);
-    List<Object[]> getProgressStatisticsByDay(Long sessionId, Instant start, Instant end);
-    List<Object[]> getLevelCompletionRates(Long sessionId);
-    List<Object[]> getUserProgressSummary(Long sessionId);
-    List<Object[]> getLevelDifficultyAnalysis(Long levelId);
+    List<Object[]> getProgressStatisticsByHour(UUID sessionId, Instant start, Instant end);
+    List<Object[]> getProgressStatisticsByDay(UUID sessionId, Instant start, Instant end);
+    List<Object[]> getLevelCompletionRates(UUID sessionId);
+    List<Object[]> getUserProgressSummary(UUID sessionId);
+    List<Object[]> getLevelDifficultyAnalysis(UUID levelId);
     
     // Операции для оптимизации
     void batchCreateProgress(List<LevelProgress> progressList);
@@ -143,24 +143,24 @@ public interface LevelProgressService {
     List<LevelProgress> getProgressForOptimization(int batchSize);
     
     // Вспомогательные методы
-    Double calculateProgressPercentage(Long sessionId, UUID userId, Long levelId);
-    boolean isLevelCompleted(Long sessionId, UUID userId, Long levelId);
-    boolean isLevelInProgress(Long sessionId, UUID userId, Long levelId);
+    Double calculateProgressPercentage(UUID sessionId, UUID userId, UUID levelId);
+    boolean isLevelCompleted(UUID sessionId, UUID userId, UUID levelId);
+    boolean isLevelInProgress(UUID sessionId, UUID userId, UUID levelId);
     String generateProgressId();
     void logProgress(LevelProgress progress);
     
     // Операции с подсказками
     LevelProgress useHint(Long progressId, Long hintId);
-    int getHintsUsed(Long sessionId, UUID userId, Long levelId);
-    Double calculateHintPenalty(Long sessionId, UUID userId, Long levelId);
+    int getHintsUsed(UUID sessionId, UUID userId, UUID levelId);
+    Double calculateHintPenalty(UUID sessionId, UUID userId, UUID levelId);
     
     // Операции с попытками
     void incrementAttempts(Long progressId);
-    int getAttemptsCount(Long sessionId, UUID userId, Long levelId);
-    Double calculateAttemptPenalty(Long sessionId, UUID userId, Long levelId);
+    int getAttemptsCount(UUID sessionId, UUID userId, UUID levelId);
+    Double calculateAttemptPenalty(UUID sessionId, UUID userId, UUID levelId);
     
     // Операции с достижениями
-    void checkAchievements(Long sessionId, UUID userId, Long levelId);
-    List<String> getUnlockedAchievements(Long sessionId, UUID userId);
+    void checkAchievements(UUID sessionId, UUID userId, UUID levelId);
+    List<String> getUnlockedAchievements(UUID sessionId, UUID userId);
     boolean hasAchievement(UUID userId, String achievementCode);
 }

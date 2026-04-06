@@ -45,7 +45,7 @@ public class Level {
      */
     @NotNull(message = "ID квеста обязателен")
     @Column(name = "quest_id", nullable = false)
-    private Long questId;
+    private UUID questId;
 
     /**
      * Порядковый номер уровня в квесте

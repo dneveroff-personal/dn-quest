@@ -4,6 +4,8 @@ import dn.quest.shared.events.BaseEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие удаления квеста
  */
@@ -14,5 +16,5 @@ public class QuestDeletedEvent extends BaseEvent {
     /**
      * ID удалённого квеста
      */
-    private Long questId;
+    private UUID questId;
 }

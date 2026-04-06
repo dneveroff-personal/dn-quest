@@ -240,17 +240,17 @@ public interface TeamService {
     /**
      * Обновить доступные квесты для команд
      */
-    void updateAvailableQuests(Long questId, String status);
+    void updateAvailableQuests(UUID questId, String status);
 
     /**
      * Обновить кэш квестов
      */
-    void updateQuestCache(Long questId, dn.quest.shared.events.quest.QuestUpdatedEvent event);
+    void updateQuestCache(UUID questId, dn.quest.shared.events.quest.QuestUpdatedEvent event);
 
     /**
      * Удалить квест из доступных
      */
-    void removeQuestFromAvailable(Long questId);
+    void removeQuestFromAvailable(UUID questId);
 
     /**
      * Обновить статистику игровой сессии

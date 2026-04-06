@@ -162,7 +162,7 @@ public record GameSessionDTO(
     @Schema(description = "Прогресс по уровням")
     public record LevelProgressDTO(
         @Schema(description = "ID уровня", example = "101")
-        Long levelId,
+        UUID levelId,
         
         @Schema(description = "Название уровня", example = "Первый этаж")
         String levelName,

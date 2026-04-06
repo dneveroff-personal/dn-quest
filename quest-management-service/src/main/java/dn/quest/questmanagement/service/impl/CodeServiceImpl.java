@@ -218,7 +218,7 @@ public class CodeServiceImpl implements CodeService {
                 .orElseThrow(() -> new CodeNotFoundException("Code not found with ID: " + id));
     }
 
-    private Long getQuestIdByLevelId(UUID levelId) {
+    private UUID getQuestIdByLevelId(UUID levelId) {
         return levelRepository.findById(levelId)
                 .map(level -> level.getQuestId())
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with ID: " + levelId));

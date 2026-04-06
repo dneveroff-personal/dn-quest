@@ -654,19 +654,19 @@ public class TeamServiceImpl implements TeamService {
     // === Методы для обработки событий Kafka ===
 
     @Override
-    public void updateAvailableQuests(Long questId, String status) {
+    public void updateAvailableQuests(UUID questId, String status) {
         log.info("Updating available quests: questId={}, status={}", questId, status);
         // Логика обновления доступных квестов для команд
     }
 
     @Override
-    public void updateQuestCache(Long questId, dn.quest.shared.events.quest.QuestUpdatedEvent event) {
+    public void updateQuestCache(UUID questId, dn.quest.shared.events.quest.QuestUpdatedEvent event) {
         log.info("Updating quest cache: questId={}", questId);
         // Логика обновления кэша квестов
     }
 
     @Override
-    public void removeQuestFromAvailable(Long questId) {
+    public void removeQuestFromAvailable(UUID questId) {
         log.info("Removing quest from available: questId={}", questId);
         // Логика удаления квеста из доступных
     }

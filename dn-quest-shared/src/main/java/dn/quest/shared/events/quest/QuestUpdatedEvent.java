@@ -4,6 +4,8 @@ import dn.quest.shared.events.BaseEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
  * Событие обновления квеста
  */
@@ -14,7 +16,7 @@ public class QuestUpdatedEvent extends BaseEvent {
     /**
      * ID обновлённого квеста
      */
-    private Long questId;
+    private UUID questId;
 
     /**
      * Название квеста

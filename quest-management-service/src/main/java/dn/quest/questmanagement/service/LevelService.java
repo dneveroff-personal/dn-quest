@@ -19,7 +19,7 @@ public interface LevelService {
      * @param questId ID квеста
      * @return созданный уровень
      */
-    LevelDTO createLevel(LevelDTO dto, Long questId);
+    LevelDTO createLevel(LevelDTO dto, UUID questId);
 
     /**
      * Обновить существующий уровень
@@ -51,7 +51,7 @@ public interface LevelService {
      * @param questId ID квеста
      * @return список уровней
      */
-    List<LevelDTO> getLevelsByQuestId(Long questId);
+    List<LevelDTO> getLevelsByQuestId(UUID questId);
 
     /**
      * Получить уровень по порядковому номеру в квесте
@@ -60,7 +60,7 @@ public interface LevelService {
      * @param order порядковый номер
      * @return уровень
      */
-    LevelDTO getLevelByOrder(Long questId, Integer order);
+    LevelDTO getLevelByOrder(UUID questId, Integer order);
 
     /**
      * Получить следующий уровень
@@ -69,7 +69,7 @@ public interface LevelService {
      * @param currentOrder текущий порядковый номер
      * @return следующий уровень или null
      */
-    LevelDTO getNextLevel(Long questId, Integer currentOrder);
+    LevelDTO getNextLevel(UUID questId, Integer currentOrder);
 
     /**
      * Получить предыдущий уровень
@@ -78,7 +78,7 @@ public interface LevelService {
      * @param currentOrder текущий порядковый номер
      * @return предыдущий уровень или null
      */
-    LevelDTO getPreviousLevel(Long questId, Integer currentOrder);
+    LevelDTO getPreviousLevel(UUID questId, Integer currentOrder);
 
     /**
      * Изменить порядок уровня
@@ -111,7 +111,7 @@ public interface LevelService {
      * @param sourceQuestId ID исходного квеста
      * @param targetQuestId ID целевого квеста
      */
-    void copyLevelsForQuest(Long sourceQuestId, Long targetQuestId);
+    void copyLevelsForQuest(UUID sourceQuestId, UUID targetQuestId);
 
     /**
      * Проверить целостность уровней квеста
@@ -119,7 +119,7 @@ public interface LevelService {
      * @param questId ID квеста
      * @return результат проверки
      */
-    LevelIntegrityResult checkLevelIntegrity(Long questId);
+    LevelIntegrityResult checkLevelIntegrity(UUID questId);
 
     /**
      * Переупорядочить уровни квеста
@@ -127,7 +127,7 @@ public interface LevelService {
      * @param questId ID квеста
      * @return список обновленных уровней
      */
-    List<LevelDTO> reorderLevels(Long questId);
+    List<LevelDTO> reorderLevels(UUID questId);
 
     /**
      * Результат проверки целостности уровней

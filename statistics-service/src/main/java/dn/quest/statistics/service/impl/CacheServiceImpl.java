@@ -145,13 +145,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public Map<String, Object> getQuestStatistics(Long questId, LocalDate date) {
+    public Map<String, Object> getQuestStatistics(UUID questId, LocalDate date) {
         String key = buildQuestStatsKey(questId, date);
         return questStatisticsCache.getIfPresent(key);
     }
 
     @Override
-    public void cacheQuestStatistics(Long questId, LocalDate date, Map<String, Object> statistics) {
+    public void cacheQuestStatistics(UUID questId, LocalDate date, Map<String, Object> statistics) {
         String key = buildQuestStatsKey(questId, date);
         questStatisticsCache.put(key, statistics);
         log.debug("Cached quest statistics for quest: {} date: {}", questId, date);
@@ -278,7 +278,7 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public void invalidateQuestCache(Long questId) {
+    public void invalidateQuestCache(UUID questId) {
         String pattern = "quest_stats:" + questId + ":*";
         clearCacheByPattern(pattern);
         log.info("Invalidated cache for quest: {}", questId);
@@ -446,7 +446,7 @@ public class CacheServiceImpl implements CacheService {
         return "user_stats:" + userId + ":" + date;
     }
 
-    private String buildQuestStatsKey(Long questId, LocalDate date) {
+    private String buildQuestStatsKey(UUID questId, LocalDate date) {
         return "quest_stats:" + questId + ":" + date;
     }
 

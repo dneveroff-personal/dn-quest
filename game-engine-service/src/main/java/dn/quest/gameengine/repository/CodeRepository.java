@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с кодами уровней
@@ -140,7 +141,7 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
     List<Object[]> findDuplicateCodes();
 
     @Query("select c.value, count(c) from Code c where c.level.quest.id = :questId group by c.value having count(c) > 1")
-    List<Object[]> findDuplicateCodesByQuest(@Param("questId") Long questId);
+    List<Object[]> findDuplicateCodesByQuest(@Param("questId") UUID questId);
 
     // Запросы для анализа эффективности кодов
     @Query("select c from Code c where c.usageCount > 0 order by (CAST(c.usageCount AS double) / nullif(c.maxUsageCount, 1)) desc")
@@ -168,10 +169,10 @@ public interface CodeRepository extends JpaRepository<Code, Long> {
 
     // Запросы для поиска кодов по квесту
     @Query("select c from Code c where c.level.quest.id = :questId order by c.level.orderIndex asc, c.sectorNo asc")
-    List<Code> findByQuestId(@Param("questId") Long questId);
+    List<Code> findByQuestId(@Param("questId") UUID questId);
 
     @Query("select c from Code c where c.level.quest.id = :questId and c.type = :type order by c.level.orderIndex asc")
-    List<Code> findByQuestIdAndType(@Param("questId") Long questId, @Param("type") CodeType type);
+    List<Code> findByQuestIdAndType(@Param("questId") UUID questId, @Param("type") CodeType type);
 
     // Запросы для комплексного анализа
     @Query("select c.type, count(c), avg(c.usageCount), avg(c.shiftSeconds) from Code c group by c.type")

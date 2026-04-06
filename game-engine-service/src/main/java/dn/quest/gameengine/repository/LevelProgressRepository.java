@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с прогрессом прохождения уровней
@@ -125,7 +126,7 @@ public interface LevelProgressRepository extends JpaRepository<LevelProgress, Lo
 
     // Запросы для получения прогресса по квесту
     @Query("SELECT lp FROM LevelProgress lp WHERE lp.level.quest.id = :questId AND lp.session = :session ORDER BY lp.level.orderIndex")
-    List<LevelProgress> findByQuestAndSession(@Param("questId") Long questId, @Param("session") GameSession session);
+    List<LevelProgress> findByQuestAndSession(@Param("questId") UUID questId, @Param("session") GameSession session);
 
     // Запросы для анализа эффективности
     @Query("SELECT lp.session, COUNT(lp), AVG(lp.sectorsClosed), AVG(lp.hintsUsed) FROM LevelProgress lp WHERE lp.closedAt IS NOT NULL GROUP BY lp.session")

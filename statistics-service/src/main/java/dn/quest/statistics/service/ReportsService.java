@@ -25,12 +25,12 @@ public interface ReportsService {
     /**
      * Экспортировать статистику квестов
      */
-    byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID authorId);
+    byte[] exportQuestStatistics(LocalDate startDate, LocalDate endDate, String format, UUID questId, UUID authorId);
 
     /**
      * Экспортировать игровую статистику
      */
-    byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, Long questId, UUID userId);
+    byte[] exportGameStatistics(LocalDate startDate, LocalDate endDate, String format, UUID questId, UUID userId);
 
     /**
      * Экспортировать лидерборды

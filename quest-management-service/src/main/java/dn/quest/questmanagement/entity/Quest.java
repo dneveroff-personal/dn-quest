@@ -44,7 +44,7 @@ public class Quest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
 
     /**
      * Уникальный номер квеста для идентификации
@@ -238,7 +238,7 @@ public class Quest {
     /**
      * Средний рейтинг квеста
      */
-    @Column(name = "average_rating", precision = 3, scale = 2)
+    @Column(name = "average_rating")
     @Builder.Default
     private Double averageRating = 0.0;
 

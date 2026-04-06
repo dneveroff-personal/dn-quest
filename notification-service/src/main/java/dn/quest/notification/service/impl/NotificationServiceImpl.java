@@ -127,7 +127,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления о создании квеста
      */
-    public CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestCreatedNotification(UUID questId, String title, UUID authorId) {
         String subject = "Квест создан";
         String message = String.format(
                 "Ваш квест \"%s\" (ID: %d) был успешно создан и готов к настройке.",
@@ -141,7 +141,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления об обновлении квеста
      */
-    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestUpdatedNotification(UUID questId, String title, UUID authorId) {
         String subject = "Квест обновлен";
         String message = String.format(
                 "Ваш квест \"%s\" (ID: %d) был обновлен.",
@@ -155,7 +155,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления о публикации квеста
      */
-    public CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestPublishedNotification(UUID questId, String title, UUID authorId) {
         String subject = "Квест опубликован";
         String message = String.format(
                 "Поздравляем! Ваш квест \"%s\" (ID: %d) был опубликован и теперь доступен всем игрокам.",
@@ -169,7 +169,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления о начале игровой сессии
      */
-    public CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, Long sessionId, Long questId) {
+    public CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, UUID sessionId, UUID questId) {
         String subject = "Игровая сессия начата";
         String message = String.format(
                 "Вы начали игровую сессию (ID: %d) для квеста (ID: %d). Удачи!",
@@ -183,7 +183,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления о завершении игровой сессии
      */
-    public CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, Long sessionId, boolean completed) {
+    public CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, UUID sessionId, boolean completed) {
         String subject = completed ? "Квест завершен!" : "Игровая сессия завершена";
         String message = String.format(
                 "Ваша игровая сессия (ID: %d) завершена.%s",
@@ -198,7 +198,7 @@ public class NotificationServiceImpl extends TelegramLongPollingBot {
     /**
      * Отправка уведомления о завершении уровня
      */
-    public CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, Long sessionId, Integer levelNumber) {
+    public CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, UUID sessionId, Integer levelNumber) {
         String subject = "Уровень пройден!";
         String message = String.format(
                 "Отлично! Вы прошли уровень %d в игровой сессии (ID: %d). Продолжайте в том же духе!",

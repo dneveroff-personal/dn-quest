@@ -1,7 +1,7 @@
 -- Создание таблицы levels
 CREATE TABLE levels (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     "order" INTEGER NOT NULL, -- порядковый номер уровня в квесте
@@ -9,7 +9,7 @@ CREATE TABLE levels (
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     radius DECIMAL(8, 2), -- радиус в метрах
-    media_ids BIGINT[], -- массив ID медиа файлов
+    media_ids UUID[], -- массив ID медиа файлов
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     

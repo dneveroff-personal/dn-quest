@@ -28,32 +28,32 @@ public interface NotificationService {
     /**
      * Отправка уведомления о создании квеста
      */
-    CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, UUID authorId);
+    CompletableFuture<Void> sendQuestCreatedNotification(UUID questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления об обновлении квеста
      */
-    CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, UUID authorId);
+    CompletableFuture<Void> sendQuestUpdatedNotification(UUID questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления о публикации квеста
      */
-    CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, UUID authorId);
+    CompletableFuture<Void> sendQuestPublishedNotification(UUID questId, String title, UUID authorId);
 
     /**
      * Отправка уведомления о начале игровой сессии
      */
-    CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, Long sessionId, Long questId);
+    CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, UUID sessionId, UUID questId);
 
     /**
      * Отправка уведомления о завершении игровой сессии
      */
-    CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, Long sessionId, boolean completed);
+    CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, UUID sessionId, boolean completed);
 
     /**
      * Отправка уведомления о завершении уровня
      */
-    CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, Long sessionId, Integer levelNumber);
+    CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, UUID sessionId, Integer levelNumber);
 
     /**
      * Отправка уведомления о создании команды

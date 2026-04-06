@@ -26,42 +26,42 @@ public interface StatisticsService {
     /**
      * Обновление статистики создания квестов
      */
-    void updateQuestCreationStatistics(Long questId, UUID authorId, Instant timestamp);
+    void updateQuestCreationStatistics(UUID questId, UUID authorId, Instant timestamp);
 
     /**
      * Обновление статистики обновления квестов
      */
-    void updateQuestUpdateStatistics(Long questId, Instant timestamp);
+    void updateQuestUpdateStatistics(UUID questId, Instant timestamp);
 
     /**
      * Обновление статистики публикации квестов
      */
-    void updateQuestPublicationStatistics(Long questId, UUID authorId, Instant timestamp);
+    void updateQuestPublicationStatistics(UUID questId, UUID authorId, Instant timestamp);
 
     /**
      * Обновление статистики удаления квестов
      */
-    void updateQuestDeletionStatistics(Long questId, Instant timestamp);
+    void updateQuestDeletionStatistics(UUID questId, Instant timestamp);
 
     /**
      * Обновление статистики начала игровых сессий
      */
-    void updateGameSessionStartStatistics(Long sessionId, UUID userId, UUID teamId, Long questId, Instant timestamp);
+    void updateGameSessionStartStatistics(UUID sessionId, UUID userId, UUID teamId, UUID questId, Instant timestamp);
 
     /**
      * Обновление статистики завершения игровых сессий
      */
-    void updateGameSessionFinishStatistics(Long sessionId, UUID userId, UUID teamId, Long questId, boolean completed, Instant timestamp);
+    void updateGameSessionFinishStatistics(UUID sessionId, UUID userId, UUID teamId, UUID questId, boolean completed, Instant timestamp);
 
     /**
      * Обновление статистики отправки кода
      */
-    void updateCodeSubmissionStatistics(Long sessionId, UUID userId, Long levelId, boolean success, Instant timestamp);
+    void updateCodeSubmissionStatistics(UUID sessionId, UUID userId, UUID levelId, boolean success, Instant timestamp);
 
     /**
      * Обновление статистики завершения уровней
      */
-    void updateLevelCompletionStatistics(Long sessionId, UUID userId, Integer levelNumber, Long completionTime, Instant timestamp);
+    void updateLevelCompletionStatistics(UUID sessionId, UUID userId, Integer levelNumber, Long completionTime, Instant timestamp);
 
     /**
      * Обновление статистики создания команд

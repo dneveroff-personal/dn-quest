@@ -11,9 +11,9 @@ spring:
     active: dev
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/team_management_db
-    username: ${DB_USERNAME:team_management_user}
-    password: ${DB_PASSWORD:team_management_pass}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_teams}
+    username: ${DATABASE_USERNAME:dn}
+    password: ${DATABASE_PASSWORD:dn}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -24,7 +24,7 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:

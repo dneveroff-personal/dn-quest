@@ -24,7 +24,7 @@ public record CreateGameSessionRequest(
     
     @NotNull(message = "ID квеста обязателен")
     @Schema(description = "ID квеста", example = "456")
-    Long questId,
+    UUID questId,
     
     @Schema(description = "ID команды (необязательно)", example = "789")
     UUID teamId,

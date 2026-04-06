@@ -1,6 +1,6 @@
 -- Создание таблицы настроек пользователей
 CREATE TABLE user_settings (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id UUID NOT NULL UNIQUE,
     
     -- Настройки приватности

@@ -35,7 +35,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public LevelDTO createLevel(LevelDTO dto, Long questId) {
+    public LevelDTO createLevel(LevelDTO dto, UUID questId) {
         log.info("Creating new level for quest with ID: {}", questId);
 
         // Проверка существования квеста
@@ -125,7 +125,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LevelDTO> getLevelsByQuestId(Long questId) {
+    public List<LevelDTO> getLevelsByQuestId(UUID questId) {
         List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
         return levels.stream()
                 .map(this::convertToDTO)
@@ -134,7 +134,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public LevelDTO getLevelByOrder(Long questId, Integer order) {
+    public LevelDTO getLevelByOrder(UUID questId, Integer order) {
         Level level = levelRepository.findByQuestIdAndOrderIndex(questId, order)
                 .orElseThrow(() -> new LevelNotFoundException(
                         "Level not found with quest ID: " + questId + " and order: " + order));
@@ -143,14 +143,14 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public LevelDTO getNextLevel(Long questId, Integer currentOrder) {
+    public LevelDTO getNextLevel(UUID questId, Integer currentOrder) {
         Optional<Level> nextLevel = levelRepository.findNextLevel(questId, currentOrder);
         return nextLevel.map(this::convertToDTO).orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public LevelDTO getPreviousLevel(Long questId, Integer currentOrder) {
+    public LevelDTO getPreviousLevel(UUID questId, Integer currentOrder) {
         Optional<Level> previousLevel = levelRepository.findPreviousLevel(questId, currentOrder);
         return previousLevel.map(this::convertToDTO).orElse(null);
     }
@@ -222,7 +222,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public void copyLevelsForQuest(Long sourceQuestId, Long targetQuestId) {
+    public void copyLevelsForQuest(UUID sourceQuestId, UUID targetQuestId) {
         log.info("Copying levels from quest {} to quest {}", sourceQuestId, targetQuestId);
 
         List<Level> sourceLevels = levelRepository.findByQuestIdOrderByOrderIndex(sourceQuestId);
@@ -252,7 +252,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional(readOnly = true)
-    public LevelIntegrityResult checkLevelIntegrity(Long questId) {
+    public LevelIntegrityResult checkLevelIntegrity(UUID questId) {
         List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
 
         List<String> errors = new ArrayList<>();
@@ -304,7 +304,7 @@ public class LevelServiceImpl implements LevelService {
 
     @Override
     @Transactional
-    public List<LevelDTO> reorderLevels(Long questId) {
+    public List<LevelDTO> reorderLevels(UUID questId) {
         log.info("Reordering levels for quest with ID: {}", questId);
 
         List<Level> levels = levelRepository.findByQuestIdOrderByOrderIndex(questId);
@@ -331,7 +331,7 @@ public class LevelServiceImpl implements LevelService {
                 .orElseThrow(() -> new LevelNotFoundException("Level not found with ID: " + id));
     }
 
-    private Integer getNextOrderNumber(Long questId) {
+    private Integer getNextOrderNumber(UUID questId) {
         Integer maxOrder = levelRepository.findMaxOrderIndexByQuestId(questId);
         return maxOrder != null ? maxOrder + 1 : 1;
     }

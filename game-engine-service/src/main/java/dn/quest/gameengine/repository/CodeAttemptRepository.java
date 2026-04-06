@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с попытками ввода кодов
@@ -28,14 +29,14 @@ public interface CodeAttemptRepository extends JpaRepository<CodeAttempt, Long> 
 
     // Запросы с пагинацией
     @Query("SELECT ca FROM CodeAttempt ca WHERE ca.session.id = :sessionId AND ca.level.id = :levelId ORDER BY ca.createdAt DESC")
-    List<CodeAttempt> findLastAttempts(@Param("sessionId") Long sessionId, @Param("levelId") Long levelId, Pageable pageable);
+    List<CodeAttempt> findLastAttempts(@Param("sessionId") UUID sessionId, @Param("levelId") UUID levelId, Pageable pageable);
 
     @Query("SELECT ca FROM CodeAttempt ca WHERE ca.session.id = :sessionId AND ca.level.id = :levelId ORDER BY ca.createdAt DESC")
-    Page<CodeAttempt> findAttemptsBySessionAndLevel(@Param("sessionId") Long sessionId, @Param("levelId") Long levelId, Pageable pageable);
+    Page<CodeAttempt> findAttemptsBySessionAndLevel(@Param("sessionId") UUID sessionId, @Param("levelId") UUID levelId, Pageable pageable);
 
     // Проверка дубликатов
     @Query("SELECT COUNT(ca) > 0 FROM CodeAttempt ca WHERE ca.session.id = :sessionId AND ca.level = :level AND ca.submittedNormalized = :normalized")
-    boolean existsBySessionAndSubmittedNormalized(@Param("sessionId") Long sessionId, @Param("level") Level level, @Param("normalized") String normalized);
+    boolean existsBySessionAndSubmittedNormalized(@Param("sessionId") UUID sessionId, @Param("level") Level level, @Param("normalized") String normalized);
 
     // Подсчет закрытых секторов
     @Query("SELECT COUNT(DISTINCT ca.matchedSectorNo) FROM CodeAttempt ca WHERE ca.session = :session AND ca.level = :level AND ca.result IN ('ACCEPTED_NORMAL', 'ACCEPTED_BONUS', 'ACCEPTED_PENALTY')")

@@ -23,8 +23,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionStartedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -45,8 +45,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionFinishedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -70,8 +70,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionParticipantJoinedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -90,8 +90,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionParticipantLeftEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -113,12 +113,12 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionLevelCompletedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
-        private Long levelId;
+        private UUID levelId;
         private String levelName;
         private Long participantId;
         private String participantUsername;
@@ -140,12 +140,12 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionHintUsedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
-        private Long levelId;
+        private UUID levelId;
         private String levelName;
         private Long hintId;
         private String hintText;
@@ -166,12 +166,12 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionAttemptSubmittedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
-        private Long levelId;
+        private UUID levelId;
         private String levelName;
         private Long attemptId;
         private String answer;
@@ -194,8 +194,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionPausedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -215,8 +215,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionResumedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -235,8 +235,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionStatusChangedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -257,8 +257,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionStatisticsUpdatedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;
@@ -285,8 +285,8 @@ public class GameEvents {
     @AllArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     public static class GameSessionAchievementUnlockedEvent extends BaseEvent {
-        private Long sessionId;
-        private Long questId;
+        private UUID sessionId;
+        private UUID questId;
         private String questName;
         private UUID teamId;
         private String teamName;

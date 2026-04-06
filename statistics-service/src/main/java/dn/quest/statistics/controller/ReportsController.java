@@ -121,7 +121,7 @@ public class ReportsController {
             @RequestParam(defaultValue = "csv") String format,
             
             @Parameter(description = "ID квеста для фильтрации") 
-            @RequestParam(required = false) Long questId,
+            @RequestParam(required = false) UUID questId,
             
             @Parameter(description = "ID автора для фильтрации") 
             @RequestParam(required = false) UUID authorId) {
@@ -164,7 +164,7 @@ public class ReportsController {
             @RequestParam(defaultValue = "csv") String format,
             
             @Parameter(description = "ID квеста для фильтрации") 
-            @RequestParam(required = false) Long questId,
+            @RequestParam(required = false) UUID questId,
             
             @Parameter(description = "ID пользователя для фильтрации") 
             @RequestParam(required = false) UUID userId) {

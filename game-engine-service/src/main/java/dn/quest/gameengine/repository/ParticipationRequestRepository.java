@@ -15,12 +15,13 @@ import org.springframework.stereotype.Repository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с запросами на участие
  */
 @Repository
-public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, Long> {
+public interface ParticipationRequestRepository extends JpaRepository<ParticipationRequest, UUID> {
 
     // Базовые запросы
     List<ParticipationRequest> findBySession(GameSession session);
@@ -135,7 +136,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     // Запросы для анализа по квестам
     @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.session.level.quest.id = :questId ORDER BY pr.createdAt DESC")
-    List<ParticipationRequest> findByQuestId(@Param("questId") Long questId);
+    List<ParticipationRequest> findByQuestId(@Param("questId") UUID questId);
 
     // Запросы для поиска запросов от конкретных пользователей
     @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.user.id IN :userIds ORDER BY pr.createdAt DESC")

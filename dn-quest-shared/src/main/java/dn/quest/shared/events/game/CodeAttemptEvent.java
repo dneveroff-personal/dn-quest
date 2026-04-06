@@ -32,7 +32,7 @@ public class CodeAttemptEvent extends GameEngineEvent {
     @Schema(description = "ID сессии", example = "789", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Getter
     @Setter
-    private Long sessionId;
+    private UUID sessionId;
 
     @Schema(description = "ID пользователя", example = "550e8400-e29b-41d4-a716-446655440000", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Getter
@@ -42,7 +42,7 @@ public class CodeAttemptEvent extends GameEngineEvent {
     @Schema(description = "ID уровня", example = "101")
     @Getter
     @Setter
-    private Long levelId;
+    private UUID levelId;
 
     @Schema(description = "Название уровня", example = "Первый этаж")
     @Getter

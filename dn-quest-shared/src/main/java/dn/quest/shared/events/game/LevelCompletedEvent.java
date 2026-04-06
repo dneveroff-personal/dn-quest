@@ -17,10 +17,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LevelCompletedEvent extends BaseEvent {
 
-    private Long questId;
-    private Long sessionId;
+    private UUID questId;
+    private UUID sessionId;
     private UUID userId;
-    private Long levelId;
+    private UUID levelId;
     private Integer levelNumber;
     private Integer score;
     private Long completionTime;

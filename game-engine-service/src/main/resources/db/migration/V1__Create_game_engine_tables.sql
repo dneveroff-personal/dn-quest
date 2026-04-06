@@ -1,13 +1,13 @@
 -- Создание таблицы игровых сессий
 CREATE TABLE game_sessions (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'CREATED',
-    owner_id BIGINT NOT NULL,
-    quest_id BIGINT NOT NULL,
-    team_id BIGINT,
-    current_level_id BIGINT,
+    owner_id UUID NOT NULL,
+    quest_id UUID NOT NULL,
+    team_id UUID,
+    current_level_id UUID,
     max_participants INTEGER DEFAULT 10,
     is_private BOOLEAN DEFAULT FALSE,
     requires_approval BOOLEAN DEFAULT FALSE,
@@ -42,10 +42,10 @@ CREATE INDEX idx_game_sessions_requires_approval ON game_sessions(requires_appro
 
 -- Создание таблицы попыток ввода кодов
 CREATE TABLE code_attempts (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    level_id UUID NOT NULL,
     submitted_code VARCHAR(255) NOT NULL,
     correct_code VARCHAR(255),
     sector VARCHAR(10) NOT NULL,
@@ -87,10 +87,10 @@ CREATE INDEX idx_code_attempts_is_bonus ON code_attempts(is_bonus);
 
 -- Создание таблицы прогресса по уровням
 CREATE TABLE level_progress (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    level_id UUID NOT NULL,
     status VARCHAR(50) NOT NULL DEFAULT 'NOT_STARTED',
     progress_percentage DECIMAL(5,2) DEFAULT 0.0,
     score DECIMAL(10,2) DEFAULT 0.0,
@@ -132,10 +132,10 @@ CREATE INDEX idx_level_progress_last_activity_at ON level_progress(last_activity
 
 -- Создание таблицы завершенных уровней
 CREATE TABLE level_completions (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    level_id UUID NOT NULL,
     completion_code VARCHAR(255) NOT NULL,
     completion_sector VARCHAR(10) NOT NULL,
     time_spent_seconds BIGINT NOT NULL,
@@ -174,17 +174,17 @@ CREATE INDEX idx_level_completions_completion_rank ON level_completions(completi
 
 -- Создание таблицы запросов на участие
 CREATE TABLE participation_requests (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    team_id BIGINT,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    team_id UUID,
     status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
     message TEXT,
     request_type VARCHAR(50) DEFAULT 'INDIVIDUAL',
     priority INTEGER DEFAULT 0,
-    submitted_by BIGINT NOT NULL,
-    approved_by BIGINT,
-    rejected_by BIGINT,
+    submitted_by UUID NOT NULL,
+    approved_by UUID,
+    rejected_by UUID,
     approved_at TIMESTAMP WITH TIME ZONE,
     rejected_at TIMESTAMP WITH TIME ZONE,
     cancelled_at TIMESTAMP WITH TIME ZONE,
@@ -219,8 +219,8 @@ CREATE INDEX idx_participation_requests_submitted_by ON participation_requests(s
 
 -- Создание таблицы участников сессий (для связи многие-ко-многим)
 CREATE TABLE session_participants (
-    session_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    session_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     joined_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     left_at TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE,

@@ -37,7 +37,7 @@ public class QuestStatistics {
      * ID квеста
      */
     @Column(name = "quest_id", nullable = false)
-    private Long questId;
+    private UUID questId;
 
     /**
      * Название квеста

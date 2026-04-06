@@ -530,10 +530,10 @@ public interface AuthServiceClient {
 #### 5.4.2 События для Kafka
 ```java
 // События
-public record QuestCreatedEvent(Long questId, String title, UUID authorId) {}
-public record QuestPublishedEvent(Long questId, String title) {}
-public record QuestUpdatedEvent(Long questId, String title) {}
-public record QuestDeletedEvent(Long questId) {}
+public record QuestCreatedEvent(UUID questId, String title, UUID authorId) {}
+public record QuestPublishedEvent(UUID questId, String title) {}
+public record QuestUpdatedEvent(UUID questId, String title) {}
+public record QuestDeletedEvent(UUID questId) {}
 ```
 
 ### 5.5 Этап 5: Team Management Service (1-2 недели)
@@ -780,19 +780,19 @@ public record UserDeletedEvent(UUID userId) {}
 #### 6.2.2 События квестов
 ```java
 // Топик: quest-events
-public record QuestCreatedEvent(Long questId, String title, UUID authorId) {}
-public record QuestPublishedEvent(Long questId, String title) {}
-public record QuestUpdatedEvent(Long questId, String title) {}
-public record QuestDeletedEvent(Long questId) {}
+public record QuestCreatedEvent(UUID questId, String title, UUID authorId) {}
+public record QuestPublishedEvent(UUID questId, String title) {}
+public record QuestUpdatedEvent(UUID questId, String title) {}
+public record QuestDeletedEvent(UUID questId) {}
 ```
 
 #### 6.2.3 Игровые события
 ```java
 // Топик: game-events
-public record GameSessionStartedEvent(Long sessionId, Long questId, UUID userId, UUID teamId) {}
-public record GameSessionFinishedEvent(Long sessionId, Long questId, UUID userId, UUID teamId) {}
-public record CodeSubmittedEvent(Long sessionId, Long levelId, UUID userId, String code, boolean correct) {}
-public record LevelCompletedEvent(Long sessionId, Long levelId, UUID userId, int durationSec) {}
+public record GameSessionStartedEvent(UUID sessionId, UUID questId, UUID userId, UUID teamId) {}
+public record GameSessionFinishedEvent(UUID sessionId, UUID questId, UUID userId, UUID teamId) {}
+public record CodeSubmittedEvent(UUID sessionId, UUID levelId, UUID userId, String code, boolean correct) {}
+public record LevelCompletedEvent(UUID sessionId, UUID levelId, UUID userId, int durationSec) {}
 ```
 
 #### 6.2.4 События команд
@@ -865,7 +865,7 @@ public class NotificationEventsHandler {
 ```sql
 -- dn_quest_auth
 CREATE TABLE users (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username VARCHAR(64) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE,
@@ -884,8 +884,8 @@ CREATE INDEX idx_users_role ON users(role);
 ```sql
 -- dn_quest_users
 CREATE TABLE user_profiles (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT UNIQUE NOT NULL,
+    id UUID PRIMARY KEY,
+    user_id UUID UNIQUE NOT NULL,
     avatar_url VARCHAR(500),
     bio TEXT,
     preferences JSONB,
@@ -895,8 +895,8 @@ CREATE TABLE user_profiles (
 );
 
 CREATE TABLE user_activities (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
     activity_type VARCHAR(50) NOT NULL,
     description TEXT,
     metadata JSONB,
@@ -912,7 +912,7 @@ CREATE INDEX idx_user_activities_type ON user_activities(activity_type);
 ```sql
 -- dn_quest_quests
 CREATE TABLE quests (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     number BIGINT UNIQUE,
     difficulty VARCHAR(16) NOT NULL,
     type VARCHAR(8) NOT NULL DEFAULT 'TEAM',
@@ -926,14 +926,14 @@ CREATE TABLE quests (
 );
 
 CREATE TABLE quest_authors (
-    quest_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    quest_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     PRIMARY KEY (quest_id, user_id)
 );
 
 CREATE TABLE levels (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
     order_index INTEGER NOT NULL,
     title VARCHAR(200) NOT NULL,
     description_html TEXT,
@@ -945,8 +945,8 @@ CREATE TABLE levels (
 );
 
 CREATE TABLE level_codes (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     type VARCHAR(16) NOT NULL DEFAULT 'NORMAL',
     sector_no INTEGER,
     value VARCHAR(200) NOT NULL,
@@ -954,8 +954,8 @@ CREATE TABLE level_codes (
 );
 
 CREATE TABLE level_hints (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     offset_sec INTEGER NOT NULL DEFAULT 0,
     text TEXT,
     order_index INTEGER NOT NULL DEFAULT 1,
@@ -963,11 +963,11 @@ CREATE TABLE level_hints (
 );
 
 CREATE TABLE participation_requests (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
     applicant_type VARCHAR(8) NOT NULL,
-    user_id BIGINT,
-    team_id BIGINT,
+    user_id UUID,
+    team_id UUID,
     status VARCHAR(12) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     decided_at TIMESTAMP
@@ -987,22 +987,22 @@ CREATE INDEX idx_participation_requests_quest ON participation_requests(quest_id
 ```sql
 -- dn_quest_game
 CREATE TABLE game_sessions (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
-    user_id BIGINT,
-    team_id BIGINT,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
+    user_id UUID,
+    team_id UUID,
     status VARCHAR(10) NOT NULL DEFAULT 'PENDING',
     started_at TIMESTAMP,
     finished_at TIMESTAMP,
     bonus_time_sum_sec INTEGER DEFAULT 0,
     penalty_time_sum_sec INTEGER DEFAULT 0,
-    current_level_id BIGINT
+    current_level_id UUID
 );
 
 CREATE TABLE game_level_progress (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    level_id UUID NOT NULL,
     started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     closed_at TIMESTAMP,
     sectors_closed INTEGER DEFAULT 0,
@@ -1012,14 +1012,14 @@ CREATE TABLE game_level_progress (
 );
 
 CREATE TABLE game_code_attempts (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
-    user_id BIGINT,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    level_id UUID NOT NULL,
+    user_id UUID,
     submitted_raw VARCHAR(180) NOT NULL,
     submitted_normalized VARCHAR(180) NOT NULL,
     result VARCHAR(20) NOT NULL,
-    matched_code_id BIGINT,
+    matched_code_id UUID,
     matched_sector_no INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ip VARCHAR(45),
@@ -1027,10 +1027,10 @@ CREATE TABLE game_code_attempts (
 );
 
 CREATE TABLE game_level_completions (
-    id BIGSERIAL PRIMARY KEY,
-    session_id BIGINT NOT NULL,
-    level_id BIGINT NOT NULL,
-    passed_by_user_id BIGINT,
+    id UUID PRIMARY KEY,
+    session_id UUID NOT NULL,
+    level_id UUID NOT NULL,
+    passed_by_user_id UUID,
     pass_time TIMESTAMP NOT NULL,
     duration_sec BIGINT NOT NULL,
     bonus_on_level_sec INTEGER DEFAULT 0,
@@ -1053,15 +1053,15 @@ CREATE INDEX idx_game_level_completions_quest ON game_level_completions(session_
 ```sql
 -- dn_quest_teams
 CREATE TABLE teams (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(120) UNIQUE NOT NULL,
-    captain_id BIGINT NOT NULL,
+    captain_id UUID NOT NULL,
     logo_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE team_members (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     team_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     role VARCHAR(16) NOT NULL DEFAULT 'MEMBER',
@@ -1070,7 +1070,7 @@ CREATE TABLE team_members (
 );
 
 CREATE TABLE team_invitations (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     team_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'PENDING',
@@ -1090,7 +1090,7 @@ CREATE INDEX idx_team_invitations_user ON team_invitations(user_id);
 ```sql
 -- dn_quest_stats (PostgreSQL для оперативной статистики)
 CREATE TABLE quest_stats (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     quest_id BIGINT NOT NULL,
     total_sessions BIGINT DEFAULT 0,
     completed_sessions INTEGER DEFAULT 0,
@@ -1100,7 +1100,7 @@ CREATE TABLE quest_stats (
 );
 
 CREATE TABLE user_stats (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id BIGINT NOT NULL,
     total_quests_completed INTEGER DEFAULT 0,
     total_time_spent_sec BIGINT DEFAULT 0,

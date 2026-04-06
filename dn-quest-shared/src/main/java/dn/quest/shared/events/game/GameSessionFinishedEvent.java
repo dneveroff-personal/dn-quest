@@ -17,8 +17,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class GameSessionFinishedEvent extends BaseEvent {
 
-    private Long questId;
-    private Long sessionId;
+    private UUID questId;
+    private UUID sessionId;
     private UUID userId;
     private UUID teamId;
     private Integer totalScore;

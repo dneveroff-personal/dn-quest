@@ -23,7 +23,7 @@ import java.util.UUID;
  * Repository для работы с квестами
  */
 @Repository
-public interface QuestRepository extends JpaRepository<Quest, Long>, JpaSpecificationExecutor<Quest> {
+public interface QuestRepository extends JpaRepository<Quest, UUID>, JpaSpecificationExecutor<Quest> {
 
     /**
      * Найти квест по номеру
@@ -273,7 +273,7 @@ public interface QuestRepository extends JpaRepository<Quest, Long>, JpaSpecific
      */
     @Modifying
     @Query("UPDATE Quest q SET q.averageRating = :averageRating WHERE q.id = :questId")
-    void updateAverageRating(@Param("questId") Long questId, @Param("averageRating") Double averageRating);
+    void updateAverageRating(@Param("questId") UUID questId, @Param("averageRating") Double averageRating);
 
     /**
      * Найти квесты с самым высоким рейтингом

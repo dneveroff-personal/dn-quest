@@ -28,7 +28,7 @@ public class LeaderboardEvent extends GameEngineEvent {
     @Schema(description = "ID квеста", example = "101")
     @Getter
     @Setter
-    private Long questId;
+    private UUID questId;
 
     @Schema(description = "Название квеста", example = "Тайна старого замка")
     @Getter

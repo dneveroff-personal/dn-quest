@@ -41,7 +41,7 @@ public abstract class GameEngineEvent {
     @Schema(description = "ID сессии", example = "789")
     @Getter
     @Setter
-    private Long sessionId;
+    private UUID sessionId;
 
     @Schema(description = "ID пользователя", example = "550e8400-e29b-41d4-a716-446655440000")
     @Getter
@@ -56,7 +56,7 @@ public abstract class GameEngineEvent {
     @Schema(description = "ID квеста", example = "101")
     @Getter
     @Setter
-    private Long questId;
+    private UUID questId;
 
     @Schema(description = "Время создания события")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")

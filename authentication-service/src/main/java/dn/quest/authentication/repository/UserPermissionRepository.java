@@ -17,18 +17,18 @@ import java.util.UUID;
  * Repository для работы с разрешениями пользователей
  */
 @Repository
-public interface UserPermissionRepository extends JpaRepository<UserPermission, Long>, JpaSpecificationExecutor<UserPermission> {
+public interface UserPermissionRepository extends JpaRepository<UserPermission, UUID>, JpaSpecificationExecutor<UserPermission> {
 
     // Поиск по пользователю
     List<UserPermission> findByUserId(UUID userId);
-    Optional<UserPermission> findByUserIdAndPermissionId(UUID userId, Long permissionId);
+    Optional<UserPermission> findByUserIdAndPermissionId(UUID userId, UUID permissionId);
 
     // Поиск с JOIN FETCH для оптимизации
     @Query("SELECT up FROM UserPermission up LEFT JOIN FETCH up.user LEFT JOIN FETCH up.permission WHERE up.user.id = :userId")
     List<UserPermission> findByUserIdWithPermissions(@Param("userId") UUID userId);
 
     // Поиск по разрешению
-    List<UserPermission> findByPermissionId(Long permissionId);
+    List<UserPermission> findByPermissionId(UUID permissionId);
 
     // Поиск по имени пользователя
     @Query("SELECT up FROM UserPermission up JOIN up.user u WHERE u.username = :username")
@@ -61,7 +61,7 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
 
     @Modifying
     @Query("DELETE FROM UserPermission up WHERE up.user.id = :userId AND up.permission.id = :permissionId")
-    int deleteByUserIdAndPermissionId(@Param("userId") UUID userId, @Param("permissionId") Long permissionId);
+    int deleteByUserIdAndPermissionId(@Param("userId") UUID userId, @Param("permissionId") UUID permissionId);
 
     // Удаление разрешений по имени
     @Modifying
@@ -80,7 +80,7 @@ public interface UserPermissionRepository extends JpaRepository<UserPermission, 
     long countByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT COUNT(up) FROM UserPermission up WHERE up.permission.id = :permissionId")
-    long countByPermissionId(@Param("permissionId") Long permissionId);
+    long countByPermissionId(@Param("permissionId") UUID permissionId);
 
     // Получение пользователей с определенным разрешением
     @Query("SELECT u.id FROM UserPermission up JOIN up.user u JOIN up.permission p WHERE p.name = :permissionName")

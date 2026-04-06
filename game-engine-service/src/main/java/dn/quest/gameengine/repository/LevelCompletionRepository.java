@@ -45,14 +45,14 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
         where l.quest.id = :questId
         order by lc.passTime asc
     """)
-    List<dn.quest.gameengine.dto.LevelCompletionDTO> findLeaderboardByQuestId(@Param("questId") Long questId);
+    List<dn.quest.gameengine.dto.LevelCompletionDTO> findLeaderboardByQuestId(@Param("questId") UUID questId);
 
     // Статистические запросы
     @Query("select count(distinct lc.session.id) from LevelCompletion lc where lc.level.quest.id = :questId")
-    long countDistinctSessionsByQuestId(@Param("questId") Long questId);
+    long countDistinctSessionsByQuestId(@Param("questId") UUID questId);
 
     @Query("select coalesce(avg(lc.durationSec),0) from LevelCompletion lc where lc.level.quest.id = :questId")
-    double averageDurationSecByQuestId(@Param("questId") Long questId);
+    double averageDurationSecByQuestId(@Param("questId") UUID questId);
 
     // Запросы по времени
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.passTime >= :since ORDER BY lc.passTime DESC")
@@ -76,34 +76,34 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     List<LevelCompletion> findCompletionsWithPenalty();
 
     @Query("SELECT AVG(lc.bonusOnLevelSec) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAverageBonusByQuestId(@Param("questId") Long questId);
+    Double getAverageBonusByQuestId(@Param("questId") UUID questId);
 
     @Query("SELECT AVG(lc.penaltyOnLevelSec) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAveragePenaltyByQuestId(@Param("questId") Long questId);
+    Double getAveragePenaltyByQuestId(@Param("questId") UUID questId);
 
     // Запросы для анализа попыток
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.totalAttempts > 0 ORDER BY lc.totalAttempts DESC")
     List<LevelCompletion> findCompletionsWithMostAttempts();
 
     @Query("SELECT AVG(lc.totalAttempts) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAverageAttemptsByQuestId(@Param("questId") Long questId);
+    Double getAverageAttemptsByQuestId(@Param("questId") UUID questId);
 
     @Query("SELECT AVG(lc.successfulAttempts) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAverageSuccessfulAttemptsByQuestId(@Param("questId") Long questId);
+    Double getAverageSuccessfulAttemptsByQuestId(@Param("questId") UUID questId);
 
     // Запросы для анализа подсказок
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.hintsUsed > 0 ORDER BY lc.hintsUsed DESC")
     List<LevelCompletion> findCompletionsWithHints();
 
     @Query("SELECT AVG(lc.hintsUsed) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAverageHintsByQuestId(@Param("questId") Long questId);
+    Double getAverageHintsByQuestId(@Param("questId") UUID questId);
 
     // Запросы для анализа методов завершения
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.completionMethod = :method ORDER BY lc.passTime DESC")
     List<LevelCompletion> findByCompletionMethod(@Param("method") String method);
 
     @Query("SELECT lc.completionMethod, COUNT(lc) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId GROUP BY lc.completionMethod")
-    List<Object[]> getCompletionMethodStatistics(@Param("questId") Long questId);
+    List<Object[]> getCompletionMethodStatistics(@Param("questId") UUID questId);
 
     // Запросы для анализа по пользователям
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.passedByUser.id = :userId ORDER BY lc.passTime DESC")
@@ -121,13 +121,13 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
 
     // Запросы для анализа по уровням
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.id = :levelId ORDER BY lc.passTime DESC")
-    List<LevelCompletion> findByLevel(@Param("levelId") Long levelId);
+    List<LevelCompletion> findByLevel(@Param("levelId") UUID levelId);
 
     @Query("SELECT COUNT(lc) FROM LevelCompletion lc WHERE lc.level.id = :levelId")
-    long countByLevel(@Param("levelId") Long levelId);
+    long countByLevel(@Param("levelId") UUID levelId);
 
     @Query("SELECT AVG(lc.durationSec) FROM LevelCompletion lc WHERE lc.level.id = :levelId")
-    Double getAverageDurationByLevel(@Param("levelId") Long levelId);
+    Double getAverageDurationByLevel(@Param("levelId") UUID levelId);
 
     // Запросы для анализа эффективности
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.totalAttempts > 0 ORDER BY (CAST(lc.successfulAttempts AS double) / lc.totalAttempts) DESC")
@@ -140,21 +140,21 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     Page<LevelCompletion> findByQuestOrderByPassTimeAsc(Quest quest, Pageable pageable);
     
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.quest.id = :questId ORDER BY lc.passTime ASC")
-    Page<LevelCompletion> findByQuestIdOrderByPassTimeAsc(@Param("questId") Long questId, Pageable pageable);
+    Page<LevelCompletion> findByQuestIdOrderByPassTimeAsc(@Param("questId") UUID questId, Pageable pageable);
 
     // Запросы для анализа по секторам
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.sectorsClosed >= :threshold ORDER BY lc.sectorsClosed DESC")
     List<LevelCompletion> findCompletionsWithMinSectors(@Param("threshold") int threshold);
 
     @Query("SELECT AVG(lc.sectorsClosed) FROM LevelCompletion lc WHERE lc.level.quest.id = :questId")
-    Double getAverageSectorsByQuestId(@Param("questId") Long questId);
+    Double getAverageSectorsByQuestId(@Param("questId") UUID questId);
 
     // Запросы для поиска лучших результатов
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.id = :levelId ORDER BY lc.adjustedDurationSec ASC")
-    List<LevelCompletion> findBestCompletionsByLevel(@Param("levelId") Long levelId);
+    List<LevelCompletion> findBestCompletionsByLevel(@Param("levelId") UUID levelId);
 
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.quest.id = :questId ORDER BY lc.adjustedDurationSec ASC")
-    List<LevelCompletion> findBestCompletionsByQuest(@Param("questId") Long questId);
+    List<LevelCompletion> findBestCompletionsByQuest(@Param("questId") UUID questId);
 
     // Запросы для анализа по IP
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.ipAddress = :ipAddress ORDER BY lc.passTime DESC")

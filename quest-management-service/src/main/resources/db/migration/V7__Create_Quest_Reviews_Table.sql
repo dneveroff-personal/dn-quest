@@ -1,8 +1,8 @@
 -- Создание таблицы quest_reviews
 CREATE TABLE quest_reviews (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     title VARCHAR(200),
     content TEXT,
     rating INTEGER CHECK (rating >= 1 AND rating <= 5),

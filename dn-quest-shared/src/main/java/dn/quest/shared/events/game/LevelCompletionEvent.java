@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Событие завершения уровня
@@ -22,7 +23,7 @@ public class LevelCompletionEvent extends GameEngineEvent {
     @Schema(description = "ID уровня", example = "101", requiredMode = io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED)
     @Getter
     @Setter
-    private Long levelId;
+    private UUID levelId;
 
     @Schema(description = "Название уровня", example = "Первый этаж")
     @Getter

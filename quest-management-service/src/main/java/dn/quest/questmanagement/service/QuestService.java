@@ -36,7 +36,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего обновление
      * @return обновленный квест
      */
-    QuestDTO updateQuest(Long id, QuestCreateUpdateDTO dto, UUID userId);
+    QuestDTO updateQuest(UUID id, QuestCreateUpdateDTO dto, UUID userId);
 
     /**
      * Удалить квест
@@ -44,7 +44,7 @@ public interface QuestService {
      * @param id ID квеста
      * @param userId ID пользователя, выполняющего удаление
      */
-    void deleteQuest(Long id, UUID userId);
+    void deleteQuest(UUID id, UUID userId);
 
     /**
      * Получить квест по ID
@@ -52,7 +52,7 @@ public interface QuestService {
      * @param id ID квеста
      * @return квест
      */
-    QuestDTO getQuestById(Long id);
+    QuestDTO getQuestById(UUID id);
 
     /**
      * Получить квест по номеру
@@ -148,7 +148,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return опубликованный квест
      */
-    QuestDTO publishQuest(Long id, UUID userId);
+    QuestDTO publishQuest(UUID id, UUID userId);
 
     /**
      * Снять квест с публикации
@@ -157,7 +157,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return квест снятый с публикации
      */
-    QuestDTO unpublishQuest(Long id, UUID userId);
+    QuestDTO unpublishQuest(UUID id, UUID userId);
 
     /**
      * Архивировать квест
@@ -167,7 +167,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return архивированный квест
      */
-    QuestDTO archiveQuest(Long id, String reason, UUID userId);
+    QuestDTO archiveQuest(UUID id, String reason, UUID userId);
 
     /**
      * Разархивировать квест
@@ -176,7 +176,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return разархивированный квест
      */
-    QuestDTO unarchiveQuest(Long id, UUID userId);
+    QuestDTO unarchiveQuest(UUID id, UUID userId);
 
     /**
      * Копировать квест
@@ -186,7 +186,7 @@ public interface QuestService {
      * @param authorId ID автора копии
      * @return скопированный квест
      */
-    QuestDTO copyQuest(Long id, String newTitle, UUID authorId);
+    QuestDTO copyQuest(UUID id, String newTitle, UUID authorId);
 
     /**
      * Создать шаблон из квеста
@@ -196,7 +196,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return созданный шаблон
      */
-    QuestDTO createTemplateFromQuest(Long id, String templateName, UUID userId);
+    QuestDTO createTemplateFromQuest(UUID id, String templateName, UUID userId);
 
     /**
      * Создать квест из шаблона
@@ -206,7 +206,7 @@ public interface QuestService {
      * @param authorId ID автора
      * @return созданный квест
      */
-    QuestDTO createQuestFromTemplate(Long templateId, String title, UUID authorId);
+    QuestDTO createQuestFromTemplate(UUID templateId, String title, UUID authorId);
 
     /**
      * Изменить статус квеста
@@ -216,7 +216,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return квест с измененным статусом
      */
-    QuestDTO changeQuestStatus(Long id, QuestStatus status, UUID userId);
+    QuestDTO changeQuestStatus(UUID id, QuestStatus status, UUID userId);
 
     /**
      * Добавить автора квесту
@@ -226,7 +226,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего операцию
      * @return обновленный квест
      */
-    QuestDTO addQuestAuthor(Long questId, UUID authorId, UUID userId);
+    QuestDTO addQuestAuthor(UUID questId, UUID authorId, UUID userId);
 
     /**
      * Удалить автора квеста
@@ -236,7 +236,7 @@ public interface QuestService {
      * @param userId ID пользователя, выполняющего операцию
      * @return обновленный квест
      */
-    QuestDTO removeQuestAuthor(Long questId, UUID authorId, UUID userId);
+    QuestDTO removeQuestAuthor(UUID questId, UUID authorId, UUID userId);
 
     /**
      * Добавить теги квесту
@@ -246,7 +246,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return обновленный квест
      */
-    QuestDTO addQuestTags(Long questId, Set<String> tags, UUID userId);
+    QuestDTO addQuestTags(UUID questId, Set<String> tags, UUID userId);
 
     /**
      * Удалить теги квеста
@@ -256,7 +256,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return обновленный квест
      */
-    QuestDTO removeQuestTags(Long questId, Set<String> tags, UUID userId);
+    QuestDTO removeQuestTags(UUID questId, Set<String> tags, UUID userId);
 
     /**
      * Проверить права доступа к квесту
@@ -265,7 +265,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если есть доступ
      */
-    boolean hasQuestAccess(Long questId, UUID userId);
+    boolean hasQuestAccess(UUID questId, UUID userId);
 
     /**
      * Проверить права на редактирование квеста
@@ -274,7 +274,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если можно редактировать
      */
-    boolean canEditQuest(Long questId, UUID userId);
+    boolean canEditQuest(UUID questId, UUID userId);
 
     /**
      * Проверить права на публикацию квеста
@@ -283,7 +283,7 @@ public interface QuestService {
      * @param userId ID пользователя
      * @return true если можно публиковать
      */
-    boolean canPublishQuest(Long questId, UUID userId);
+    boolean canPublishQuest(UUID questId, UUID userId);
 
     /**
      * Валидировать квест перед публикацией
@@ -291,7 +291,7 @@ public interface QuestService {
      * @param questId ID квеста
      * @return результат валидации
      */
-    QuestValidationResult validateQuestForPublishing(Long questId);
+    QuestValidationResult validateQuestForPublishing(UUID questId);
 
     /**
      * Получить статистику по квестам

@@ -33,7 +33,7 @@ public interface StatisticsQueryService {
     /**
      * Получить статистику квеста
      */
-    Map<String, Object> getQuestStatistics(Long questId, LocalDate date);
+    Map<String, Object> getQuestStatistics(UUID questId, LocalDate date);
 
     /**
      * Получить статистику команды

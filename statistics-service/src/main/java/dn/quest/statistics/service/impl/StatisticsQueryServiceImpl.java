@@ -174,7 +174,7 @@ public class StatisticsQueryServiceImpl implements StatisticsQueryService {
 
     @Override
     @Cacheable(value = "quest-statistics", key = "{#questId, #date}")
-    public Map<String, Object> getQuestStatistics(Long questId, LocalDate date) {
+    public Map<String, Object> getQuestStatistics(UUID questId, LocalDate date) {
         log.debug("Getting statistics for quest: {} for date: {}", questId, date);
         
         Map<String, Object> statistics = new HashMap<>();

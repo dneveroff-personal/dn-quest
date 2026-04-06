@@ -43,7 +43,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testStartGameSession_Success() throws Exception {
         // Given - Сначала создаем квест (предполагаем, что он существует)
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         // When & Then
@@ -82,7 +82,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testGetCurrentLevel_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -109,7 +109,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testSubmitCode_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
@@ -141,7 +141,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testSubmitCode_WrongCode_ReturnsWrongCode() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
@@ -169,7 +169,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testSubmitCode_DuplicateCode_ReturnsAlreadyFound() throws Exception {
         // Given - Сначала создаем игровую сессию и отправляем правильный код
-        Long questId = 1L;
+        UUID questId = 1L;
         UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
@@ -204,7 +204,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testGetHint_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -228,7 +228,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testFinishGameSession_Success() throws Exception {
         // Given - Сначала создаем игровую сессию и завершаем все уровни
-        Long questId = 1L;
+        UUID questId = 1L;
         UUID userId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
@@ -264,7 +264,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testPauseGameSession_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -286,7 +286,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testResumeGameSession_Success() throws Exception {
         // Given - Сначала создаем и приостанавливаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")
@@ -312,7 +312,7 @@ class GameEngineIntegrationTest extends AbstractIntegrationTestBase {
     @WithMockUser(roles = {"PLAYER"})
     void testGetGameSession_Success() throws Exception {
         // Given - Сначала создаем игровую сессию
-        Long questId = 1L;
+        UUID questId = 1L;
         var sessionRequest = EnhancedTestDataFactory.createGameSessionRequestDTO(questId);
 
         String sessionResponse = mockMvc.perform(post("/api/game/sessions")

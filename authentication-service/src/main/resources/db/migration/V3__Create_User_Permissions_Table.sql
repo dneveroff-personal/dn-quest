@@ -1,8 +1,8 @@
 -- Создание таблицы связи пользователей и разрешений
 CREATE TABLE user_permissions (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    permission_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    permission_id UUID NOT NULL,
     granted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     granted_by VARCHAR(100),
     

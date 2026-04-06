@@ -158,7 +158,7 @@ public class LeaderboardController {
     @Operation(summary = "Получить позицию квеста в лидерборде", description = "Возвращает позицию и статистику квеста в различных лидербордах")
     public ResponseEntity<Map<String, Object>> getQuestLeaderboardPosition(
             @Parameter(description = "ID квеста") 
-            @PathVariable Long questId,
+            @PathVariable UUID questId,
             
             @Parameter(description = "Период (daily, weekly, monthly, all_time)") 
             @RequestParam(defaultValue = "all_time") String period,

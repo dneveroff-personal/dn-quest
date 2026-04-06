@@ -114,7 +114,7 @@ public class StatisticsController {
     @Operation(summary = "Получить статистику квеста", description = "Возвращает детальную статистику по указанному квесту")
     public ResponseEntity<Map<String, Object>> getQuestStatistics(
             @Parameter(description = "ID квеста") 
-            @PathVariable Long questId,
+            @PathVariable UUID questId,
             
             @Parameter(description = "Дата статистики") 
             @RequestParam(required = false) 

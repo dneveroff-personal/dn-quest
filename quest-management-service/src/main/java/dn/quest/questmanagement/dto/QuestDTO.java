@@ -32,7 +32,7 @@ public class QuestDTO {
     /**
      * Идентификатор сущности
      */
-    private Long id;
+    private UUID id;
 
     /**
      * Версия для оптимистичной блокировки

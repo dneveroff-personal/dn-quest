@@ -1,7 +1,7 @@
 -- Создание таблицы user_statistics
 CREATE TABLE user_statistics (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
     date DATE NOT NULL,
     registrations INTEGER DEFAULT 0,
     logins INTEGER DEFAULT 0,
@@ -34,10 +34,10 @@ CREATE INDEX idx_user_statistics_last_active ON user_statistics(last_active_at);
 
 -- Создание таблицы quest_statistics
 CREATE TABLE quest_statistics (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
     quest_title VARCHAR(255),
-    author_id BIGINT,
+    author_id UUID,
     date DATE NOT NULL,
     creations INTEGER DEFAULT 0,
     updates INTEGER DEFAULT 0,
@@ -78,11 +78,11 @@ CREATE INDEX idx_quest_statistics_author_date ON quest_statistics(author_id, dat
 
 -- Создание таблицы game_statistics
 CREATE TABLE game_statistics (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
-    user_id BIGINT,
-    team_id BIGINT,
-    quest_id BIGINT NOT NULL,
+    user_id UUID,
+    team_id UUID,
+    quest_id UUID NOT NULL,
     date DATE NOT NULL,
     session_type VARCHAR(50),
     start_time TIMESTAMP,
@@ -126,10 +126,10 @@ CREATE INDEX idx_game_statistics_quest_date ON game_statistics(quest_id, date);
 
 -- Создание таблицы team_statistics
 CREATE TABLE team_statistics (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL,
     team_name VARCHAR(255),
-    captain_id BIGINT,
+    captain_id UUID,
     date DATE NOT NULL,
     creations INTEGER DEFAULT 0,
     updates INTEGER DEFAULT 0,
@@ -174,9 +174,9 @@ CREATE INDEX idx_team_statistics_captain_date ON team_statistics(captain_id, dat
 
 -- Создание таблицы file_statistics
 CREATE TABLE file_statistics (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     file_id VARCHAR(255) NOT NULL,
-    user_id BIGINT,
+    user_id UUID,
     date DATE NOT NULL,
     uploads INTEGER DEFAULT 0,
     downloads INTEGER DEFAULT 0,
@@ -203,11 +203,11 @@ CREATE INDEX idx_file_statistics_user_date ON file_statistics(user_id, date);
 
 -- Создание таблицы leaderboards
 CREATE TABLE leaderboards (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     leaderboard_type VARCHAR(50) NOT NULL,
     period VARCHAR(50) NOT NULL,
     date DATE,
-    entity_id BIGINT NOT NULL,
+    entity_id UUID NOT NULL,
     entity_name VARCHAR(255),
     rank INTEGER NOT NULL,
     previous_rank INTEGER,
@@ -250,7 +250,7 @@ CREATE INDEX idx_leaderboards_rank ON leaderboards(rank);
 
 -- Создание таблицы system_statistics
 CREATE TABLE system_statistics (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     date DATE NOT NULL,
     metric VARCHAR(255) NOT NULL,
     value DOUBLE PRECISION,
@@ -283,7 +283,7 @@ CREATE INDEX idx_system_statistics_date_metric ON system_statistics(date, metric
 
 -- Создание таблицы daily_aggregated_statistics
 CREATE TABLE daily_aggregated_statistics (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     date DATE NOT NULL,
     total_users BIGINT DEFAULT 0,
     active_users BIGINT DEFAULT 0,

@@ -31,7 +31,7 @@ public interface AnalyticsService {
     /**
      * Получить отчет по игровым сессиям
      */
-    Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, Long questId, UUID userId);
+    Map<String, Object> getGameSessionReport(LocalDate startDate, LocalDate endDate, UUID questId, UUID userId);
 
     /**
      * Получить отчет по командной активности

@@ -17,13 +17,13 @@ public record LevelProgressDTO(
     Long id,
     
     @Schema(description = "ID сессии", example = "789")
-    Long sessionId,
+    UUID sessionId,
     
     @Schema(description = "ID пользователя", example = "123")
     UUID userId,
     
     @Schema(description = "ID уровня", example = "101")
-    Long levelId,
+    UUID levelId,
     
     @Schema(description = "Название уровня", example = "Первый этаж")
     String levelName,

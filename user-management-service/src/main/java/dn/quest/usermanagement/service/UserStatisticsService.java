@@ -162,7 +162,7 @@ public interface UserStatisticsService {
     /**
      * Обновляет статистику игровых сессий
      */
-    void updateGameSessionStatistics(UUID userId, Long sessionId, String status);
+    void updateGameSessionStatistics(UUID userId, UUID sessionId, String status);
 
     /**
      * Обновляет статистику прохождения уровней

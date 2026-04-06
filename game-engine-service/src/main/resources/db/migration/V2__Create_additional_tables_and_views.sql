@@ -1,11 +1,11 @@
 -- Создание таблицы квестов (если еще не существует)
 CREATE TABLE IF NOT EXISTS quests (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     type VARCHAR(50) NOT NULL DEFAULT 'ADVENTURE',
     difficulty VARCHAR(50) NOT NULL DEFAULT 'MEDIUM',
-    author_id BIGINT NOT NULL,
+    author_id UUID NOT NULL,
     is_published BOOLEAN DEFAULT FALSE,
     is_archived BOOLEAN DEFAULT FALSE,
     rating DECIMAL(3,2) DEFAULT 0.0,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS quests (
     estimated_duration_minutes INTEGER,
     max_participants INTEGER DEFAULT 10,
     min_participants INTEGER DEFAULT 1,
-    level_ids BIGINT[],
+    level_ids UUID[],
     tags TEXT[],
     settings JSONB,
     metadata JSONB,
@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS quests (
 
 -- Создание таблицы уровней (если еще не существует)
 CREATE TABLE IF NOT EXISTS levels (
-    id BIGSERIAL PRIMARY KEY,
-    quest_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    quest_id UUID NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     order_number INTEGER NOT NULL,
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS levels (
 
 -- Создание таблицы кодов (если еще не существует)
 CREATE TABLE IF NOT EXISTS codes (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     code_value VARCHAR(255) NOT NULL,
     sector VARCHAR(10) NOT NULL,
     code_type VARCHAR(50) NOT NULL DEFAULT 'MAIN',
@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS codes (
 
 -- Создание таблицы подсказок (если еще не существует)
 CREATE TABLE IF NOT EXISTS level_hints (
-    id BIGSERIAL PRIMARY KEY,
-    level_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    level_id UUID NOT NULL,
     hint_text TEXT NOT NULL,
     order_number INTEGER NOT NULL,
     penalty_points DECIMAL(10,2) DEFAULT 10.0,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS level_hints (
 
 -- Создание таблицы пользователей (если еще не существует)
 CREATE TABLE IF NOT EXISTS users (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
@@ -134,10 +134,10 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Создание таблицы команд (если еще не существует)
 CREATE TABLE IF NOT EXISTS teams (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
-    captain_id BIGINT NOT NULL,
+    captain_id UUID NOT NULL,
     logo_url VARCHAR(500),
     rating DECIMAL(10,2) DEFAULT 1000.0,
     total_games_played INTEGER DEFAULT 0,
@@ -161,9 +161,9 @@ CREATE TABLE IF NOT EXISTS teams (
 
 -- Создание таблицы участников команд (если еще не существует)
 CREATE TABLE IF NOT EXISTS team_members (
-    id BIGSERIAL PRIMARY KEY,
-    team_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
+    id UUID PRIMARY KEY,
+    team_id UUID NOT NULL,
+    user_id UUID NOT NULL,
     role VARCHAR(50) NOT NULL DEFAULT 'MEMBER',
     joined_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     left_at TIMESTAMP WITH TIME ZONE,

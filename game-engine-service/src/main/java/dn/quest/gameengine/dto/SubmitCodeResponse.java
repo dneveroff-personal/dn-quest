@@ -243,7 +243,7 @@ public record SubmitCodeResponse(
         Instant responseTime,
         
         @Schema(description = "ID сессии", example = "789")
-        Long sessionId,
+        UUID sessionId,
         
         @Schema(description = "ID пользователя", example = "123")
         UUID userId,

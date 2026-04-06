@@ -18,7 +18,7 @@ public class LevelCompletionDTO {
     /**
      * ID уровня
      */
-    private Long levelId;
+    private UUID levelId;
 
     /**
      * Название уровня

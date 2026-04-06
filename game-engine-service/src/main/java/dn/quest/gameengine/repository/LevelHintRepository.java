@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с подсказками уровней
@@ -118,10 +119,10 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, Long> {
 
     // Запросы для поиска подсказок по квесту
     @Query("select h from LevelHint h where h.level.quest.id = :questId order by h.level.orderIndex asc, h.orderIndex asc")
-    List<LevelHint> findByQuestId(@Param("questId") Long questId);
+    List<LevelHint> findByQuestId(@Param("questId") UUID questId);
 
     @Query("select h from LevelHint h where h.level.quest.id = :questId and h.isActive = true order by h.level.orderIndex asc, h.orderIndex asc")
-    List<LevelHint> findActiveByQuestId(@Param("questId") Long questId);
+    List<LevelHint> findActiveByQuestId(@Param("questId") UUID questId);
 
     // Запросы для комплексного анализа
     @Query("select h.hintType, count(h), avg(h.usageCount), avg(h.penaltySeconds) from LevelHint h group by h.hintType")

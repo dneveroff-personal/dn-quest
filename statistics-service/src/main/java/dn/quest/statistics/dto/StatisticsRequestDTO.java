@@ -39,7 +39,7 @@ public class StatisticsRequestDTO {
     /**
      * ID квеста (для фильтрации по квесту)
      */
-    private Long questId;
+    private UUID questId;
 
     /**
      * ID команды (для фильтрации по команде)

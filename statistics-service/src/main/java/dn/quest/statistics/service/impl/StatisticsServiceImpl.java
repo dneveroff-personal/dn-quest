@@ -139,7 +139,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestCreationStatistics(Long questId, UUID authorId, Instant timestamp) {
+    public void updateQuestCreationStatistics(UUID questId, UUID authorId, Instant timestamp) {
         log.debug("Updating quest creation statistics for quest: {} by author: {} at: {}", questId, authorId, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -166,7 +166,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestUpdateStatistics(Long questId, Instant timestamp) {
+    public void updateQuestUpdateStatistics(UUID questId, Instant timestamp) {
         log.debug("Updating quest update statistics for quest: {} at: {}", questId, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -188,7 +188,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestPublicationStatistics(Long questId, UUID authorId, Instant timestamp) {
+    public void updateQuestPublicationStatistics(UUID questId, UUID authorId, Instant timestamp) {
         log.debug("Updating quest publication statistics for quest: {} by author: {} at: {}", questId, authorId, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -210,7 +210,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateQuestDeletionStatistics(Long questId, Instant timestamp) {
+    public void updateQuestDeletionStatistics(UUID questId, Instant timestamp) {
         log.debug("Updating quest deletion statistics for quest: {} at: {}", questId, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -232,7 +232,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateGameSessionStartStatistics(Long sessionId, UUID userId, UUID teamId, Long questId, Instant timestamp) {
+    public void updateGameSessionStartStatistics(UUID sessionId, UUID userId, UUID teamId, UUID questId, Instant timestamp) {
         log.debug("Updating game session start statistics for session: {} by user: {} at: {}", sessionId, userId, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -265,7 +265,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateGameSessionFinishStatistics(Long sessionId, UUID userId, UUID teamId, Long questId, boolean completed, Instant timestamp) {
+    public void updateGameSessionFinishStatistics(UUID sessionId, UUID userId, UUID teamId, UUID questId, boolean completed, Instant timestamp) {
         log.debug("Updating game session finish statistics for session: {} by user: {} completed: {} at: {}", sessionId, userId, completed, timestamp);
         
         CompletableFuture.runAsync(() -> {
@@ -290,8 +290,8 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateCodeSubmissionStatistics(Long sessionId, UUID userId, Long LevelId, boolean success, Instant timestamp) {
-        log.debug("Updating code submission statistics for session: {} by user: {} level: {} success: {} at: {}", sessionId, userId, LevelId, success, timestamp);
+    public void updateCodeSubmissionStatistics(UUID sessionId, UUID userId, UUID levelId, boolean success, Instant timestamp) {
+        log.debug("Updating code submission statistics for session: {} by user: {} level: {} success: {} at: {}", sessionId, userId, levelId, success, timestamp);
         
         CompletableFuture.runAsync(() -> {
             try {
@@ -315,7 +315,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public void updateLevelCompletionStatistics(Long sessionId, UUID userId, Integer levelNumber, Long completionTime, Instant timestamp) {
+    public void updateLevelCompletionStatistics(UUID sessionId, UUID userId, Integer levelNumber, Long completionTime, Instant timestamp) {
         log.debug("Updating level completion statistics for session: {} by user: {} level: {} time: {}ms at: {}", sessionId, userId, levelNumber, completionTime, timestamp);
         
         CompletableFuture.runAsync(() -> {

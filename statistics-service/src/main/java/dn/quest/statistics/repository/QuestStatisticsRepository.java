@@ -23,22 +23,22 @@ public interface QuestStatisticsRepository extends JpaRepository<QuestStatistics
     /**
      * Найти статистику квеста по ID и дате
      */
-    Optional<QuestStatistics> findByQuestIdAndDate(Long questId, LocalDate date);
+    Optional<QuestStatistics> findByQuestIdAndDate(UUID questId, LocalDate date);
 
     /**
      * Найти всю статистику квеста по ID
      */
-    List<QuestStatistics> findByQuestIdOrderByDateDesc(Long questId);
+    List<QuestStatistics> findByQuestIdOrderByDateDesc(UUID questId);
 
     /**
      * Найти статистику квеста за период
      */
-    List<QuestStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(Long questId, LocalDate startDate, LocalDate endDate);
+    List<QuestStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(UUID questId, LocalDate startDate, LocalDate endDate);
 
     /**
      * Найти статистику квеста за период с пагинацией
      */
-    Page<QuestStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(Long questId, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<QuestStatistics> findByQuestIdAndDateBetweenOrderByDateDesc(UUID questId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     /**
      * Найти статистику по автору
@@ -154,42 +154,42 @@ public interface QuestStatisticsRepository extends JpaRepository<QuestStatistics
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.views = q.views + 1 WHERE q.questId = :questId AND q.date = :date")
-    int incrementViews(@Param("questId") Long questId, @Param("date") LocalDate date);
+    int incrementViews(@Param("questId") UUID questId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество уникальных просмотров квеста
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.uniqueViews = q.uniqueViews + 1 WHERE q.questId = :questId AND q.date = :date")
-    int incrementUniqueViews(@Param("questId") Long questId, @Param("date") LocalDate date);
+    int incrementUniqueViews(@Param("questId") UUID questId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество стартов квеста
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.starts = q.starts + 1 WHERE q.questId = :questId AND q.date = :date")
-    int incrementStarts(@Param("questId") Long questId, @Param("date") LocalDate date);
+    int incrementStarts(@Param("questId") UUID questId, @Param("date") LocalDate date);
 
     /**
      * Увеличить количество завершений квеста
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.completions = q.completions + 1 WHERE q.questId = :questId AND q.date = :date")
-    int incrementCompletions(@Param("questId") Long questId, @Param("date") LocalDate date);
+    int incrementCompletions(@Param("questId") UUID questId, @Param("date") LocalDate date);
 
     /**
      * Обновить рейтинг квеста
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.currentRating = :rating, q.ratingCount = q.ratingCount + 1, q.avgRating = :avgRating WHERE q.questId = :questId AND q.date = :date")
-    int updateQuestRating(@Param("questId") Long questId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("avgRating") Double avgRating);
+    int updateQuestRating(@Param("questId") UUID questId, @Param("date") LocalDate date, @Param("rating") Double rating, @Param("avgRating") Double avgRating);
 
     /**
      * Добавить время прохождения квеста
      */
     @Modifying
     @Query("UPDATE QuestStatistics q SET q.totalGameTimeMinutes = q.totalGameTimeMinutes + :minutes WHERE q.questId = :questId AND q.date = :date")
-    int addGameTime(@Param("questId") Long questId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
+    int addGameTime(@Param("questId") UUID questId, @Param("date") LocalDate date, @Param("minutes") Long minutes);
 
     /**
      * Получить количество квестов с рейтингом

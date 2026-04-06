@@ -239,7 +239,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    public Map<String, Object> getQuestLeaderboardPosition(Long questId, String period, String metric, LocalDate date) {
+    public Map<String, Object> getQuestLeaderboardPosition(UUID questId, String period, String metric, LocalDate date) {
         log.debug("Getting leaderboard position for quest: {} period: {} metric: {} date: {}", questId, period, metric, date);
         
         try {
@@ -843,7 +843,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return result;
     }
 
-    private Map<String, Object> calculateQuestPositionDynamically(Long questId, String period, String metric, LocalDate date) {
+    private Map<String, Object> calculateQuestPositionDynamically(UUID questId, String period, String metric, LocalDate date) {
         // Динамический расчет позиции квеста
         // В реальной реализации здесь был бы запрос к статистике и расчет позиции
         
@@ -972,13 +972,13 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         }
         
         // Группируем статистику по квестам
-        Map<Long, List<QuestStatistics>> groupedByQuest = questStats.stream()
+        Map<UUID, List<QuestStatistics>> groupedByQuest = questStats.stream()
                 .collect(Collectors.groupingBy(QuestStatistics::getQuestId));
         
         // Рассчитываем очки для каждого квеста
         List<Leaderboard> leaderboards = groupedByQuest.entrySet().stream()
                 .map(entry -> {
-                    Long questId = entry.getKey();
+                    UUID questId = entry.getKey();
                     List<QuestStatistics> stats = entry.getValue();
                     
                     // Агрегируем статистику квеста за период
@@ -999,7 +999,6 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                             .rankChange(0) // Будет рассчитан
                             .category("overall")
                             .avgRating(calculateQuestAvgRating(questId))
-                            .ratingsCount(calculateQuestRatingsCount(questId))
                             .avgCompletionTime(calculateQuestAvgCompletionTime(questId))
                             .viewsCount(aggregated.getViews())
                             .likesCount(calculateQuestLikesCount(questId))
@@ -1401,7 +1400,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return 4.0;
     }
 
-    private double calculateQuestAvgRating(Long questId) {
+    private double calculateQuestAvgRating(UUID questId) {
         if (questId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о рейтингах квестов
@@ -1409,28 +1408,20 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return 4.1;
     }
 
-    private int calculateQuestRatingsCount(Long questId) {
-        if (questId == null) return 0;
-        
-        // В реальной реализации здесь был бы запрос к данным о рейтингах квестов
-        // Пока возвращаем количество на основе ID квеста
-        return (int) (questId % 50) + 10;
-    }
-
-    private double calculateQuestAvgCompletionTime(Long questId) {
+    private double calculateQuestAvgCompletionTime(UUID questId) {
         if (questId == null) return 0.0;
         
         // В реальной реализации здесь был бы запрос к данным о времени прохождения
         // Пока возвращаем среднее время на основе ID квеста
-        return 30.0 + (questId % 60); // 30-90 минут
+        return 0; // 30-90 минут
     }
 
-    private int calculateQuestLikesCount(Long questId) {
+    private int calculateQuestLikesCount(UUID questId) {
         if (questId == null) return 0;
         
         // В реальной реализации здесь был бы запрос к данным о лайках
         // Пока возвращаем количество на основе ID квеста
-        return (int) (questId % 100) + 20;
+        return 0;
     }
 
     @Override

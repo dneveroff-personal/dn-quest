@@ -60,7 +60,7 @@ public class QuestController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> updateQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody QuestCreateUpdateDTO dto,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -77,7 +77,7 @@ public class QuestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Void> deleteQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -91,7 +91,7 @@ public class QuestController {
      * Получить квест по ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<QuestDTO> getQuestById(@PathVariable Long id) {
+    public ResponseEntity<QuestDTO> getQuestById(@PathVariable UUID id) {
         QuestDTO quest = questService.getQuestById(id);
         return ResponseEntity.ok(quest);
     }
@@ -229,7 +229,7 @@ public class QuestController {
     @PostMapping("/{id}/publish")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> publishQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -245,7 +245,7 @@ public class QuestController {
     @PostMapping("/{id}/unpublish")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> unpublishQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -261,7 +261,7 @@ public class QuestController {
     @PostMapping("/{id}/archive")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> archiveQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestParam String reason,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -278,7 +278,7 @@ public class QuestController {
     @PostMapping("/{id}/unarchive")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> unarchiveQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -294,7 +294,7 @@ public class QuestController {
     @PostMapping("/{id}/copy")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> copyQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestParam String newTitle,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -312,7 +312,7 @@ public class QuestController {
     @PostMapping("/{id}/template")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> createTemplateFromQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestParam String templateName,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -330,7 +330,7 @@ public class QuestController {
     @PostMapping("/template/{templateId}/create")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> createQuestFromTemplate(
-            @PathVariable Long templateId,
+            @PathVariable UUID templateId,
             @RequestParam String title,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -348,7 +348,7 @@ public class QuestController {
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> changeQuestStatus(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestParam QuestStatus status,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -365,7 +365,7 @@ public class QuestController {
     @PostMapping("/{id}/authors/{authorId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> addQuestAuthor(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @PathVariable UUID authorId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -382,7 +382,7 @@ public class QuestController {
     @DeleteMapping("/{id}/authors/{authorId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> removeQuestAuthor(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @PathVariable UUID authorId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -399,7 +399,7 @@ public class QuestController {
     @PostMapping("/{id}/tags")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> addQuestTags(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody Set<String> tags,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -416,7 +416,7 @@ public class QuestController {
     @DeleteMapping("/{id}/tags")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<QuestDTO> removeQuestTags(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody Set<String> tags,
             @AuthenticationPrincipal UserDetails userDetails) {
         
@@ -432,7 +432,7 @@ public class QuestController {
      */
     @GetMapping("/{id}/access")
     public ResponseEntity<Boolean> hasQuestAccess(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -445,7 +445,7 @@ public class QuestController {
      */
     @GetMapping("/{id}/edit-access")
     public ResponseEntity<Boolean> canEditQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -458,7 +458,7 @@ public class QuestController {
      */
     @GetMapping("/{id}/publish-access")
     public ResponseEntity<Boolean> canPublishQuest(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         UUID userId = getUserIdFromUserDetails(userDetails);
@@ -470,7 +470,7 @@ public class QuestController {
      * Валидировать квест перед публикацией
      */
     @GetMapping("/{id}/validate")
-    public ResponseEntity<QuestValidationResult> validateQuestForPublishing(@PathVariable Long id) {
+    public ResponseEntity<QuestValidationResult> validateQuestForPublishing(@PathVariable UUID id) {
         QuestValidationResult result = questService.validateQuestForPublishing(id);
         return ResponseEntity.ok(result);
     }

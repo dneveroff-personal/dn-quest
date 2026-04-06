@@ -1,6 +1,6 @@
 -- Создание таблицы quests
 CREATE TABLE quests (
-    id BIGSERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     number BIGINT UNIQUE NOT NULL,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -18,7 +18,7 @@ CREATE TABLE quests (
     tags TEXT[], -- массив тегов
     is_public BOOLEAN DEFAULT false,
     is_template BOOLEAN DEFAULT false,
-    author_ids BIGINT[], -- массив ID авторов
+    author_ids UUID[], -- массив ID авторов
     status VARCHAR(50) DEFAULT 'DRAFT',
     version INTEGER DEFAULT 1,
     start_time TIMESTAMP,
