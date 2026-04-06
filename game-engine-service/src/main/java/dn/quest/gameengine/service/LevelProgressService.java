@@ -1,8 +1,6 @@
 package dn.quest.gameengine.service;
 
 import dn.quest.gameengine.entity.LevelProgress;
-import dn.quest.gameengine.entity.GameSession;
-import dn.quest.gameengine.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -113,11 +113,11 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
     List<TeamMember> findPlayersWithMinGames(@Param("minGames") Integer minGames);
 
     // Запросы для поиска участников по рейтингу
-    @Query("SELECT tm FROM TeamMember tm WHERE tm.rating > 0 AND tm.isActive = true ORDER BY tm.rating DESC")
+    @Query("SELECT tm FROM TeamMember tm WHERE tm.contributionScore > 0 AND tm.isActive = true ORDER BY tm.contributionScore DESC")
     List<TeamMember> findTopRatedMembers();
 
-    @Query("SELECT tm FROM TeamMember tm WHERE tm.rating >= :minRating AND tm.isActive = true ORDER BY tm.rating DESC")
-    List<TeamMember> findMembersWithMinRating(@Param("minRating") Double minRating);
+    @Query("SELECT tm FROM TeamMember tm WHERE tm.contributionScore >= :minContributionScore AND tm.isActive = true ORDER BY tm.contributionScore DESC")
+    List<TeamMember> findMembersWithMinContributionScore(@Param("minContributionScore") Integer minContributionScore);
 
     // Запросы для поиска участников по времени в игре
     @Query("SELECT tm FROM TeamMember tm WHERE tm.totalPlaytimeSeconds > 0 AND tm.isActive = true ORDER BY tm.totalPlaytimeSeconds DESC")
@@ -133,7 +133,7 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
           AND (:team IS NULL OR tm.team = :team)
           AND (:user IS NULL OR tm.user = :user)
           AND (:role IS NULL OR tm.role = :role)
-          AND (:minRating IS NULL OR tm.rating >= :minRating)
+          AND (:minContributionScore IS NULL OR tm.contributionScore >= :minContributionScore)
           AND (:minGamesPlayed IS NULL OR tm.gamesPlayed >= :minGamesPlayed)
         ORDER BY tm.joinedAt DESC
     """)
@@ -142,26 +142,26 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
         @Param("team") Team team,
         @Param("user") User user,
         @Param("role") TeamRole role,
-        @Param("minRating") Double minRating,
+        @Param("minContributionScore") Integer minContributionScore,
         @Param("minGamesPlayed") Integer minGamesPlayed
     );
 
     // Запросы для анализа по пользователям
-    @Query("SELECT tm.user, COUNT(tm), AVG(tm.rating), SUM(tm.gamesPlayed) FROM TeamMember tm WHERE tm.isActive = true GROUP BY tm.user ORDER BY COUNT(tm) DESC")
+    @Query("SELECT tm.user, COUNT(tm), AVG(tm.contributionScore), SUM(tm.gamesPlayed) FROM TeamMember tm WHERE tm.isActive = true GROUP BY tm.user ORDER BY COUNT(tm) DESC")
     List<Object[]> getUserTeamStatistics();
 
     @Query("SELECT tm.user, COUNT(DISTINCT tm.team) FROM TeamMember tm WHERE tm.isActive = true GROUP BY tm.user ORDER BY COUNT(DISTINCT tm.team) DESC")
     List<Object[]> getUsersByTeamCount();
 
     // Запросы для анализа по командам
-    @Query("SELECT tm.team, COUNT(tm), AVG(tm.rating), SUM(tm.gamesPlayed) FROM TeamMember tm WHERE tm.isActive = true GROUP BY tm.team ORDER BY COUNT(tm) DESC")
+    @Query("SELECT tm.team, COUNT(tm), AVG(tm.contributionScore), SUM(tm.gamesPlayed) FROM TeamMember tm WHERE tm.isActive = true GROUP BY tm.team ORDER BY COUNT(tm) DESC")
     List<Object[]> getTeamMemberStatistics();
 
     @Query("SELECT tm.team, COUNT(tm) FROM TeamMember tm WHERE tm.isActive = true AND tm.role = 'CAPTAIN' GROUP BY tm.team")
     List<Object[]> getTeamCaptainCount();
 
     // Запросы для поиска участников с определенным опытом
-    @Query("SELECT tm FROM TeamMember tm WHERE tm.gamesPlayed > 0 AND tm.totalPlaytimeSeconds > 0 AND tm.isActive = true ORDER BY (tm.rating + tm.gamesPlayed * 0.1 + tm.totalPlaytimeSeconds * 0.0001) DESC")
+    @Query("SELECT tm FROM TeamMember tm WHERE tm.gamesPlayed > 0 AND tm.totalPlaytimeSeconds > 0 AND tm.isActive = true ORDER BY (tm.gamesPlayed * 0.1 + tm.totalPlaytimeSeconds * 0.0001) DESC")
     List<TeamMember> findMostExperiencedPlayersOverall();
 
     // Запросы для поиска участников, которые покинули команды
@@ -176,7 +176,7 @@ public interface TeamMemberRepository extends JpaRepository<TeamMember, UUID> {
     List<Object[]> getTeamMemberTenure(@Param("team") Team team);
 
     // Запросы для поиска участников с высоким вкладом
-    @Query("SELECT tm FROM TeamMember tm WHERE tm.isActive = true AND (tm.gamesPlayed > 10 OR tm.totalPlaytimeSeconds > 3600 OR tm.rating > 100) ORDER BY tm.rating DESC")
+    @Query("SELECT tm FROM TeamMember tm WHERE tm.isActive = true AND (tm.gamesPlayed > 10 OR tm.totalPlaytimeSeconds > 3600 OR tm.contributionScore > 100) ORDER BY tm.contributionScore DESC")
     List<TeamMember> findHighContributingMembers();
 
     // Запросы для пагинации

@@ -65,7 +65,7 @@ public interface QuestRepository extends JpaRepository<Quest, UUID> {
     List<Quest> findPublishedByDifficulty(@Param("difficulty") Difficulty difficulty);
     
     // Поиск по названию
-    @Query("SELECT q FROM Quest q WHERE q.published = true AND LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%')) ORDER BY q.startAt ASC")
+    @Query("SELECT q FROM Quest q WHERE q.published = true AND LOWER(q.name) LIKE LOWER(CONCAT('%', :title, '%')) ORDER BY q.startAt ASC")
     List<Quest> findByTitleContainingIgnoreCase(@Param("title") String title);
     
     // Подсчет количества квестов
@@ -155,7 +155,7 @@ public interface QuestRepository extends JpaRepository<Quest, UUID> {
         WHERE (:published IS NULL OR q.published = :published)
           AND (:type IS NULL OR q.type = :type)
           AND (:difficulty IS NULL OR q.difficulty = :difficulty)
-          AND (:title IS NULL OR LOWER(q.title) LIKE LOWER(CONCAT('%', :title, '%')))
+          AND (:title IS NULL OR LOWER(q.name) LIKE LOWER(CONCAT('%', :title, '%')))
           AND (:hasTimeLimit IS NULL OR (:hasTimeLimit = true AND q.estimatedDurationMinutes IS NOT NULL) OR (:hasTimeLimit = false AND q.estimatedDurationMinutes IS NULL))
         ORDER BY q.startAt ASC
     """)

@@ -107,9 +107,9 @@ public class GameSession {
     private Integer maxParticipants;
 
     /**
-     * Участники сессии
+     * Участники сессии (many-to-many)
      */
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(mappedBy = "participatedSessions", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @Builder.Default
     private Set<User> participants = new HashSet<>();

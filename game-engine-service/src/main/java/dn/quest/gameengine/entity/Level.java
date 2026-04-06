@@ -44,7 +44,7 @@ public class Level {
     @Column(nullable = false, length = 200)
     private String title;
 
-    @Lob
+    @Column(name = "description_html", columnDefinition = "text")
     private String descriptionHtml;
 
     @Column(name = "ap_time")

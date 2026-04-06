@@ -152,7 +152,7 @@ public interface LevelHintRepository extends JpaRepository<LevelHint, UUID> {
     );
 
     // Запросы для поиска подсказок, которые были использованы
-    @Query("select h from LevelHint h where h.usageCount > 0 order by h.lastUsed desc")
+    @Query("select h from LevelHint h where h.usageCount > 0 order by h.usageCount desc")
     List<LevelHint> findRecentlyUsedHints();
 
     // Запросы для анализа распределения подсказок по времени

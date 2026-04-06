@@ -53,10 +53,6 @@ dev-team:
 	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d team-management-service-dev
 
-dev-team:
-	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d team-management-service-dev
-
 dev-game:
 	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d game-engine-service-dev

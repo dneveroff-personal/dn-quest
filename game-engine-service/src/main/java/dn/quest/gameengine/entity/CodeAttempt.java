@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 @Data
 @Entity
-@Table(name = "game_code_attempts",
+@Table(name = "code_attempts",
         indexes = {
                 @Index(name = "idx_attempt_session_level_time", columnList = "session_id,level_id,created_at"),
                 @Index(name = "idx_attempt_session", columnList = "session_id"),
@@ -66,7 +66,7 @@ public class CodeAttempt {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 
-    @Column(name = "ip_address")
+    @Column(name = "ip_address", columnDefinition = "inet")
     private String ipAddress;
 
     @Column(name = "user_agent")

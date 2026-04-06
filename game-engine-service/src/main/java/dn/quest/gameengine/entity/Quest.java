@@ -48,10 +48,10 @@ public class Quest {
     @Column(nullable = false, length = 8)
     private QuestType type = QuestType.TEAM;
 
-    @Column(nullable = false, length = 300)
-    private String title;
+    @Column(name = "name", nullable = false, length = 300)
+    private String name;
 
-    @Lob
+    @Column(name = "description_html", columnDefinition = "text")
     private String descriptionHtml;
 
     @Column(name = "start_at")
@@ -66,7 +66,7 @@ public class Quest {
     @Column(name = "updated_at")
     private Instant updatedAt = Instant.now();
 
-    @Column(nullable = false)
+    @Column(name = "is_published", nullable = false)
     private boolean published = false;
 
     @Column(name = "max_participants")

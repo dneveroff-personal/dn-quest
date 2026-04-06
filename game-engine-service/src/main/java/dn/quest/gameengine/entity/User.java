@@ -29,8 +29,8 @@ import java.util.UUID;
                 @Index(name = "idx_user_public_name", columnList = "public_name")
         })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@EqualsAndHashCode(exclude = {"authoredQuests", "captainedTeams", "teamMemberships", "sessions", "codeAttempts", "levelCompletions"})
-@ToString(exclude = {"authoredQuests", "captainedTeams", "teamMemberships", "sessions", "codeAttempts", "levelCompletions"})
+@EqualsAndHashCode(exclude = {"authoredQuests", "captainedTeams", "teamMemberships", "sessions", "codeAttempts", "levelCompletions", "participatedSessions"})
+@ToString(exclude = {"authoredQuests", "captainedTeams", "teamMemberships", "sessions", "codeAttempts", "levelCompletions", "participatedSessions"})
 public class User {
 
     @Id
@@ -103,6 +103,14 @@ public class User {
 
     @OneToMany(mappedBy = "passedByUser")
     private Set<LevelCompletion> levelCompletions = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "game_session_participants",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "session_id")
+    )
+    private Set<GameSession> participatedSessions = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

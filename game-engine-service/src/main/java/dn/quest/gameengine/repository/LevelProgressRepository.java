@@ -103,18 +103,18 @@ public interface LevelProgressRepository extends JpaRepository<LevelProgress, UU
     long countByLevelAndMinSectors(@Param("level") Level level, @Param("threshold") int threshold);
 
     // Запросы для получения статистики по сессиям
-    @Query("SELECT lp.level, COUNT(lp), AVG(EXTRACT(EPOCH FROM (lp.closedAt - lp.startedAt))) FROM LevelProgress lp WHERE lp.session = :session AND lp.closedAt IS NOT NULL GROUP BY lp.level")
+    @Query(value = "SELECT lp.level_id, COUNT(*), AVG(EXTRACT(EPOCH FROM lp.closed_at - lp.started_at)) FROM level_progress lp WHERE lp.session_id = :session AND lp.closed_at IS NOT NULL GROUP BY lp.level_id", nativeQuery = true)
     List<Object[]> getSessionLevelStatistics(@Param("session") GameSession session);
 
     // Запросы для поиска долгих прохождений
-    @Query("SELECT lp FROM LevelProgress lp WHERE lp.closedAt IS NOT NULL ORDER BY (EXTRACT(EPOCH FROM (lp.closedAt - lp.startedAt))) DESC")
+    @Query("SELECT lp FROM LevelProgress lp WHERE lp.closedAt IS NOT NULL ORDER BY lp.closedAt DESC")
     List<LevelProgress> findLongestCompletions();
 
-    @Query("SELECT lp FROM LevelProgress lp WHERE lp.closedAt IS NOT NULL AND EXTRACT(EPOCH FROM (lp.closedAt - lp.startedAt)) > :threshold ORDER BY (EXTRACT(EPOCH FROM (lp.closedAt - lp.startedAt))) DESC")
+    @Query(value = "SELECT * FROM level_progress WHERE closed_at IS NOT NULL AND EXTRACT(EPOCH FROM closed_at - started_at) > :threshold ORDER BY closed_at DESC", nativeQuery = true)
     List<LevelProgress> findLongestCompletionsAboveThreshold(@Param("threshold") long threshold);
 
     // Запросы для поиска быстрых прохождений
-    @Query("SELECT lp FROM LevelProgress lp WHERE lp.closedAt IS NOT NULL ORDER BY (EXTRACT(EPOCH FROM (lp.closedAt - lp.startedAt))) ASC")
+    @Query(value = "SELECT * FROM level_progress WHERE closed_at IS NOT NULL ORDER BY EXTRACT(EPOCH FROM closed_at - started_at) ASC", nativeQuery = true)
     List<LevelProgress> findFastestCompletions();
 
     // Запросы для анализа по времени

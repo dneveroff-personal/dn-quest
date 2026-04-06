@@ -167,7 +167,7 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
     Page<Team> findByCaptainOrderByNameAsc(User captain, Pageable pageable);
 
     // Запросы для поиска команд по уровню участников
-    @Query("SELECT t FROM Team t WHERE t.isActive = true AND (SELECT AVG(u.rating) FROM User u JOIN TeamMember tm ON u.id = tm.user WHERE tm.team = t AND tm.isActive = true) >= :minAvgRating ORDER BY t.name ASC")
+    @Query("SELECT t FROM Team t JOIN t.members tm JOIN tm.user u WHERE t.isActive = true AND tm.isActive = true GROUP BY t HAVING AVG(u.rating) >= :minAvgRating ORDER BY t.name ASC")
     List<Team> findTeamsWithMinAverageMemberRating(@Param("minAvgRating") Double minAvgRating);
 
     // Запросы для анализа активности команд

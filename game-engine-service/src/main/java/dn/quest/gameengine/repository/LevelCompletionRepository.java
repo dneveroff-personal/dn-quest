@@ -137,7 +137,8 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     List<LevelCompletion> findLeastEfficientCompletions();
 
     // Запросы для пагинации
-    Page<LevelCompletion> findByQuestOrderByPassTimeAsc(Quest quest, Pageable pageable);
+    @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.quest = :quest ORDER BY lc.passTime ASC")
+    Page<LevelCompletion> findByQuestOrderByPassTimeAsc(@Param("quest") Quest quest, Pageable pageable);
     
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.quest.id = :questId ORDER BY lc.passTime ASC")
     Page<LevelCompletion> findByQuestIdOrderByPassTimeAsc(@Param("questId") UUID questId, Pageable pageable);
@@ -150,10 +151,10 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     Double getAverageSectorsByQuestId(@Param("questId") UUID questId);
 
     // Запросы для поиска лучших результатов
-    @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.id = :levelId ORDER BY lc.adjustedDurationSec ASC")
+    @Query(value = "SELECT * FROM level_completions WHERE level_id = :levelId ORDER BY duration_sec + bonus_on_level_sec - penalty_on_level_sec ASC LIMIT 100", nativeQuery = true)
     List<LevelCompletion> findBestCompletionsByLevel(@Param("levelId") UUID levelId);
 
-    @Query("SELECT lc FROM LevelCompletion lc WHERE lc.level.quest.id = :questId ORDER BY lc.adjustedDurationSec ASC")
+    @Query(value = "SELECT * FROM level_completions lc JOIN levels l ON lc.level_id = l.id WHERE l.quest_id = :questId ORDER BY lc.duration_sec + lc.bonus_on_level_sec - lc.penalty_on_level_sec ASC LIMIT 100", nativeQuery = true)
     List<LevelCompletion> findBestCompletionsByQuest(@Param("questId") UUID questId);
 
     // Запросы для анализа по IP
@@ -161,7 +162,7 @@ public interface LevelCompletionRepository extends JpaRepository<LevelCompletion
     List<LevelCompletion> findByIpAddress(@Param("ipAddress") String ipAddress);
 
     // Запросы для анализа временных паттернов
-    @Query("SELECT lc FROM LevelCompletion lc WHERE DATE(lc.passTime) = CURRENT_DATE ORDER BY lc.passTime DESC")
+    @Query(value = "SELECT * FROM level_completions WHERE pass_time >= CURRENT_DATE AND pass_time < CURRENT_DATE + INTERVAL '1 day' ORDER BY pass_time DESC", nativeQuery = true)
     List<LevelCompletion> findTodayCompletions();
 
     @Query("SELECT lc FROM LevelCompletion lc WHERE lc.passTime >= :since ORDER BY lc.passTime DESC")

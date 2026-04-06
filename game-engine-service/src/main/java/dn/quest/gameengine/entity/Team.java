@@ -58,7 +58,7 @@ public class Team {
     @Column(name = "max_members")
     private Integer maxMembers = 10;
 
-    @Column(name = "rating")
+    @Column(name = "rating", columnDefinition = "numeric")
     private Double rating = 0.0;
 
     @Column(name = "total_games_played")

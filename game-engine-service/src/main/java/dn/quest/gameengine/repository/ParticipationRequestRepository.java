@@ -72,10 +72,10 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     List<ParticipationRequest> findByCreatedAtBetween(@Param("start") Instant start, @Param("end") Instant end);
 
     // Запросы для анализа времени ожидания
-    @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.status != 'PENDING' ORDER BY (pr.processedAt.getEpochSecond() - pr.createdAt.getEpochSecond()) DESC")
+    @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.status = dn.quest.shared.enums.ParticipationStatus.PENDING ORDER BY pr.createdAt ASC")
     List<ParticipationRequest> findLongestWaitingRequests();
 
-    @Query("SELECT AVG(pr.processedAt.getEpochSecond() - pr.createdAt.getEpochSecond()) FROM ParticipationRequest pr WHERE pr.status != 'PENDING' AND pr.processedAt IS NOT NULL")
+    @Query("SELECT AVG(TIMESTAMPDIFF(SECOND, pr.createdAt, pr.processedAt)) FROM ParticipationRequest pr WHERE pr.status <> 'PENDING' AND pr.processedAt IS NOT NULL")
     Double getAverageWaitingTime();
 
     // Запросы для поиска запросов по обработчику
@@ -135,7 +135,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     List<Object[]> findDuplicateTeamRequests();
 
     // Запросы для анализа по квестам
-    @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.session.level.quest.id = :questId ORDER BY pr.createdAt DESC")
+    @Query("SELECT pr FROM ParticipationRequest pr WHERE pr.session.quest.id = :questId ORDER BY pr.createdAt DESC")
     List<ParticipationRequest> findByQuestId(@Param("questId") UUID questId);
 
     // Запросы для поиска запросов от конкретных пользователей
@@ -143,6 +143,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     List<ParticipationRequest> findByUserIds(@Param("userIds") List<UUID> userIds);
 
     // Запросы для анализа эффективности обработки
-    @Query("SELECT pr.processedByUser, COUNT(pr), AVG(pr.processedAt.getEpochSecond() - pr.createdAt.getEpochSecond()) FROM ParticipationRequest pr WHERE pr.processedByUser IS NOT NULL GROUP BY pr.processedByUser")
+    @Query("SELECT pr.processedByUser, COUNT(pr), AVG(EXTRACT(EPOCH FROM pr.processedAt) - EXTRACT(EPOCH FROM pr.createdAt)) FROM ParticipationRequest pr WHERE pr.processedByUser IS NOT NULL GROUP BY pr.processedByUser")
     List<Object[]> getProcessorStatistics();
 }
