@@ -18,7 +18,7 @@ import java.util.UUID;
  * Репозиторий для работы с лидербордами
  */
 @Repository
-public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> {
+public interface LeaderboardRepository extends JpaRepository<Leaderboard, UUID> {
 
     /**
      * Найти запись в лидерборде по типу, периоду, дате и ID сущности
@@ -203,8 +203,13 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, Long> 
     /**
      * Найти топ N записей в лидерборде
      */
+    @Query("SELECT l FROM Leaderboard l WHERE l.leaderboardType = :leaderboardType " +
+           "AND l.period = :period AND l.date = :date ORDER BY l.rank ASC")
     List<Leaderboard> findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc(
-            String leaderboardType, String period, LocalDate date, int limit);
+            @Param("leaderboardType") String leaderboardType,
+            @Param("period") String period,
+            @Param("date") LocalDate date,
+            Pageable pageable);
 
     /**
      * Найти записи в лидерборде по типу, периоду, дате и диапазону рангов

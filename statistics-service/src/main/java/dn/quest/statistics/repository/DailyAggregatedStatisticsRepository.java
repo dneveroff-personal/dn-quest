@@ -100,18 +100,6 @@ public interface DailyAggregatedStatisticsRepository extends JpaRepository<Daily
     Long getTotalTeamsByPeriod(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     /**
-     * Получить общее количество файлов за период
-     */
-    @Query("SELECT SUM(d.totalFiles) FROM DailyAggregatedStatistics d WHERE d.date BETWEEN :startDate AND :endDate")
-    Long getTotalFilesByPeriod(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
-    /**
-     * Получить общий размер хранилища за период (в байтах)
-     */
-    @Query("SELECT SUM(d.totalStorageUsed) FROM DailyAggregatedStatistics d WHERE d.date BETWEEN :startDate AND :endDate")
-    Long getTotalStorageUsedByPeriod(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
-    /**
      * Получить средний коэффициент удержания за период
      */
     @Query("SELECT AVG(d.retentionRate) FROM DailyAggregatedStatistics d WHERE d.date BETWEEN :startDate AND :endDate AND d.retentionRate IS NOT NULL")
@@ -233,20 +221,6 @@ public interface DailyAggregatedStatisticsRepository extends JpaRepository<Daily
     @Modifying
     @Query("UPDATE DailyAggregatedStatistics d SET d.totalTeams = :count WHERE d.date = :date")
     int updateTotalTeams(@Param("date") LocalDate date, @Param("count") Integer count);
-
-    /**
-     * Обновить общее количество файлов
-     */
-    @Modifying
-    @Query("UPDATE DailyAggregatedStatistics d SET d.totalFiles = :count WHERE d.date = :date")
-    int updateTotalFiles(@Param("date") LocalDate date, @Param("count") Integer count);
-
-    /**
-     * Обновить общий размер хранилища
-     */
-    @Modifying
-    @Query("UPDATE DailyAggregatedStatistics d SET d.totalStorageUsed = :size WHERE d.date = :date")
-    int updateTotalStorageUsed(@Param("date") LocalDate date, @Param("size") Long size);
 
     /**
      * Удалить старую статистику (для очистки)
