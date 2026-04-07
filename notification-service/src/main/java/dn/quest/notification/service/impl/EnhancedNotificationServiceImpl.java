@@ -107,7 +107,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendProfileUpdatedNotification(UUID userId, String username) {
+    public CompletableFuture<Void> sendProfileUpdatedNotification(Long userId, String username) {
         log.info("Sending profile updated notification to user: {}", userId);
 
         try {
@@ -131,7 +131,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestCreatedNotification(UUID questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestCreatedNotification(Long questId, String title, Long authorId) {
         log.info("Sending quest created notification to author: {}", authorId);
 
         try {
@@ -155,7 +155,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestUpdatedNotification(UUID questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestUpdatedNotification(Long questId, String title, Long authorId) {
         log.info("Sending quest updated notification for quest: {}", questId);
         // Broadcast notification - notify all subscribers
         return CompletableFuture.completedFuture(null);
@@ -163,7 +163,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendQuestPublishedNotification(UUID questId, String title, UUID authorId) {
+    public CompletableFuture<Void> sendQuestPublishedNotification(Long questId, String title, Long authorId) {
         log.info("Sending quest published notification to author: {}", authorId);
 
         try {
@@ -187,7 +187,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendGameSessionStartedNotification(UUID userId, UUID sessionId, UUID questId) {
+    public CompletableFuture<Void> sendGameSessionStartedNotification(Long userId, Long sessionId, Long questId) {
         log.info("Sending game session started notification to user: {}", userId);
 
         try {
@@ -211,7 +211,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendGameSessionFinishedNotification(UUID userId, UUID sessionId, boolean completed) {
+    public CompletableFuture<Void> sendGameSessionFinishedNotification(Long userId, Long sessionId, boolean completed) {
         log.info("Sending game session finished notification to user: {}", userId);
 
         try {
@@ -235,7 +235,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendLevelCompletedNotification(UUID userId, UUID sessionId, Integer levelNumber) {
+    public CompletableFuture<Void> sendLevelCompletedNotification(Long userId, Long sessionId, Integer levelNumber) {
         log.info("Sending level completed notification to user: {}", userId);
 
         try {
@@ -259,7 +259,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendTeamCreatedNotification(UUID teamId, String teamName, UUID captainId) {
+    public CompletableFuture<Void> sendTeamCreatedNotification(Long teamId, String teamName, Long captainId) {
         log.info("Sending team created notification to captain: {}", captainId);
 
         try {
@@ -283,7 +283,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendTeamUpdatedNotification(UUID teamId, String teamName) {
+    public CompletableFuture<Void> sendTeamUpdatedNotification(Long teamId, String teamName) {
         log.info("Sending team updated notification for team: {}", teamId);
 
         try {
@@ -298,7 +298,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendTeamMemberAddedNotification(UUID teamId, String teamName, UUID userId, String userName) {
+    public CompletableFuture<Void> sendTeamMemberAddedNotification(Long teamId, String teamName, Long userId, String userName) {
         log.info("Sending team member added notification to user: {}", userId);
 
         try {
@@ -322,7 +322,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendTeamMemberRemovedNotification(UUID teamId, String teamName, UUID userId, String userName) {
+    public CompletableFuture<Void> sendTeamMemberRemovedNotification(Long teamId, String teamName, Long userId, String userName) {
         log.info("Sending team member removed notification to user: {}", userId);
 
         try {
@@ -346,7 +346,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendFileUploadedNotification(UUID userId, String fileName) {
+    public CompletableFuture<Void> sendFileUploadedNotification(Long userId, String fileName) {
         log.info("Sending file uploaded notification to user: {}", userId);
 
         try {
@@ -377,7 +377,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     @Override
     @Async
-    public CompletableFuture<Void> sendTelegramNotification(UUID userId, String message) {
+    public CompletableFuture<Void> sendTelegramNotification(Long userId, String message) {
         log.debug("Delegating telegram notification to legacy service");
         return legacyNotificationService.sendTelegramNotification(userId, message);
     }
@@ -468,7 +468,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
                 String payload = new ObjectMapper().writeValueAsString(notification);
                 
                 queueService.addToQueue(
-                    notification.getNotificationId(),
+                    notification.getId(),
                     notification.getUserId(),
                     channel,
                     notification.getPriority(),
@@ -649,7 +649,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
 
     // Методы создания уведомлений для разных сценариев
 
-    private List<Notification> createWelcomeNotifications(UUID userId, String username, String email, 
+    private List<Notification> createWelcomeNotifications(Long userId, String username, String email, 
                                                          UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "welcome_" + userId + "_" + System.currentTimeMillis();
@@ -701,7 +701,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createProfileUpdatedNotifications(UUID userId, String username, 
+    private List<Notification> createProfileUpdatedNotifications(Long userId, String username, 
                                                                UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "profile_updated_" + userId + "_" + System.currentTimeMillis();
@@ -733,7 +733,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestCreatedNotifications(UUID questId, String title, UUID authorId, 
+    private List<Notification> createQuestCreatedNotifications(Long questId, String title, Long authorId, 
                                                               UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_created_" + questId + "_" + System.currentTimeMillis();
@@ -766,7 +766,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestUpdatedNotifications(UUID questId, String title, UUID authorId, 
+    private List<Notification> createQuestUpdatedNotifications(Long questId, String title, Long authorId, 
                                                               UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_updated_" + questId + "_" + System.currentTimeMillis();
@@ -799,7 +799,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createQuestPublishedNotifications(UUID questId, String title, UUID authorId, 
+    private List<Notification> createQuestPublishedNotifications(Long questId, String title, Long authorId, 
                                                                 UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "quest_published_" + questId + "_" + System.currentTimeMillis();
@@ -832,7 +832,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createGameSessionStartedNotifications(UUID userId, UUID sessionId, UUID questId, 
+    private List<Notification> createGameSessionStartedNotifications(Long userId, Long sessionId, Long questId, 
                                                                     UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "game_started_" + sessionId + "_" + System.currentTimeMillis();
@@ -865,7 +865,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createGameSessionFinishedNotifications(UUID userId, UUID sessionId, boolean completed, 
+    private List<Notification> createGameSessionFinishedNotifications(Long userId, Long sessionId, boolean completed, 
                                                                      UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "game_finished_" + sessionId + "_" + System.currentTimeMillis();
@@ -901,7 +901,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createLevelCompletedNotifications(UUID userId, UUID sessionId, Integer levelNumber, 
+    private List<Notification> createLevelCompletedNotifications(Long userId, Long sessionId, Integer levelNumber, 
                                                                UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "level_completed_" + sessionId + "_" + levelNumber + "_" + System.currentTimeMillis();
@@ -934,7 +934,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createTeamCreatedNotifications(UUID teamId, String teamName, UUID captainId, 
+    private List<Notification> createTeamCreatedNotifications(Long teamId, String teamName, Long captainId, 
                                                              UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "team_created_" + teamId + "_" + System.currentTimeMillis();
@@ -967,7 +967,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createTeamMemberAddedNotifications(UUID teamId, String teamName, UUID userId, String userName, 
+    private List<Notification> createTeamMemberAddedNotifications(Long teamId, String teamName, Long userId, String userName, 
                                                                  UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "team_member_added_" + teamId + "_" + userId + "_" + System.currentTimeMillis();
@@ -1001,7 +1001,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createTeamMemberRemovedNotifications(UUID teamId, String teamName, UUID userId, String userName, 
+    private List<Notification> createTeamMemberRemovedNotifications(Long teamId, String teamName, Long userId, String userName, 
                                                                   UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "team_member_removed_" + teamId + "_" + userId + "_" + System.currentTimeMillis();
@@ -1035,7 +1035,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
         return notifications;
     }
 
-    private List<Notification> createFileUploadedNotifications(UUID userId, String fileName, 
+    private List<Notification> createFileUploadedNotifications(Long userId, String fileName, 
                                                              UserNotificationPreferences preferences) {
         List<Notification> notifications = new ArrayList<>();
         String notificationId = "file_uploaded_" + userId + "_" + System.currentTimeMillis();
@@ -1070,7 +1070,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
     /**
      * Создать уведомление
      */
-    private Notification createNotification(String notificationId, UUID userId, NotificationType type, 
+    private Notification createNotification(String notificationId, UUID userId, NotificationType type,
                                           NotificationCategory category, String subject, String content, 
                                           String htmlContent, String email, String phone, 
                                           String telegramChatId, String fcmToken, 
