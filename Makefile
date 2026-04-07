@@ -37,35 +37,19 @@ dev-common:
 	@echo "$(GREEN) Запускаем базовые: Postgres, Redis, Zookeeper, Kafka, Minio $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
 
-dev-auth:
-	@echo "$(GREEN) Запускаем authentication сервис $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d authentication-service-dev
-
-dev-user-file:
-	@echo "$(GREEN) Запускаем user-management и file-storage сервисы $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d user-management-service-dev file-storage-service-dev
-
-dev-quest:
-	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d quest-management-service-dev
-
-dev-team:
-	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d team-management-service-dev
-
-dev-game:
-	@echo "$(GREEN) Запускаем quest-management и team-management сервисы $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d game-engine-service-dev
+dev-stat:
+	@echo "$(GREEN) Запускаем statistics-service-dev $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d statistics-service-dev
 
 dev-ready:
-	@echo "$(GREEN) Запускаем 1 этап $(RESET)"
+	@echo "$(GREEN) Запускаем готовые сервисы $(RESET)"
 	$(MAKE) dev-common
-	docker compose -f docker-compose.dev.yml up -d authentication-service-dev user-management-service-dev file-storage-service-dev quest-management-service-dev team-management-service-dev
+	docker compose -f docker-compose.dev.yml up -d authentication-service-dev user-management-service-dev file-storage-service-dev quest-management-service-dev team-management-service-dev game-engine-service-dev
 
 dev-test:
-	@echo "$(GREEN) Запускаем 1 этап $(RESET)"
+	@echo "$(GREEN) Запускаем тест этап $(RESET)"
 	$(MAKE) dev-ready
-	$(MAKE) dev-game
+	$(MAKE) dev-stat
 
 logs: ## Показать логи сервиса: make logs SERVICE=file-storage-service
 	docker compose -f docker-compose.dev.yml logs -f $(SERVICE)
@@ -79,7 +63,7 @@ clean: ## Полная очистка проекта
 	rm -rf */build/ .gradle/ build/
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans
 	docker rmi     $$(docker images "dn-quest/*:dev" -q) 2>/dev/null || true
-	@echo "$$   (GREEN)Очистка завершена!   $$(RESET)"
+	@echo "$(GREEN)Очистка завершена! $(RESET)"
 
 minio-console: ## Открыть MinIO консоль
 	@echo "Открываем MinIO → http://localhost:9001"

@@ -19,6 +19,8 @@ import java.util.UUID;
 @Table(name = "daily_aggregated_statistics", indexes = {
     @Index(name = "idx_daily_aggregated_date", columnList = "date"),
     @Index(name = "idx_daily_aggregated_type", columnList = "aggregationType")
+}, uniqueConstraints = {
+    @UniqueConstraint(name = "uk_daily_aggregated_statistics_date", columnNames = {"date", "aggregationType"})
 })
 @Data
 @Builder
