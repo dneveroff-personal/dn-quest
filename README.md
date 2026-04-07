@@ -205,9 +205,6 @@ dn-quest/
 3. Внесите изменения
 4. Создайте Pull Request
 
-## 📄 Лицензия
-
-MIT License
 
 ---
 ## Структура зависимостей
@@ -226,30 +223,7 @@ statistics, notification          ← зависят от game
 ↓
 api-gateway, frontend             ← уже healthy!
 
-**DN Quest** — современная платформа для онлайн-квестов с микросервисной архитектурой
 
-## Команды для разработки:
-- Показать статус запущенных сервисов 
-  > docker ps --format "table {{.Names}}\t{{.Status}}"
+## 📄 Лицензия
 
-- Билд jar файлов 
-  > ./gradlew clean build -x test
-
-- Запуск докер контейнеров 
-  > docker compose -f docker-compose.dev.yml up -d --build
-  
-- Запуск последовательно:
-  - №1 ТОЛЬКО контейнеров служб
-  >   docker compose -f docker-compose.dev.yml up -d postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
-  - №2 authentication-service-dev
-  >   docker compose -f docker-compose.dev.yml up -d authentication-service-dev
-  - №3 user-management-service-dev и file-storage-service-dev
-  > docker compose -f docker-compose.dev.yml up -d user-management-service-dev file-storage-service-dev
-- Правильная остановка всех контейнеров
-  > docker compose -f docker-compose.dev.yml down -v --remove-orphans
-
-- Перезапуск определенного контейнера 
-  > docker compose -f docker-compose.dev.yml up -d frontend-dev
-
-- Дроп БД для билда с нова
-  > docker compose -f docker-compose.dev.yml down -v && docker volume rm dn-quest-dev_postgres_dev_data 2>/dev/null || true
+MIT License
