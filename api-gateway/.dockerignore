@@ -1,0 +1,81 @@
+# Gradle
+.gradle/
+build/
+!build/libs/
+gradlew
+gradlew.bat
+gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+target/
+!.gradle/
+test-results/
+*.test
+
+# Documentation
+README.md
+docs/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Cache
+.cache/
+
+# Node modules (if any)
+node_modules/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Local configuration
+application-local.yml
+application-local.properties

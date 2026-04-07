@@ -1,0 +1,225 @@
+spring:
+  application:
+    name: game-engine-service
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  config:
+    import: optional:file:./config/application.yml
+
+  # Database configuration
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_game}
+    username: ${DATABASE_USERNAME:dn}
+    password: ${DATABASE_PASSWORD:dn}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+  
+  # JPA configuration
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        generate_statistics: false
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+        use_sql_comments: false
+        connection:
+          provider_disables_autocommit: true
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        batch_size: 25
+        session:
+          events:
+            log:
+              level: WARN
+        default_schema: game
+  
+  # Flyway configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: false
+    locations: classpath:db/migration
+    schemas: game
+    default-schema: game
+  
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.gameengine.event"
+    consumer:
+      group-id: game-engine-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.gameengine.event"
+        spring.json.value.default.type: "dn.quest.shared.events.BaseEvent"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 100
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 10000
+    listener:
+      ack-mode: manual_immediate
+      poll-timeout: 3000
+      concurrency: 3
+  
+  # Cache configuration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=5m
+  
+  # Redis configuration for session caching
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  
+  # Security configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_SERVICE_URL:http://localhost:8081}
+
+# Feign configuration
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: none
+      authentication-service:
+        url: ${AUTH_SERVICE_URL:http://localhost:8081}
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+      user-management-service:
+        url: ${USER_SERVICE_URL:http://localhost:8082}
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+      quest-management-service:
+        url: ${QUEST_SERVICE_URL:http://localhost:8083}
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+      team-management-service:
+        url: ${TEAM_SERVICE_URL:http://localhost:8085}
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+      statistics-service:
+        url: ${STATISTICS_SERVICE_URL:http://localhost:8087}
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: basic
+
+# Application configuration
+app:
+  game:
+    # Игровые ограничения
+    limits:
+      max-attempts-per-minute: 30
+      max-sessions-per-user: 10
+      max-sessions-per-team: 5
+      max-code-length: 200
+      session-timeout-minutes: 480  # 8 часов
+      auto-pass-check-interval-seconds: 30
+    # Бонусы и штрафы
+    scoring:
+      default-bonus-seconds: 300
+      default-penalty-seconds: 180
+      max-bonus-per-level: 900
+      max-penalty-per-level: 600
+    # Кэширование
+    cache:
+      active-sessions-ttl-minutes: 30
+      quest-data-ttl-minutes: 60
+      user-data-ttl-minutes: 15
+    # WebSocket
+    websocket:
+      allowed-origins: ${WEBSOCKET_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:8080}
+      heartbeat-interval-seconds: 30
+
+# Logging configuration
+logging:
+  level:
+    dn.quest.gameengine: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.kafka: INFO
+    feign: INFO
+    org.springframework.web.socket: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: game-engine-service
+
+# Server configuration
+server:
+  port: ${SERVER_PORT:8084}
+  servlet:
+    context-path: /api/game
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  http2:
+    enabled: true
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# OpenAPI configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method

@@ -1,0 +1,666 @@
+# DN Quest - Dev-конфигурация (host-build)
+# Workflow: ./gradlew clean build -x test → docker compose -f docker-compose.dev.yml up -d --build
+# Пересборка одного сервиса: ./gradlew :game-engine-service:bootJar -x test && docker compose -f docker-compose.dev.yml up -d --build game-engine-service-dev
+services:
+
+  # ======================
+  # Инфраструктура
+  # ======================
+
+  postgres-dev:
+    image: postgres:16-alpine
+    container_name: dn-quest-postgres-dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DEV_DB:-dnquest_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-dn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "${POSTGRES_DEV_PORT:-5432}:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./docker/postgres/dev/init:/docker-entrypoint-initdb.d
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dn} -d ${POSTGRES_DEV_DB:-dnquest_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  redis-dev:
+    image: redis:7-alpine
+    container_name: dn-quest-redis-dev
+    ports:
+      - "${REDIS_DEV_PORT:-6379}:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - dn-quest-dev-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  zookeeper-dev:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: dn-quest-zookeeper-dev
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  kafka-dev:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: dn-quest-kafka-dev
+    depends_on:
+      zookeeper-dev:
+        condition: service_healthy
+    ports:
+      - "${KAFKA_DEV_PORT:-9092}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-dev:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-dev:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_DELETE_TOPIC_ENABLE: true
+      KAFKA_LOG_RETENTION_HOURS: 24
+    volumes:
+      - kafka_dev_data:/var/lib/kafka/data
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  minio-dev:
+    image: minio/minio:latest
+    container_name: dn-quest-minio-dev
+    ports:
+      - "${MINIO_DEV_PORT:-9000}:9000"
+      - "${MINIO_DEV_CONSOLE_PORT:-9001}:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_dev_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ======================
+  # Микросервисы (host-build)
+  # Все используют один ./Dockerfile в корне проекта
+  # ======================
+
+  api-gateway-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+        PORT: 8080
+    image: dn-quest/api-gateway:dev
+    container_name: dn-quest-api-gateway-dev
+    ports:
+      - "${API_GATEWAY_DEV_PORT:-8080}:8080"
+      - "${API_GATEWAY_DEBUG_PORT:-5005}:5005"
+    environment:
+      GATEWAY_USER: admin
+      GATEWAY_PASSWORD: admin
+      SPRING_PROFILES_ACTIVE: dev
+      REDIS_HOST: redis-dev
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:8080}
+      AUTHENTICATION_SERVICE_URL: http://authentication-service-dev:8081
+      USER_MANAGEMENT_SERVICE_URL: http://user-management-service-dev:8082
+      QUEST_MANAGEMENT_SERVICE_URL: http://quest-management-service-dev:8083
+      GAME_ENGINE_SERVICE_URL: http://game-engine-service-dev:8084
+      TEAM_MANAGEMENT_SERVICE_URL: http://team-management-service-dev:8085
+      NOTIFICATION_SERVICE_URL: http://notification-service-dev:8086
+      STATISTICS_SERVICE_URL: http://statistics-service-dev:8087
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service-dev:8088
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_GATEWAY: DEBUG
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+    volumes:
+      - api_gateway_dev_logs:/app/logs
+    depends_on:
+      redis-dev:
+        condition: service_healthy
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  authentication-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: authentication-service
+        PORT: 8081
+    image: dn-quest/authentication-service:dev
+    container_name: dn-quest-authentication-service-dev
+    ports:
+      - "${AUTHENTICATION_SERVICE_DEV_PORT:-8081}:8081"
+      - "${AUTHENTICATION_SERVICE_DEBUG_PORT:-5006}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_AUTH_DB:-dnquest_auth}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      JWT_SECRET: ${JWT_SECRET:-dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-900000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_AUTHENTICATION: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: INFO
+    volumes:
+      - authentication_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/auth/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  user-management-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: user-management-service
+        PORT: 8082
+    image: dn-quest/user-management-service:dev
+    container_name: dn-quest-user-management-service-dev
+    ports:
+      - "${USER_MANAGEMENT_SERVICE_DEV_PORT:-8082}:8082"
+      - "${USER_MANAGEMENT_SERVICE_DEBUG_PORT:-5007}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_USERS_DB:-dnquest_users}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_USERMANAGEMENT: DEBUG
+    volumes:
+      - user_management_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/api/users/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  quest-management-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: quest-management-service
+        PORT: 8083
+    image: dn-quest/quest-management-service:dev
+    container_name: dn-quest-quest-management-service-dev
+    ports:
+      - "${QUEST_MANAGEMENT_SERVICE_DEV_PORT:-8083}:8083"
+      - "${QUEST_MANAGEMENT_SERVICE_DEBUG_PORT:-5008}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_QUESTS_DB:-dnquest_quests}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      FILE_STORAGE_SERVICE_URL: http://file-storage-service-dev:8088
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_QUESTMANAGEMENT: DEBUG
+    volumes:
+      - quest_management_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/api/quests/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  game-engine-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: game-engine-service
+        PORT: 8084
+    image: dn-quest/game-engine-service:dev
+    container_name: dn-quest-game-engine-service-dev
+    ports:
+      - "${GAME_ENGINE_SERVICE_DEV_PORT:-8084}:8084"
+      - "${GAME_ENGINE_SERVICE_DEBUG_PORT:-5009}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_GAME_DB:-dnquest_game}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      REDIS_HOST: redis-dev
+      REDIS_PORT: 6379
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      QUEST_SERVICE_URL: http://quest-management-service-dev:8083
+      TEAM_SERVICE_URL: http://team-management-service-dev:8085
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_GAMEENGINE: DEBUG
+    volumes:
+      - game_engine_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/api/game/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  team-management-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: team-management-service
+        PORT: 8085
+    image: dn-quest/team-management-service:dev
+    container_name: dn-quest-team-management-service-dev
+    ports:
+      - "${TEAM_MANAGEMENT_SERVICE_DEV_PORT:-8085}:8085"
+      - "${TEAM_MANAGEMENT_SERVICE_DEBUG_PORT:-5010}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_TEAMS_DB:-dnquest_teams}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      USER_SERVICE_URL: http://user-management-service-dev:8082
+      REDIS_HOST: redis-dev
+      REDIS_PORT: 6379
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_TEAMMANAGEMENT: DEBUG
+    volumes:
+      - team_management_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+      redis-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/api/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  notification-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: notification-service
+        PORT: 8086
+    image: dn-quest/notification-service:dev
+    container_name: dn-quest-notification-service-dev
+    ports:
+      - "${NOTIFICATION_SERVICE_DEV_PORT:-8086}:8086"
+      - "${NOTIFICATION_SERVICE_DEBUG_PORT:-5011}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      SMTP_HOST: ${SMTP_HOST:-smtp.mailtrap.io}
+      SMTP_PORT: ${SMTP_PORT:-2525}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_NOTIFICATION: DEBUG
+    volumes:
+      - notification_service_dev_logs:/app/logs
+    depends_on:
+      kafka-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8086/api/notifications/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  statistics-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: statistics-service
+        PORT: 8087
+    image: dn-quest/statistics-service:dev
+    container_name: dn-quest-statistics-service-dev
+    ports:
+      - "${STATISTICS_SERVICE_DEV_PORT:-8087}:8087"
+      - "${STATISTICS_SERVICE_DEBUG_PORT:-5012}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_STATISTICS_DB:-dnquest_statistics}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      GAME_SERVICE_URL: http://game-engine-service-dev:8084
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_STATISTICS: DEBUG
+    volumes:
+      - statistics_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+      authentication-service-dev:
+        condition: service_started
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8087/api/stats/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  file-storage-service-dev:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        SERVICE_NAME: file-storage-service
+        PORT: 8088
+    image: dn-quest/file-storage-service:dev
+    container_name: dn-quest-file-storage-service-dev
+    ports:
+      - "${FILE_STORAGE_SERVICE_DEV_PORT:-8088}:8088"
+      - "${FILE_STORAGE_SERVICE_DEBUG_PORT:-5013}:5005"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_FILES_DB:-dnquest_files}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
+      KAFKA_TOPICS_REPLICATION_FACTOR: 1
+      KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      MINIO_ENDPOINT: http://minio-dev:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-dn-quest-files}
+      FILE_UPLOAD_ALLOWED_TYPES: image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml,video/mp4,video/avi,video/mov,audio/mp3,audio/wav,audio/ogg,application/pdf
+      FILE_UPLOAD_ALLOWED_EXTENSIONS: jpg,jpeg,png,gif,webp,svg,mp4,avi,mov,mp3,wav,ogg,pdf
+      JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      LOGGING_LEVEL_DN_QUEST_FILESTORAGE: DEBUG
+    volumes:
+      - file_storage_service_dev_logs:/app/logs
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      minio-dev:
+        condition: service_healthy
+      kafka-dev:
+        condition: service_healthy
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8088/api/files/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Frontend — собирается отдельно, свой Dockerfile в ./frontend/
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: dn-quest/frontend:dev
+    container_name: dn-quest-frontend-dev
+    ports:
+      - "${FRONTEND_DEV_PORT:-3000}:80"
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
+      VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:8080}
+      VITE_MINIO_URL: ${VITE_MINIO_URL:-http://localhost:9000}
+    volumes:
+      - frontend_dev_node_modules:/app/node_modules
+    networks:
+      - dn-quest-dev-network
+    depends_on:
+      - api-gateway-dev
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+# ======================
+# Volumes
+# ======================
+volumes:
+  postgres_dev_data:
+  redis_dev_data:
+  kafka_dev_data:
+  minio_dev_data:
+  api_gateway_dev_logs:
+  authentication_service_dev_logs:
+  user_management_service_dev_logs:
+  quest_management_service_dev_logs:
+  game_engine_service_dev_logs:
+  team_management_service_dev_logs:
+  notification_service_dev_logs:
+  statistics_service_dev_logs:
+  file_storage_service_dev_logs:
+  frontend_dev_node_modules:
+
+# ======================
+# Networks
+# ======================
+networks:
+  dn-quest-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16

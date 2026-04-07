@@ -1,0 +1,206 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /api/files
+
+spring:
+  application:
+    name: file-storage-service
+  
+  profiles:
+    active: dev
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_files}
+    username: ${DATABASE_USERNAME:dn}
+    password: ${DATABASE_PASSWORD:dn}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      pool-name: DNQuestFilesHikariCP
+      max-lifetime: 1200000
+      connection-timeout: 20000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+        default_schema: files
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
+    schemas: files
+    default-schema: files
+  
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000, expireAfterWrite=30m
+  
+  # File upload configuration
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  
+  # Kafka configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.filestorage.event"
+    consumer:
+      group-id: file-storage-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "dn.quest.shared.events,dn.quest.filestorage.event"
+        spring.json.value.default.type: "dn.quest.shared.events.BaseEvent"
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 100
+      session-timeout-ms: 30000
+      heartbeat-interval-ms: 10000
+    listener:
+      ack-mode: manual_immediate
+      poll-timeout: 3000
+      concurrency: 3
+
+# MinIO Configuration
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket-name: ${MINIO_BUCKET_NAME:dn-quest-files}
+
+# Application configuration
+app:
+  kafka:
+    topics:
+      file-events: file-events
+      user-events: user-events
+      quest-events: quest-events
+      team-events: team-events
+      notification-events: notification-events
+      statistics-events: statistics-events
+      dead-letter-queue: file-storage-dlq
+
+  # File upload configuration
+  upload:
+    allowed-types: ${FILE_UPLOAD_ALLOWED_TYPES:image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml,video/mp4,video/avi,video/mov,audio/mp3,audio/wav,application/pdf}
+    allowed-extensions: ${FILE_UPLOAD_ALLOWED_EXTENSIONS:jpg,jpeg,png,gif,webp,svg,mp4,avi,mov,mp3,wav,pdf}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    dn.quest.filestorage: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    dn.quest.filestorage: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+minio:
+  endpoint: ${MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket-name: ${MINIO_BUCKET_NAME}
+
+logging:
+  level:
+    dn.quest.filestorage: INFO
+  file:
+    name: /var/log/dn-quest/file-storage-service.log
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    dn.quest.filestorage: DEBUG

@@ -1,0 +1,65 @@
+# Kibana configuration for DN Quest logging
+server.name: dn-quest-kibana
+server.host: "0.0.0.0"
+server.port: 5601
+
+# Elasticsearch configuration
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.requestTimeout: 90000
+
+# Security configuration
+xpack.security.enabled: false
+xpack.encryptedSavedObjects.encryptionKey: "dn-quest-encryption-key-for-saved-objects"
+
+# Monitoring configuration
+xpack.monitoring.ui.container.elasticsearch.enabled: true
+
+# Logging configuration
+logging.dest: stdout
+logging.silent: false
+logging.quiet: false
+logging.verbose: false
+
+# Internationalization
+i18n.locale: "ru"
+
+# Default index pattern
+kibana.index: ".kibana"
+
+# Saved objects
+savedObjects.maxImportPayloadBytes: 26214400
+
+# Search configuration
+search.maxBucketsLimit: 10000
+
+# UI configuration
+uiSettings.enabled: true
+
+# Custom settings for DN Quest
+xpack.maps.showMapVisualizationTypes: true
+xpack.graph.enabled: true
+xpack.ml.enabled: false
+xpack.reporting.enabled: true
+xpack.reporting.csv.maxSizeBytes: 10485760
+
+# Index patterns and visualizations
+xpack.savedObjects.import.allowOverwrite: true
+
+# Performance settings
+server.maxPayloadBytes: 1048576
+
+# CORS configuration (if needed)
+server.cors.enabled: true
+server.cors.origin: ["*"]
+
+# Rate limiting
+server.xsrf.whitelist: ["/api/saved_objects/_import"]
+
+# Default dashboard settings
+dashboard.defaultDarkTheme: true
+
+# Timezone
+dateFormat:tz: "Europe/Moscow"
+
+# Custom branding
+server.rewriteBasePath: false

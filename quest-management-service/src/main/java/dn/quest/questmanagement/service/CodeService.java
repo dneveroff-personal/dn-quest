@@ -1,0 +1,198 @@
+package dn.quest.questmanagement.service;
+
+import dn.quest.questmanagement.dto.CodeDTO;
+import dn.quest.shared.enums.CodeType;
+
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Сервис для управления кодами уровней
+ */
+public interface CodeService {
+
+    /**
+     * Создать новый код
+     *
+     * @param dto DTO для создания кода
+     * @param levelId ID уровня
+     * @return созданный код
+     */
+    CodeDTO createCode(CodeDTO dto, UUID levelId);
+
+    /**
+     * Обновить существующий код
+     *
+     * @param id ID кода
+     * @param dto DTO для обновления кода
+     * @return обновленный код
+     */
+    CodeDTO updateCode(UUID id, CodeDTO dto);
+
+    /**
+     * Удалить код
+     *
+     * @param id ID кода
+     */
+    void deleteCode(UUID id);
+
+    /**
+     * Получить код по ID
+     *
+     * @param id ID кода
+     * @return код
+     */
+    CodeDTO getCodeById(UUID id);
+
+    /**
+     * Получить все коды уровня
+     *
+     * @param levelId ID уровня
+     * @return список кодов
+     */
+    List<CodeDTO> getCodesByLevelId(UUID levelId);
+
+    /**
+     * Получить коды по типу
+     *
+     * @param levelId ID уровня
+     * @param type тип кода
+     * @return список кодов
+     */
+    List<CodeDTO> getCodesByType(UUID levelId, CodeType type);
+
+    /**
+     * Проверить код
+     *
+     * @param levelId ID уровня
+     * @param codeValue значение кода
+     * @return результат проверки
+     */
+    CodeValidationResult validateCode(UUID levelId, String codeValue);
+
+    /**
+     * Копировать коды из одного уровня в другой
+     *
+     * @param sourceLevelId ID исходного уровня
+     * @param targetLevelId ID целевого уровня
+     */
+    void copyCodesForLevel(UUID sourceLevelId, UUID targetLevelId);
+
+    /**
+     * Получить статистику использования кодов уровня
+     *
+     * @param levelId ID уровня
+     * @return статистика
+     */
+    CodeUsageStatistics getCodeUsageStatistics(UUID levelId);
+
+    /**
+     * Сбросить использование кодов уровня
+     *
+     * @param levelId ID уровня
+     */
+    void resetCodeUsage(UUID levelId);
+
+    /**
+     * Активировать/деактивировать код
+     *
+     * @param codeId ID кода
+     * @param active флаг активности
+     * @return обновленный код
+     */
+    CodeDTO toggleCodeActive(UUID codeId, boolean active);
+
+    /**
+     * Результат проверки кода
+     */
+    class CodeValidationResult {
+        private final boolean valid;
+        private final String message;
+        private final UUID codeId;
+
+        public CodeValidationResult(boolean valid, String message, UUID codeId) {
+            this.valid = valid;
+            this.message = message;
+            this.codeId = codeId;
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public UUID getCodeId() {
+            return codeId;
+        }
+    }
+
+    /**
+     * Результат использования кода
+     */
+    class CodeUsageResult {
+        private final boolean success;
+        private final String message;
+        private final boolean wasAlreadyUsed;
+
+        public CodeUsageResult(boolean success, String message, boolean wasAlreadyUsed) {
+            this.success = success;
+            this.message = message;
+            this.wasAlreadyUsed = wasAlreadyUsed;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public boolean wasAlreadyUsed() {
+            return wasAlreadyUsed;
+        }
+    }
+
+    /**
+     * Статистика использования кодов
+     */
+    class CodeUsageStatistics {
+        private final long totalCodes;
+        private final long activeCodes;
+        private final long usedCodes;
+        private final long unusedCodes;
+        private final long uniqueUsers;
+
+        public CodeUsageStatistics(long totalCodes, long activeCodes, long usedCodes, 
+                                  long unusedCodes, long uniqueUsers) {
+            this.totalCodes = totalCodes;
+            this.activeCodes = activeCodes;
+            this.usedCodes = usedCodes;
+            this.unusedCodes = unusedCodes;
+            this.uniqueUsers = uniqueUsers;
+        }
+
+        public long getTotalCodes() {
+            return totalCodes;
+        }
+
+        public long getActiveCodes() {
+            return activeCodes;
+        }
+
+        public long getUsedCodes() {
+            return usedCodes;
+        }
+
+        public long getUnusedCodes() {
+            return unusedCodes;
+        }
+
+        public long getUniqueUsers() {
+            return uniqueUsers;
+        }
+    }
+}

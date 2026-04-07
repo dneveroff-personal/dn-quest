@@ -1,0 +1,374 @@
+# AlertManager configuration for DN Quest
+global:
+  smtp_smarthost: '${SMTP_HOST:-localhost:587}'
+  smtp_from: '${SMTP_FROM:-alerts@dn-quest.com}'
+  smtp_auth_username: '${SMTP_USERNAME:-}'
+  smtp_auth_password: '${SMTP_PASSWORD:-}'
+  smtp_require_tls: true
+  
+  # Slack configuration
+  slack_api_url: '${SLACK_WEBHOOK_URL:-}'
+  
+  # Telegram configuration
+  telegram_api_url: 'https://api.telegram.org'
+
+# Route configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 5s
+      group_interval: 5s
+      repeat_interval: 5m
+      routes:
+        - match:
+            service: database
+          receiver: 'database-critical'
+        - match:
+            service: authentication
+          receiver: 'security-critical'
+    
+    # Warning alerts
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 30s
+      group_interval: 30s
+      repeat_interval: 2h
+    
+    # Info alerts
+    - match:
+        severity: info
+      receiver: 'info-alerts'
+      group_wait: 5m
+      group_interval: 5m
+      repeat_interval: 24h
+    
+    # Security alerts
+    - match:
+        alertname: 'HighAuthenticationFailures|SuspiciousActivity|UnauthorizedAccessAttempts'
+      receiver: 'security-alerts'
+      group_wait: 0s
+      group_interval: 0s
+      repeat_interval: 30m
+    
+    # Business alerts
+    - match:
+        service: business
+      receiver: 'business-alerts'
+      group_wait: 1m
+      group_interval: 1m
+      repeat_interval: 1h
+
+# Inhibition rules
+inhibit_rules:
+  # Inhibit warning alerts if critical alert is firing
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+  
+  # Inhibit info alerts if warning alert is firing
+  - source_match:
+      severity: 'warning'
+    target_match:
+      severity: 'info'
+    equal: ['alertname', 'cluster', 'service']
+  
+  # Inhibit service alerts if node is down
+  - source_match:
+      alertname: 'NodeDown'
+    target_match_re:
+      service: '.*'
+    equal: ['instance']
+
+# Receivers configuration
+receivers:
+  # Default receiver
+  - name: 'default'
+    email_configs:
+      - to: '${DEFAULT_EMAIL:-admin@dn-quest.com}'
+        headers:
+          subject: '[DN Quest] {{ .GroupLabels.alertname }}'
+        html: |
+          <h3>DN Quest Alert</h3>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Labels:</strong> {{ range .Labels.SortedPairs }}{{ .Name }}={{ .Value }} {{ end }}</p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#alerts'
+        title: 'DN Quest Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+  
+  # Critical alerts receiver
+  - name: 'critical-alerts'
+    email_configs:
+      - to: '${CRITICAL_EMAIL:-oncall@dn-quest.com}'
+        headers:
+          subject: '[CRITICAL] DN Quest - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>🚨 CRITICAL ALERT 🚨</h2>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
+          <p><strong>Service:</strong> {{ .Labels.service }}</p>
+          <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <p><strong>Runbook:</strong> {{ .Annotations.runbook_url }}</p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#critical-alerts'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          *Runbook:* {{ .Annotations.runbook_url }}
+          {{ end }}
+    
+    telegram_configs:
+      - chat_id: 123456789  # Replace with actual chat ID
+        message: |
+          🚨 *CRITICAL ALERT* 🚨
+          
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          {{ end }}
+    
+    webhook_configs:
+      - url: '${WEBHOOK_URL:-http://localhost:8080/webhooks/alerts}'
+        send_resolved: true
+  
+  # Warning alerts receiver
+  - name: 'warning-alerts'
+    email_configs:
+      - to: '${WARNING_EMAIL:-devops@dn-quest.com}'
+        headers:
+          subject: '[WARNING] DN Quest - {{ .GroupLabels.alertname }}'
+        html: |
+          <h3>⚠️ WARNING ALERT ⚠️</h3>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Service:</strong> {{ .Labels.service }}</p>
+          <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#warnings'
+        title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+  
+  # Info alerts receiver
+  - name: 'info-alerts'
+    slack_configs:
+      - channel: '#info'
+        title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
+        color: 'good'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+  
+  # Security alerts receiver
+  - name: 'security-alerts'
+    email_configs:
+      - to: '${SECURITY_EMAIL:-security@dn-quest.com}'
+        headers:
+          subject: '[SECURITY] DN Quest - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>🔒 SECURITY ALERT 🔒</h2>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Service:</strong> {{ .Labels.service }}</p>
+          <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <p><strong>Immediate action required!</strong></p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#security'
+        title: '🔒 SECURITY: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          
+          🚨 Immediate action required!
+          {{ end }}
+    
+    telegram_configs:
+      - chat_id: 123456789  # Replace with actual chat ID
+        message: |
+          🔒 *SECURITY ALERT* 🔒
+          
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          
+          Immediate action required!
+          {{ end }}
+  
+  # Database critical alerts
+  - name: 'database-critical'
+    email_configs:
+      - to: '${DBA_EMAIL:-dba@dn-quest.com}'
+        headers:
+          subject: '[DB CRITICAL] DN Quest - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>🗄️ DATABASE CRITICAL ALERT 🗄️</h2>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Database:</strong> {{ .Labels.instance }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#database-alerts'
+        title: '🗄️ DB CRITICAL: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Database:* {{ .Labels.instance }}
+          {{ end }}
+  
+  # Security critical alerts
+  - name: 'security-critical'
+    email_configs:
+      - to: '${CISO_EMAIL:-ciso@dn-quest.com}'
+        headers:
+          subject: '[CISO] DN Quest Security Incident - {{ .GroupLabels.alertname }}'
+        html: |
+          <h2>🚨 CISO ALERT 🚨</h2>
+          <p>Security incident detected:</p>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Service:</strong> {{ .Labels.service }}</p>
+          <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <p><strong>This requires immediate CISO attention!</strong></p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#ciso-alerts'
+        title: '🚨 CISO: {{ .GroupLabels.alertname }}'
+        color: 'danger'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Instance:* {{ .Labels.instance }}
+          
+          Immediate CISO attention required!
+          {{ end }}
+  
+  # Business alerts receiver
+  - name: 'business-alerts'
+    email_configs:
+      - to: '${BUSINESS_EMAIL:-product@dn-quest.com}'
+        headers:
+          subject: '[BUSINESS] DN Quest - {{ .GroupLabels.alertname }}'
+        html: |
+          <h3>📊 BUSINESS ALERT 📊</h3>
+          {{ range .Alerts }}
+          <p><strong>Alert:</strong> {{ .Annotations.summary }}</p>
+          <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+          <p><strong>Impact:</strong> {{ .Annotations.impact }}</p>
+          <p><strong>Time:</strong> {{ .StartsAt }}</p>
+          <hr>
+          {{ end }}
+    
+    slack_configs:
+      - channel: '#business-metrics'
+        title: '📊 BUSINESS: {{ .GroupLabels.alertname }}'
+        color: 'warning'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Impact:* {{ .Annotations.impact }}
+          {{ end }}
+
+# Time intervals configuration
+time_intervals:
+  - name: 'business-hours'
+    time_intervals:
+      - times:
+          - start_time: '09:00'
+            end_time: '18:00'
+        weekdays: ['monday:friday']
+        location: 'Europe/Moscow'
+  
+  - name: 'weekends'
+    time_intervals:
+      - weekdays: ['saturday', 'sunday']
+        location: 'Europe/Moscow'
+  
+  - name: 'after-hours'
+    time_intervals:
+      - times:
+          - start_time: '18:01'
+            end_time: '08:59'
+        weekdays: ['monday:friday']
+        location: 'Europe/Moscow'
+
+# Mute timing configurations
+mute_time_intervals:
+  - name: 'maintenance-window'
+    time_intervals:
+      - times:
+          - start_time: '02:00'
+            end_time: '04:00'
+        weekdays: ['sunday']
+        location: 'Europe/Moscow'

@@ -1,0 +1,300 @@
+# Recording Rules for DN Quest - Aggregated Metrics
+groups:
+  - name: dn-quest.service.aggregations
+    interval: 30s
+    rules:
+      # Service-level aggregations
+      - record: dn_quest:services:up
+        expr: up{job=~".*-service"}
+        
+      - record: dn_quest:services:request_rate
+        expr: rate(http_requests_total{job=~".*-service"}[5m])
+        
+      - record: dn_quest:services:error_rate
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100
+        
+      - record: dn_quest:services:response_time_p95
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m]))
+        
+      - record: dn_quest:services:response_time_p99
+        expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m]))
+        
+      - record: dn_quest:services:jvm_memory_usage
+        expr: (jvm_memory_used_bytes{area="heap", job=~".*-service"} / jvm_memory_max_bytes{area="heap", job=~".*-service"}) * 100
+        
+      - record: dn_quest:services:gc_time
+        expr: rate(jvm_gc_collection_seconds_sum{job=~".*-service"}[5m]) * 100
+        
+      - record: dn_quest:services:thread_count
+        expr: jvm_threads_live_threads{job=~".*-service"}
+        
+      - record: dn_quest:services:db_connections_usage
+        expr: (hikaricp_connections_active{job=~".*-service"} / hikaricp_connections_max{job=~".*-service"}) * 100
+
+  - name: dn_quest.business.metrics
+    interval: 60s
+    rules:
+      # Business metrics aggregations
+      - record: dn_quest:business:user_activity_rate
+        expr: rate(http_requests_total{job="api-gateway",handler=~"/api/(auth|users)/.*"}[5m])
+        
+      - record: dn_quest:business:game_sessions_rate
+        expr: rate(http_requests_total{job="game-engine-service",handler=~"/api/game/sessions"}[5m])
+        
+      - record: dn_quest:business:quest_completion_rate
+        expr: rate(http_requests_total{job="game-engine-service",handler=~"/api/game/.*complete"}[5m])
+        
+      - record: dn_quest:business:notification_rate
+        expr: rate(http_requests_total{job="notification-service"}[5m])
+        
+      - record: dn_quest:business:file_upload_rate
+        expr: rate(http_requests_total{job="file-storage-service",handler=~"/api/files/upload"}[5m])
+        
+      - record: dn_quest:business:team_creation_rate
+        expr: rate(http_requests_total{job="team-management-service",handler=~"/api/teams"}[5m])
+        
+      - record: dn_quest:business:authentication_success_rate
+        expr: rate(http_requests_total{job="authentication-service",handler="/api/auth/login",status!~"4..|5.."}[5m]) / rate(http_requests_total{job="authentication-service",handler="/api/auth/login"}[5m]) * 100
+        
+      - record: dn_quest:business:authentication_failure_rate
+        expr: rate(http_requests_total{job="authentication-service",handler="/api/auth/login",status="401"}[5m]) / rate(http_requests_total{job="authentication-service",handler="/api/auth/login"}[5m]) * 100
+
+  - name: dn_quest.infrastructure.metrics
+    interval: 30s
+    rules:
+      # Infrastructure metrics aggregations
+      - record: dn_quest:infra:cpu_usage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+        
+      - record: dn_quest:infra:memory_usage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+        
+      - record: dn_quest:infra:disk_usage
+        expr: (1 - (node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"})) * 100
+        
+      - record: dn_quest:infra:network_receive_rate
+        expr: rate(node_network_receive_bytes_total[5m])
+        
+      - record: dn_quest:infra:network_transmit_rate
+        expr: rate(node_network_transmit_bytes_total[5m])
+        
+      - record: dn_quest:infra:disk_io_read_rate
+        expr: rate(node_disk_read_bytes_total[5m])
+        
+      - record: dn_quest:infra:disk_io_write_rate
+        expr: rate(node_disk_written_bytes_total[5m])
+        
+      - record: dn_quest:infra:load_average_1m
+        expr: node_load1
+        
+      - record: dn_quest:infra:load_average_5m
+        expr: node_load5
+        
+      - record: dn_quest:infra:load_average_15m
+        expr: node_load15
+
+  - name: dn_quest.database.metrics
+    interval: 30s
+    rules:
+      # Database metrics aggregations
+      - record: dn_quest:db:connection_usage
+        expr: (pg_stat_database_numbackends / pg_settings_max_connections) * 100
+        
+      - record: dn_quest:db:query_duration_avg
+        expr: rate(pg_stat_statements_mean_time_seconds[5m])
+        
+      - record: dn_quest:db:query_duration_p95
+        expr: histogram_quantile(0.95, rate(pg_stat_statements_mean_time_seconds_bucket[5m]))
+        
+      - record: dn_quest:db:transactions_rate
+        expr: rate(pg_stat_database_xact_commit[5m]) + rate(pg_stat_database_xact_rollback[5m])
+        
+      - record: dn_quest:db:deadlocks_rate
+        expr: rate(pg_stat_database_deadlocks[5m])
+        
+      - record: dn_quest:db:cache_hit_ratio
+        expr: (pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read)) * 100
+        
+      - record: dn_quest:db:database_size
+        expr: pg_database_size_bytes
+        
+      - record: dn_quest:db:table_size
+        expr: pg_stat_user_tables_size
+
+  - name: dn_quest.kafka.metrics
+    interval: 30s
+    rules:
+      # Kafka metrics aggregations
+      - record: dn_quest:kafka:messages_in_rate
+        expr: rate(kafka_server_brokertopicmetrics_messagesin_total[5m])
+        
+      - record: dn_quest:kafka:messages_out_rate
+        expr: rate(kafka_server_brokertopicmetrics_bytesout_total[5m])
+        
+      - record: dn_quest:kafka:consumer_lag
+        expr: kafka_consumer_lag_sum
+        
+      - record: dn_quest:kafka:producer_rate
+        expr: rate(kafka_server_brokertopicmetrics_bytesin_total[5m])
+        
+      - record: dn_quest:kafka:under_replicated_partitions
+        expr: kafka_server_replicamanager_underreplicatedpartitions
+        
+      - record: dn_quest:kafka:active_controllers
+        expr: kafka_controller_kafkacontroller_activecontrollercount
+        
+      - record: dn_quest:kafka:offline_partitions_count
+        expr: kafka_controller_kafkacontroller_offlinepartitionscount
+
+  - name: dn_quest.redis.metrics
+    interval: 30s
+    rules:
+      # Redis metrics aggregations
+      - record: dn_quest:redis:memory_usage
+        expr: (redis_memory_used_bytes / redis_memory_max_bytes) * 100
+        
+      - record: dn_quest:redis:connected_clients
+        expr: redis_connected_clients
+        
+      - record: dn_quest:redis:commands_rate
+        expr: rate(redis_commands_processed_total[5m])
+        
+      - record: dn_quest:redis:keyspace_hits_rate
+        expr: rate(redis_keyspace_hits_total[5m])
+        
+      - record: dn_quest:redis:keyspace_misses_rate
+        expr: rate(redis_keyspace_misses_total[5m])
+        
+      - record: dn_quest:redis:hit_ratio
+        expr: (redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)) * 100
+        
+      - record: dn_quest:redis:expired_keys_rate
+        expr: rate(redis_expired_keys_total[5m])
+        
+      - record: dn_quest:redis:evicted_keys_rate
+        expr: rate(redis_evicted_keys_total[5m])
+
+  - name: dn_quest.container.metrics
+    interval: 30s
+    rules:
+      # Container metrics aggregations
+      - record: dn_quest:container:cpu_usage
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) * 100
+        
+      - record: dn_quest:container:memory_usage
+        expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""}) * 100
+        
+      - record: dn_quest:container:network_receive_rate
+        expr: rate(container_network_receive_bytes_total{name!=""}[5m])
+        
+      - record: dn_quest:container:network_transmit_rate
+        expr: rate(container_network_transmit_bytes_total{name!=""}[5m])
+        
+      - record: dn_quest:container:filesystem_read_rate
+        expr: rate(container_fs_reads_bytes_total{name!=""}[5m])
+        
+      - record: dn_quest:container:filesystem_write_rate
+        expr: rate(container_fs_writes_bytes_total{name!=""}[5m])
+        
+      - record: dn_quest:container:restart_count
+        expr: increase(container_start_time_seconds{name!=""}[1h])
+
+  - name: dn_quest.security.metrics
+    interval: 60s
+    rules:
+      # Security metrics aggregations
+      - record: dn_quest:security:auth_failure_rate
+        expr: rate(http_requests_total{job="authentication-service",handler="/api/auth/login",status="401"}[5m])
+        
+      - record: dn_quest:security:auth_success_rate
+        expr: rate(http_requests_total{job="authentication-service",handler="/api/auth/login",status!~"4..|5.."}[5m])
+        
+      - record: dn_quest:security:unauthorized_attempts_rate
+        expr: rate(http_requests_total{job=~".*",status="403"}[5m])
+        
+      - record: dn_quest:security:rate_limit_hits_rate
+        expr: rate(http_requests_total{job="api-gateway",status="429"}[5m])
+        
+      - record: dn_quest:security:suspicious_ips_rate
+        expr: rate(http_requests_total{job=~".*",status=~"4..|5.."}[5m]) by (client_ip) > 10
+        
+      - record: dn_quest:security:jwt_validation_failures_rate
+        expr: rate(http_requests_total{job="api-gateway",status="401"}[5m])
+
+  - name: dn_quest.sla.metrics
+    interval: 60s
+    rules:
+      # SLA calculations
+      - record: dn_quest:sla:availability
+        expr: up{job=~".*-service"} * 100
+        
+      - record: dn_quest:sla:error_budget_burn_rate
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100
+        
+      - record: dn_quest:sla:response_time_sla_compliance
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m])) < 1.0
+        
+      - record: dn_quest:sla:throughput
+        expr: rate(http_requests_total{job=~".*-service"}[5m])
+        
+      - record: dn_quest:sla:uptime_percentage
+        expr: (up{job=~".*-service"} * 100)
+        
+      - record: dn_quest:sla:monthly_uptime
+        expr: avg_over_time(up{job=~".*-service"}[30d]) * 100
+
+  - name: dn_quest.cost.metrics
+    interval: 300s
+    rules:
+      # Cost estimation metrics
+      - record: dn_quest:cost:cpu_cores_used
+        expr: sum by (instance) (rate(container_cpu_usage_seconds_total{name!=""}[5m]))
+        
+      - record: dn_quest:cost:memory_gb_used
+        expr: sum by (instance) (container_memory_usage_bytes{name!=""}) / 1024 / 1024 / 1024
+        
+      - record: dn_quest:cost:storage_gb_used
+        expr: sum by (instance) (container_fs_usage_bytes{name!=""}) / 1024 / 1024 / 1024
+        
+      - record: dn_quest:cost:network_gb_transferred
+        expr: sum by (instance) (rate(container_network_receive_bytes_total{name!=""}[5m]) + rate(container_network_transmit_bytes_total{name!=""}[5m])) / 1024 / 1024 / 1024
+        
+      - record: dn_quest:cost:requests_per_second
+        expr: sum by (service) (rate(http_requests_total{job=~".*-service"}[5m]))
+        
+      - record: dn_quest:cost:data_processed_gb
+        expr: sum by (service) (rate(http_request_response_bytes_total{job=~".*-service"}[5m])) / 1024 / 1024 / 1024
+
+  - name: dn_quest.performance.baselines
+    interval: 300s
+    rules:
+      # Performance baseline calculations
+      - record: dn_quest:baseline:response_time_p95_daily
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m]))
+        labels:
+          timeframe: "daily"
+          
+      - record: dn_quest:baseline:response_time_p95_weekly
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=~".*-service"}[5m]))
+        labels:
+          timeframe: "weekly"
+          
+      - record: dn_quest:baseline:error_rate_daily
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100
+        labels:
+          timeframe: "daily"
+          
+      - record: dn_quest:baseline:error_rate_weekly
+        expr: rate(http_requests_total{job=~".*-service",status=~"5.."}[5m]) / rate(http_requests_total{job=~".*-service"}[5m]) * 100
+        labels:
+          timeframe: "weekly"
+          
+      - record: dn_quest:baseline:throughput_daily
+        expr: rate(http_requests_total{job=~".*-service"}[5m])
+        labels:
+          timeframe: "daily"
+          
+      - record: dn_quest:baseline:throughput_weekly
+        expr: rate(http_requests_total{job=~".*-service"}[5m])
+        labels:
+          timeframe: "weekly"
