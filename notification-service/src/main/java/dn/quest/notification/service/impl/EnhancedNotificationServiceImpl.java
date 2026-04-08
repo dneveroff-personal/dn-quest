@@ -1070,7 +1070,7 @@ public class EnhancedNotificationServiceImpl implements NotificationService {
     /**
      * Создать уведомление
      */
-    private Notification createNotification(String notificationId, UUID userId, NotificationType type, 
+    private Notification createNotification(String notificationId, UUID userId, NotificationType type,
                                           NotificationCategory category, String subject, String content, 
                                           String htmlContent, String email, String phone, 
                                           String telegramChatId, String fcmToken, 

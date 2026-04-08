@@ -9,6 +9,18 @@ spring:
   
   profiles:
     active: dev
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_notifications}
+    username: ${DATABASE_USERNAME:dn}
+    password: ${DATABASE_PASSWORD:dn}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   
   cache:
     type: caffeine
@@ -47,10 +59,10 @@ spring:
   
   # Email Configuration
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -62,6 +74,12 @@ spring:
     properties:
       hibernate:
         default_schema: notifications
+    # Disable JAXB auto-registration in Jackson
+    open-in-view: false
+
+  jackson:
+    parser:
+      AUTO_CLOSE_SOURCE: true
 
   flyway:
     enabled: true
@@ -98,10 +116,15 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    mail:
+      enabled: false
   prometheus:
     metrics:
       export:
-        enabled: true
+        enabled: false
 
 logging:
   level:
@@ -136,10 +159,10 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
   
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
 
 telegram:
   bot:

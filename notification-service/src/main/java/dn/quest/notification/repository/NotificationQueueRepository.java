@@ -108,8 +108,7 @@ public interface NotificationQueueRepository extends JpaRepository<NotificationQ
     /**
      * Получает среднее время обработки уведомлений
      */
-    @Query("SELECT AVG(FUNCTION('TIMESTAMPDIFF', 'SECOND', nq.createdAt, nq.processedAt)) " +
-           "FROM NotificationQueue nq WHERE nq.processedAt IS NOT NULL")
+    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM (processed_at - created_at))) FROM notifications.notification_queue WHERE processed_at IS NOT NULL", nativeQuery = true)
     Double getAverageProcessingTime();
 
     /**

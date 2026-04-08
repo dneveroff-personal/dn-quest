@@ -21,7 +21,6 @@ import dn.quest.statistics.service.CacheService;
 import dn.quest.statistics.service.StatisticsAggregationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.web.embedded.TomcatVirtualThreadsWebServerFactoryCustomizer;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,6 @@ public class StatisticsAggregationServiceImpl implements StatisticsAggregationSe
     private final FileStatisticsRepository fileStatisticsRepository;
     private final SystemStatisticsRepository systemStatisticsRepository;
     private final CacheService cacheService;
-    private final TomcatVirtualThreadsWebServerFactoryCustomizer tomcatVirtualThreadsProtocolHandlerCustomizer;
 
     @Override
     @Async

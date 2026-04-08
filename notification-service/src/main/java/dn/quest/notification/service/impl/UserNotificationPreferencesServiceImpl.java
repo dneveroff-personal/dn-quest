@@ -1,6 +1,5 @@
 package dn.quest.notification.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dn.quest.notification.entity.UserNotificationPreferences;
 import dn.quest.notification.enums.NotificationType;
 import dn.quest.notification.repository.NotificationRepository;
@@ -13,11 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Реализация сервиса для управления пользовательскими предпочтениями уведомлений
@@ -30,7 +27,6 @@ public class UserNotificationPreferencesServiceImpl implements UserNotificationP
 
     private final UserNotificationPreferencesRepository preferencesRepository;
     private final NotificationRepository notificationRepository;
-    private final ObjectMapper objectMapper;
 
     @Value("${app.notification.defaults.email-enabled:true}")
     private boolean defaultEmailEnabled;

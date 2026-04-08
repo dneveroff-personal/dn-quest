@@ -1,6 +1,5 @@
 package dn.quest.notification.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dn.quest.notification.entity.Notification;
 import dn.quest.notification.entity.NotificationQueue;

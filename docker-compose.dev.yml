@@ -472,6 +472,9 @@ services:
       - "${NOTIFICATION_SERVICE_DEBUG_PORT:-5011}:5005"
     environment:
       SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres-dev:5432/${POSTGRES_NOTIFICATIONS_DB:-dnquest_notifications}
+      DATABASE_USERNAME: ${POSTGRES_USER:-dn}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-dn}
       KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
       KAFKA_TOPICS_REPLICATION_FACTOR: 1
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
@@ -487,6 +490,8 @@ services:
       - notification_service_dev_logs:/app/logs
     depends_on:
       kafka-dev:
+        condition: service_healthy
+      postgres-dev:
         condition: service_healthy
       authentication-service-dev:
         condition: service_started

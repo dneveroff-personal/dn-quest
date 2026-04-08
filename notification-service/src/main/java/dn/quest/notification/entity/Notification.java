@@ -47,7 +47,7 @@ public class Notification {
     /**
      * ID получателя уведомления (UUID пользователя)
      */
-    @Column(nullable = false, columnDefinition = "BINARY(16)")
+    @Column(nullable = false)
     private UUID userId;
 
     /**

@@ -176,7 +176,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     /**
      * Получить среднее время доставки
      */
-    @Query("SELECT AVG(FUNCTION('TIMESTAMPDIFF', 'SECOND', n.createdAt, n.deliveredAt)) FROM Notification n WHERE n.deliveredAt IS NOT NULL")
+    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM (delivered_at - created_at))) FROM notifications.notifications WHERE delivered_at IS NOT NULL", nativeQuery = true)
     Double getAverageDeliveryTime();
 
     /**

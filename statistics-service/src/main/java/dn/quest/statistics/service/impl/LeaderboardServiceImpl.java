@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -595,7 +596,8 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             LocalDate targetDate = getTargetDate(period, date);
             
             List<Leaderboard> topUsers = leaderboardRepository
-                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc("users", period, targetDate, limit);
+                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc(
+                            "users", period, targetDate, PageRequest.of(0, limit));
             
             return topUsers.stream()
                     .map(this::convertToLeaderboardDTO)
@@ -615,7 +617,8 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             LocalDate targetDate = getTargetDate(period, date);
             
             List<Leaderboard> topQuests = leaderboardRepository
-                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc("quests", period, targetDate, limit);
+                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc(
+                            "quests", period, targetDate, PageRequest.of(0, limit));
             
             return topQuests.stream()
                     .map(this::convertToLeaderboardDTO)
@@ -635,7 +638,8 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             LocalDate targetDate = getTargetDate(period, date);
             
             List<Leaderboard> topTeams = leaderboardRepository
-                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc("teams", period, targetDate, limit);
+                    .findTopByLeaderboardTypeAndPeriodAndDateOrderByRankAsc(
+                            "teams", period, targetDate, PageRequest.of(0, limit));
             
             return topTeams.stream()
                     .map(this::convertToLeaderboardDTO)
