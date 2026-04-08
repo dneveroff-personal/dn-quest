@@ -15,12 +15,10 @@ import java.time.Duration;
 public class AuthenticationServiceClient {
 
     private final WebClient webClient;
-    private final String authenticationServiceUrl;
 
     public AuthenticationServiceClient(
             WebClient.Builder webClientBuilder,
             @Value("${services.authentication.url:http://localhost:8081}") String authenticationServiceUrl) {
-        this.authenticationServiceUrl = authenticationServiceUrl;
         this.webClient = webClientBuilder
                 .baseUrl(authenticationServiceUrl)
                 .build();

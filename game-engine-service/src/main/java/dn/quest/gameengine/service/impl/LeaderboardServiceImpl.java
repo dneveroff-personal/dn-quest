@@ -5,7 +5,6 @@ import dn.quest.gameengine.service.LeaderboardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +28,12 @@ import java.util.UUID;
 public class LeaderboardServiceImpl implements LeaderboardService {
 
     private static final String LEADERBOARD_CACHE = "leaderboard-cache";
-    private static final int DEFAULT_PAGE_SIZE = 20;
 
     private final LeaderboardServiceClient leaderboardClient;
 
-    // Базовые операции с лидербордами
+    // Базовые операции с лидер бордами
 
     @Override
-    @Cacheable(value = LEADERBOARD_CACHE, key = "'session:' + #sessionId + ':' + #pageable.pageNumber")
     public Map<String, Object> getSessionLeaderboard(UUID sessionId, Pageable pageable) {
         log.info("Fetching session leaderboard for session: {}", sessionId);
         
@@ -49,7 +46,6 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    @Cacheable(value = LEADERBOARD_CACHE, key = "'quest:' + #questId + ':' + #pageable.pageNumber")
     public Map<String, Object> getQuestLeaderboard(UUID questId, Pageable pageable) {
         log.info("Fetching quest leaderboard for quest: {}", questId);
         
@@ -60,9 +56,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             Map<String, Object> result = new HashMap<>();
             result.put("questId", questId);
-            result.put("entries", page.getContent());
-            result.put("totalPages", page.getTotalPages());
-            result.put("totalElements", page.getTotalElements());
+            if (page != null) {
+                result.put("entries", page.getContent());
+                result.put("totalPages", page.getTotalPages());
+                result.put("totalElements", page.getTotalElements());
+            }
             result.put("pageable", pageable);
             
             return result;
@@ -73,7 +71,6 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    @Cacheable(value = LEADERBOARD_CACHE, key = "'global:' + #pageable.pageNumber")
     public Map<String, Object> getGlobalLeaderboard(Pageable pageable) {
         log.info("Fetching global leaderboard");
         
@@ -83,9 +80,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             Page<LeaderboardServiceClient.LeaderboardEntryDTO> page = response.getBody();
             
             Map<String, Object> result = new HashMap<>();
-            result.put("entries", page.getContent());
-            result.put("totalPages", page.getTotalPages());
-            result.put("totalElements", page.getTotalElements());
+            if (page != null) {
+                result.put("entries", page.getContent());
+                result.put("totalPages", page.getTotalPages());
+                result.put("totalElements", page.getTotalElements());
+            }
             result.put("pageable", pageable);
             
             return result;
@@ -96,7 +95,6 @@ public class LeaderboardServiceImpl implements LeaderboardService {
     }
 
     @Override
-    @Cacheable(value = LEADERBOARD_CACHE, key = "'team:' + #teamId + ':' + #pageable.pageNumber")
     public Map<String, Object> getTeamLeaderboard(UUID teamId, Pageable pageable) {
         log.info("Fetching team leaderboard for team: {}", teamId);
         
@@ -107,9 +105,11 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             Map<String, Object> result = new HashMap<>();
             result.put("teamId", teamId);
-            result.put("entries", page.getContent());
-            result.put("totalPages", page.getTotalPages());
-            result.put("totalElements", page.getTotalElements());
+            if (page != null) {
+                result.put("entries", page.getContent());
+                result.put("totalPages", page.getTotalPages());
+                result.put("totalElements", page.getTotalElements());
+            }
             result.put("pageable", pageable);
             
             return result;
@@ -119,7 +119,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         }
     }
 
-    // Лидерборды по разным метрикам
+    // Лидер борды по разным метрикам
 
     @Override
     public Map<String, Object> getSessionLeaderboardByScore(UUID sessionId, Pageable pageable) {
@@ -234,7 +234,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return getTeamLeaderboard(sessionId, pageable);
     }
 
-    // Статистика лидербордов
+    // Статистика лидер бордов
 
     @Override
     public long getTotalParticipantsInSession(UUID sessionId) {
@@ -266,7 +266,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return 0.0;
     }
 
-    // Исторические лидерборды
+    // Исторические лидер борды
 
     @Override
     public Map<String, Object> getSessionLeaderboardAtTime(UUID sessionId, Instant timestamp, Pageable pageable) {
@@ -290,7 +290,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return List.of();
     }
 
-    // Лидерборды по периодам
+    // Лидер борды по периодам
 
     @Override
     public Map<String, Object> getDailyLeaderboard(Instant date, Pageable pageable) {
@@ -305,7 +305,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             Map<String, Object> result = new HashMap<>();
             result.put("period", "daily");
             result.put("date", localDate);
-            result.put("entries", page.getContent());
+            result.put("entries", page != null ? page.getContent() : null);
             result.put("pageable", pageable);
             
             return result;
@@ -328,7 +328,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             Map<String, Object> result = new HashMap<>();
             result.put("period", "weekly");
             result.put("weekStart", date);
-            result.put("entries", page.getContent());
+            result.put("entries", page != null ? page.getContent() : null);
             result.put("pageable", pageable);
             
             return result;
@@ -351,7 +351,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             Map<String, Object> result = new HashMap<>();
             result.put("period", "monthly");
             result.put("monthStart", date);
-            result.put("entries", page.getContent());
+            result.put("entries", page != null ? page.getContent() : null);
             result.put("pageable", pageable);
             
             return result;
@@ -367,7 +367,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return getGlobalLeaderboard(pageable);
     }
 
-    // Лидерборды по категориям
+    // Лидер борды по категориям
 
     @Override
     public Map<String, Object> getLeaderboardByDifficulty(String difficulty, Pageable pageable) {
@@ -380,7 +380,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
             
             Map<String, Object> result = new HashMap<>();
             result.put("difficulty", difficulty);
-            result.put("entries", page.getContent());
+            result.put("entries", page != null ? page.getContent() : null);
             result.put("pageable", pageable);
             
             return result;
@@ -408,7 +408,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return createEmptyResult(pageable);
     }
 
-    // Персонализированные лидерборды
+    // Персонализированные лидер борды
 
     @Override
     public Map<String, Object> getUserRelativeLeaderboard(UUID userId, UUID sessionId, int radius) {
@@ -441,7 +441,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return createEmptyResult(pageable);
     }
 
-    // Операции с кэшированием лидербордов
+    // Операции с кэшированием лидер бордов
 
     @Override
     @CacheEvict(value = LEADERBOARD_CACHE, key = "'session:' + #sessionId + '*'")
@@ -488,7 +488,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         log.info("Evicting all leaderboard cache");
     }
 
-    // Обновление лидербордов
+    // Обновление лидер бордов
 
     @Override
     public void updateSessionLeaderboard(UUID sessionId) {
@@ -539,7 +539,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
                 teamId, sessionId, oldRank, newRank);
     }
 
-    // Аналитика лидербордов
+    // Аналитика лидер бордов
 
     @Override
     public List<Object[]> getLeaderboardStatistics(UUID sessionId) {
@@ -735,7 +735,7 @@ public class LeaderboardServiceImpl implements LeaderboardService {
         return List.of();
     }
 
-    // Операции с сравнением
+    // Операции со сравнением
 
     @Override
     public Map<String, Object> compareUsers(UUID userId1, UUID userId2, UUID sessionId) {

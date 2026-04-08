@@ -4,10 +4,13 @@ import dn.quest.gateway.filter.AuthenticationFilter;
 import dn.quest.gateway.filter.LoggingFilter;
 import dn.quest.gateway.filter.SecurityHeadersFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Mono;
 
 /**
  * Конфигурация фильтров и маршрутов API Gateway
@@ -172,19 +175,19 @@ public class FilterConfig {
     /**
      * Redis Rate Limiter
      */
-    private org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter redisRateLimiter() {
-        return new org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter(10, 20, 1);
+    private RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(10, 20, 1);
     }
 
     /**
      * User Key Resolver для Rate Limiting
      */
-    private org.springframework.cloud.gateway.filter.ratelimit.KeyResolver userKeyResolver() {
+    private KeyResolver userKeyResolver() {
         return exchange -> {
             String username = exchange.getRequest()
                     .getHeaders()
                     .getFirst("X-Username");
-            return reactor.core.publisher.Mono.just(username != null ? username : "anonymous");
+            return Mono.just(username != null ? username : "anonymous");
         };
     }
 }

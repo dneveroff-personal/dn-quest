@@ -1,9 +1,4 @@
 -- =============================================
--- authentication-service — V1__init.sql
--- Schema: auth
--- =============================================
-
--- =============================================
 -- Таблица пользователей
 -- =============================================
 CREATE TABLE users (
@@ -134,3 +129,31 @@ COMMENT ON COLUMN user_permissions.user_id     IS 'ID пользователя';
 COMMENT ON COLUMN user_permissions.permission_id IS 'ID разрешения';
 COMMENT ON COLUMN user_permissions.granted_at  IS 'Дата выдачи разрешения';
 COMMENT ON COLUMN user_permissions.granted_by  IS 'Кто выдал разрешение';
+
+-- Admin user (password: admin, BCrypt hashed)
+-- The password hash is: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p9ldwKZmBQlJRb5.nqi7GOS
+INSERT INTO users (id, username, password_hash, email, public_name, role, is_active, is_email_verified, created_at, updated_at)
+VALUES (
+    'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    'admin',
+    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p9ldwKZmBQlJRb5.nqi7GOS',
+    'admin@dn-quest.local',
+    'Administrator',
+    'ADMIN',
+    TRUE,
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+) ON CONFLICT (username) DO NOTHING;
+
+-- Grant admin permissions
+INSERT INTO user_permissions (user_id, permission_id, granted_at, granted_by)
+SELECT 
+    u.id,
+    p.id,
+    CURRENT_TIMESTAMP,
+    'system'
+FROM users u, permissions p
+WHERE u.username = 'admin'
+AND p.name IN ('ADMIN_USERS', 'ADMIN_PERMISSIONS', 'ADMIN_SYSTEM', 'ADMIN_STATISTICS')
+ON CONFLICT DO NOTHING;
