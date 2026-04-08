@@ -8,7 +8,7 @@ spring:
   security:
     user:
       name: ${GATEWAY_USER:admin}
-      password: ${GATEWAY_PASSWORD:admin}
+      password: ${GATEWAY_PASSWORD:{noop}admin}
 
   profiles:
     active: dev
