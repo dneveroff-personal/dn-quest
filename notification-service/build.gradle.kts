@@ -3,6 +3,7 @@ plugins {
 
     id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
+    id("org.flywaydb.flyway") version "9.22.3"
     id("com.google.cloud.tools.jib") version "3.4.0"
 }
 
@@ -17,6 +18,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.postgresql:postgresql:42.7.1")
+    implementation("org.flywaydb:flyway-core:9.22.3")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
@@ -24,6 +29,12 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("io.opentelemetry:opentelemetry-api:1.32.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    
+    // JAXB support for Java 11+ - use javax namespace for backward compatibility
+    // This is needed because jackson-module-jaxb-annotations still uses javax.xml.bind
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.9")
+    implementation("javax.activation:activation:1.1.1")
     
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
@@ -61,6 +72,14 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/dnquest_notifications"
+    user = "dn"
+    password = "dn"
+    locations = arrayOf("classpath:db/migration")
+    baselineOnMigrate = true
 }
 
 jib {

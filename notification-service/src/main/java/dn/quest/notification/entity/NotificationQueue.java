@@ -31,7 +31,7 @@ public class NotificationQueue {
     @Column(name = "notification_id", nullable = false)
     private String notificationId;
 
-    @Column(name = "user_id", nullable = false, columnDefinition = "BINARY(16)")
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
     @Enumerated(EnumType.STRING)

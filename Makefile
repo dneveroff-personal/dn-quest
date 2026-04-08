@@ -29,6 +29,10 @@ dev-down: ## Остановить и удалить всё
 	@echo "$(YELLOW)Остановка всех сервисов... $(RESET)"
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans
 
+dev-down-service: ## Остановить и удалить один сервис: make dev-down-service SERVICE=notification-service-dev
+	@echo "$(YELLOW)Остановка сервиса $(SERVICE)... $(RESET)"
+	docker compose -f docker-compose.dev.yml down -v $(SERVICE)
+
 dev-restart: ## Полный перезапуск
 	@$(MAKE) dev-down
 	@$(MAKE) dev-up
@@ -37,19 +41,19 @@ dev-common:
 	@echo "$(GREEN) Запускаем базовые: Postgres, Redis, Zookeeper, Kafka, Minio $(RESET)"
 	docker compose -f docker-compose.dev.yml up -d postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
 
-dev-stat:
-	@echo "$(GREEN) Запускаем statistics-service-dev $(RESET)"
-	docker compose -f docker-compose.dev.yml up -d statistics-service-dev
+dev-notif:
+	@echo "$(GREEN) Запускаем notification-service-dev $(RESET)"
+	docker compose -f docker-compose.dev.yml up -d notification-service-dev
 
 dev-ready:
 	@echo "$(GREEN) Запускаем готовые сервисы $(RESET)"
 	$(MAKE) dev-common
-	docker compose -f docker-compose.dev.yml up -d authentication-service-dev user-management-service-dev file-storage-service-dev quest-management-service-dev team-management-service-dev game-engine-service-dev
+	docker compose -f docker-compose.dev.yml up -d authentication-service-dev user-management-service-dev file-storage-service-dev quest-management-service-dev team-management-service-dev game-engine-service-dev statistics-service-dev
 
 dev-test:
 	@echo "$(GREEN) Запускаем тест этап $(RESET)"
 	$(MAKE) dev-ready
-	$(MAKE) dev-stat
+	$(MAKE) dev-notif
 
 logs: ## Показать логи сервиса: make logs SERVICE=file-storage-service
 	docker compose -f docker-compose.dev.yml logs -f $(SERVICE)

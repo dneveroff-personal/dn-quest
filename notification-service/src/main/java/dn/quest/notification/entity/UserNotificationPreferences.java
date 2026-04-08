@@ -33,7 +33,7 @@ public class UserNotificationPreferences {
     /**
      * ID пользователя (UUID)
      */
-    @Column(nullable = false, unique = true, columnDefinition = "BINARY(16)")
+    @Column(nullable = false, unique = true)
     private UUID userId;
 
     /**

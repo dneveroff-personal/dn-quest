@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Репозиторий для работы с шаблонами уведомлений
  */
 @Repository
-public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, Long> {
+public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, UUID> {
 
     /**
      * Найти шаблон по ID

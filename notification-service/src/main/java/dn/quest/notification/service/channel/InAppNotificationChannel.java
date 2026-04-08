@@ -2,9 +2,11 @@ package dn.quest.notification.service.channel;
 
 import dn.quest.notification.entity.Notification;
 import dn.quest.notification.enums.NotificationType;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,13 +20,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Реализация In-app канала доставки уведомлений через WebSocket
  */
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class InAppNotificationChannel implements NotificationChannel {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private SimpMessagingTemplate messagingTemplate;
 
-    @Value("${app.notification.in-app.enabled:true}")
+    @Value("${app.notification.in-app.enabled:false}")
     private boolean inAppEnabled;
 
     @Value("${app.notification.in-app.destination:/topic/notifications}")
@@ -35,6 +36,17 @@ public class InAppNotificationChannel implements NotificationChannel {
 
     // Кэш активных подключений пользователей
     private final Map<UUID, Boolean> activeUsers = new ConcurrentHashMap<>();
+
+    @Autowired(required = false)
+    @Lazy
+    public InAppNotificationChannel(@Nullable SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+        if (messagingTemplate != null) {
+            log.info("InAppNotificationChannel: WebSocket enabled");
+        } else {
+            log.warn("InAppNotificationChannel: WebSocket not available, in-app notifications will be disabled");
+        }
+    }
 
     @Override
     public String getChannelType() {
