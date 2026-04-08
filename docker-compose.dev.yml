@@ -167,7 +167,7 @@ services:
       - "${API_GATEWAY_DEBUG_PORT:-5005}:5005"
     environment:
       GATEWAY_USER: admin
-      GATEWAY_PASSWORD: admin
+      GATEWAY_PASSWORD: '{noop}admin'
       SPRING_PROFILES_ACTIVE: dev
       REDIS_HOST: redis-dev
       REDIS_PORT: 6379
