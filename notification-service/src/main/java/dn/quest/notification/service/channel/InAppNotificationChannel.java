@@ -5,7 +5,6 @@ import dn.quest.notification.enums.NotificationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -23,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class InAppNotificationChannel implements NotificationChannel {
 
+    // Инжектируется через setter — не ломает старт, если WebSocket не сконфигурирован
     private SimpMessagingTemplate messagingTemplate;
 
     @Value("${app.notification.in-app.enabled:false}")
@@ -37,14 +37,19 @@ public class InAppNotificationChannel implements NotificationChannel {
     // Кэш активных подключений пользователей
     private final Map<UUID, Boolean> activeUsers = new ConcurrentHashMap<>();
 
+    // Конструктор без аргументов — Spring создаёт бин без проблем
+    public InAppNotificationChannel() {
+        log.info("InAppNotificationChannel: initialized (WebSocket availability will be checked at runtime)");
+    }
+
+    // required = false + @Nullable — инжектируется только если бин SimpMessagingTemplate существует
     @Autowired(required = false)
-    @Lazy
-    public InAppNotificationChannel(@Nullable SimpMessagingTemplate messagingTemplate) {
+    public void setMessagingTemplate(@Nullable SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
         if (messagingTemplate != null) {
-            log.info("InAppNotificationChannel: WebSocket enabled");
+            log.info("InAppNotificationChannel: SimpMessagingTemplate found, WebSocket enabled");
         } else {
-            log.warn("InAppNotificationChannel: WebSocket not available, in-app notifications will be disabled");
+            log.warn("InAppNotificationChannel: SimpMessagingTemplate not available, in-app notifications will be disabled");
         }
     }
 
@@ -95,10 +100,10 @@ public class InAppNotificationChannel implements NotificationChannel {
 
             // Отправка уведомления конкретному пользователю
             String destination = userNotificationDestination.replace("{userId}", notification.getUserId().toString());
-            
+
             messagingTemplate.convertAndSend(destination, payload);
 
-            log.info("In-app notification sent successfully to user: {} for notification: {}", 
+            log.info("In-app notification sent successfully to user: {} for notification: {}",
                     notification.getUserId(), notification.getNotificationId());
 
             Map<String, Object> metadata = new HashMap<>();
@@ -112,10 +117,10 @@ public class InAppNotificationChannel implements NotificationChannel {
             );
 
         } catch (Exception e) {
-            log.error("Failed to send in-app notification to user: {} for notification: {}", 
+            log.error("Failed to send in-app notification to user: {} for notification: {}",
                     notification.getUserId(), notification.getNotificationId(), e);
             return NotificationChannelResult.failure(
-                    "In-app notification failed: " + e.getMessage(), 
+                    "In-app notification failed: " + e.getMessage(),
                     "IN_APP_SEND_ERROR"
             );
         }
@@ -137,7 +142,7 @@ public class InAppNotificationChannel implements NotificationChannel {
      */
     private Map<String, Object> createNotificationPayload(Notification notification) {
         Map<String, Object> payload = new HashMap<>();
-        
+
         payload.put("id", notification.getNotificationId());
         payload.put("type", notification.getType().getValue());
         payload.put("category", notification.getCategory().getValue());
@@ -146,7 +151,7 @@ public class InAppNotificationChannel implements NotificationChannel {
         payload.put("content", notification.getContent());
         payload.put("createdAt", notification.getCreatedAt().toString());
         payload.put("userId", notification.getUserId());
-        
+
         if (notification.getRelatedEntityId() != null) {
             Map<String, String> relatedEntity = new HashMap<>();
             relatedEntity.put("id", notification.getRelatedEntityId());
@@ -217,7 +222,7 @@ public class InAppNotificationChannel implements NotificationChannel {
         } catch (Exception e) {
             log.error("Failed to broadcast in-app notification: {}", notification.getNotificationId(), e);
             return NotificationChannelResult.failure(
-                    "Broadcast failed: " + e.getMessage(), 
+                    "Broadcast failed: " + e.getMessage(),
                     "IN_APP_BROADCAST_ERROR"
             );
         }
