@@ -108,9 +108,6 @@ management:
     health:
       show-details: when-authorized
   metrics:
-    export:
-      prometheus:
-        enabled: true
     distribution:
       percentiles-histogram:
         http.server.requests: true
@@ -133,6 +130,10 @@ management:
       enabled: true
     os:
       enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 # Logging Configuration
 logging:
@@ -203,35 +204,3 @@ logging:
     org.springframework.web: WARN
   file:
     name: /var/log/dn-quest/authentication-service.log
-
----
-# Test Profile
-spring:
-  config:
-    activate:
-      on-profile: test
-  
-  # H2 Database for tests
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-  
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-  
-  h2:
-    console:
-      enabled: true
-
-jwt:
-  secret: test-secret-key-for-testing-only
-  access-token-expiration: 60000  # 1 minute for tests
-  refresh-token-expiration: 300000  # 5 minutes for tests
-
-logging:
-  level:
-    dn.quest.authentication: DEBUG

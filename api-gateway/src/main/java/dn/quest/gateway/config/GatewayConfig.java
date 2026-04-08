@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
 
 import java.security.Principal;
+import java.util.Objects;
 
 /**
  * Конфигурация API Gateway
@@ -20,10 +21,10 @@ public class GatewayConfig {
      * Key resolver для rate limiting по IP адресу
      */
     @Bean
-    @Primary  // ← добавить
+    @Primary
     public KeyResolver ipKeyResolver() {
         return exchange -> Mono.just(
-                exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+                Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress()
         );
     }
 

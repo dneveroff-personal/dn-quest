@@ -64,15 +64,13 @@ public class WebClientConfig {
      * Фильтр Circuit Breaker для WebClient
      */
     private ExchangeFilterFunction circuitBreakerFilter(CircuitBreaker circuitBreaker) {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            return Mono.defer(() -> {
-                if (circuitBreaker.getState() == CircuitBreaker.State.OPEN) {
-                    log.warn("Circuit breaker OPEN for service, rejecting request");
-                    return Mono.error(new java.io.IOException("Circuit breaker is OPEN"));
-                }
-                return Mono.just(clientRequest);
-            });
-        });
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> Mono.defer(() -> {
+            if (circuitBreaker.getState() == CircuitBreaker.State.OPEN) {
+                log.warn("Circuit breaker OPEN for service, rejecting request");
+                return Mono.error(new java.io.IOException("Circuit breaker is OPEN"));
+            }
+            return Mono.just(clientRequest);
+        }));
     }
 
     /**
