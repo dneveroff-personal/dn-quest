@@ -1,79 +1,100 @@
 # DN Quest - Платформа для онлайн-квестов
 
-[![Java 21](https://img.shields.io/badge/Java-21-blue.svg)](https://openjdk.org/)
-[![Spring Boot 3.x](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg)](https://spring.io/projects/spring-boot)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![Java 21](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot 3](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=spring&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![Makefile](https://img.shields.io/badge/Makefile-2C3E50)](https://www.gnu.org/software/make/manual/make.html)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-Event%20Driven-black?logo=apachekafka)](https://kafka.apache.org/)
 
-DN Quest — это микросервисная платформа для создания и прохождения онлайн-квестов в команде или одиночку.
+Микросервисная платформа для создания и прохождения **командных квестов** в реальном времени.
 
 ## 🚀 Быстрый старт
-
-### Требования
-
-- **Docker** 20.10+ и **Docker Compose** 2.0+
-- **8GB+ RAM** (минимум)
-- **20GB+ свободного диска**
 
 ### Запуск на локальной машине (Development)
 
 ```bash
-# 1. Сделать скрипт исполняемым
-chmod +x dn-quest.sh
+make dev-up          # Запустить dev-окружение
+make status          # Проверить статус всех сервисов
+make open-all        # Открыть все интерфейсы в браузере
 
-# 2. Инициализировать проект
-./dn-quest.sh init
+Все точки взаимодействия
 
-# 3. Запустить в режиме разработки
-./dn-quest.sh start -e dev
 
-# Проверить статус
-./dn-quest.sh status
-```
 
-После запуска сервисы будут доступны:
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **Kafka UI**: http://localhost:8089
-- **MinIO Console**: http://localhost:9001 (minioadmin/minioadmin)
 
-### Запуск в Production режиме
 
-```bash
-# 1. Настроить переменные окружения
-cp .env.production .env
-# Отредактировать .env с безопасными значениями паролей и секретов
 
-# 2. Собрать и запустить
-./dn-quest.sh build
-./dn-quest.sh start -e prod
 
-# Или использовать docker-compose напрямую
-docker compose -f docker-compose.production.yml up -d
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+СервисURLУчётные данныеНазначениеFrontend (Vue)http://localhost:3000—Основной пользовательский интерфейсAPI Gatewayhttp://localhost:8080admin / adminЕдиная входная точка для всех APISwagger UIhttp://localhost:8080/swagger-ui.htmladmin / adminИнтерактивная документация и тестирование эндпоинтовKafka UIhttp://localhost:8089—Просмотр Kafka-топиков и событий в реальном времениMinIO Consolehttp://localhost:9001minioadmin / minioadminХранилище файлов (фото квестов, медиа и т.д.)Grafana (full mode)http://localhost:3001admin / adminМониторинг метрик и дашбордыJaeger UIhttp://localhost:16686—Распределённая трассировка запросов
+
 
 ## 📋 Основные команды
 
-```bash
-# Управление сервисами
-./dn-quest.sh start          # Запуск (используйте -e dev/prod/full для разных окружений)
-./dn-quest.sh stop          # Остановка
-./dn-quest.sh restart       # Перезапуск
-./dn-quest.sh status        # Статус сервисов
-./dn-quest.sh logs          # Просмотр логов
-
-# Управление конкретным сервисом
-./dn-quest.sh restart-service api-gateway
-./dn-quest.sh logs api-gateway -f
-
-# Сборка
-./dn-quest.sh build         # Пересобрать все сервисы
-./dn-quest.sh clean         # Очистить контейнеры и volumes
-```
+Основные команды Makefile
+Bashmake help                    # Показать все доступные команды
+make dev-up                  # Запуск dev-окружения
+make dev-down                # Остановить все сервисы
+make dev-restart             # Полный рестарт
+make status                  # Статус контейнеров
+make logs SERVICE=xxx        # Логи конкретного сервиса (например: api-gateway-dev)
+make build                   # Пересобрать все Java-сервисы
+make open-all                # Открыть все URL в браузере
+make clean                   # Полная очистка (включая volumes)
 
 ## 🏗️ Архитектура
 
 ### Микросервисы
+
+API Gateway — единственная дверь (Spring Cloud Gateway + JWT-аутентификация + rate limiting)
+8 микросервисов общаются между собой только асинхронно через Kafka
+Базы: отдельный PostgreSQL на каждый сервис + Redis + MinIO
+Основные события: UserRegistered, QuestCompleted, TeamJoined, CodeScanned и др.
 
 | Сервис | Порт | Описание |
 |--------|------|----------|
@@ -88,55 +109,6 @@ docker compose -f docker-compose.production.yml up -d
 | **File Storage Service** | 8088 | Хранение файлов (MinIO/S3) |
 | **Frontend** | 3000 | Vue.js приложение |
 
-### Инфраструктура
-
-- **PostgreSQL** (8 баз данных) — основное хранилище
-- **Redis** — кэширование и сессии
-- **Kafka** — асинхронная коммуникация
-- **MinIO** — S3-совместимое хранилище файлов
-- **Nginx** — reverse proxy и load balancer
-
-### Мониторинг (Full окружение)
-
-| Сервис | Порт | Описание |
-|--------|------|----------|
-| **Prometheus** | 9090 | Сбор метрик |
-| **Grafana** | 3001 | Визуализация (admin/admin) |
-| **Jaeger** | 16686 | Распределенный трейсинг |
-| **Kibana** | 5601 | Логирование |
-
-## 🌍 Окружения
-
-| Окружение | Команда | Описание |
-|-----------|---------|----------|
-| **dev** | `./dn-quest.sh start -e dev` | Разработка с hot reload |
-| **prod** | `./dn-quest.sh start -e prod` | Production с оптимизациями |
-| **full** | `./dn-quest.sh start -e full` | Полный стек с мониторингом |
-| **test** | `./dn-quest.sh start -e test` | Тестирование |
-
-## 🔧 Конфигурация
-
-### Файлы окружений
-
-- `.env.development` — настройки для разработки
-- `.env.production` — настройки для продакшена
-- `.env.full` — полный стек с мониторингом
-- `.env.testing` — для тестирования
-
-### Основные переменные
-
-```bash
-# База данных
-POSTGRES_USER=dn
-POSTGRES_PASSWORD=dn  # Изменить в production!
-
-# JWT
-JWT_SECRET=your-secret-key  # Изменить в production!
-
-# Порты
-API_GATEWAY_PORT=8080
-FRONTEND_PORT=3000
-```
 
 ## 🗂️ Структура проекта
 
@@ -155,7 +127,6 @@ dn-quest/
 ├── frontend/                # Vue.js приложение
 ├── docker/                  # Docker конфигурации
 ├── docs/                   # Документация
-├── scripts/                 # Скрипты управления
 ├── dn-quest.sh             # Главный скрипт управления
 └── docker-compose*.yml      # Docker Compose файлы
 ```
@@ -175,36 +146,6 @@ dn-quest/
 3. **Измените JWT_SECRET** на длинную случайную строку
 4. **Настройте firewall** — откройте только необходимые порты
 5. **Включите мониторинг** и алерты
-
-## 🐛 Troubleshooting
-
-```bash
-# Проверка статуса
-./dn-quest.sh status -h -d
-
-# Логи с ошибками
-./dn-quest.sh logs | grep ERROR
-
-# Перезапуск сервиса
-./dn-quest.sh restart-service api-gateway
-
-# Полная очистка
-./dn-quest.sh clean
-```
-
-### Частые проблемы
-
-1. **Порты заняты** — измените порты в `.env` файле
-2. **Недостаточно памяти** — увеличьте Docker memory limits
-3. **Базы данных не стартуют** — проверьте права на volumes
-
-## 🤝 Вклад в проект
-
-1. Fork репозитория
-2. Создайте feature branch
-3. Внесите изменения
-4. Создайте Pull Request
-
 
 ---
 ## Структура зависимостей

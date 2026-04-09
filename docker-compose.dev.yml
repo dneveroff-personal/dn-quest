@@ -183,11 +183,13 @@ services:
       STATISTICS_SERVICE_URL: http://statistics-service-dev:8087
       FILE_STORAGE_SERVICE_URL: http://file-storage-service-dev:8088
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      SPRING_CONFIG_ADDITIONAL_LOCATION: file:/app/config/
       LOGGING_LEVEL_DN_QUEST_GATEWAY: DEBUG
       KAFKA_TOPICS_REPLICATION_FACTOR: 1
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
     volumes:
       - api_gateway_dev_logs:/app/logs
+      - ./api-gateway/src/main/resources/application.yml:/app/config/application.yml:ro
     depends_on:
       redis-dev:
         condition: service_healthy

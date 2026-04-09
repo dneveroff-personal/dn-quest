@@ -36,6 +36,9 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.9")
     implementation("javax.activation:activation:1.1.1")
     
+    // javax.annotation meta-annotations (provides javax.annotation.meta.When)
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")

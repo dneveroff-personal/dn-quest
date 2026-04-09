@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 /**
  * Реализация сервиса для генерации отчетов и экспорта данных
  */
+@SuppressWarnings("unchecked")
 @Service
 @RequiredArgsConstructor
 @Slf4j
