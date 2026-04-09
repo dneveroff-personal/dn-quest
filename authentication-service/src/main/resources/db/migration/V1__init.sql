@@ -130,13 +130,13 @@ COMMENT ON COLUMN user_permissions.permission_id IS 'ID разрешения';
 COMMENT ON COLUMN user_permissions.granted_at  IS 'Дата выдачи разрешения';
 COMMENT ON COLUMN user_permissions.granted_by  IS 'Кто выдал разрешение';
 
--- Admin user (password: admin, BCrypt hashed)
--- The password hash is: $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p9ldwKZmBQlJRb5.nqi7GOS
+-- Admin user (password: admin, BCrypt hashed with strength 12)
+-- The password hash is: $2b$12$K8cPByZZrTMXkuj94qcYMud3yOpoaNAxUtcr6NjoqH/ZEOMM/w51.
 INSERT INTO users (id, username, password_hash, email, public_name, role, is_active, is_email_verified, created_at, updated_at)
 VALUES (
     'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
     'admin',
-    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p9ldwKZmBQlJRb5.nqi7GOS',
+    '$2b$12$K8cPByZZrTMXkuj94qcYMud3yOpoaNAxUtcr6NjoqH/ZEOMM/w51.',
     'admin@dn-quest.local',
     'Administrator',
     'ADMIN',

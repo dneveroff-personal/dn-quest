@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Реализация In-app канала доставки уведомлений через WebSocket
  */
+@SuppressWarnings("processing")
 @Component
 @Slf4j
 public class InAppNotificationChannel implements NotificationChannel {
