@@ -16,7 +16,8 @@ RESET  := \033[39m
 # Сервисы
 INFRA_SERVICES := postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
 ALL_SERVICES := api-gateway-dev authentication-service-dev user-management-service-dev quest-management-service-dev \
-	game-engine-service-dev team-management-service-dev notification-service-dev statistics-service-dev file-storage-service-dev
+	game-engine-service-dev team-management-service-dev notification-service-dev statistics-service-dev \
+	file-storage-service-dev kafka-ui
 FRONTEND_SERVICE := frontend-dev
 ALL_MICROSERVICES := $(ALL_SERVICES) $(FRONTEND_SERVICE)
 

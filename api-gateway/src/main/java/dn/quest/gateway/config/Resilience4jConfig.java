@@ -1,6 +1,7 @@
 package dn.quest.gateway.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -23,8 +24,8 @@ public class Resilience4jConfig {
      * Конфигурация Circuit Breaker для микросервисов
      */
     @Bean
-    public io.github.resilience4j.circuitbreaker.CircuitBreakerConfig defaultCircuitBreakerConfig() {
-        return io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.custom()
+    public CircuitBreakerConfig defaultCircuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
                 .failureRateThreshold(50) // Процент отказов для открытия цепи
                 .waitDurationInOpenState(Duration.ofSeconds(30)) // Время ожидания в открытом состоянии
                 .slidingWindowSize(10) // Размер окна для расчета процента отказов
@@ -40,8 +41,8 @@ public class Resilience4jConfig {
      * Конфигурация Circuit Breaker для Authentication Service
      */
     @Bean
-    public io.github.resilience4j.circuitbreaker.CircuitBreakerConfig authenticationServiceCircuitBreakerConfig() {
-        return io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.custom()
+    public CircuitBreakerConfig authenticationServiceCircuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
                 .failureRateThreshold(30) // Более низкий порог для критичного сервиса
                 .waitDurationInOpenState(Duration.ofSeconds(15)) // Быстрее восстанавливаемся
                 .slidingWindowSize(5)
@@ -85,8 +86,8 @@ public class Resilience4jConfig {
      */
     @Bean
     public CircuitBreakerRegistry circuitBreakerRegistry(
-            io.github.resilience4j.circuitbreaker.CircuitBreakerConfig defaultCircuitBreakerConfig,
-            io.github.resilience4j.circuitbreaker.CircuitBreakerConfig authenticationServiceCircuitBreakerConfig) {
+            CircuitBreakerConfig defaultCircuitBreakerConfig,
+            CircuitBreakerConfig authenticationServiceCircuitBreakerConfig) {
         
         CircuitBreakerRegistry registry = CircuitBreakerRegistry.ofDefaults();
         

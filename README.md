@@ -76,7 +76,32 @@ make status
 ## 🏗️ Архитектура
 
 ### Высокоуровневая схема
+```
+graph TB
+    Frontend["Frontend<br/>:3000"] --> Gateway["API Gateway<br/>:8080"]
+    
+    Gateway --> Auth["Auth Service<br/>:8081"]
+    Gateway --> User["User Management<br/>:8082"]
+    Gateway --> Quest["Quest Management<br/>:8083"]
+    Gateway --> Game["Game Engine<br/>:8084"]
+    Gateway --> Team["Team Management<br/>:8085"]
+    Gateway --> Notify["Notification<br/>:8086"]
+    Gateway --> Stats["Statistics<br/>:8087"]
+    Gateway --> Files["File Storage<br/>:8088"]
+    
+    Kafka{"Apache Kafka<br/>:9092"} 
+    Auth --> Kafka
+    Quest --> Kafka
+    Game --> Kafka
+    Team --> Kafka
+    Notify --> Kafka
+    Stats --> Kafka
+    
+    PostgreSQL["PostgreSQL<br/>:5432"]
+    Redis["Redis<br/>:6379"]
+    MinIO["MinIO<br/>:9000"]
 
+```
 ```
                                     ┌─────────────────┐
                                     │   Frontend      │
@@ -417,6 +442,11 @@ docker compose -f docker-compose.dev.yml down -v --remove-orphans
 └─────────────────────────────┘ └─────────────────────────────┘
 ```
 
+### Kafka
+
+![kafka_schema.png](docs/kafka_schema.png)
+
+
 ### Порядок запуска
 
 1. **Инфраструктура:** PostgreSQL → Redis → Kafka → MinIO
@@ -530,4 +560,4 @@ MIT License
 
 ## 👨‍💻 Авторы
 
-Команда DN Quest
+Denis Neverov
