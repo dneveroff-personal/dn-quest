@@ -104,27 +104,35 @@ jwt:
 services:
   authentication:
     url: ${AUTHENTICATION_SERVICE_URL:http://localhost:8081}
+    health-url: ${AUTHENTICATION_HEALTH_URL:http://localhost:8081}
     timeout: 5000
   user-management:
     url: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8082}
+    health-url: ${USER_MANAGEMENT_HEALTH_URL:http://localhost:8082}
     timeout: 5000
   quest-management:
     url: ${QUEST_MANAGEMENT_SERVICE_URL:http://localhost:8083}
+    health-url: ${QUEST_MANAGEMENT_HEALTH_URL:http://localhost:8083}
     timeout: 5000
   game-engine:
     url: ${GAME_ENGINE_SERVICE_URL:http://localhost:8084}
+    health-url: ${GAME_ENGINE_HEALTH_URL:http://localhost:8084}
     timeout: 5000
   team-management:
     url: ${TEAM_MANAGEMENT_SERVICE_URL:http://localhost:8085}
+    health-url: ${TEAM_MANAGEMENT_HEALTH_URL:http://localhost:8085}
     timeout: 5000
   notification:
     url: ${NOTIFICATION_SERVICE_URL:http://localhost:8086}
+    health-url: ${NOTIFICATION_HEALTH_URL:http://localhost:8086}
     timeout: 5000
   statistics:
     url: ${STATISTICS_SERVICE_URL:http://localhost:8087}
+    health-url: ${STATISTICS_HEALTH_URL:http://localhost:8087}
     timeout: 5000
   file-storage:
     url: ${FILE_STORAGE_SERVICE_URL:http://localhost:8088}
+    health-url: ${FILE_STORAGE_HEALTH_URL:http://localhost:8088}
     timeout: 5000
 
 # Rate Limiting Configuration
@@ -246,14 +254,14 @@ spring:
             - StripPrefix=1
         
         - id: statistics-service
-          uri: ${STATISTICS_SERVICE_URL:http://localhost:8086}
+          uri: ${STATISTICS_SERVICE_URL:http://localhost:8087}
           predicates:
             - Path=/api/statistics/**
           filters:
             - StripPrefix=1
         
         - id: file-storage-service
-          uri: ${FILE_STORAGE_SERVICE_URL:http://localhost:8086}
+          uri: ${FILE_STORAGE_SERVICE_URL:http://localhost:8088}
           predicates:
             - Path=/api/files/**
           filters:
