@@ -16,8 +16,8 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        // Разрешаем Swagger без JWT (для удобства dev)
-                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").permitAll()
+                        // Swagger endpoints должны быть доступны без аутентификации для удобства dev
+                        .pathMatchers("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/api-docs").permitAll()
                         // Health endpoints должны быть доступны без аутентификации для мониторинга
                         .pathMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         // Остальные actuator endpoints требуют аутентификацию
