@@ -202,7 +202,7 @@ spring:
     show-sql: false
     
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-dev:29092}
     consumer:
       group-id: test-group
       auto-offset-reset: earliest
