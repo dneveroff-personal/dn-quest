@@ -7,8 +7,15 @@ spring:
 
   security:
     user:
-      name: ${GATEWAY_USER:admin}
-      password: ${GATEWAY_PASSWORD:{noop}admin}
+      name: admin
+      password: admin
+
+  # Disabled Zipkin and Sleuth to avoid connection errors
+  # zipkin:
+  #   base-url: ${ZIPKIN_URL:http://zipkin:9411}
+  #   endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
+  sleuth:
+    enabled: false
 
   profiles:
     active: dev
@@ -158,15 +165,15 @@ management:
         include: health,info,metrics,prometheus,gateway
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
     gateway:
       enabled: true
   prometheus:
     metrics:
       export:
         enabled: true
-
-# Logging configuration
+  tracing:
+    enabled: false
 logging:
   level:
     dn.quest.gateway: INFO
