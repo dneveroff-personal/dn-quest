@@ -141,7 +141,15 @@ spring:
   config:
     activate:
       on-profile: dev
-  
+
+  # Disable tracing in development to avoid connection errors to Zipkin
+  sleuth:
+    enabled: false
+
+management:
+  tracing:
+    enabled: false
+
   jpa:
     show-sql: true
 
