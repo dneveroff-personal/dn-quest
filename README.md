@@ -56,12 +56,13 @@ make status
 
 После запуска доступны:
 
-| Сервис | URL | Учётные данные | Примечание |
-|--------|-----|----------------|------------|
-| Frontend | http://localhost:3000 | — | |
-| API Gateway | http://localhost:8080 | admin / admin | |
-| Swagger UI | http://localhost:8080/swagger-ui.html | admin / admin | |
-| MinIO Console | http://localhost:9001 | minioadmin / minioadmin | |
+| Сервис        | URL                                   | Учётные данные          | Примечание |
+|---------------|---------------------------------------|-------------------------|------------|
+| Frontend      | http://localhost:3000                 | —                       | |
+| API Gateway   | http://localhost:8080                 | admin / admin           | |
+| Swagger UI    | http://localhost:8080/swagger-ui.html | admin / admin           | |
+| Kafka UI      | http://localhost:8089                 | -                       | |
+| MinIO Console | http://localhost:9001                 | minioadmin / minioadmin | |
 
 **Дополнительные сервисы мониторинга (в разработке)** (в `docker/` директории):
 

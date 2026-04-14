@@ -223,3 +223,22 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+
+---
+# Development profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  # Disable tracing in development to avoid connection errors to Zipkin
+  sleuth:
+    enabled: false
+
+management:
+  tracing:
+    enabled: false
+
+logging:
+  level:
+    dn.quest.gameengine: DEBUG

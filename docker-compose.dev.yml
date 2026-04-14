@@ -164,12 +164,13 @@ services:
         condition: service_healthy
     networks:
       - dn-quest-dev-network
+    # Healthcheck - Kafka-UI works without Kafka connection
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 40s
     restart: unless-stopped
 
   # ======================
@@ -211,6 +212,9 @@ services:
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       SPRING_CONFIG_ADDITIONAL_LOCATION: file:/app/config/
       LOGGING_LEVEL_DN_QUEST_GATEWAY: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
       KAFKA_TOPICS_REPLICATION_FACTOR: 1
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
     volumes:
@@ -261,6 +265,9 @@ services:
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_AUTHENTICATION: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: INFO
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - authentication_service_dev_logs:/app/logs
     depends_on:
@@ -307,6 +314,9 @@ services:
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_USERMANAGEMENT: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - user_management_service_dev_logs:/app/logs
     depends_on:
@@ -356,6 +366,9 @@ services:
       FILE_STORAGE_SERVICE_URL: http://file-storage-service-dev:8088
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_QUESTMANAGEMENT: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - quest_management_service_dev_logs:/app/logs
     depends_on:
@@ -408,6 +421,9 @@ services:
       TEAM_SERVICE_URL: http://team-management-service-dev:8085
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_GAMEENGINE: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - game_engine_service_dev_logs:/app/logs
     depends_on:
@@ -459,6 +475,9 @@ services:
       REDIS_PORT: 6379
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_TEAMMANAGEMENT: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - team_management_service_dev_logs:/app/logs
     depends_on:
@@ -514,6 +533,9 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_NOTIFICATION: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - notification_service_dev_logs:/app/logs
     depends_on:
@@ -563,6 +585,9 @@ services:
       GAME_SERVICE_URL: http://game-engine-service-dev:8084
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_STATISTICS: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - statistics_service_dev_logs:/app/logs
     depends_on:
@@ -616,6 +641,9 @@ services:
       FILE_UPLOAD_ALLOWED_EXTENSIONS: jpg,jpeg,png,gif,webp,svg,mp4,avi,mov,mp3,wav,ogg,pdf
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_FILESTORAGE: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
+      LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
     volumes:
       - file_storage_service_dev_logs:/app/logs
     depends_on:
