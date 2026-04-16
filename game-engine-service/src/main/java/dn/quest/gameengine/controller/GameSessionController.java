@@ -42,7 +42,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/game/sessions")
+@RequestMapping("/game/sessions")
 @RequiredArgsConstructor
 @Tag(name = "Game Session Management", description = "API для управления игровыми сессиями")
 public class GameSessionController {

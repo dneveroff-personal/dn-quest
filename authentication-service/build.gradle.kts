@@ -41,11 +41,10 @@ dependencies {
     // Cloud
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     
-    // Monitoring
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.micrometer:micrometer-tracing-bridge-brave")
-    implementation("io.zipkin.reporter2:zipkin-reporter-brave")
-    implementation("io.opentelemetry:opentelemetry-api:1.32.0")
+    // Tracing - Micrometer with OTLP export to Jaeger
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     
     // Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")

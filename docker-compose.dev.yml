@@ -173,6 +173,28 @@ services:
       start_period: 40s
     restart: unless-stopped
 
+  # Jaeger - распределённая трассировка
+  jaeger-dev:
+    image: jaegertracing/all-in-one:latest
+    container_name: dn-quest-jaeger-dev
+    ports:
+      - "16686:16686"   # UI
+      - "14268:14268"   # Collector HTTP (приём OTLP HTTP)
+      - "14250:14250"   # Collector gRPC
+      - "9411:9411"     # Zipkin-совместимый порт
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "true"
+    networks:
+      - dn-quest-dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:16686"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
   # ======================
   # Микросервисы (host-build)
   # Все используют один ./Dockerfile в корне проекта
@@ -217,6 +239,10 @@ services:
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
       KAFKA_TOPICS_REPLICATION_FACTOR: 1
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: api-gateway
+      SPRING_SLEUTH_ENABLED: "true"
     volumes:
       - api_gateway_dev_logs:/app/logs
       - ./api-gateway/src/main/resources/application.yml:/app/config/application.yml:ro
@@ -262,6 +288,10 @@ services:
       JWT_SECRET: ${JWT_SECRET:-dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
       JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-900000}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: authentication-service
+      SPRING_SLEUTH_ENABLED: "true"
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_AUTHENTICATION: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: INFO
@@ -278,7 +308,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/api/auth/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -312,6 +342,10 @@ services:
       KAFKA_TOPICS_REPLICATION_FACTOR: 1
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: user-management-service
+      SPRING_SLEUTH_ENABLED: "true"
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_USERMANAGEMENT: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
@@ -329,7 +363,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/api/users/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -364,6 +398,10 @@ services:
       KAFKA_TOPICS_PARTITIONS_DEFAULT: 1
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
       FILE_STORAGE_SERVICE_URL: http://file-storage-service-dev:8088
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: quest-management-service
+      SPRING_SLEUTH_ENABLED: "true"
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_QUESTMANAGEMENT: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
@@ -381,7 +419,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/api/quests/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -417,6 +455,10 @@ services:
       REDIS_HOST: redis-dev
       REDIS_PORT: 6379
       AUTH_SERVICE_URL: http://authentication-service-dev:8081
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: game-engine-service
+      SPRING_SLEUTH_ENABLED: "true"
       QUEST_SERVICE_URL: http://quest-management-service-dev:8083
       TEAM_SERVICE_URL: http://team-management-service-dev:8085
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
@@ -436,7 +478,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/api/game/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -473,6 +515,10 @@ services:
       USER_SERVICE_URL: http://user-management-service-dev:8082
       REDIS_HOST: redis-dev
       REDIS_PORT: 6379
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: team-management-service
+      SPRING_SLEUTH_ENABLED: "true"
       JAVA_OPTS: "-Xms256m -Xmx512m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
       LOGGING_LEVEL_DN_QUEST_TEAMMANAGEMENT: DEBUG
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
@@ -492,7 +538,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/api/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -512,6 +558,13 @@ services:
       args:
         SERVICE_NAME: notification-service
         PORT: 8086
+    environment:
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: notification-service
+      SPRING_SLEUTH_ENABLED: "true"
+      SPRING_PROFILES_ACTIVE: dev
+      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
     image: dn-quest/notification-service:dev
     container_name: dn-quest-notification-service-dev
     ports:
@@ -548,7 +601,7 @@ services:
     networks:
       - dn-quest-dev-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8086/api/notifications/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8086/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 5

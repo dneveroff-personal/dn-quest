@@ -1,7 +1,5 @@
 server:
   port: 8086
-  servlet:
-    context-path: /api/notifications
 
 spring:
   application:
@@ -112,7 +110,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
@@ -121,10 +119,6 @@ management:
   health:
     mail:
       enabled: false
-  prometheus:
-    metrics:
-      export:
-        enabled: false
 
 logging:
   level:
@@ -144,6 +138,9 @@ spring:
   config:
     activate:
       on-profile: dev
+
+  sleuth:
+    enabled: false
 
 logging:
   level:

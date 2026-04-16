@@ -26,6 +26,11 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     
+    // Tracing - Micrometer with OTLP export to Jaeger
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
     
@@ -33,8 +38,6 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.3")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.opentelemetry:opentelemetry-api:1.32.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

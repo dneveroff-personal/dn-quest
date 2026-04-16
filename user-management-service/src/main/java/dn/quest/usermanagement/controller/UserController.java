@@ -28,7 +28,7 @@ import java.util.UUID;
  * Контроллер для управления профилями пользователей
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "User Management", description = "API для управления профилями пользователей")

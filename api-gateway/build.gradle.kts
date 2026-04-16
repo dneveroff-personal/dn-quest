@@ -38,6 +38,11 @@ dependencies {
     // Spring Cloud Gateway
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+    
+    // Tracing - Micrometer with OTLP export to Jaeger
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 
     // Spring Cloud LoadBalancer
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
@@ -49,10 +54,6 @@ dependencies {
 
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-
-    // Monitoring
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.opentelemetry:opentelemetry-api")
 
     // Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")

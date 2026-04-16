@@ -2,9 +2,7 @@ package dn.quest.authentication.controller;
 
 import dn.quest.authentication.dto.*;
 import dn.quest.shared.dto.UserDTO;
-import dn.quest.authentication.metrics.AuthenticationMetrics;
 import dn.quest.authentication.service.AuthService;
-import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,14 +26,13 @@ import java.util.stream.Collectors;
  * Контроллер аутентификации пользователей
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Аутентификация", description = "API для аутентификации и управления пользователями")
 public class AuthController {
 
     private final AuthService authService;
-    private final AuthenticationMetrics authenticationMetrics;
 
     @PostMapping("/register")
     @Operation(summary = "Регистрация нового пользователя", description = "Создает нового пользователя в системе")
@@ -49,30 +46,20 @@ public class AuthController {
             @Valid @RequestBody RegisterRequestDTO request,
             BindingResult bindingResult,
             HttpServletRequest httpRequest) {
-        
-        authenticationMetrics.recordRegistrationAttempt();
-        Timer.Sample timer = authenticationMetrics.startRegistrationTimer();
-        
+
         if (bindingResult.hasErrors()) {
             log.warn("Ошибка валидации при регистрации: {}", bindingResult.getAllErrors());
-            authenticationMetrics.recordFailedRegistration("validation_error");
-            authenticationMetrics.recordRegistrationDuration(timer);
             return ResponseEntity.badRequest().body(createErrorResponse("Ошибка валидации", bindingResult));
         }
 
         String clientIp = getClientIp(httpRequest);
-        
+
         try {
             LoginResponseDTO response = authService.register(request, clientIp);
             log.info("Пользователь {} успешно зарегистрирован с IP: {}", request.getUsername(), clientIp);
-            authenticationMetrics.recordSuccessfulRegistration();
-            authenticationMetrics.incrementActiveUsersCount();
-            authenticationMetrics.recordRegistrationDuration(timer);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка регистрации пользователя {} с IP: {}", request.getUsername(), clientIp, e);
-            authenticationMetrics.recordFailedRegistration("user_exists");
-            authenticationMetrics.recordRegistrationDuration(timer);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         }
     }
@@ -89,30 +76,20 @@ public class AuthController {
             @Valid @RequestBody LoginRequestDTO request,
             BindingResult bindingResult,
             HttpServletRequest httpRequest) {
-        
-        authenticationMetrics.recordLoginAttempt();
-        Timer.Sample timer = authenticationMetrics.startLoginTimer();
-        
+
         if (bindingResult.hasErrors()) {
             log.warn("Ошибка валидации при входе: {}", bindingResult.getAllErrors());
-            authenticationMetrics.recordFailedLogin("validation_error");
-            authenticationMetrics.recordLoginDuration(timer);
             return ResponseEntity.badRequest().body(createErrorResponse("Ошибка валидации", bindingResult));
         }
 
         String clientIp = getClientIp(httpRequest);
-        
+
         try {
             LoginResponseDTO response = authService.login(request, clientIp);
             log.info("Пользователь {} успешно вошел в систему с IP: {}", request.getUsername(), clientIp);
-            authenticationMetrics.recordSuccessfulLogin();
-            authenticationMetrics.incrementSessionsCount();
-            authenticationMetrics.recordLoginDuration(timer);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.warn("Неудачная попытка входа для пользователя {} с IP: {}", request.getUsername(), clientIp);
-            authenticationMetrics.recordFailedLogin("invalid_credentials");
-            authenticationMetrics.recordLoginDuration(timer);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
         }
     }
@@ -126,15 +103,12 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Refresh токен истек")
     })
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO request) {
-        authenticationMetrics.recordTokenRefreshAttempt();
         try {
             LoginResponseDTO response = authService.refreshToken(request);
             log.debug("Токен успешно обновлен");
-            authenticationMetrics.recordSuccessfulTokenRefresh();
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка обновления токена", e);
-            authenticationMetrics.recordFailedTokenRefresh("invalid_token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
         }
     }
@@ -149,7 +123,6 @@ public class AuthController {
         String refreshToken = request != null ? request.get("refreshToken") : null;
         authService.logout(refreshToken);
         log.info("Пользователь вышел из системы");
-        authenticationMetrics.decrementSessionsCount();
         return ResponseEntity.ok(Map.of("message", "Выход выполнен успешно"));
     }
 
@@ -195,7 +168,6 @@ public class AuthController {
         try {
             UserDTO updatedProfile = authService.updateProfile(username, request);
             log.info("Профиль пользователя {} обновлен", username);
-            authenticationMetrics.recordProfileUpdate();
             return ResponseEntity.ok(updatedProfile);
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка обновления профиля пользователя {}", username, e);
@@ -224,20 +196,13 @@ public class AuthController {
             return ResponseEntity.badRequest().body(createErrorResponse("Ошибка валидации", bindingResult));
         }
 
-        authenticationMetrics.recordPasswordChangeAttempt();
-        Timer.Sample timer = authenticationMetrics.startPasswordChangeTimer();
-        
         try {
             authService.changePassword(username, request);
             log.info("Пароль пользователя {} изменен", username);
-            authenticationMetrics.recordSuccessfulPasswordChange();
-            authenticationMetrics.recordPasswordChangeDuration(timer);
             return ResponseEntity.ok(Map.of("message", "Пароль успешно изменен"));
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка смены пароля пользователя {}", username, e);
-            authenticationMetrics.recordFailedPasswordChange("invalid_current_password");
-            authenticationMetrics.recordPasswordChangeDuration(timer);
-            if (e.getMessage().contains("Неверный текущий пароль")) {
+            if (e.getMessage().contains("Н��верный текущий пароль")) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
@@ -257,7 +222,6 @@ public class AuthController {
 
         authService.forgotPassword(request);
         log.info("Запрос на восстановление пароля отправлен для email: {}", request.getEmail());
-        authenticationMetrics.recordPasswordReset();
         return ResponseEntity.ok(Map.of("message", "Инструкция по восстановлению пароля отправлена на указанный email"));
     }
 
@@ -276,7 +240,6 @@ public class AuthController {
         try {
             authService.resetPassword(request);
             log.info("Пароль успешно сброшен по токену");
-            authenticationMetrics.recordPasswordReset();
             return ResponseEntity.ok(Map.of("message", "Пароль успешно изменен"));
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка сброса пароля", e);
@@ -296,10 +259,8 @@ public class AuthController {
         }
 
         String token = authHeader.substring(7);
-        Timer.Sample timer = authenticationMetrics.startTokenValidationTimer();
         boolean isValid = authService.validateToken(token);
-        authenticationMetrics.recordTokenValidationDuration(timer);
-        
+
         return ResponseEntity.ok(Map.of("valid", isValid));
     }
 

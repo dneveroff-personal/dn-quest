@@ -71,10 +71,6 @@ subprojects {
         // Cloud
         implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
         
-        // Monitoring
-        implementation("io.micrometer:micrometer-registry-prometheus")
-        implementation("io.opentelemetry:opentelemetry-api:1.32.0")
-        
         // Documentation
         implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
         

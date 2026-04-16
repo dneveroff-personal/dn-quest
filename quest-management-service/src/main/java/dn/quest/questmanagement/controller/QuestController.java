@@ -32,7 +32,7 @@ import java.util.UUID;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/quests")
+@RequestMapping("/quests")
 @RequiredArgsConstructor
 public class QuestController {
 

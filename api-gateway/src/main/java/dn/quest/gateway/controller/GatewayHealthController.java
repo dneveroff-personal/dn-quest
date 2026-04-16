@@ -80,30 +80,29 @@ public class GatewayHealthController implements HealthIndicator {
         log.info("Определение окружения для health check: isDocker={}", isDocker);
         
         // Для Docker используем имена контейнеров с портами, для localhost - порты напрямую
-        // Actuator endpoints находятся внутри context-path сервиса!
-        // С context-path /api/auth -> actuator доступен по /api/auth/actuator/health
+        // Actuator endpoints: для сервисов с context-path (/api/stats, /api/files) - с префиксом, для остальных - /actuator/health
         List<ServiceCheck> services;
         if (isDocker) {
-            log.info("Используем URL для Docker контейнеров (actuator В context-path)");
+            log.info("Используем URL для Docker контейнеров");
             services = List.of(
-                new ServiceCheck("authentication-service", "http://authentication-service-dev", "8081", "/api/auth/actuator/health"),
-                new ServiceCheck("user-management-service", "http://user-management-service-dev", "8082", "/api/users/actuator/health"),
-                new ServiceCheck("quest-management-service", "http://quest-management-service-dev", "8083", "/api/quests/actuator/health"),
-                new ServiceCheck("game-engine-service", "http://game-engine-service-dev", "8084", "/api/game/actuator/health"),
-                new ServiceCheck("team-management-service", "http://team-management-service-dev", "8085", "/api/actuator/health"),
-                new ServiceCheck("notification-service", "http://notification-service-dev", "8086", "/api/notifications/actuator/health"),
+                new ServiceCheck("authentication-service", "http://authentication-service-dev", "8081", "/actuator/health"),
+                new ServiceCheck("user-management-service", "http://user-management-service-dev", "8082", "/actuator/health"),
+                new ServiceCheck("quest-management-service", "http://quest-management-service-dev", "8083", "/actuator/health"),
+                new ServiceCheck("game-engine-service", "http://game-engine-service-dev", "8084", "/actuator/health"),
+                new ServiceCheck("team-management-service", "http://team-management-service-dev", "8085", "/actuator/health"),
+                new ServiceCheck("notification-service", "http://notification-service-dev", "8086", "/actuator/health"),
                 new ServiceCheck("statistics-service", "http://statistics-service-dev", "8087", "/api/stats/actuator/health"),
                 new ServiceCheck("file-storage-service", "http://file-storage-service-dev", "8088", "/api/files/actuator/health")
             );
         } else {
-            log.info("Используем URL для localhost (actuator В context-path)");
+            log.info("Используем URL для localhost");
             services = List.of(
-                new ServiceCheck("authentication-service", "http://localhost", "8081", "/api/auth/actuator/health"),
-                new ServiceCheck("user-management-service", "http://localhost", "8082", "/api/users/actuator/health"),
-                new ServiceCheck("quest-management-service", "http://localhost", "8083", "/api/quests/actuator/health"),
-                new ServiceCheck("game-engine-service", "http://localhost", "8084", "/api/game/actuator/health"),
-                new ServiceCheck("team-management-service", "http://localhost", "8085", "/api/actuator/health"),
-                new ServiceCheck("notification-service", "http://localhost", "8086", "/api/notifications/actuator/health"),
+                new ServiceCheck("authentication-service", "http://localhost", "8081", "/actuator/health"),
+                new ServiceCheck("user-management-service", "http://localhost", "8082", "/actuator/health"),
+                new ServiceCheck("quest-management-service", "http://localhost", "8083", "/actuator/health"),
+                new ServiceCheck("game-engine-service", "http://localhost", "8084", "/actuator/health"),
+                new ServiceCheck("team-management-service", "http://localhost", "8085", "/actuator/health"),
+                new ServiceCheck("notification-service", "http://localhost", "8086", "/actuator/health"),
                 new ServiceCheck("statistics-service", "http://localhost", "8087", "/api/stats/actuator/health"),
                 new ServiceCheck("file-storage-service", "http://localhost", "8088", "/api/files/actuator/health")
             );

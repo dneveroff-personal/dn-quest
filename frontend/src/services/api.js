@@ -196,17 +196,17 @@ export const authService = {
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
   changePassword: (oldPassword, newPassword) => api.post('/auth/change-password', { oldPassword, newPassword }),
   updateProfile: (profileData) => api.put('/auth/profile', profileData),
-  getCurrentUser: () => api.get('/auth/me'),
+  getCurrentUser: () => api.get('/auth/profile'),
 };
 
 export const userService = {
-  getCurrentUser: () => api.get('/users/me'),
-  updateProfile: (userData) => api.put('/users/profile', userData),
+  getCurrentUser: () => api.get('/users/profile/{userId}'),
+  updateProfile: (userId, userData) => api.put(`/users/profile/${userId}`, userData),
   getUsers: (params) => api.get('/users', { params }),
   getUserById: (id) => api.get(`/users/${id}`),
   updateUser: (id, userData) => api.put(`/users/${id}`, userData),
   deleteUser: (id) => api.delete(`/users/${id}`),
-  getAuthors: () => api.get('/users?role=AUTHOR'),
+  getAuthors: () => api.get('/users/author/{authorId}'),
 };
 
 export const questService = {
@@ -216,20 +216,16 @@ export const questService = {
   updateQuest: (id, questData) => api.put(`/quests/${id}`, questData),
   deleteQuest: (id) => api.delete(`/quests/${id}`),
   getPublishedQuests: (params) => api.get('/quests/published', { params }),
-  getMyQuests: (params) => api.get('/quests/my', { params }),
-  participateInQuest: (questId, teamId) => api.post(`/quests/${questId}/participate`, { teamId }),
-  getParticipationRequests: (questId) => api.get(`/participation/by-quest/${questId}`),
-  updateParticipationStatus: (requestId, status) => api.post(`/participation/${requestId}/status`, null, { params: { status } }),
+  getMyQuests: (authorId, params) => api.get(`/quests/author/${authorId}`, { params }),
 };
 
 export const gameService = {
-  getCurrentLevel: (sessionId) => api.get(`/game/sessions/${sessionId}/current`),
-  submitCode: (sessionId, codeData) => api.post(`/game/sessions/${sessionId}/code`, codeData),
-  autoPass: (sessionId) => api.post(`/game/sessions/${sessionId}/auto-pass`),
-  getSessionAttempts: (sessionId, params) => api.get(`/game/sessions/${sessionId}/last-attempts`, { params }),
-  startSession: (questId, teamId) => api.post('/game/sessions/start', { questId, teamId }),
+  getCurrentLevel: (sessionId) => api.get(`/game/sessions/${sessionId}/current-level`),
+  submitCode: (sessionId, codeData) => api.post(`/game/sessions/${sessionId}/submit-code`, codeData),
+  getSessionAttempts: (sessionId, params) => api.get(`/game/sessions/${sessionId}/attempts`, { params }),
+  startSession: (questId, teamId) => api.post('/game/sessions', { questId, teamId }),
   finishSession: (sessionId) => api.post(`/game/sessions/${sessionId}/finish`),
-  getSessionStats: (sessionId) => api.get(`/game/sessions/${sessionId}/stats`),
+  getSessionStats: (sessionId) => api.get(`/game/sessions/${sessionId}/leaderboard`),
 };
 
 export const teamService = {
@@ -239,11 +235,9 @@ export const teamService = {
   updateTeam: (id, teamData) => api.put(`/teams/${id}`, teamData),
   deleteTeam: (id) => api.delete(`/teams/${id}`),
   joinTeam: (teamId, inviteCode) => api.post(`/teams/${teamId}/join`, { inviteCode }),
-  leaveTeam: (teamId) => api.post(`/teams/${teamId}/leave`),
-  inviteToTeam: (teamId, userId) => api.post(`/teams/${teamId}/invite`, { userId }),
-  getInvitations: () => api.get('/teams/invitations'),
-  respondToInvitation: (invitationId, response) => api.post(`/teams/invitations/${invitationId}/respond`, { response }),
-  getInvitationCount: () => api.get('/teams/invitations/count'),
+  inviteToTeam: (teamId, userId, message) => api.post(`/teams/${teamId}/invitations`, { userId, message }),
+  getTeamInvitations: (teamId, params) => api.get(`/teams/${teamId}/invitations`, { params }),
+  respondToInvitation: (teamId, invitationId, response) => api.post(`/teams/${teamId}/invitations/${invitationId}/respond`, { response }),
 };
 
 export const fileService = {
@@ -271,25 +265,19 @@ export const fileService = {
   },
   getFileUrl: (fileId) => `${API_CONFIG.baseURL}/files/${fileId}`,
   deleteFile: (fileId) => api.delete(`/files/${fileId}`),
-  getFileInfo: (fileId) => api.get(`/files/${fileId}/info`),
-  searchFiles: (searchParams) => api.get('/files/search', { params: searchParams }),
-  getStorageStats: () => api.get('/files/stats'),
 };
 
 export const notificationService = {
   getNotifications: (params) => api.get('/notifications', { params }),
-  markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),
-  markAllAsRead: () => api.put('/notifications/read-all'),
   deleteNotification: (notificationId) => api.delete(`/notifications/${notificationId}`),
-  getUnreadCount: () => api.get('/notifications/unread-count'),
 };
 
 export const statisticsService = {
   getQuestStats: (questId) => api.get(`/statistics/quests/${questId}`),
   getTeamStats: (teamId) => api.get(`/statistics/teams/${teamId}`),
-  getUserStats: (userId) => api.get(`/statistics/users/${userId}`),
-  getLeaderboard: (params) => api.get('/statistics/leaderboard', { params }),
-  getGameStats: (sessionId) => api.get(`/statistics/games/${sessionId}`),
+  getUserStats: (userId) => api.get(`/users/statistics/${userId}`),
+  getLeaderboard: (params) => api.get('/users/statistics/leaderboard/score', { params }),
+  getGameStats: (sessionId) => api.get(`/game/sessions/${sessionId}/leaderboard`),
 };
 
 // Экспортируем основной экземпляр API для обратной совместимости

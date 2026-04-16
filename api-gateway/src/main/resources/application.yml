@@ -170,18 +170,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,gateway
+        include: health,info,gateway
   endpoint:
     health:
       show-details: always
     gateway:
       enabled: true
-  prometheus:
-    metrics:
-      export:
-        enabled: true
-  tracing:
-    enabled: false
 logging:
   level:
     dn.quest.gateway: INFO
@@ -206,7 +200,12 @@ spring:
   config:
     activate:
       on-profile: dev
-  
+
+    sleuth:
+    enabled: false
+
+management:
+
   cloud:
     gateway:
       routes:

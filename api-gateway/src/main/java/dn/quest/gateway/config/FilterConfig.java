@@ -4,6 +4,7 @@ import dn.quest.gateway.filter.AuthenticationFilter;
 import dn.quest.gateway.filter.LoggingFilter;
 import dn.quest.gateway.filter.SecurityHeadersFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -23,6 +24,31 @@ public class FilterConfig {
     private final LoggingFilter loggingFilter;
     private final SecurityHeadersFilter securityHeadersFilter;
 
+    // Docker service URLs
+    @Value("${AUTHENTICATION_SERVICE_URL:http://localhost:8081}")
+    private String authenticationServiceUrl;
+
+    @Value("${USER_MANAGEMENT_SERVICE_URL:http://localhost:8082}")
+    private String userManagementServiceUrl;
+
+    @Value("${QUEST_MANAGEMENT_SERVICE_URL:http://localhost:8083}")
+    private String questManagementServiceUrl;
+
+    @Value("${GAME_ENGINE_SERVICE_URL:http://localhost:8084}")
+    private String gameEngineServiceUrl;
+
+    @Value("${TEAM_MANAGEMENT_SERVICE_URL:http://localhost:8085}")
+    private String teamManagementServiceUrl;
+
+    @Value("${NOTIFICATION_SERVICE_URL:http://localhost:8086}")
+    private String notificationServiceUrl;
+
+    @Value("${STATISTICS_SERVICE_URL:http://localhost:8087}")
+    private String statisticsServiceUrl;
+
+    @Value("${FILE_STORAGE_SERVICE_URL:http://localhost:8088}")
+    private String fileStorageServiceUrl;
+
     /**
      * Конфигурация маршрутов с фильтрами
      */
@@ -41,7 +67,7 @@ public class FilterConfig {
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
                         )
-                        .uri("http://localhost:8081"))
+                        .uri(authenticationServiceUrl))
 
                 // User Management Service
                 .route("user-management-service", r -> r.path("/api/users/**")
@@ -59,7 +85,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8082"))
+                        .uri(userManagementServiceUrl))
 
                 // Quest Management Service
                 .route("quest-management-service", r -> r.path("/api/quests/**")
@@ -77,7 +103,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8083"))
+                        .uri(questManagementServiceUrl))
 
                 // Game Engine Service
                 .route("game-engine-service", r -> r.path("/api/game/**")
@@ -95,7 +121,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8084"))
+                        .uri(gameEngineServiceUrl))
 
                 // Team Management Service
                 .route("team-management-service", r -> r.path("/api/teams/**")
@@ -113,7 +139,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8085"))
+                        .uri(teamManagementServiceUrl))
 
                 // Notification Service
                 .route("notification-service", r -> r.path("/api/notifications/**")
@@ -131,7 +157,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8086"))
+                        .uri(notificationServiceUrl))
 
                 // Statistics Service
                 .route("statistics-service", r -> r.path("/api/statistics/**")
@@ -149,7 +175,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8087"))
+                        .uri(statisticsServiceUrl))
 
                 // File Storage Service
                 .route("file-storage-service", r -> r.path("/api/files/**")
@@ -167,7 +193,7 @@ public class FilterConfig {
                                         .setRateLimiter(redisRateLimiter())
                                         .setKeyResolver(userKeyResolver()))
                         )
-                        .uri("http://localhost:8088"))
+                        .uri(fileStorageServiceUrl))
 
                 .build();
     }

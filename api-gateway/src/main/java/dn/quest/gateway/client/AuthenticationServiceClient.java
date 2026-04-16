@@ -86,7 +86,7 @@ public class AuthenticationServiceClient {
     public Mono<Boolean> isServiceHealthy() {
         log.debug("Выполнение health check для Authentication Service");
         return healthWebClient.get()
-                .uri("/api/auth/actuator/health")
+                .uri("/actuator/health")
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(response -> {

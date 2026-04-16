@@ -35,7 +35,7 @@ import java.util.UUID;
  * REST контроллер для управления командами
  */
 @RestController
-@RequestMapping("/api/teams")
+@RequestMapping("/teams")
 @RequiredArgsConstructor
 @Slf4j
 public class TeamController {

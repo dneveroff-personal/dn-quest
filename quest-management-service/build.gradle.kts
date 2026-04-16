@@ -26,8 +26,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.opentelemetry:opentelemetry-api:1.32.0")
+    
+    // Tracing - Micrometer with OTLP export to Jaeger
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")

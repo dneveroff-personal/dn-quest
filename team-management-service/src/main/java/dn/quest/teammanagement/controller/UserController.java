@@ -24,7 +24,7 @@ import java.util.UUID;
  * REST контроллер для управления пользователями
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {

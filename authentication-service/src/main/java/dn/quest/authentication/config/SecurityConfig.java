@@ -90,8 +90,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Публичные эндпоинты
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
-                                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/validate")
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/refresh",
+                                "/auth/forgot-password", "/auth/reset-password", "/auth/validate")
                         .permitAll()
                         
                         // Эндпоинты документации
@@ -103,7 +103,7 @@ public class SecurityConfig {
                         .permitAll()
                         
                         // Эндпоинты требующие аутентификации
-                        .requestMatchers("/api/auth/profile", "/api/auth/change-password", "/api/auth/logout")
+                        .requestMatchers("/auth/profile", "/auth/change-password", "/auth/logout")
                         .authenticated()
                         
                         // Административные эндпоинты

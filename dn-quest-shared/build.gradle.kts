@@ -19,18 +19,12 @@ repositories {
 }
 
 dependencies {
+    // Spring Cloud BOM
+    api(platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.0"))
+    
     // Spring Boot
     api("org.springframework.boot:spring-boot-starter")
     api("org.springframework.boot:spring-boot-starter-logging")
-
-    // Micrometer + Tracing (Brave bridge - compatible with Spring Boot 3.2)
-    api("io.micrometer:micrometer-core")
-    api("io.micrometer:micrometer-registry-prometheus")
-    api("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
-
-    // Zipkin Reporter
-    api("io.zipkin.reporter2:zipkin-reporter")
-    api("io.zipkin.reporter2:zipkin-reporter-brave")
 
     // Spring Kafka + Kafka clients
     api("org.springframework.kafka:spring-kafka")

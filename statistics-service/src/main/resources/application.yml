@@ -109,14 +109,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
-        enabled: true
 
 logging:
   level:
@@ -137,12 +133,7 @@ spring:
     activate:
       on-profile: dev
 
-  # Disable tracing in development to avoid connection errors to Zipkin
   sleuth:
-    enabled: false
-
-management:
-  tracing:
     enabled: false
 
   jpa:
