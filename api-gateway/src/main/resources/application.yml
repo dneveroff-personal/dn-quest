@@ -201,10 +201,8 @@ spring:
     activate:
       on-profile: dev
 
-    sleuth:
+  sleuth:
     enabled: false
-
-management:
 
   cloud:
     gateway:

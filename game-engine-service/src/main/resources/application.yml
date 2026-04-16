@@ -186,13 +186,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-# Tracing Configuration (Jaeger)
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-    enabled: true
-
+# Management and Tracing Configuration
 management:
   endpoints:
     web:
@@ -201,6 +195,10 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
 
 # Server configuration
 server:

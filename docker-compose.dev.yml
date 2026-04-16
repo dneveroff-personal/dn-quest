@@ -558,13 +558,6 @@ services:
       args:
         SERVICE_NAME: notification-service
         PORT: 8086
-    environment:
-      # Jaeger distributed tracing
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
-      OTEL_SERVICE_NAME: notification-service
-      SPRING_SLEUTH_ENABLED: "true"
-      SPRING_PROFILES_ACTIVE: dev
-      KAFKA_BOOTSTRAP_SERVERS: kafka-dev:29092
     image: dn-quest/notification-service:dev
     container_name: dn-quest-notification-service-dev
     ports:
@@ -589,6 +582,10 @@ services:
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: WARN
       LOGGING_LEVEL_ORG_SPRING_BOOT_ACTUATOR_TRACING: WARN
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB_CLIENT: WARN
+      # Jaeger distributed tracing
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger-dev:14268
+      OTEL_SERVICE_NAME: notification-service
+      SPRING_SLEUTH_ENABLED: "true"
     volumes:
       - notification_service_dev_logs:/app/logs
     depends_on:

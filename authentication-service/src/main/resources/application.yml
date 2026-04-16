@@ -3,6 +3,13 @@ server:
 
 # Enable distributed tracing
 spring:
+  application:
+    name: authentication-service
+
+  profiles:
+    active: dev
+
+  # Distributed tracing (OpenTelemetry/Jaeger)
   sleuth:
     enabled: true
   otel:
@@ -12,13 +19,6 @@ spring:
     service:
       name: authentication-service
 
-spring:
-  application:
-    name: authentication-service
-  
-  profiles:
-    active: dev
-  
   # Database Configuration
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_auth}
@@ -103,8 +103,8 @@ spring:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
-  access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}  # 15 minutes
-  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
   issuer: ${JWT_ISSUER:dn-quest-auth-service}
 
 # Management Endpoints
@@ -123,6 +123,10 @@ management:
       enabled: true
     os:
       enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
 
 # Logging Configuration
 logging:
@@ -133,13 +137,6 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
-# Tracing Configuration (Jaeger)
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-    enabled: true
 
 # OpenAPI Documentation
 springdoc:
@@ -170,22 +167,16 @@ logging:
     dn.quest.authentication: DEBUG
     org.springframework.security: DEBUG
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-    enabled: true
-
 ---
 # Production Profile
 spring:
   config:
     activate:
       on-profile: prod
-  
+
   jpa:
     show-sql: false
-  
+
   # Production Database
   datasource:
     url: ${DATABASE_URL}
