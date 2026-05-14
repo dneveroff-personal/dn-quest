@@ -11,6 +11,7 @@ const routes = [
     { path: "/", component: Home },
     { path: "/login", component: Login },
     { path: "/register", component: Register },
+    { path: "/auth", redirect: "/login" },
     {
         path: "/admin/users/manage",
         component: ManageUsers,

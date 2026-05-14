@@ -139,10 +139,16 @@ spring:
       on-profile: dev
 
   sleuth:
-    enabled: false
+    enabled: true
 
   jpa:
     show-sql: true
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:

@@ -492,6 +492,7 @@ dn-quest/
 ├── frontend/             # Vue.js фронтенд
 ├── docker/               # Конфигурации Docker
 ├── docs/                 # Документация
+│   └── user-guide.md     # Руководство пользователя
 ├── Makefile              # Команды для разработки
 ├── docker-compose.dev.yml # Docker Compose конфигурация
 └── .env                  # Переменные окружения

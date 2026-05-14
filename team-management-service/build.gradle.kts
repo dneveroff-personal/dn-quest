@@ -20,11 +20,6 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
-}
-
 dependencies {
     // Spring Boot Starters
     implementation("org.springframework.boot:spring-boot-starter-web")

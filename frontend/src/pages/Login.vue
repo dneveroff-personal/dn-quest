@@ -50,7 +50,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage } from "naive-ui";
 import api from "@/services/api";
-import { setToken } from "@/services/auth";
+import { setToken, setRefreshToken, setCurrentUser } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -67,13 +67,15 @@ async function doLogin() {
 
   loading.value = true;
   try {
-    const resp = await api.post("/login", {
+    const resp = await api.post("/auth/login", {
       username: username.value,
       password: password.value
     });
 
-    // сохраняем токен
-    setToken(resp.data.token);
+    // сохраняем токены и пользователя
+    setToken(resp.data.accessToken);
+    setRefreshToken(resp.data.refreshToken);
+    setCurrentUser(resp.data.user);
 
     // триггерим событие, App.vue подхватит и обновит currentUser
     window.dispatchEvent(new Event("user-changed"));

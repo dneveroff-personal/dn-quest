@@ -11,6 +11,25 @@
       </p>
     </div>
 
+    <!-- Hero-секция для неавторизованных пользователей -->
+    <div v-if="!currentUser" class="w-full max-w-2xl mb-8 text-center">
+      <p class="text-lg text-[var(--color-text)] opacity-80 mb-6">
+        Присоединяйтесь к захватывающим квестам и проверьте свои навыки!
+      </p>
+      <div class="flex gap-4 justify-center">
+        <router-link to="/login">
+          <n-button type="primary" size="large">
+            Войти
+          </n-button>
+        </router-link>
+        <router-link to="/register">
+          <n-button size="large">
+            Регистрация
+          </n-button>
+        </router-link>
+      </div>
+    </div>
+
     <!-- Фильтры и поиск -->
     <div class="w-full max-w-4xl mb-6">
       <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -119,6 +138,7 @@ import {
   NSelect,
   NCard,
   NPagination,
+  NButton,
   useMessage
 } from "naive-ui";
 import { questService } from "@/services/api";

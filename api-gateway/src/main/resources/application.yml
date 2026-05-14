@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+debug: true
+
 spring:
   application:
     name: api-gateway
@@ -14,8 +16,6 @@ spring:
   # zipkin:
   #   base-url: ${ZIPKIN_URL:http://zipkin:9411}
   #   endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
-  sleuth:
-    enabled: false
 
   profiles:
     active: dev
@@ -33,6 +33,16 @@ spring:
       - org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration
 
   cloud:
+    circuitbreaker:
+      resilience4j:
+        configs:
+          default:
+            time-limiter:
+              timeout-duration: 5s
+        circuitbreakers:
+          authenticationService:
+            time-limiter:
+              timeout-duration: 5s
     gateway:
       # Global CORS configuration
       globalcors:
@@ -176,11 +186,22 @@ management:
       show-details: always
     gateway:
       enabled: true
+  tracing:
+    enabled: true
+  otlp:
+    enabled: true
+    tracing:
+      endpoint: http://jaeger-dev:4318/v1/traces
+      protocol: http
+      enabled: true
 logging:
   level:
     dn.quest.gateway: INFO
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web.reactive: DEBUG
+    io.micrometer.tracing: DEBUG
+    io.opentelemetry: DEBUG
+    org.springframework.boot.actuate.autoconfigure.tracing: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
@@ -201,8 +222,6 @@ spring:
     activate:
       on-profile: dev
 
-  sleuth:
-    enabled: false
 
   cloud:
     gateway:

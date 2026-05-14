@@ -86,6 +86,10 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:
@@ -121,6 +125,12 @@ jpa:
 logging:
   level:
     dn.quest.usermanagement: DEBUG
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 ---
 spring:

@@ -18,12 +18,6 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
-    maven { url = uri("https://repo1.maven.org/maven2/") }
-}
-
 subprojects {
     apply(plugin = "java")
     apply(plugin = "org.springframework.boot")
@@ -37,12 +31,6 @@ subprojects {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
-    }
-
-    repositories {
-        mavenCentral()
-        maven { url = uri("https://maven.aliyun.com/repository/central") }
-        maven { url = uri("https://repo1.maven.org/maven2/") }
     }
 
     dependencies {

@@ -119,6 +119,10 @@ management:
   health:
     mail:
       enabled: false
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:
@@ -140,7 +144,7 @@ spring:
       on-profile: dev
 
   sleuth:
-    enabled: false
+    enabled: true
 
 logging:
   level:
