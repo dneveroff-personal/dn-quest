@@ -94,6 +94,7 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
                 .build();
 
         // Асинхронная валидация через Authentication Service
+        // Если сервис недоступен, разрешаем запрос при валидном токене (fail-open)
         return authenticationServiceClient.validateToken(token)
                 .flatMap(validationResponse -> {
                     if (validationResponse.getValid() == null || !validationResponse.getValid()) {
@@ -103,8 +104,8 @@ public class AuthenticationFilter implements GatewayFilter, Ordered {
                     return chain.filter(modifiedExchange);
                 })
                 .onErrorResume(throwable -> {
-                    log.error("Ошибка при валидации токена через Authentication Service", throwable);
-                    // Если Authentication Service недоступен, продолжаем с локальной валидацией
+                    log.warn("Authentication Service недоступен, разрешаем запрос при валидном токене: {}", throwable.getMessage());
+                    // При недоступности Authentication Service разрешаем запрос, если токен локально валиден
                     return chain.filter(modifiedExchange);
                 });
     }

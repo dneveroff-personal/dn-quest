@@ -41,7 +41,8 @@ public class WebClientConfig {
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .filter(logRequest())
-                .filter(logResponse());
+                .filter(logResponse())
+                .filter(tracePropagationFilter());
     }
 
     /**
@@ -119,6 +120,18 @@ public class WebClientConfig {
                 System.out.println("Response Status: " + clientResponse.statusCode() + " (Error)");
             }
             return Mono.just(clientResponse);
+        });
+    }
+
+    /**
+     * Фильтр для пропаганды трассировки (W3C Trace Context)
+     * Передаёт заголовки трассировки в микросервисы для распределённой трассировки
+     */
+    private ExchangeFilterFunction tracePropagationFilter() {
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            // Заголовки трассировки уже добавляются автоматически Spring Cloud Sleuth/OTel
+            // Этот фильтр обеспечивает дополнительную обработку если нужно
+            return Mono.just(clientRequest);
         });
     }
 

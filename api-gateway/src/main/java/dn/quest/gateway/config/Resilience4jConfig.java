@@ -71,12 +71,23 @@ public class Resilience4jConfig {
     }
 
     /**
-     * Конфигурация Time Limiter
+     * Конфигурация Time Limiter по умолчанию
      */
     @Bean
     public TimeLimiterConfig defaultTimeLimiterConfig() {
         return TimeLimiterConfig.custom()
                 .timeoutDuration(Duration.ofSeconds(5)) // Таймаут выполнения
+                .cancelRunningFuture(true) // Отменять выполняющиеся задачи
+                .build();
+    }
+
+    /**
+     * Конфигурация Time Limiter для Authentication Service
+     */
+    @Bean
+    public TimeLimiterConfig authenticationServiceTimeLimiterConfig() {
+        return TimeLimiterConfig.custom()
+                .timeoutDuration(Duration.ofSeconds(10)) // Таймаут выполнения увеличен до 10 секунд
                 .cancelRunningFuture(true) // Отменять выполняющиеся задачи
                 .build();
     }
@@ -150,7 +161,7 @@ public class Resilience4jConfig {
      * Time Limiter для Authentication Service
      */
     @Bean
-    public TimeLimiter authenticationServiceTimeLimiter(TimeLimiterConfig defaultTimeLimiterConfig) {
-        return TimeLimiter.of(defaultTimeLimiterConfig);
+    public TimeLimiter authenticationServiceTimeLimiter(TimeLimiterConfig authenticationServiceTimeLimiterConfig) {
+        return TimeLimiter.of(authenticationServiceTimeLimiterConfig);
     }
 }

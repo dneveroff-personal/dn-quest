@@ -20,6 +20,15 @@ public class SecurityConfig {
                         .pathMatchers("/", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/api-docs").permitAll()
                         // Health endpoints должны быть доступны без аутентификации для мониторинга
                         .pathMatchers("/actuator/health", "/actuator/health/**", "/actuator/gateway-health", "/actuator/gateway-health/**").permitAll()
+                        // Публичные auth эндпоинты (без аутентификации)
+                        .pathMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/validate"
+                        ).permitAll()
                         // Остальные actuator endpoints требуют аутентификацию
                         .pathMatchers("/actuator/**").authenticated()
                         // Все остальные запросы требуют аутентификации

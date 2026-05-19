@@ -130,7 +130,7 @@ dev-stopped: ## Показать остановленные контейнеры
 	docker compose -f docker-compose.dev.yml ps -a
 
 # =============================================
-# Управлени�� се��висами
+# Управление сервисами
 # =============================================
 
 dev-up-service: ## Запустить один сервис: make dev-up-service SERVICE=authentication-service-dev
@@ -224,3 +224,11 @@ clean: ## Полная очистка проекта
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans
 	docker rmi $$(docker images "dn-quest/*:dev" -q) 2>/dev/null || true
 	@echo "$(GREEN)Очистка завершена!$(RESET)"
+
+# =============================================
+# Dev mode
+# =============================================
+
+diag: ## Диагностика авторизации
+	@echo "$(YELLOW)Диагностика ...$(RESET)"
+	./scripts/diagnose-services.sh

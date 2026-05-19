@@ -40,34 +40,34 @@ public final class JwtUtil {
      * Генерирует access токен
      */
     public static String generateAccessToken(String secret, String subject, Map<String, Object> claims) {
-        return generateToken(secret, subject, claims, DEFAULT_ACCESS_TOKEN_EXPIRATION);
+        return generateAccessToken(secret, subject, claims, DEFAULT_ACCESS_TOKEN_EXPIRATION, ISSUER);
     }
     
     /**
      * Генерирует access токен с указанным временем жизни
      */
     public static String generateAccessToken(String secret, String subject, Map<String, Object> claims, long expiration) {
-        return generateToken(secret, subject, claims, expiration);
+        return generateToken(secret, subject, claims, expiration, ISSUER);
     }
     
     /**
      * Генерирует refresh токен
      */
     public static String generateRefreshToken(String secret, String subject) {
-        return generateToken(secret, subject, Map.of(), DEFAULT_REFRESH_TOKEN_EXPIRATION);
+        return generateRefreshToken(secret, subject, DEFAULT_REFRESH_TOKEN_EXPIRATION, ISSUER);
     }
     
     /**
      * Генерирует refresh токен с указанным временем жизни
      */
     public static String generateRefreshToken(String secret, String subject, long expiration) {
-        return generateToken(secret, subject, Map.of(), expiration);
+        return generateToken(secret, subject, Map.of(), expiration, ISSUER);
     }
     
     /**
      * Генерирует JWT токен
      */
-    public static String generateToken(String secret, String subject, Map<String, Object> claims, long expiration) {
+    public static String generateToken(String secret, String subject, Map<String, Object> claims, long expiration, String issuer) {
         try {
             SecretKey signingKey = getSigningKey(secret);
             LocalDateTime now = LocalDateTime.now();
@@ -76,7 +76,7 @@ public final class JwtUtil {
             
             JwtBuilder builder = Jwts.builder()
                     .subject(subject)
-                    .issuer(ISSUER)
+                    .issuer(issuer)
                     .issuedAt(issuedAt)
                     .expiration(expirationDate)
                     .signWith(signingKey);
@@ -247,7 +247,11 @@ public final class JwtUtil {
                 return UUID.fromString((String) userId);
             } catch (IllegalArgumentException e) {
                 return null;
-            }        }
+            }
+        }
+        if (userId instanceof UUID) {
+            return (UUID) userId;
+        }
         return null;
     }
     

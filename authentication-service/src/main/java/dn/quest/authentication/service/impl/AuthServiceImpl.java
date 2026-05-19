@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -69,8 +70,8 @@ public class AuthServiceImpl implements AuthService {
         claims.put("userId", user.getId());
         claims.put("role", user.getRole().name());
         
-        String accessToken = JwtUtil.generateAccessToken(jwtSecret, user.getUsername(), claims, accessTokenExpiration);
-        String refreshToken = JwtUtil.generateRefreshToken(jwtSecret, user.getUsername(), refreshTokenExpiration);
+        String accessToken = JwtUtil.generateAccessToken(jwtSecret, user.getUsername(), claims, accessTokenExpiration, jwtIssuer);
+        String refreshToken = JwtUtil.generateRefreshToken(jwtSecret, user.getUsername(), refreshTokenExpiration, jwtIssuer);
         
         // Сохранение refresh токена
         user.setRefreshToken(refreshToken);
@@ -114,8 +115,8 @@ public class AuthServiceImpl implements AuthService {
         claims.put("userId", user.getId());
         claims.put("role", user.getRole().name());
         
-        String accessToken = JwtUtil.generateAccessToken(jwtSecret, user.getUsername(), claims, accessTokenExpiration);
-        String refreshToken = JwtUtil.generateRefreshToken(jwtSecret, user.getUsername(), refreshTokenExpiration);
+        String accessToken = JwtUtil.generateAccessToken(jwtSecret, user.getUsername(), claims, accessTokenExpiration, jwtIssuer);
+        String refreshToken = JwtUtil.generateRefreshToken(jwtSecret, user.getUsername(), refreshTokenExpiration, jwtIssuer);
         
         // Обновление refresh токена и времени последнего входа
         user.setRefreshToken(refreshToken);
@@ -321,6 +322,33 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             log.debug("Ошибка извлечения имени пользователя из токена", e);
             return null;
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getTokenDetails(String token) {
+        try {
+            if (!JwtUtil.isTokenValid(token, jwtSecret)) {
+                return Map.of();
+            }
+
+            String username = JwtUtil.extractSubject(token, jwtSecret);
+            UUID userId = JwtUtil.extractUserId(token, jwtSecret);
+            String role = JwtUtil.extractRole(token, jwtSecret);
+            java.util.Date expirationDate = JwtUtil.getExpirationDate(token, jwtSecret);
+            Instant expiration = expirationDate.toInstant();
+            long expiresIn = ChronoUnit.SECONDS.between(Instant.now(), expiration);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("username", username);
+            result.put("userId", userId);
+            result.put("role", role);
+            result.put("expiresIn", expiresIn);
+            return result;
+        } catch (Exception e) {
+            log.debug("Ошибка получения деталей токена", e);
+            return Map.of();
         }
     }
 }

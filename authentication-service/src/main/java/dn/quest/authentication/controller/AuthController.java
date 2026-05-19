@@ -1,6 +1,7 @@
 package dn.quest.authentication.controller;
 
 import dn.quest.authentication.dto.*;
+import dn.quest.shared.dto.TokenValidationResponse;
 import dn.quest.shared.dto.UserDTO;
 import dn.quest.authentication.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -202,9 +204,9 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("message", "Пароль успешно изменен"));
         } catch (IllegalArgumentException e) {
             log.warn("Ошибка смены пароля пользователя {}", username, e);
-            if (e.getMessage().contains("Н��верный текущий пароль")) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
-            }
+if (e.getMessage().contains("Неверный текущий пароль")) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
+}
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
         }
     }
@@ -248,20 +250,42 @@ public class AuthController {
     }
 
     @GetMapping("/validate")
-    @Operation(summary = "Валидация токена", description = "Проверяет валидность JWT токена")
+    @Operation(summary = "Валидация токена", description = "Проверяет валидность JWT токена и возвращает его данные")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Токен валиден"),
+            @ApiResponse(responseCode = "200", description = "Токен валиден",
+                    content = @Content(schema = @Schema(implementation = TokenValidationResponse.class))),
             @ApiResponse(responseCode = "401", description = "Токен невалиден")
     })
-    public ResponseEntity<?> validateToken(@Parameter(description = "JWT токен") @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<TokenValidationResponse> validateToken(
+            @Parameter(description = "JWT токен") @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("valid", false));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(TokenValidationResponse.builder()
+                            .valid(false)
+                            .error("Missing or invalid Authorization header")
+                            .build());
         }
 
         String token = authHeader.substring(7);
-        boolean isValid = authService.validateToken(token);
+        Map<String, Object> tokenDetails = authService.getTokenDetails(token);
 
-        return ResponseEntity.ok(Map.of("valid", isValid));
+        if (tokenDetails.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(TokenValidationResponse.builder()
+                            .valid(false)
+                            .error("Token is invalid or expired")
+                            .build());
+        }
+
+        TokenValidationResponse response = TokenValidationResponse.builder()
+                .valid(true)
+                .username((String) tokenDetails.get("username"))
+                .userId((UUID) tokenDetails.get("userId"))
+                .role((String) tokenDetails.get("role"))
+                .expiresIn((Long) tokenDetails.get("expiresIn"))
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     private String getClientIp(HttpServletRequest request) {

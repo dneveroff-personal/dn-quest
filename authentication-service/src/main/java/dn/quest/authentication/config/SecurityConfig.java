@@ -125,7 +125,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        // Используем конкретные origins вместо wildcard для совместимости с credentials
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000",   // фронтенд (dev)
+            "http://localhost:8080",   // gateway (dev)
+            "https://dn-quest.com"     // production
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(Arrays.asList("X-Username", "Authorization"));

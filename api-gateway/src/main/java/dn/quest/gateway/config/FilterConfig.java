@@ -4,20 +4,20 @@ import dn.quest.gateway.filter.AuthenticationFilter;
 import dn.quest.gateway.filter.LoggingFilter;
 import dn.quest.gateway.filter.SecurityHeadersFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Mono;
 
 /**
  * Конфигурация фильтров и маршрутов API Gateway
  */
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class FilterConfig {
 
     private final AuthenticationFilter authenticationFilter;
@@ -81,9 +81,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/users"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(userManagementServiceUrl))
 
@@ -99,9 +96,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/quests"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(questManagementServiceUrl))
 
@@ -117,9 +111,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/game"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(gameEngineServiceUrl))
 
@@ -135,9 +126,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/teams"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(teamManagementServiceUrl))
 
@@ -153,9 +141,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/notifications"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(2))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(notificationServiceUrl))
 
@@ -171,9 +156,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/statistics"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(statisticsServiceUrl))
 
@@ -189,9 +171,6 @@ public class FilterConfig {
                                         .setFallbackUri("forward:/fallback/files"))
                                 .retry(retryConfig -> retryConfig
                                         .setRetries(3))
-                                .requestRateLimiter(config -> config
-                                        .setRateLimiter(redisRateLimiter())
-                                        .setKeyResolver(userKeyResolver()))
                         )
                         .uri(fileStorageServiceUrl))
 
@@ -199,21 +178,15 @@ public class FilterConfig {
     }
 
     /**
-     * Redis Rate Limiter
+     * Redis Rate Limiter - опциональный, если Redis недоступен
      */
-    private RedisRateLimiter redisRateLimiter() {
-        return new RedisRateLimiter(10, 20, 1);
-    }
-
-    /**
-     * User Key Resolver для Rate Limiting
-     */
-    private KeyResolver userKeyResolver() {
-        return exchange -> {
-            String username = exchange.getRequest()
-                    .getHeaders()
-                    .getFirst("X-Username");
-            return Mono.just(username != null ? username : "anonymous");
-        };
+    @Bean
+    public RedisRateLimiter redisRateLimiter() {
+        try {
+            return new RedisRateLimiter(10, 20);
+        } catch (Exception e) {
+            log.warn("Failed to create RedisRateLimiter, rate limiting will be disabled", e);
+            return null;
+        }
     }
 }
