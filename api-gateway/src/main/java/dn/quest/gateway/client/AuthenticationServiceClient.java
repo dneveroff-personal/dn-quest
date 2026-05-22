@@ -1,6 +1,6 @@
 package dn.quest.gateway.client;
 
-import dn.quest.gateway.dto.TokenValidationResponse;
+import dn.quest.shared.dto.TokenValidationResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,7 +53,7 @@ public class AuthenticationServiceClient {
      */
     public Mono<TokenValidationResponse> validateToken(String token) {
         return webClient.get()
-                .uri("/api/auth/validate")
+                .uri("/auth/validate")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .bodyToMono(TokenValidationResponse.class)
@@ -72,7 +72,7 @@ public class AuthenticationServiceClient {
      */
     public Mono<String> refreshToken(String refreshToken) {
         return webClient.post()
-                .uri("/api/auth/refresh")
+                .uri("/auth/refresh")
                 .bodyValue("{\"refreshToken\":\"" + refreshToken + "\"}")
                 .retrieve()
                 .bodyToMono(String.class)
@@ -86,7 +86,7 @@ public class AuthenticationServiceClient {
     public Mono<Boolean> isServiceHealthy() {
         log.debug("Выполнение health check для Authentication Service");
         return healthWebClient.get()
-                .uri("/api/auth/actuator/health")
+                .uri("/actuator/health")
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(response -> {

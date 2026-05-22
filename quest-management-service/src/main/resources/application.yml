@@ -1,4 +1,17 @@
+# Server configuration
+server:
+  port: 8083
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
 spring:
+  application:
+    name: quest-management-service
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
   datasource:
     url: jdbc:postgresql://postgres-dev:5432/dnquest_quests
     username: dn
@@ -65,6 +78,19 @@ spring:
         jwt:
           issuer-uri: http://authentication-service-dev:8081
 
+  # Enable distributed tracing
+  sleuth:
+    enabled: true
+  otel:
+    exporter:
+      otlp:
+        endpoint: http://jaeger-dev:14268
+    service:
+      name: quest-management-service
+
+  # Tracing Configuration (Jaeger)
+  config.import: optional:file:./config/application.yml
+
 # Feign clients configuration
 feign:
   client:
@@ -123,23 +149,14 @@ logging:
 
 # Management endpoints
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: always
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-
-# Server configuration
-server:
-  port: 8083
-  servlet:
-    context-path: /api/quests
-  compression:
-    enabled: true
-    mime-types: application/json,application/xml,text/html,text/xml,text/plain

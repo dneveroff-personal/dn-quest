@@ -1,7 +1,5 @@
 server:
   port: 8082
-  servlet:
-    context-path: /api/users
 
 spring:
   application:
@@ -84,14 +82,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:
@@ -111,14 +109,15 @@ spring:
   config:
     activate:
       on-profile: dev
-  
-  # Disable tracing in development to avoid connection errors to Zipkin
-  sleuth:
-    enabled: false
 
-management:
-  tracing:
-    enabled: false
+  sleuth:
+    enabled: true
+  otel:
+    exporter:
+      otlp:
+        endpoint: http://jaeger-dev:14268
+    service:
+      name: user-management-service
 
 jpa:
   show-sql: true
@@ -127,12 +126,18 @@ logging:
   level:
     dn.quest.usermanagement: DEBUG
 
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+
 ---
 spring:
   config:
     activate:
       on-profile: prod
-  
+
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -144,6 +149,14 @@ spring:
 logging:
   level:
     dn.quest.usermanagement: INFO
+
+# Production Tracing
+management:
+  tracing:
+    sampling:
+      probability: 0.1
+    enabled: true
+
   file:
     name: /var/log/dn-quest/user-management-service.log
 

@@ -90,8 +90,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // Публичные эндпоинты
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh",
-                                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/validate")
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/refresh",
+                                "/auth/forgot-password", "/auth/reset-password", "/auth/validate")
                         .permitAll()
                         
                         // Эндпоинты документации
@@ -103,7 +103,7 @@ public class SecurityConfig {
                         .permitAll()
                         
                         // Эндпоинты требующие аутентификации
-                        .requestMatchers("/api/auth/profile", "/api/auth/change-password", "/api/auth/logout")
+                        .requestMatchers("/auth/profile", "/auth/change-password", "/auth/logout")
                         .authenticated()
                         
                         // Административные эндпоинты
@@ -125,7 +125,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
+        // Используем конкретные origins вместо wildcard для совместимости с credentials
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000",   // фронтенд (dev)
+            "http://localhost:8080",   // gateway (dev)
+            "https://dn-quest.com"     // production
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(Arrays.asList("X-Username", "Authorization"));

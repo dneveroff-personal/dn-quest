@@ -1,129 +1,93 @@
 package dn.quest.gateway.filter;
 
-import dn.quest.gateway.client.AuthenticationServiceClient;
 import dn.quest.shared.utils.JwtUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Фильтр аутентификации для проверки JWT токенов
+ * WebFilter для добавления заголовков пользователя после JWT аутентификации.
+ * Работает после Spring Security, которая уже проверила токен.
  */
 @Component
-@RequiredArgsConstructor
+@Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
-public class AuthenticationFilter implements GatewayFilter, Ordered {
+public class AuthenticationFilter implements WebFilter {
 
-    private final JwtUtil jwtUtil;
-    private final AuthenticationServiceClient authenticationServiceClient;
-    
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private static final List<String> EXCLUDED_PATHS = List.of(
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/auth/forgot-password",
-            "/api/auth/reset-password",
-            "/api/auth/validate",
-            "/actuator/health",
-            "/actuator/info",
-            "/api-docs",
-            "/swagger-ui.html",
-            "/swagger-ui",
-            "/v3/api-docs"
-    );
-
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
-        // Пропускаем исключенные пути
+        // Пропускаем публичные эндпоинты
         if (isExcludedPath(path)) {
             return chain.filter(exchange);
         }
 
-        // Проверяем наличие Authorization header
+        // Получаем токен из заголовка
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Отсутствует или некорректный Authorization header для пути: {}", path);
-            return handleUnauthorized(exchange);
+            return chain.filter(exchange);
         }
 
         String token = authHeader.substring(7);
-
-        // Сначала выполняем локальную валидацию токена
+        
+        // Проверяем валидность токена перед извлечением данных
         if (!JwtUtil.validateToken(token, jwtSecret)) {
-            log.warn("Невалидный JWT токен для пути: {}", path);
-            return handleUnauthorized(exchange);
+            return chain.filter(exchange);
         }
-
-        // Извлекаем информацию из токена
+        
+        // Извлекаем информацию из токена для заголовков
         String username = JwtUtil.extractUsername(token, jwtSecret);
         UUID userId = JwtUtil.extractUserId(token, jwtSecret);
         String role = JwtUtil.extractRole(token, jwtSecret);
 
-        if (username == null) {
-            log.warn("Не удалось извлечь имя пользователя из токена для пути: {}", path);
-            return handleUnauthorized(exchange);
+        if (username != null) {
+            // Добавляем заголовки для downstream сервисов
+            ServerHttpRequest modifiedRequest = request.mutate()
+                    .header("X-Username", username)
+                    .header("X-User-Id", userId != null ? userId.toString() : "")
+                    .header("X-User-Role", role != null ? role : "USER")
+                    .build();
+
+            ServerWebExchange modifiedExchange = exchange.mutate()
+                    .request(modifiedRequest)
+                    .build();
+
+            return chain.filter(modifiedExchange);
         }
 
-        // Добавляем информацию о пользователе в headers
-        ServerHttpRequest modifiedRequest = request.mutate()
-                .header("X-Username", username)
-                .header("X-User-Id", userId != null ? userId.toString() : "")
-                .header("X-User-Role", role != null ? role : "USER")
-                .build();
-
-        ServerWebExchange modifiedExchange = exchange.mutate()
-                .request(modifiedRequest)
-                .build();
-
-        // Асинхронная валидация через Authentication Service
-        return authenticationServiceClient.validateToken(token)
-                .flatMap(validationResponse -> {
-                    if (validationResponse.getValid() == null || !validationResponse.getValid()) {
-                        log.warn("Токен не прошел валидацию в Authentication Service для пользователя: {}", username);
-                        return handleUnauthorized(exchange);
-                    }
-                    return chain.filter(modifiedExchange);
-                })
-                .onErrorResume(throwable -> {
-                    log.error("Ошибка при валидации токена через Authentication Service", throwable);
-                    // Если Authentication Service недоступен, продолжаем с локальной валидацией
-                    return chain.filter(modifiedExchange);
-                });
+        return chain.filter(exchange);
     }
 
     private boolean isExcludedPath(String path) {
-        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
-    }
-
-    private Mono<Void> handleUnauthorized(ServerWebExchange exchange) {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        response.getHeaders().add("Content-Type", "application/json");
-        
-        String body = "{\"error\":\"Unauthorized\",\"message\":\"Требуется аутентификация\"}";
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(body.getBytes())));
-    }
-
-    @Override
-    public int getOrder() {
-        return -100; // Высокий приоритет
+        return path.startsWith("/api/auth/login") ||
+               path.startsWith("/api/auth/register") ||
+               path.startsWith("/api/auth/refresh") ||
+               path.startsWith("/api/auth/forgot-password") ||
+               path.startsWith("/api/auth/reset-password") ||
+               path.startsWith("/api/auth/validate") ||
+               path.startsWith("/actuator/health") ||
+               path.startsWith("/actuator/info") ||
+               path.startsWith("/api-docs") ||
+               path.startsWith("/swagger-ui.html") ||
+               path.startsWith("/swagger-ui") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/actuator/gateway-health") ||
+               path.equals("/") ||
+               path.startsWith("/webjars");
     }
 }

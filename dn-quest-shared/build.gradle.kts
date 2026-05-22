@@ -13,24 +13,17 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.2.0")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
+    }
 }
 
 dependencies {
     // Spring Boot
     api("org.springframework.boot:spring-boot-starter")
     api("org.springframework.boot:spring-boot-starter-logging")
-
-    // Micrometer + Tracing (Brave bridge - compatible with Spring Boot 3.2)
-    api("io.micrometer:micrometer-core")
-    api("io.micrometer:micrometer-registry-prometheus")
-    api("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
-
-    // Zipkin Reporter
-    api("io.zipkin.reporter2:zipkin-reporter")
-    api("io.zipkin.reporter2:zipkin-reporter-brave")
 
     // Spring Kafka + Kafka clients
     api("org.springframework.kafka:spring-kafka")
@@ -53,6 +46,9 @@ dependencies {
     
     // Validation
     api("jakarta.validation:jakarta.validation-api")
+    
+    // Tracing - Micrometer Tracing (required for OpenTelemetry bridge)
+    api("io.micrometer:micrometer-tracing:1.2.0")
 
     // Тесты
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -20,7 +20,7 @@ import java.util.UUID;
  * Контроллер для управления настройками пользователей
  */
 @RestController
-@RequestMapping("/api/users/settings")
+@RequestMapping("/users/settings")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "User Settings", description = "API для управления настройками пользователей")

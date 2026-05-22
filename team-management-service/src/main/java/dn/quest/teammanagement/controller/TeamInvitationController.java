@@ -29,7 +29,7 @@ import java.util.UUID;
  * REST контроллер для управления приглашениями в команды
  */
 @RestController
-@RequestMapping("/api/teams/{teamId}/invitations")
+@RequestMapping("/teams/{teamId}/invitations")
 @RequiredArgsConstructor
 @Slf4j
 public class TeamInvitationController {
@@ -160,7 +160,7 @@ public class TeamInvitationController {
  * REST контроллер для управления приглашениями пользователя
  */
 @RestController
-@RequestMapping("/api/users/invitations")
+@RequestMapping("/users/invitations")
 @RequiredArgsConstructor
 @Slf4j
 class UserInvitationController {
@@ -247,7 +247,7 @@ class UserInvitationController {
  * REST контроллер для управления отдельными приглашениями
  */
 @RestController
-@RequestMapping("/api/invitations")
+@RequestMapping("/invitations")
 @RequiredArgsConstructor
 @Slf4j
 class InvitationController {
@@ -372,7 +372,7 @@ class InvitationController {
  * REST контроллер для административных функций приглашений
  */
 @RestController
-@RequestMapping("/api/admin/invitations")
+@RequestMapping("/admin/invitations")
 @RequiredArgsConstructor
 @Slf4j
 @PreAuthorize("hasRole('ADMIN')")

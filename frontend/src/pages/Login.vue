@@ -50,7 +50,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage } from "naive-ui";
 import api from "@/services/api";
-import { setToken } from "@/services/auth";
+import { setToken, setRefreshToken, setCurrentUser } from "@/services/auth";
 
 const router = useRouter();
 const message = useMessage();
@@ -66,25 +66,55 @@ async function doLogin() {
   }
 
   loading.value = true;
-  try {
-    const resp = await api.post("/login", {
-      username: username.value,
-      password: password.value
-    });
+  let attempt = 0;
+  const maxAttempts = 3;
+  const baseDelay = 1000; // 1 second
+  let lastError = null;
 
-    // сохраняем токен
-    setToken(resp.data.token);
+  while (attempt < maxAttempts) {
+    try {
+      const resp = await api.post("/auth/login", {
+        username: username.value,
+        password: password.value
+      });
 
-    // триггерим событие, App.vue подхватит и обновит currentUser
-    window.dispatchEvent(new Event("user-changed"));
-
-    message.success("Добро пожаловать!");
-    router.push("/");
-  } catch (err) {
-    message.error("Неправильный логин или пароль");
-    console.error("Ошибка логина", err);
-  } finally {
-    loading.value = false;
+      // success
+      setToken(resp.data.accessToken);
+      setRefreshToken(resp.data.refreshToken);
+      setCurrentUser(resp.data.user);
+      window.dispatchEvent(new Event("user-changed"));
+      message.success("Добро пожаловать!");
+      router.push("/");
+      loading.value = false;
+      return; // exit the function on success
+    } catch (err) {
+      lastError = err;
+      if (err.response && err.response.status === 503 && attempt < maxAttempts - 1) {
+        // Show retry message and wait
+        const delaySeconds = baseDelay * Math.pow(2, attempt) / 1000;
+        message.warning(`Сервис временно недоступен. Повторная попытка через ${delaySeconds} секунд...`);
+        await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, attempt)));
+        attempt++;
+        continue;
+      } else {
+        // For non-503 errors or if we've exhausted retries for 503, break the loop
+        break;
+      }
+    }
   }
+
+  // If we reach here, all attempts failed
+  if (lastError) {
+    if (lastError.response && lastError.response.status === 401) {
+      message.error("Неправильный логин или пароль");
+    } else if (lastError.response && lastError.response.status === 503) {
+      message.error("Сервис временно недоступен. Пожалуйста, попробуйте позже.");
+    } else {
+      message.error("Произошла ошибка при входе. Пожалуйста, попробуйте позже.");
+    }
+    console.error("Ошибка логина", lastError);
+  }
+
+  loading.value = false;
 }
 </script>

@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+debug: true
+
 spring:
   application:
     name: api-gateway
@@ -14,8 +16,6 @@ spring:
   # zipkin:
   #   base-url: ${ZIPKIN_URL:http://zipkin:9411}
   #   endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
-  sleuth:
-    enabled: false
 
   profiles:
     active: dev
@@ -33,12 +33,25 @@ spring:
       - org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration
 
   cloud:
+    circuitbreaker:
+      resilience4j:
+        configs:
+          default:
+            time-limiter:
+              timeout-duration: 5s
+        circuitbreakers:
+          authenticationService:
+            time-limiter:
+              timeout-duration: 10s
     gateway:
       # Global CORS configuration
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "*"
+            allowedOriginPatterns:
+              - "http://localhost:3000"   # фронтенд (dev)
+              - "http://localhost:8080"   # gateway (dev)
+              - "https://dn-quest.com"    # production
             allowedMethods:
               - GET
               - POST
@@ -98,7 +111,7 @@ spring:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
-  expiration: ${JWT_EXPIRATION:86400000} # 24 hours
+  expiration: ${JWT_EXPIRATION:900000} # 15 minutes
 
 # Services Configuration
 services:
@@ -170,23 +183,30 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,gateway
+        include: health,info,gateway
   endpoint:
     health:
       show-details: always
     gateway:
       enabled: true
-  prometheus:
-    metrics:
-      export:
-        enabled: true
   tracing:
-    enabled: false
+    enabled: true
+    sampling:
+      probability: 1.0
+  otlp:
+    enabled: true
+    tracing:
+      endpoint: http://jaeger-dev:4318/v1/traces
+      protocol: http
+      enabled: true
 logging:
   level:
     dn.quest.gateway: INFO
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web.reactive: DEBUG
+    io.micrometer.tracing: DEBUG
+    io.opentelemetry: DEBUG
+    org.springframework.boot.actuate.autoconfigure.tracing: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
@@ -206,66 +226,29 @@ spring:
   config:
     activate:
       on-profile: dev
+
   
   cloud:
     gateway:
-      routes:
-        # Development routes with local services
-        - id: authentication-service
-          uri: ${AUTHENTICATION_SERVICE_URL:http://localhost:8081}
-          predicates:
-            - Path=/api/auth/**
-          filters:
-            - StripPrefix=1
-        
-        - id: user-management-service
-          uri: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8082}
-          predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=1
-        
-        - id: quest-management-service
-          uri: ${QUEST_MANAGEMENT_SERVICE_URL:http://localhost:8083}
-          predicates:
-            - Path=/api/quests/**
-          filters:
-            - StripPrefix=1
-        
-        - id: game-engine-service
-          uri: ${GAME_ENGINE_SERVICE_URL:http://localhost:8084}
-          predicates:
-            - Path=/api/game/**
-          filters:
-            - StripPrefix=1
-        
-        - id: team-management-service
-          uri: ${TEAM_MANAGEMENT_SERVICE_URL:http://localhost:8085}
-          predicates:
-            - Path=/api/teams/**
-          filters:
-            - StripPrefix=1
-        
-        - id: notification-service
-          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8086}
-          predicates:
-            - Path=/api/notifications/**
-          filters:
-            - StripPrefix=1
-        
-        - id: statistics-service
-          uri: ${STATISTICS_SERVICE_URL:http://localhost:8087}
-          predicates:
-            - Path=/api/statistics/**
-          filters:
-            - StripPrefix=1
-        
-        - id: file-storage-service
-          uri: ${FILE_STORAGE_SERVICE_URL:http://localhost:8088}
-          predicates:
-            - Path=/api/files/**
-          filters:
-            - StripPrefix=1
+      # Маршруты настроены программно в FilterConfig.java
+      # Для разработки используются local services, для production - service discovery
+      # Routes are configured in FilterConfig.java
+      default-filters:
+        - name: CircuitBreaker
+          args:
+            name: default
+            fallbackUri: forward:/fallback/general
+        - name: Retry
+          args:
+            retries: 3
+            backoff:
+              firstBackoff: 50ms
+              maxBackoff: 500ms
+              factor: 2
+            statuses:
+              - BAD_GATEWAY
+              - GATEWAY_TIMEOUT
+              - INTERNAL_SERVER_ERROR
 
 logging:
   level:
@@ -280,110 +263,9 @@ spring:
   
   cloud:
     gateway:
-      routes:
-        # Production routes with service discovery
-        - id: authentication-service
-          uri: lb://authentication-service
-          predicates:
-            - Path=/api/auth/**
-          filters:
-            - StripPrefix=1
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 100
-                redis-rate-limiter.burstCapacity: 200
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: user-management-service
-          uri: lb://user-management-service
-          predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 50
-                redis-rate-limiter.burstCapacity: 100
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: quest-management-service
-          uri: lb://quest-management-service
-          predicates:
-            - Path=/api/quests/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 50
-                redis-rate-limiter.burstCapacity: 100
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: game-engine-service
-          uri: lb://game-engine-service
-          predicates:
-            - Path=/api/game/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 100
-                redis-rate-limiter.burstCapacity: 200
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: team-management-service
-          uri: lb://team-management-service
-          predicates:
-            - Path=/api/teams/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 30
-                redis-rate-limiter.burstCapacity: 60
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: notification-service
-          uri: lb://notification-service
-          predicates:
-            - Path=/api/notifications/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 200
-                redis-rate-limiter.burstCapacity: 400
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: statistics-service
-          uri: lb://statistics-service
-          predicates:
-            - Path=/api/statistics/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 20
-                redis-rate-limiter.burstCapacity: 40
-                key-resolver: "#{@userKeyResolver}"
-        
-        - id: file-storage-service
-          uri: lb://file-storage-service
-          predicates:
-            - Path=/api/files/**
-          filters:
-            - StripPrefix=1
-            - name: AuthenticationFilter
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 50
-                redis-rate-limiter.burstCapacity: 100
-                key-resolver: "#{@userKeyResolver}"
+      # Маршруты настроены программно в FilterConfig.java
+      # В production используется service discovery через lb://
+      # Routes are configured in FilterConfig.java with service URLs from properties
 
   data:
     redis:
@@ -391,15 +273,15 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
-jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
 
-logging:
-  level:
-    dn.quest.gateway: INFO
-  file:
-    name: /var/log/dn-quest/api-gateway.log
+  logging:
+    level:
+      dn.quest.gateway: INFO
+    file:
+      name: /var/log/dn-quest/api-gateway.log
 
 ---
 spring:

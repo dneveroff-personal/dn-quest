@@ -18,12 +18,6 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
-    maven { url = uri("https://repo1.maven.org/maven2/") }
-}
-
 subprojects {
     apply(plugin = "java")
     apply(plugin = "org.springframework.boot")
@@ -37,12 +31,6 @@ subprojects {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
-    }
-
-    repositories {
-        mavenCentral()
-        maven { url = uri("https://maven.aliyun.com/repository/central") }
-        maven { url = uri("https://repo1.maven.org/maven2/") }
     }
 
     dependencies {
@@ -70,10 +58,6 @@ subprojects {
         
         // Cloud
         implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0")
-        
-        // Monitoring
-        implementation("io.micrometer:micrometer-registry-prometheus")
-        implementation("io.opentelemetry:opentelemetry-api:1.32.0")
         
         // Documentation
         implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")

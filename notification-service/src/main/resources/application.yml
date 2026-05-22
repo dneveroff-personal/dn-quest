@@ -1,7 +1,5 @@
 server:
   port: 8086
-  servlet:
-    context-path: /api/notifications
 
 spring:
   application:
@@ -112,7 +110,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
@@ -121,10 +119,10 @@ management:
   health:
     mail:
       enabled: false
-  prometheus:
-    metrics:
-      export:
-        enabled: false
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:
@@ -145,6 +143,9 @@ spring:
     activate:
       on-profile: dev
 
+  sleuth:
+    enabled: true
+
 logging:
   level:
     dn.quest.notification: DEBUG
@@ -154,20 +155,20 @@ spring:
   config:
     activate:
       on-profile: prod
-  
+
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
-  
+
   mail:
     host: ${SMTP_HOST}
     port: ${SMTP_PORT}
     username: ${SMTP_USERNAME}
     password: ${SMTP_PASSWORD}
 
-telegram:
-  bot:
-    token: ${TELEGRAM_BOT_TOKEN}
-    username: ${TELEGRAM_BOT_USERNAME}
+  telegram:
+    bot:
+      token: ${TELEGRAM_BOT_TOKEN}
+      username: ${TELEGRAM_BOT_USERNAME}
 
 logging:
   level:

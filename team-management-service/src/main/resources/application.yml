@@ -1,7 +1,5 @@
 server:
   port: 8085
-  servlet:
-    context-path: /api
 
 spring:
   application:
@@ -9,6 +7,16 @@ spring:
   
   profiles:
     active: dev
+  
+  # Enable distributed tracing
+  sleuth:
+    enabled: true
+  otel:
+    exporter:
+      otlp:
+        endpoint: http://jaeger-dev:14268
+    service:
+      name: team-management-service
   
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_teams}
@@ -162,17 +170,17 @@ logging:
 
 # Метрики и мониторинг
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: always
-  metrics:
-    export:
-      prometheus:
-        enabled: true
 
 # Feign настройки
 feign:
@@ -207,22 +215,3 @@ async:
 scheduling:
   pool:
     size: 3
-
----
-# Development profile
-spring:
-  config:
-    activate:
-      on-profile: dev
-
-  # Disable tracing in development to avoid connection errors to Zipkin
-  sleuth:
-    enabled: false
-
-management:
-  tracing:
-    enabled: false
-
-logging:
-  level:
-    dn.quest.teammanagement: DEBUG

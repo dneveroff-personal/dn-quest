@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
  * REST контроллер для управления уведомлениями
  */
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/notifications")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Notification Management", description = "API для управления уведомлениями")

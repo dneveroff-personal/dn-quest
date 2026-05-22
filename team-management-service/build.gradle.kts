@@ -20,11 +20,6 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
-}
-
 dependencies {
     // Spring Boot Starters
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -44,6 +39,11 @@ dependencies {
     // Feign Client
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     
+    // Tracing - Micrometer with OTLP export to Jaeger
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
+    
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     
@@ -57,9 +57,6 @@ dependencies {
     
     // Shared module
     implementation(project(":dn-quest-shared"))
-    
-    // Micrometer for metrics
-    implementation("io.micrometer:micrometer-registry-prometheus")
     
     // Test Dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -25,7 +25,7 @@ import java.util.UUID;
  * Контроллер для управления статистикой пользователей
  */
 @RestController
-@RequestMapping("/api/users/statistics")
+@RequestMapping("/users/statistics")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "User Statistics", description = "API для управления статистикой пользователей")

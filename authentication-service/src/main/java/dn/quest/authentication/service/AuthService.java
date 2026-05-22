@@ -3,6 +3,8 @@ package dn.quest.authentication.service;
 import dn.quest.authentication.dto.*;
 import dn.quest.shared.dto.UserDTO;
 
+import java.util.Map;
+
 /**
  * Сервис аутентификации пользователей
  */
@@ -62,4 +64,11 @@ public interface AuthService {
      * Получение имени пользователя из токена
      */
     String extractUsername(String token);
+
+    /**
+     * Получение деталей токена для валидации
+     * @param token JWT токен
+     * @return Map с данными токена (username, userId, role, expiresIn) или пустой Map если токен невалиден
+     */
+    Map<String, Object> getTokenDetails(String token);
 }

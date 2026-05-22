@@ -20,9 +20,13 @@ configurations {
     }
 }
 
-repositories {
-    maven { url = uri("https://maven.aliyun.com/repository/central") }
-    mavenCentral()
+// Repositories are configured in settings.gradle.kts
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:3.2.0")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:2023.0.0")
+    }
 }
 
 extra["springCloudVersion"] = "2023.0.0"
@@ -38,6 +42,12 @@ dependencies {
     // Spring Cloud Gateway
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j")
+    
+    // Tracing - Micrometer with OpenTelemetry bridge and OTLP exporter
+    implementation("io.micrometer:micrometer-tracing-bridge-otel:1.3.0")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp:1.32.0")
+    // OpenTelemetry instrumentation for Spring WebFlux 6 - temporarily removed due to missing artifact
+    // implementation("io.opentelemetry.instrumentation:opentelemetry-spring-webflux:1.29.0")
 
     // Spring Cloud LoadBalancer
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
@@ -49,10 +59,6 @@ dependencies {
 
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
-
-    // Monitoring
-    implementation("io.micrometer:micrometer-registry-prometheus")
-    implementation("io.opentelemetry:opentelemetry-api")
 
     // Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
@@ -79,11 +85,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers")
 }
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
-}
+
 
 // === Main class for Spring Boot (правильный способ в Kotlin DSL) ===
 tasks.bootJar {

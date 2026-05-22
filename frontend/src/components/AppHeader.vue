@@ -96,8 +96,7 @@
     <div class="flex flex-wrap gap-3 mt-4 justify-center">
       <n-button
           v-if="!currentUser"
-          to="/login"
-          tag="router-link"
+          @click="goToLogin"
           type="primary"
           size="large"
           class="px-6"
@@ -107,11 +106,10 @@
         </template>
         Войти
       </n-button>
-      
+
       <n-button
           v-if="!currentUser"
-          to="/register"
-          tag="router-link"
+          @click="goToRegister"
           type="info"
           size="large"
           class="px-6"
@@ -124,8 +122,7 @@
       
       <n-button
           v-if="currentUser?.role === 'ADMIN'"
-          to="/admin/users/manage"
-          tag="router-link"
+          @click="goToUserManage"
           type="warning"
           size="large"
           class="px-6"
@@ -133,7 +130,7 @@
         <template #icon>
           <span>👑</span>
         </template>
-        Управление
+        Управление пользователями
       </n-button>
       
       <n-button
@@ -168,7 +165,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   NButton,
@@ -252,6 +249,18 @@ async function loadInvitationCount() {
       showMessage: false,
     });
   }
+}
+
+function goToLogin() {
+  router.push("/login");
+}
+
+function goToRegister() {
+  router.push("/register");
+}
+
+function goToUserManage() {
+  router.push("/admin/users/manage");
 }
 
 function logout() {

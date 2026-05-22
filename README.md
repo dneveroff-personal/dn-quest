@@ -19,7 +19,6 @@
 - [Микросервисы](#-микросервисы)
 - [Технологический стек](#-технологический-стек)
 - [Запуск](#-запуск)
-- [Зависимости сервисов](#-зависимости-сервисов)
 - [Конфигурация](#-конфигурация)
 - [Мониторинг](#-мониторинг)
 - [Безопасность](#-безопасность)
@@ -31,11 +30,12 @@
 ### Предварительные требования
 
 | Инструмент | Версия | Назначение |
-|-------------|--------|------------|
+|------------|--------|------------|
 | Docker | 24.0+ | Контейнеризация |
 | Docker Compose | 2.20+ | Оркестрация сервисов |
 | Java | 21 | Среда выполнения |
 | Gradle | 8.5 | Сборка проекта |
+| Node.js | 18+ | Среда для frontend |
 
 ### Запуск за 5 минут
 
@@ -44,104 +44,72 @@
 git clone https://github.com/your-repo/dn-quest.git
 cd dn-quest
 
-# 2. Сборка проекта
+# 2. Сборка проекта (backend)
 make build
 
-# 3. Запуск всех сервисов
+# 3. Сборка frontend
+cd frontend && npm install && npm run build
+
+# 4. Запуск всех сервисов
 make dev-up
 
-# 4. Проверка статуса
+# 5. Проверка статуса
 make status
 ```
 
 После запуска доступны:
 
-| Сервис        | URL                                   | Учётные данные          | Примечание |
-|---------------|---------------------------------------|-------------------------|------------|
-| Frontend      | http://localhost:3000                 | —                       | |
-| API Gateway   | http://localhost:8080                 | admin / admin           | |
-| Swagger UI    | http://localhost:8080/swagger-ui.html | admin / admin           | |
-| Kafka UI      | http://localhost:8089                 | -                       | |
-| MinIO Console | http://localhost:9001                 | minioadmin / minioadmin | |
-
-**Дополнительные сервисы мониторинга (в разработке)** (в `docker/` директории):
-
-| Сервис | URL | Учётные данные | Конфигурация |
+| Сервис | URL | Учётные данные | Примечание |
 |--------|-----|--------|------------|
-| Grafana | http://localhost:3001 | admin / admin | `docker/grafana/` |
-| Jaeger | http://localhost:16686 | — | `docker/jaeger/` |
-| Prometheus | http://localhost:9090 | — | `docker/prometheus/` |
+| Frontend | http://localhost:3000 | — | Vue.js приложение |
+| API Gateway | http://localhost:8080 | admin / admin | Основная точка входа |
+| Swagger UI | http://localhost:8080/swagger-ui.html | admin / admin | API документация |
+| Kafka UI | http://localhost:8089 | — | Управление топиками |
+| pgAdmin | http://localhost:5432 | — | Администрирование PostgreSQL |
+| MinIO Console | http://localhost:9001 | minioadmin / minioadmin | S3 хранилище |
+| Jaeger | http://localhost:16686 | — | Трассировка |
 
 ---
 
 ## 🏗️ Архитектура
 
 ### Высокоуровневая схема
-```
-graph TB
-    Frontend["Frontend<br/>:3000"] --> Gateway["API Gateway<br/>:8080"]
-    
-    Gateway --> Auth["Auth Service<br/>:8081"]
-    Gateway --> User["User Management<br/>:8082"]
-    Gateway --> Quest["Quest Management<br/>:8083"]
-    Gateway --> Game["Game Engine<br/>:8084"]
-    Gateway --> Team["Team Management<br/>:8085"]
-    Gateway --> Notify["Notification<br/>:8086"]
-    Gateway --> Stats["Statistics<br/>:8087"]
-    Gateway --> Files["File Storage<br/>:8088"]
-    
-    Kafka{"Apache Kafka<br/>:9092"} 
-    Auth --> Kafka
-    Quest --> Kafka
-    Game --> Kafka
-    Team --> Kafka
-    Notify --> Kafka
-    Stats --> Kafka
-    
-    PostgreSQL["PostgreSQL<br/>:5432"]
-    Redis["Redis<br/>:6379"]
-    MinIO["MinIO<br/>:9000"]
 
 ```
-```
-                                    ┌─────────────────┐
-                                    │   Frontend      │
-                                    │   (Vue.js)      │
-                                    └────────┬────────┘
-                                             │
-                                    ┌────────▼────────┐
-                                    │  API Gateway   │
-                                    │  :8080        │
-                                    ���────────┬────────┘
-                                             │
-           ┌─────────────────────────────────┼─────────────────────────────────┐
-           │                                 │                                 │
-    ┌──────▼──────┐                  ┌──────▼──────┐                  ┌──────▼──────┐
-    │  Auth       │                  │  Game       │                  │  Quest      │
-    │  Service   │                  │  Engine     │                  │  Management │
-    │  :8081     │                  │  :8084     │                  │  :8083     │
-    └──────┬──────┘                  └──────┬──────┘                  └──────┬──────┘
-           │                                 │                                 │
-    ┌──────▼──────┐                  ┌──────▼──────┐                  ┌──────▼──────┐
-    │  User      │                  │  Team       │                  │  File      │
-    │  Management│                  │  Management │                  │  Storage   │
-    │  :8082     │                  │  :8085      │                  │  :8088     │
-    └──────┬──────┘                  └──────┬──────┘                  └──────┬──────┘
-           │                                 │                                 │
-           └─────────────────────────────────┼─────────────────────────────────┘
-                                             │
-                                  ┌─────────▼──────────┐
-                                  │  Notification     │
-                                  │  :8086            │
-                                  └─────────┬──────────┘
-                                             │
-                                  ┌─────────▼──────────┐
-                                  │  Statistics       │
-                                  │  :8087            │
-                                  └─────────────────────┘
+                            ┌─────────────────┐
+                            │    Frontend     │
+                            │   (Vue.js)      │
+                            │   :3000         │
+                            └────────┬────────┘
+                                     │
+                            ┌────────▼────────┐
+                            │   API Gateway  │
+                            │    :8080       │
+                            └────────┬────────┘
+                                     │
+    ┌──────────────┬──────────────┬──┴────┬──────────────┬──────────────┐
+    │              │              │       │              │              │
+┌───▼───┐     ┌────▼────┐   ┌────▼────┐ ┌───▼────┐   ┌───▼────┐   ┌────▼────┐
+│ Auth  │     │  User   │   │  Quest  │ │ Game   │   │ Team  │   │  File   │
+│:8081  │     │ :8082   │   │ :8083   │ │ :8084  │   │:8085  │   │ :8088   │
+└───┬───┘     └────┬────┘   └────┬────┘ └───┬────┘   └───┬────┘   └────┬────┘
+    │              │              │         │         │              │
+    └──────────────┴──────────────┴─────────┴─────────┴──────────────┘
+                                     │
+                            ┌────────▼────────┐
+                            │    Kafka        │
+                            │   :9092         │
+                            └────────┬────────┘
+                                     │
+    ┌──────────────┬────────────────┼────────────────┬──────────────┐
+    │              │                │                │              │
+┌───▼───┐     ┌────▼────┐   ┌──────▼──────┐  ┌──────▼──────┐  ┌────▼────┐
+│Notify │     │ Stats   │   │ PostgreSQL   │  │   Redis     │  │  MinIO  │
+│:8086  │     │ :8087   │   │   :5432      │  │   :6379     │  │ :9000   │
+└───────┘     └─────────┘   └─────────────┘  └─────────────┘  └─────────┘
 ```
 
-### Схема событийной шины
+### Событийная архитектура (Kafka)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -149,11 +117,12 @@ graph TB
 │                    (Событийная шина сообщений)                             │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │  Topics:                                                                   │
-│  • dn-quest.users.events     — События пользователей                       │
+│  • dn-quest.users.events     — События пользователей                        │
 │  • dn-quest.quests.events   — События квестов                             │
-│  • dn-quest.game.events     — События игрового процесса                      │
-│  • dn-quest.teams.events   — События к��манд                                │
-│  • dn-quest.notifications  — Уведомления                                  │
+│  • dn-quest.game.events     — События игрового процесса                   │
+│  • dn-quest.teams.events    — События команд                              │
+│  • dn-quest.notifications   — Уведомления                                 │
+│  • dn-quest.files.events    — События файлов                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -163,28 +132,26 @@ graph TB
 
 ### 1. API Gateway (порт: 8080)
 
-[![Spring Cloud Gateway](https://img.shields.io/badge/Spring%20Cloud%20Gateway-6DB33F?style=flat)](https://spring.io/projects/spring-cloud-gateway)
-
 **Описание:** Единая точка входа для всех микросервисов. Обеспечивает маршрутизацию запросов, JWT-аутентификацию и rate limiting.
 
 **Функции:**
 - Маршрутизация запросов к соответствующим сервисам
 - JWT-валидация и генерация токенов
 - Rate limiting на основе Redis
-- Circuit breaker для отказоустойчивости
+- Circuit breaker (Resilience4j) для отказоустойчивости
 - CORS конфигурация
 - Логирование и трассировка
 
 **Эндпоинты:**
 ```
-/api/auth/**          → Authentication Service (:8081, /api/auth)
+/api/auth/**         → Authentication Service (:8081, /api/auth)
 /api/users/**        → User Management Service (:8082, /api/users)
-/api/quests/**      → Quest Management Service (:8083, /api/quests)
-/api/game/**       → Game Engine Service (:8084, /api/game)
-/api/teams/**      → Team Management Service (:8085, /api)
-/api/notifications → Notification Service (:8086, /api/notifications)
-/api/statistics/** → Statistics Service (:8087, /api/stats)
-/api/files/**      → File Storage Service (:8088, /api/files)
+/api/quests/**       → Quest Management Service (:8083, /api/quests)
+/api/game/**         → Game Engine Service (:8084, /api/game)
+/api/teams/**        → Team Management Service (:8085, /api)
+/api/notifications   → Notification Service (:8086, /api/notifications)
+/api/statistics/**   → Statistics Service (:8087, /api/stats)
+/api/files/**        → File Storage Service (:8088, /api/files)
 ```
 
 ### 2. Authentication Service (порт: 8081, context-path: /api/auth)
@@ -195,14 +162,11 @@ graph TB
 - Регистрация пользователей
 - Вход по логину/паролю
 - Генерация и валидация JWT токенов (access + refresh)
-- Сброс пароля
+- Сброс и изменение пароля
 - Управление разрешениями (permissions)
 - Интеграция с Kafka для событий пользователей
 
 **База данных:** PostgreSQL (схема `auth`)
-
-**Топики Kafka:**
-- `dn-quest.users.events` — События пользователей
 
 ### 3. User Management Service (порт: 8082, context-path: /api/users)
 
@@ -239,7 +203,7 @@ graph TB
 - Валидация ответов на задания
 - Подсчёт очков и времени
 - Лидерборды в реальном времени
-- Интеграция с Redis для ��эширования
+- Интеграция с Redis для кэширования
 
 **База данных:** PostgreSQL (схема `game`)
 
@@ -251,7 +215,6 @@ graph TB
 - Создание и управление командами
 - Приглашение участников
 - Управление ролями в команде (лидер, участник)
-- Чат команды
 - Командные статистики
 
 **База данных:** PostgreSQL (схема `teams`)
@@ -283,7 +246,6 @@ graph TB
 - Командные рейтинги
 - Аналитика активности
 - Экспорт отчётов
-- Интеграция с Elasticsearch
 
 **База данных:** PostgreSQL (схема `statistics`)
 
@@ -306,11 +268,11 @@ graph TB
 ### Backend
 
 | Технология | Версия | Назначение |
-|-------------|--------|------------|
+|------------|--------|------------|
 | Java | 21 | Язык программирования |
 | Kotlin | 1.9.20 | Дополнительный язык |
 | Spring Boot | 3.2.0 | Фреймворк |
-| Spring Cloud | 4.1.x | Облачные компоненты |
+| Spring Cloud Gateway | 4.1.x | API Gateway |
 | Spring Data JPA | 3.2.x | ORM |
 | PostgreSQL | 16 | Основная БД |
 | Redis | 7 | Кэширование, сессии |
@@ -320,7 +282,7 @@ graph TB
 ### Frontend
 
 | Технология | Версия | Назначение |
-|-------------|--------|------------|
+|------------|--------|------------|
 | Vue.js | 3.x | Фреймворк |
 | Vite | 5.x | Сборщик |
 | Axios | ^1.6 | HTTP клиент |
@@ -329,15 +291,12 @@ graph TB
 ### Инфраструктура и мониторинг
 
 | Технология | Версия | Назначение |
-|-------------|--------|------------|
+|------------|--------|------------|
 | Docker | 24+ | Контейнеризация |
 | Docker Compose | 2.20+ | Оркестрация |
 | Grafana | 10.x | Мониторинг |
 | Prometheus | 2.x | Метрики |
 | Jaeger | 1.x | Трассировка |
-| Elasticsearch | 8.x | Логи |
-| Logstash | 8.x | Сбор логов |
-| Kibana | 8.x | Визуализация логов |
 
 ---
 
@@ -350,8 +309,8 @@ graph TB
 # Сборка
 # =============================================
 
-make build               # Полная пересборка всех сервисов
-make build-service      # Пересобрать один сервис
+make build               # Полная пересборка всех сервисов (без тестов)
+make build-service      # Пересобрать один сервис: make build-service SERVICE=game-engine-service
 make test               # Запустить все тесты
 make check              # Проверка качества кода
 
@@ -369,17 +328,17 @@ make dev-restart       # Полный перезапуск
 # Управление сервисами
 # =============================================
 
-make logs SERVICE=xxx  # Логи сервиса
-make status           # Статус всех контейнеров
-make stats            # Использование ресурсов
+make logs SERVICE=xxx   # Логи сервиса: make logs SERVICE=api-gateway-dev
+make status            # Статус всех контейнеров
+make stats             # Использование ресурсов
 
 # =============================================
 # Консоли
 # =============================================
 
-make minio-console     # Открыть MinIO Console
-make swagger         # Открыть Swagger UI
-make pgadmin         # Открыть pgAdmin
+make minio-console      # Открыть MinIO Console
+make swagger           # Открыть Swagger UI
+make pgadmin           # Открыть pgAdmin
 ```
 
 ### Ручной запуск
@@ -388,6 +347,9 @@ make pgadmin         # Открыть pgAdmin
 # Запуск инфраструктуры
 docker compose -f docker-compose.dev.yml up -d postgres-dev redis-dev zookeeper-dev kafka-dev minio-dev
 
+# Сборка jar файлов
+./gradlew clean build -x test
+
 # Запуск микросервисов
 docker compose -f docker-compose.dev.yml up -d --build
 
@@ -395,68 +357,17 @@ docker compose -f docker-compose.dev.yml up -d --build
 docker compose -f docker-compose.dev.yml down -v --remove-orphans
 ```
 
----
+### Запуск только инфраструктуры
 
-## 🔗 Зависимости сервисов
-
-### Диаграмма зависимостей
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           ИНФРАСТРУКТУРА                                   │
-│    PostgreSQL ─── Redis ─── Kafka ─── MinIO                               │
-└────────────���─���──────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    .authentication-service                                    │
-│              (Аутентификация, JWT токены)                                 │
-│                        :8081                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-           │                                             │
-           ▼                                             ▼
-┌─────────────────────────────┐         ┌─────────────────────────────────┐
-│  user-management-service   │         │       file-storage-service     │
-│     Управление профилями   │         │        Хранение файлов        │
-│           :8082            │         │            :8088                │
-└─────────────────────────────┘         └─────────────────────────────────┘
-           │                                             │
-           ▼                                             ▼
-┌─────────────────────────────┐         ┌─────────────────────────────────┐
-│  quest-management-service  │         │    team-management-service     │
-│      Управление квестами   │         │      Управление командами     │
-│           :8083            │         │            :8085                │
-└─────────────────────────────┘         └─────────────────────────────────┘
-           │                                             │
-           ▼                                             ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        game-engine-service                                 │
-│                   Игровая логика, обработка кодов                        │
-│                              :8084                                        │
-└─────────────────────────────────────────────────────────────────────────────┘
-           │                              │                              │
-           ▼                              ▼                              ▼
-┌─────────────────────────────┐ ┌─────────────────────────────┐ ┌──────────────┐
-│  notification-service      │ │  statistics-service       │ │  API Gateway│
-│     Уведомления           │ │     Статистика            │ │   :8080     │
-│         :8086             │ │         :8087             │ └──────────────┘
-└─────────────────────────────┘ └─────────────────────────────┘
+```bash
+make dev-infra
 ```
 
-### Kafka
-
-![kafka_schema.png](docs/kafka_schema.png)
-
-
-### Порядок запуска
-
-1. **Инфраструктура:** PostgreSQL → Redis → Kafka → MinIO
-2. **Authentication Service** (базовый сервис)
-3. **User Management Service** → **File Storage Service**
-4. **Quest Management Service** → **Team Management Service**
-5. **Game Engine Service** (зависит от Quest + Team)
-6. **Notification Service** → **Statistics Service**
-7. **API Gateway** (точка входа)
+После запуска инфраструктуры доступны:
+- PostgreSQL: localhost:5432
+- Redis: localhost:6379
+- Kafka: localhost:9092
+- MinIO: localhost:9000 (console: localhost:9001)
 
 ---
 
@@ -464,17 +375,7 @@ docker compose -f docker-compose.dev.yml down -v --remove-orphans
 
 ### Переменные окружения
 
-| Переменная | Описание | Значение по умолчанию |
-|------------|----------|----------------------|
-| `POSTGRES_PASSWORD` | Пароль PostgreSQL | dn |
-| `REDIS_HOST` | Хост Redis | localhost |
-| `KAFKA_BOOTSTRAP_SERVERS` | Kafka серверы | kafka-dev:29092 |
-| `MINIO_ACCESS_KEY` | MinIO ключ | minioadmin |
-| `MINIO_SECRET_KEY` | MinIO секрет | minioadmin |
-| `JWT_SECRET` | Секрет JWT | ... |
-| `JWT_EXPIRATION` | Срок жизни JWT (мс) | 86400000 |
-
-### Настройка .env файла
+Основные переменные находятся в файле `.env`. Для локальной разработки создайте `.env.local`:
 
 ```bash
 # Копировать и настроить
@@ -484,10 +385,30 @@ cp .env .env.local
 nano .env.local
 ```
 
+| Переменная | Описание | Значение по умолчанию |
+|------------|----------|----------------------|
+| `POSTGRES_PASSWORD` | Пароль PostgreSQL | dn |
+| `REDIS_HOST` | Хост Redis | localhost |
+| `KAFKA_BOOTSTRAP_SERVERS` | Kafka серверы | kafka-dev:29092 |
+| `MINIO_ACCESS_KEY` | MinIO ключ | minioadmin |
+| `MINIO_SECRET_KEY` | MinIO секрет | minioadmin |
+| `JWT_SECRET` | Секрет JWT | dnQuestSecretKeyForJWTTokenGenerationAndValidation2024 |
+| `JWT_EXPIRATION` | Срок жизни access токена (мс) | 900000 (15 мин) |
+| `JWT_REFRESH_EXPIRATION` | Срок жизни refresh токена (мс) | 604800000 (7 дней) |
+
+### Frontend конфигурация
+
+Настройки frontend находятся в `frontend/.env.development`:
+
+```
+VITE_API_URL=http://localhost:8080
+VITE_WS_URL=ws://localhost:8080
+```
+
 ### Профили Spring
 
 | Профиль | Назначение |
-|---------|----------|
+|---------|------------|
 | `dev` | Локальная разработка |
 | `test` | Тестирование |
 | `prod` | Production |
@@ -496,24 +417,35 @@ nano .env.local
 
 ## 📊 Мониторинг
 
-> **Примечание:** Сервисы мониторинга (Grafana, Jaeger, Elasticsearch, Kibana) находятся в директории `docker/` и могут требовать отдельного запуска.
-
 ### Доступные дашборды
 
-| Инструмент | URL | Описание | Конфигурация |
-|------------|-----|-----------|-------------|
-| Grafana | http://localhost:3001 | Метрики и дашборды | `docker/grafana/` |
-| Jaeger | http://localhost:16686 | Распределённая трассировка | `docker/jaeger/` |
-| Prometheus | http://localhost:9090 | Сбор метрик | `docker/prometheus/` |
-| Elasticsearch | http://localhost:9200 | Поиск логов | `docker/elasticsearch/` |
-| Kibana | http://localhost:5601 | Визуализация логов | `docker/kibana/` |
+| Инструмент | URL | Описание |
+|------------|-----|-----------|
+| Grafana | http://localhost:3001 | Метрики и дашборды |
+| Jaeger | http://localhost:16686 | Распределённая трассировка |
+| Prometheus | http://localhost:9090 | Сбор метрик |
+| Kafka UI | http://localhost:8089 | Управление топиками |
 
-### Метрики
+### Метрики сервисов
 
 - **API Gateway:** Rate limiting, количество запросов, время отклика
 - **Authentication:** Входы, регистрации, ошибки аутентификации
 - **Game Engine:** Активные сессии, количество игроков
 - **Database:** Запросы, время выполнения, соединения
+
+### Проверка здоровья сервисов
+
+```bash
+make health
+```
+
+или через curl:
+
+```bash
+curl http://localhost:8080/api/actuator/health
+curl http://localhost:8081/auth/actuator/health
+curl http://localhost:8082/users/actuator/health
+```
 
 ---
 
@@ -523,7 +455,7 @@ nano .env.local
 
 - [ ] Изменить все пароли по умолчанию
 - [ ] Настроить HTTPS (SSL/TLS сертификаты)
-- [ ] Сменить `JWT_SECRET` на безопасное значение
+- [ ] Сменить `JWT_SECRET` на безопасное значение (минимум 256 бит)
 - [ ] Настроить firewall (открыть только необходимые порты)
 - [ ] Включить мониторинг и алерты
 - [ ] Настроить резервное копирование БД
@@ -533,23 +465,38 @@ nano .env.local
 ### Порты для firewall
 
 ```
-80, 443   - HTTP/HTTPS
-3000       - Frontend
-8080       - API Gateway
-5432       - PostgreSQL
-6379       - Redis
-9092       - Kafka
+80, 443     - HTTP/HTTPS
+3000        - Frontend
+8080        - API Gateway
+5432        - PostgreSQL
+6379        - Redis
+9092        - Kafka
 ```
 
 ---
 
-## 📚 Документация
+## 📂 Структура проекта
 
-- [Руководство по Docker](docs/docker-configuration-guide.md)
-- [Архитектура микросервисов](docs/microservices-architecture.md)
-- [Интеграци�� Kafka](docs/kafka-integration.md)
-- [Мониторинг и метрики](docs/monitoring-guide.md)
-- [Тестирование](docs/testing-guide.md)
+```
+dn-quest/
+├── api-gateway/           # API Gateway сервис
+├── authentication-service/ # Сервис аутентификации
+├── user-management-service/ # Управление пользователями
+├── quest-management-service/ # Управление квестами
+├── game-engine-service/  # Игровой движок
+├── team-management-service/ # Управление командами
+├── notification-service/ # Сервис уведомлений
+├── statistics-service/  # Сервис статистики
+├── file-storage-service/ # Хранение файлов
+├── dn-quest-shared/      # Общие библиотеки и компоненты
+├── frontend/             # Vue.js фронтенд
+├── docker/               # Конфигурации Docker
+├── docs/                 # Документация
+│   └── user-guide.md     # Руководство пользователя
+├── Makefile              # Команды для разработки
+├── docker-compose.dev.yml # Docker Compose конфигурация
+└── .env                  # Переменные окружения
+```
 
 ---
 
@@ -559,6 +506,6 @@ MIT License
 
 ---
 
-## 👨‍💻 Авторы
+## 👨‍💻 Автор
 
 Denis Neverov

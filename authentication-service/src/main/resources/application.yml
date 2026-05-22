@@ -1,15 +1,24 @@
 server:
   port: 8081
-  servlet:
-    context-path: /api/auth
 
+# Enable distributed tracing
 spring:
   application:
     name: authentication-service
-  
+
   profiles:
     active: dev
-  
+
+  # Distributed tracing (OpenTelemetry/Jaeger)
+  sleuth:
+    enabled: true
+  otel:
+    exporter:
+      otlp:
+        endpoint: http://jaeger-dev:14268
+    service:
+      name: authentication-service
+
   # Database Configuration
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/dnquest_auth}
@@ -94,8 +103,8 @@ spring:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:dnQuestSecretKeyForJWTTokenGenerationAndValidation2024}
-  access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}  # 15 minutes
-  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
   issuer: ${JWT_ISSUER:dn-quest-auth-service}
 
 # Management Endpoints
@@ -103,26 +112,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: always
-  metrics:
-    distribution:
-      percentiles-histogram:
-        http.server.requests: true
-        spring.data.repository.invocations: true
-      percentiles:
-        http.server.requests: 0.5,0.95,0.99
-        spring.data.repository.invocations: 0.5,0.95,0.99
-    tags:
-      application: ${spring.application.name}
-      environment: ${spring.profiles.active}
-  tracing:
-    sampling:
-      probability: 1.0
-    zipkin:
-      endpoint: ${ZIPKIN_URL:http://zipkin:9411}/api/v2/spans
   info:
     env:
       enabled: true
@@ -130,10 +123,10 @@ management:
       enabled: true
     os:
       enabled: true
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
 
 # Logging Configuration
 logging:
@@ -160,13 +153,8 @@ spring:
     activate:
       on-profile: dev
 
-  # Disable tracing in development to avoid connection errors to Zipkin
   sleuth:
-    enabled: false
-
-management:
-  tracing:
-    enabled: false
+    enabled: true
 
   jpa:
     show-sql: true
@@ -185,10 +173,10 @@ spring:
   config:
     activate:
       on-profile: prod
-  
+
   jpa:
     show-sql: false
-  
+
   # Production Database
   datasource:
     url: ${DATABASE_URL}
@@ -212,3 +200,10 @@ logging:
     org.springframework.web: WARN
   file:
     name: /var/log/dn-quest/authentication-service.log
+
+# Production Tracing
+management:
+  tracing:
+    sampling:
+      probability: 0.1
+    enabled: true

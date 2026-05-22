@@ -114,14 +114,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health,info
   endpoint:
     health:
       show-details: when-authorized
-  prometheus:
-    metrics:
-      export:
-        enabled: true
 
 logging:
   level:
@@ -142,16 +138,17 @@ spring:
     activate:
       on-profile: dev
 
-  # Disable tracing in development to avoid connection errors to Zipkin
   sleuth:
-    enabled: false
-
-management:
-  tracing:
-    enabled: false
+    enabled: true
 
   jpa:
     show-sql: true
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
 
 logging:
   level:
@@ -162,7 +159,7 @@ spring:
   config:
     activate:
       on-profile: prod
-  
+
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
@@ -170,17 +167,17 @@ spring:
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10
-  
+
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
 
-minio:
-  endpoint: ${MINIO_ENDPOINT}
-  access-key: ${MINIO_ACCESS_KEY}
-  secret-key: ${MINIO_SECRET_KEY}
-  bucket-name: ${MINIO_BUCKET_NAME}
+  minio:
+    endpoint: ${MINIO_ENDPOINT}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket-name: ${MINIO_BUCKET_NAME}
 
 logging:
   level:
@@ -193,18 +190,18 @@ spring:
   config:
     activate:
       on-profile: test
-  
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: 
-  
+    password:
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
-  
+
   h2:
     console:
       enabled: true
