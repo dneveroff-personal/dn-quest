@@ -85,23 +85,6 @@ build-service: ## Пересобрать один сервис: make build-servi
 	@echo "$(GREEN)Пересборка $(SERVICE)...$(RESET)"
 	./gradlew :$(SERVICE):clean :$(SERVICE):bootJar -x test
 
-# Frontend build commands
-frontend-install: ## Установить зависимости фронтенда
-	@echo "$(GREEN)Установка зависимостей фронтенда...$(RESET)"
-	cd frontend && npm install
-
-frontend-build: ## Собрать фронтенд (npm run build)
-	@echo "$(GREEN)Сборка фронтенда...$(RESET)"
-	cd frontend && npm run build
-
-frontend-dev: ## Запустить фронтенд в dev-режиме (vite dev server)
-	@echo "$(GREEN)Запуск фронтенда в dev-режиме...$(RESET)"
-	cd frontend && npm run dev
-
-frontend-test: ## Запустить тесты фронтенда
-	@echo "$(GREEN)Запуск тестов фронтенда...$(RESET)"
-	cd frontend && npm test
-
 test: ## Запустить все тесты
 	@echo "$(GREEN)Запуск тестов...$(RESET)"
 	./gradlew test --parallel
@@ -133,10 +116,6 @@ dev-infra: ## Запустить только инфраструктуру
 	@echo "$(GREEN)Запуск инфраструктуры...$(RESET)"
 	docker compose -f docker-compose.dev.yml up -d --build $(INFRA_SERVICES)
 
-dev-all: ## Запустить инфраструктуру + все микросервисы
-	@echo "$(GREEN)Запуск полного окружения...$(RESET)"
-	docker compose -f docker-compose.dev.yml up -d --build
-
 dev-down: ## Остановить и удалить все контейнеры
 	@echo "$(YELLOW)Остановка всех сервисов...$(RESET)"
 	@echo "$(YELLOW)Остановка standalone kafka-ui контейнера...$(RESET)"
@@ -144,8 +123,9 @@ dev-down: ## Остановить и удалить все контейнеры
 	@docker rm -f dn-quest-kafka-ui 2>/dev/null || true
 	docker compose -f docker-compose.dev.yml down -v --remove-orphans
 
-dev-restart: ## Полный перезапуск
+dev-restart: ## Полный перезапуск с билдом
 	@$(MAKE) dev-down
+	@$(MAKE) build
 	@$(MAKE) dev-all
 
 dev-stopped: ## Показать остановленные контейнеры
