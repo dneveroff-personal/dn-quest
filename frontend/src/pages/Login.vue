@@ -85,6 +85,7 @@ async function doLogin() {
       window.dispatchEvent(new Event("user-changed"));
       message.success("Добро пожаловать!");
       router.push("/");
+      loading.value = false;
       return; // exit the function on success
     } catch (err) {
       lastError = err;

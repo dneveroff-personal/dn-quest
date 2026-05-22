@@ -40,7 +40,7 @@ public final class JwtUtil {
      * Генерирует access токен
      */
     public static String generateAccessToken(String secret, String subject, Map<String, Object> claims) {
-        return generateAccessToken(secret, subject, claims, DEFAULT_ACCESS_TOKEN_EXPIRATION, ISSUER);
+        return generateToken(secret, subject, claims, DEFAULT_ACCESS_TOKEN_EXPIRATION, ISSUER);
     }
     
     /**
@@ -49,19 +49,33 @@ public final class JwtUtil {
     public static String generateAccessToken(String secret, String subject, Map<String, Object> claims, long expiration) {
         return generateToken(secret, subject, claims, expiration, ISSUER);
     }
-    
+
+    /**
+     * Генерирует access токен с указанным временем жизни
+     */
+    public static String generateAccessToken(String secret, String subject, Map<String, Object> claims, long expiration, String issuer) {
+        return generateToken(secret, subject, claims, expiration, issuer);
+    }
+
     /**
      * Генерирует refresh токен
      */
-    public static String generateRefreshToken(String secret, String subject) {
+    public static String generateRefreshToken(String secret, String subject, long expiration) {
         return generateRefreshToken(secret, subject, DEFAULT_REFRESH_TOKEN_EXPIRATION, ISSUER);
     }
     
     /**
      * Генерирует refresh токен с указанным временем жизни
      */
-    public static String generateRefreshToken(String secret, String subject, long expiration) {
-        return generateToken(secret, subject, Map.of(), expiration, ISSUER);
+    public static String generateRefreshToken(String secret, String subject, long expiration, String issuer) {
+        return generateToken(secret, subject, Map.of(), expiration, issuer);
+    }
+
+    /**
+     * Генерирует refresh токен
+     */
+    public static String generateRefreshToken(String secret, String subject, String issuer) {
+        return generateToken(secret, subject, Map.of(), DEFAULT_REFRESH_TOKEN_EXPIRATION, issuer);
     }
     
     /**

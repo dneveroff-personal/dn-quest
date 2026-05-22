@@ -87,9 +87,14 @@ router.beforeEach(async (to, from, next) => {
             return next("/login");
         }
 
-        // Можно проверять валидность токена
+        // Получаем текущего пользователя
         const user = await fetchCurrentUser();
         if (!user) return next("/login");
+
+        // Проверяем роль, если она указана в маршруте
+        if (to.meta.role && user.role !== to.meta.role) {
+            return next("/");
+        }
     }
 
     next();

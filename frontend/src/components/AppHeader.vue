@@ -96,8 +96,7 @@
     <div class="flex flex-wrap gap-3 mt-4 justify-center">
       <n-button
           v-if="!currentUser"
-          to="/login"
-          tag="router-link"
+          @click="goToLogin"
           type="primary"
           size="large"
           class="px-6"
@@ -107,11 +106,10 @@
         </template>
         Войти
       </n-button>
-      
+
       <n-button
           v-if="!currentUser"
-          to="/register"
-          tag="router-link"
+          @click="goToRegister"
           type="info"
           size="large"
           class="px-6"
@@ -168,7 +166,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import {
   NButton,
@@ -252,6 +250,14 @@ async function loadInvitationCount() {
       showMessage: false,
     });
   }
+}
+
+function goToLogin() {
+  router.push("/login");
+}
+
+function goToRegister() {
+  router.push("/register");
 }
 
 function logout() {

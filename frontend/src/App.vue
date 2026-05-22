@@ -83,7 +83,7 @@ import AppHeader from "@/components/AppHeader.vue";
 import GameHeader from "@/components/GameHeader.vue";
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { fetchCurrentUser } from "@/services/auth";
+import { fetchCurrentUser, getCurrentUser } from "@/services/auth";
 import api from "@/services/api";
 
 const route = useRoute();
@@ -109,10 +109,25 @@ async function loadUser() {
   
   loading.value = true;
   try {
-    currentUser.value = await fetchCurrentUser();
+    // Сначала пытаемся взять пользователя из localStorage для мгновенного отображения
+    const cachedUser = getCurrentUser();
+    if (cachedUser) {
+      currentUser.value = cachedUser;
+    }
+    
+    // Затем обновляем данные с сервера
+    const user = await fetchCurrentUser();
+    if (user) {
+      currentUser.value = user;
+    } else if (!cachedUser) {
+      currentUser.value = null;
+    }
   } catch (error) {
     console.warn("Не удалось загрузить пользователя:", error);
-    currentUser.value = null;
+    // Оставляем кэшированного пользователя, если он есть
+    if (!currentUser.value) {
+      currentUser.value = null;
+    }
   } finally {
     loading.value = false;
   }

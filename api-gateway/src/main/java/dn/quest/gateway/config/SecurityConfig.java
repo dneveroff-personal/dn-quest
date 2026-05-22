@@ -1,5 +1,7 @@
 package dn.quest.gateway.config;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -7,9 +9,16 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+/**
+ * Конфигурация безопасности для API Gateway
+ */
 @Configuration
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
+
+    private final JwtSecurityContextRepository jwtSecurityContextRepository;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -34,12 +43,9 @@ public class SecurityConfig {
                         // Все остальные запросы требуют аутентификации
                         .anyExchange().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults())
+                .securityContextRepository(jwtSecurityContextRepository);
 
         return http.build();
     }
-
-    // In-memory пользователь для Basic Auth
-    // Удалён - используется стандартный пользователь из application.yml
-    // GatewayConfig предоставляет PasswordEncoder (BCrypt) для Spring Security
 }

@@ -1,6 +1,5 @@
 package dn.quest.gateway.config;
 
-import dn.quest.gateway.filter.AuthenticationFilter;
 import dn.quest.gateway.filter.LoggingFilter;
 import dn.quest.gateway.filter.SecurityHeadersFilter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class FilterConfig {
 
-    private final AuthenticationFilter authenticationFilter;
     private final LoggingFilter loggingFilter;
     private final SecurityHeadersFilter securityHeadersFilter;
 
@@ -73,7 +71,6 @@ public class FilterConfig {
                 .route("user-management-service", r -> r.path("/api/users/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -88,7 +85,6 @@ public class FilterConfig {
                 .route("quest-management-service", r -> r.path("/api/quests/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -103,7 +99,6 @@ public class FilterConfig {
                 .route("game-engine-service", r -> r.path("/api/game/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -118,7 +113,6 @@ public class FilterConfig {
                 .route("team-management-service", r -> r.path("/api/teams/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -133,7 +127,6 @@ public class FilterConfig {
                 .route("notification-service", r -> r.path("/api/notifications/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -148,7 +141,6 @@ public class FilterConfig {
                 .route("statistics-service", r -> r.path("/api/statistics/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config
@@ -163,7 +155,6 @@ public class FilterConfig {
                 .route("file-storage-service", r -> r.path("/api/files/**")
                         .filters(f -> f
                                 .filter(loggingFilter)
-                                .filter(authenticationFilter)
                                 .filter(securityHeadersFilter)
                                 .stripPrefix(1)
                                 .circuitBreaker(config -> config

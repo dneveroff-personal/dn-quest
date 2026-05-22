@@ -4,7 +4,8 @@
 
 .PHONY: help build build-service dev-up dev-down dev-restart logs logs-all status stats health clean minio-console swagger \
 	test test-service dependencies check format flyway-migrate volumes networks prune psql redis-cli kafka-cli \
-	dev-infra dev-up-service dev-db dev-redis inspect reload dev-all dev-stopped
+	dev-infra dev-up-service dev-db dev-redis inspect reload dev-all dev-stopped \
+	frontend-install frontend-build frontend-dev frontend-test
 
 # Простые ANSI цвета (работают везде: Windows, Linux, macOS, WSL, Git Bash)
 GREEN  := \033[32m
@@ -27,6 +28,10 @@ help: ## Показать все команды
 	@echo "$(GREEN)Сборка:$(RESET)"
 	@echo "  build               - Полная пересборка всех сервисов"
 	@echo "  build-service      - Пересобрать один сервис: make build-service SERVICE=file-storage-service"
+	@echo "  frontend-install   - Установить зависимости фронтенда"
+	@echo "  frontend-build     - Собрать фронтенд (npm run build)"
+	@echo "  frontend-dev       - Запустить фронтенд в dev-режиме (vite dev server)"
+	@echo "  frontend-test      - Запустить тесты фронтенда"
 	@echo "  test              - Запустить все тесты"
 	@echo "  test-service      - Запустить тесты для одного сервиса: make test-service SERVICE=authentication-service"
 	@echo "  dependencies     - Показать зависимости проекта"
@@ -51,7 +56,7 @@ help: ## Показать все команды
 	@echo "  reload          - Перезагрузить сервис: make reload SERVICE=authentication-service-dev"
 	@echo ""
 	@echo "$(GREEN)Инфраструктура:$(RESET)"
-	@echo "  dev-db          - По��ключиться к PostgreSQL: make dev-db DB=dnquest_auth"
+	@echo "  dev-db          - Поцключиться к PostgreSQL: make dev-db DB=dnquest_auth"
 	@echo "  dev-redis-cli   - Подключиться к Redis CLI"
 	@echo "  kafka-cli      - Подключиться к Kafka container"
 	@echo "  volumes        - Показать тома Docker"
@@ -79,6 +84,23 @@ build: ## Полная пересборка всех сервисов
 build-service: ## Пересобрать один сервис: make build-service SERVICE=file-storage-service
 	@echo "$(GREEN)Пересборка $(SERVICE)...$(RESET)"
 	./gradlew :$(SERVICE):clean :$(SERVICE):bootJar -x test
+
+# Frontend build commands
+frontend-install: ## Установить зависимости фронтенда
+	@echo "$(GREEN)Установка зависимостей фронтенда...$(RESET)"
+	cd frontend && npm install
+
+frontend-build: ## Собрать фронтенд (npm run build)
+	@echo "$(GREEN)Сборка фронтенда...$(RESET)"
+	cd frontend && npm run build
+
+frontend-dev: ## Запустить фронтенд в dev-режиме (vite dev server)
+	@echo "$(GREEN)Запуск фронтенда в dev-режиме...$(RESET)"
+	cd frontend && npm run dev
+
+frontend-test: ## Запустить тесты фронтенда
+	@echo "$(GREEN)Запуск тестов фронтенда...$(RESET)"
+	cd frontend && npm test
 
 test: ## Запустить все тесты
 	@echo "$(GREEN)Запуск тестов...$(RESET)"
