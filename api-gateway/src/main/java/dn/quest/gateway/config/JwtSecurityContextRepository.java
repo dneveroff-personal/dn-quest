@@ -29,6 +29,14 @@ public class JwtSecurityContextRepository implements ServerSecurityContextReposi
 
     @Override
     public Mono<SecurityContext> load(ServerWebExchange exchange) {
+        String path = exchange.getRequest().getPath().value();
+        
+        // Пропускаем публичные эндпоинты - возвращаем пустой контекст вместо Mono.empty()
+        // чтобы не блокировать запросы к публичным ресурсам
+        if (isPublicEndpoint(path)) {
+            return Mono.just(new SecurityContextImpl());
+        }
+        
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -48,11 +56,31 @@ public class JwtSecurityContextRepository implements ServerSecurityContextReposi
                 }
             }
         }
-        return Mono.empty();
+        // Для неавторизованных запросов к защищенным эндпоинтам возвращаем пустой контекст
+        // Spring Security сам обработает это как 401 Unauthorized
+        return Mono.just(new SecurityContextImpl());
     }
 
     @Override
     public Mono<Void> save(ServerWebExchange exchange, SecurityContext context) {
         return Mono.empty();
+    }
+    
+    private boolean isPublicEndpoint(String path) {
+        return path.startsWith("/api/auth/login") ||
+               path.startsWith("/api/auth/register") ||
+               path.startsWith("/api/auth/refresh") ||
+               path.startsWith("/api/auth/forgot-password") ||
+               path.startsWith("/api/auth/reset-password") ||
+               path.startsWith("/api/auth/validate") ||
+               path.startsWith("/actuator/health") ||
+               path.startsWith("/actuator/info") ||
+               path.startsWith("/api-docs") ||
+               path.startsWith("/swagger-ui.html") ||
+               path.startsWith("/swagger-ui") ||
+               path.startsWith("/v3/api-docs") ||
+               path.startsWith("/actuator/gateway-health") ||
+               path.equals("/") ||
+               path.startsWith("/webjars");
     }
 }

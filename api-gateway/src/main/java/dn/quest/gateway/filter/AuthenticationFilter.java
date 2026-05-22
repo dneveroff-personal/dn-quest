@@ -45,6 +45,11 @@ public class AuthenticationFilter implements WebFilter {
 
         String token = authHeader.substring(7);
         
+        // Проверяем валидность токена перед извлечением данных
+        if (!JwtUtil.validateToken(token, jwtSecret)) {
+            return chain.filter(exchange);
+        }
+        
         // Извлекаем информацию из токена для заголовков
         String username = JwtUtil.extractUsername(token, jwtSecret);
         UUID userId = JwtUtil.extractUserId(token, jwtSecret);
@@ -81,6 +86,8 @@ public class AuthenticationFilter implements WebFilter {
                path.startsWith("/swagger-ui.html") ||
                path.startsWith("/swagger-ui") ||
                path.startsWith("/v3/api-docs") ||
-               path.startsWith("/actuator/gateway-health");
+               path.startsWith("/actuator/gateway-health") ||
+               path.equals("/") ||
+               path.startsWith("/webjars");
     }
 }

@@ -122,8 +122,7 @@
       
       <n-button
           v-if="currentUser?.role === 'ADMIN'"
-          to="/admin/users/manage"
-          tag="router-link"
+          @click="goToUserManage"
           type="warning"
           size="large"
           class="px-6"
@@ -131,7 +130,7 @@
         <template #icon>
           <span>👑</span>
         </template>
-        Управление
+        Управление пользователями
       </n-button>
       
       <n-button
@@ -258,6 +257,10 @@ function goToLogin() {
 
 function goToRegister() {
   router.push("/register");
+}
+
+function goToUserManage() {
+  router.push("/admin/users/manage");
 }
 
 function logout() {
