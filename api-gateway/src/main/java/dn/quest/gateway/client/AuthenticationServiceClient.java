@@ -21,8 +21,8 @@ public class AuthenticationServiceClient {
 
     public AuthenticationServiceClient(
             WebClient.Builder webClientBuilder,
-            @Value("${services.authentication.url:http://localhost:8081}") String authenticationServiceUrl,
-            @Value("${services.authentication.health-url:${services.authentication.url:http://localhost:8081}}") String healthServiceUrl) {
+            @Value("${AUTHENTICATION_SERVICE_URL:http://localhost:8081}") String authenticationServiceUrl,
+            @Value("${AUTHENTICATION_HEALTH_URL:${AUTHENTICATION_SERVICE_URL:http://localhost:8081}}") String healthServiceUrl) {
         this.webClient = webClientBuilder
                 .baseUrl(authenticationServiceUrl)
                 .build();

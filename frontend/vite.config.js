@@ -20,14 +20,15 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: '0.0.0.0',
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // API Gateway
+        target: 'http://api-gateway-dev:8080',
         changeOrigin: true,
         secure: false
       },
       '/ws': {
-        target: 'ws://localhost:8080', // WebSocket Gateway
+        target: 'ws://api-gateway-dev:8080',
         ws: true,
         changeOrigin: true
       }

@@ -4,7 +4,7 @@ import { handleError } from './errorHandler';
 
 // Конфигурация WebSocket
 const WS_CONFIG = {
-  baseURL: import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:8080/ws',
+  baseURL: import.meta.env.VITE_WS_URL || 'ws://localhost:8080/ws',
   reconnectInterval: 5000,
   maxReconnectAttempts: 10,
   heartbeatInterval: 30000,
