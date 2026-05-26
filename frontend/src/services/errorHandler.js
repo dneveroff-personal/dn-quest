@@ -1,5 +1,5 @@
 // src/services/errorHandler.js
-import { useMessage, useDialog } from 'naive-ui';
+import { createDiscreteApi } from 'naive-ui';
 
 // Типы ошибок
 export const ErrorTypes = {
@@ -41,22 +41,14 @@ export class AppError extends Error {
   }
 }
 
-// Создаем экземпляры message и dialog (будут инициализированы при первом использовании)
-let messageInstance = null;
-let dialogInstance = null;
+// Создаем глобальный discrete API для message и dialog
+let discreteApi = null;
 
-function getMessageInstance() {
-  if (!messageInstance) {
-    messageInstance = useMessage();
+function getDiscreteApi() {
+  if (!discreteApi) {
+    discreteApi = createDiscreteApi();
   }
-  return messageInstance;
-}
-
-function getDialogInstance() {
-  if (!dialogInstance) {
-    dialogInstance = useDialog();
-  }
-  return dialogInstance;
+  return discreteApi;
 }
 
 // Функция для определения типа ошибки
@@ -200,33 +192,33 @@ export function handleError(error, options = {}) {
 
   // Показываем уведомление
   if (showMessage) {
-    const messageInstance = getMessageInstance();
+    const { message: messageApi } = getDiscreteApi();
     
     switch (errorType) {
       case ErrorTypes.VALIDATION_ERROR:
-        messageInstance.warning(message);
+        messageApi.warning(message);
         break;
       case ErrorTypes.AUTHENTICATION_ERROR:
-        messageInstance.error(message);
+        messageApi.error(message);
         break;
       case ErrorTypes.AUTHORIZATION_ERROR:
-        messageInstance.warning(message);
+        messageApi.warning(message);
         break;
       case ErrorTypes.NETWORK_ERROR:
       case ErrorTypes.SERVER_ERROR:
       case ErrorTypes.CIRCUIT_BREAKER_ERROR:
-        messageInstance.error(message);
+        messageApi.error(message);
         break;
       default:
-        messageInstance.error(message);
+        messageApi.error(message);
     }
   }
 
   // Показываем диалоговое окно для критических ошибок
   if (showDialog) {
-    const dialogInstance = getDialogInstance();
+    const { dialog } = getDiscreteApi();
     
-    dialogInstance.error({
+    dialog.error({
       title: 'Ошибка',
       content: message,
       positiveText: onRetry ? 'Повторить' : 'ОК',
@@ -254,24 +246,23 @@ export function createErrorHandler(options = {}) {
 
 // React/Vue composable для использования в компонентах
 export function useErrorHandler() {
-  const message = useMessage();
-  const dialog = useDialog();
+  const { message, dialog } = getDiscreteApi();
 
   return {
     handleError: (error, options = {}) => handleError(error, { showMessage: true, ...options }),
-    showError: (message, type = 'error') => {
+    showError: (msg, type = 'error') => {
       switch (type) {
         case 'warning':
-          message.warning(message);
+          message.warning(msg);
           break;
         case 'info':
-          message.info(message);
+          message.info(msg);
           break;
         case 'success':
-          message.success(message);
+          message.success(msg);
           break;
         default:
-          message.error(message);
+          message.error(msg);
       }
     },
     showErrorDialog: (title, content, onPositiveClick) => {

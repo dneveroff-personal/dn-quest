@@ -37,6 +37,8 @@ public class SecurityConfig {
                                 "/api/auth/reset-password",
                                 "/api/auth/validate"
                         ).permitAll()
+                        // WebSocket эндпоинт (аутентификация происходит в обработчике)
+                        .pathMatchers("/ws/**").permitAll()
                         // Остальные actuator endpoints требуют аутентификацию
                         .pathMatchers("/actuator/**").authenticated()
                         // Все остальные запросы требуют аутентификации

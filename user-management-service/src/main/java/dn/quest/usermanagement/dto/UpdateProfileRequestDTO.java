@@ -1,7 +1,7 @@
 package dn.quest.usermanagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +23,7 @@ public class UpdateProfileRequestDTO {
     private String publicName;
     
     @Schema(description = "Email пользователя", example = "player@example.com")
-    @Email(message = "Некорректный формат email")
+    @Pattern(regexp = "^$|.+@.+\\..+", message = "Некорректный формат email")
     private String email;
     
     @Schema(description = "URL аватара", example = "https://example.com/avatars/player123.jpg", maxLength = 512)
